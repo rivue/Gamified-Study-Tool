@@ -8,6 +8,7 @@ import { useGameStore } from "@/store/gameStore";
 
 import './assets/styles.css';
 import './assets/themes.css';
+import axios from 'axios';
 
 const routes = [
   { path: '/lessons', component: defineAsyncComponent(() => import('./components/Chat/ChatComponent.vue')), meta: { title: 'Ascendance·☁️| Lessons' } },
@@ -79,6 +80,7 @@ router.beforeEach((to, from, next) => {
   document.title = to.meta.title || 'Ascendance·☁️| Learn Anything!';
 });
 
+axios.defaults.baseURL = 'http://127.0.0.1:5000';
 
 const pinia = createPinia()
 

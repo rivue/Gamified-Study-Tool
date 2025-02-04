@@ -45,7 +45,7 @@ export default {
       formData.append("email", this.email);
       formData.append("password", this.password);
 
-      axios.post("/api/login", formData)
+      axios.post("api/login", formData)
         .then(response => {
           const data = response.data;
           if (data.status === "success") {

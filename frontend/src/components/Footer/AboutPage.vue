@@ -26,6 +26,7 @@
         </div>
       </div>
       <transition name="fade" mode="out-in">
+        <div v-if="4===2+2">
         <div class="value-content" v-if="activeIndex === 0" key="content-0">
           <div class="value-explainer">Your personal learning journey.</div>
           <div class="value-text">
@@ -46,6 +47,7 @@
             Seeing progress gives us the rewarding feeling hard work deserves.
             Track your gains with graphs and stats.
           </div>
+        </div>
         </div>
       </transition>
       <!-- <img :src="openaiPath" alt="Powered by OpenAI" class="openai" /> -->

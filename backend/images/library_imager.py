@@ -1,14 +1,14 @@
 import os
 import requests
-from azure.storage.blob import BlobServiceClient
+# from azure.storage.blob import BlobServiceClient
 
 from openapi import get_image
 from database.library_handlers import update_library_image, get_library_details
 
 # Initialize the BlobServiceClient
-connect_str = os.getenv('AZURE_STORAGE_CONNECTION_STRING')
-blob_service_client = BlobServiceClient.from_connection_string(connect_str)
-container_name = "library-images"
+# connect_str = os.getenv('AZURE_STORAGE_CONNECTION_STRING')
+# blob_service_client = BlobServiceClient.from_connection_string(connect_str)
+# container_name = "library-images"
 
 def download_image(image_url):
     print("Downloading image...")
@@ -20,7 +20,7 @@ def download_image(image_url):
 
 def upload_file_to_blob(file_content, file_name):
     print("Uploading file to Azure Blob Storage...")
-    blob_client = blob_service_client.get_blob_client(container=container_name, blob=file_name)
+    # blob_client = blob_service_client.get_blob_client(container=container_name, blob=file_name)
     try:
         blob_client.upload_blob(file_content)
         print("Upload successful!")

@@ -7,7 +7,7 @@ from bleach import clean
 from flask_executor import Executor
 
 from openapi import moderate
-from utils import mask_email
+from utils import mask_email, get_client_ip
 import database.library_handlers as lbh
 import knowledge_net.library_generator as lgn
 from images.library_imager import generate_images_task, save_image
@@ -22,9 +22,10 @@ def init_library_routes(app):
         # User checks
         user_id = current_user.id if not isinstance(current_user, AnonymousUserMixin) else None
         if not user_id:
-            ip = request.remote_addr
-            if not check_generation_allowed(ip, 'library'):
-                return jsonify(status="error", message="Library generation limit reached."), 403
+            # ip = request.remote_addr
+            ip = get_client_ip()
+            # if not check_generation_allowed(ip, 'library'):
+            #     return jsonify(status="error", message="Library generation limit reached."), 403
 
         # Topic checks
         topic = request.json.get("topic")

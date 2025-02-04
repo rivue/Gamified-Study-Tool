@@ -16,12 +16,16 @@
         />
       </transition>
       <transition name="fade" mode="out-in">
-        <button v-if="!showLoginForm" class="toggle-btn" @click="toggleForms">
+        <div v-if="!showLoginForm">
+        <button class="toggle-btn" @click="toggleForms">
           Already have an account? <span class="underline-text">Log in</span>
         </button>
-        <button v-if="showLoginForm" class="toggle-btn" @click="toggleForms">
+        </div>
+        <div v-else>
+        <button class="toggle-btn" @click="toggleForms">
           Don't have an account? <span class="underline-text">Sign up</span>
         </button>
+        </div>
       </transition>
       <div ref="googleButton"></div>
     </div>

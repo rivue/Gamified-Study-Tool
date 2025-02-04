@@ -1,4 +1,5 @@
 import re
+from flask import request
 
 emoji_pattern = re.compile("[\U0001F600-\U0001F64F\U0001F300-\U0001F5FF\U0001F680-\U0001F6FF\U0001F700-\U0001F77F\U0001F780-\U0001F7FF\U0001F800-\U0001F8FF\U0001F900-\U0001F9FF\U0001FA70-\U0001FAFF\U0001FB00-\U0001FBFF\U0001FC00-\U0001FCFF\U0001FD00-\U0001FDFF\U0001FE00-\U0001FEFF\U0001FF00-\U0001FFFF]+", flags=re.UNICODE)
 
@@ -48,3 +49,8 @@ def mask_email(email):
 
     return masked_local + '@' + domain
 
+def get_client_ip():
+    forwarded_ip = request.headers.get("X-Forwarded-For")
+    if forwarded_ip:
+        return forwarded_ip.split(",")[0].strip()  # Extract first real IP
+    return request.remote_addr or "127.0.0.1"

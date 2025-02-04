@@ -14,24 +14,26 @@ from database.upgrade_db import run_upgrades
 
 load_dotenv()
 app = Flask(__name__, static_folder='../frontend/dist')
-app.secret_key = os.getenv('FLASK_SECRET_KEY')
-openai.api_key = os.getenv("OPENAI_API_KEY")
-resend.api_key = os.getenv('RESEND_API_KEY')
+app.secret_key = os.getenv('FLASK_SECRET_KEY') # done
+openai.api_key = os.getenv("OPENAI_API_KEY") # done
+resend.api_key = os.getenv('RESEND_API_KEY') # done
 
-host = os.environ.get('AZURE_MYSQL_HOST')
-name = os.environ.get('AZURE_MYSQL_NAME')
-password = os.environ.get('AZURE_MYSQL_PASSWORD')
-user = os.environ.get('AZURE_MYSQL_USER')
-if host and name and password and user:
-    uri = f'mysql+pymysql://{user}:{password}@{host}/{name}'
-else:
-    uri = os.environ.get('SQLALCHEMY_DATABASE_URI', 'mysql+pymysql://root:password@localhost/ascendance')
-app.config['SQLALCHEMY_DATABASE_URI'] = uri
+# host = os.environ.get('AZURE_MYSQL_HOST')
+# name = os.environ.get('AZURE_MYSQL_NAME')
+# password = os.environ.get('AZURE_MYSQL_PASSWORD')
+# user = os.environ.get('AZURE_MYSQL_USER')
+# if host and name and password and user:
+#     uri = f'mysql+pymysql://{user}:{password}@{host}/{name}'
+# else:
+#     uri = os.environ.get('SQLALCHEMY_DATABASE_URI', 'mysql+pymysql://root:password@localhost/ascendance')
+
+# os.makedirs("instance", exist_ok=True)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
 migrate = Migrate(app, db)
-CORS(app)
+CORS(app, origins="*")
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -40,6 +42,8 @@ login_manager.login_view = 'login'
 def load_user(user_id):
     session = db.session
     return session.get(User, int(user_id))
+
+print(app.config['SQLALCHEMY_DATABASE_URI'])
 
 # Routes
 from routes.auth_routes import init_auth_routes

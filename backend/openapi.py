@@ -13,21 +13,22 @@ TOKEN_CAP = 500
 LESSON_TOKENS = 1500
 
 GPT3_5 = "gpt-4o"
-GPT4 = "gpt-4o"
+GPT4 = "gpt-4o-mini"
 EMBEDDING_MODEL = "text-embedding-3-small"
 DEFAULT_TEMP = 0.1
 
-def generate_response(user_id, messages, functions=None, function_call="none", model=GPT3_5, tokens=TOKEN_CAP, temperature=None):
+def generate_response(user_id, messages, functions=None, function_call="none", model=GPT4, tokens=TOKEN_CAP, temperature=None):
+
+    if not openai.api_key:
+        raise ValueError("Missing OpenAI API key. Set openai.api_key before calling this function.")
+
     headers = {
         "Authorization": f"Bearer {openai.api_key}",
         "Content-Type": "application/json"
     }
 
-    if temperature is not None:
-        data_temperature = temperature
-    else:
-        data_temperature = 0.1 if functions else 0.4
-
+    data_temperature = temperature if temperature is not None else (0.1 if functions else 0.4)
+    
     for attempt in range(max_retries):
         try:
             data = {

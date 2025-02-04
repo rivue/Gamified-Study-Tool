@@ -5,7 +5,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, login_required, logout_user, current_user
 from sqlalchemy.exc import IntegrityError
 import pymysql.err as pymysql_err
-from oauth2client import client, crypt
+# from oauth2client import client, crypt
 
 from database.models import db, User
 from database.user_handler import confirm, generate_confirmation_token, get_user_tier, get_daily_request_count
@@ -13,7 +13,7 @@ from message_handler import initialize_messages
 from email_provider.resend_api import send_registration_email
 from email_provider.email_templates import Registration
 
-GOOGLE_CLIENT_ID = "529262341360-9sq10od3qkro19jaavhgachkpviugfv3.apps.googleusercontent.com"
+# GOOGLE_CLIENT_ID = "529262341360-9sq10od3qkro19jaavhgachkpviugfv3.apps.googleusercontent.com"
 
 def init_auth_routes(app):
 
@@ -56,7 +56,7 @@ def init_auth_routes(app):
             db.session.commit()
             
             confirmation_link = url_for('confirm_email', token=new_user.confirmation_token, _external=True)
-            send_registration_email(email, Registration, confirmation_link)
+            # send_registration_email(email, Registration, confirmation_link)
             return jsonify({'status': 'success'})
         except IntegrityError as e:
             if isinstance(e.orig, pymysql_err.IntegrityError) and 'Duplicate entry' in str(e.orig):
@@ -83,46 +83,46 @@ def init_auth_routes(app):
                 return redirect('/about?message=expired_registration_token')
             return redirect('/about?message=invalid_registration_token')
     
-    @app.route('/api/auth/google/callback', methods=['POST'])
-    def google_auth_callback():
-        token = request.json.get('id_token')
+    # @app.route('/api/auth/google/callback', methods=['POST'])
+    # def google_auth_callback():
+    #     token = request.json.get('id_token')
 
-        try:
-            idinfo = client.verify_id_token(token, GOOGLE_CLIENT_ID)
+    #     try:
+    #         idinfo = client.verify_id_token(token, GOOGLE_CLIENT_ID)
 
-            if idinfo['aud'] not in [GOOGLE_CLIENT_ID]:
-                raise crypt.AppIdentityError("Unrecognized client.")
+    #         if idinfo['aud'] not in [GOOGLE_CLIENT_ID]:
+    #             raise crypt.AppIdentityError("Unrecognized client.")
 
-            if idinfo['iss'] not in ['accounts.google.com', 'https://accounts.google.com']:
-                raise crypt.AppIdentityError("Wrong issuer.")
+    #         if idinfo['iss'] not in ['accounts.google.com', 'https://accounts.google.com']:
+    #             raise crypt.AppIdentityError("Wrong issuer.")
             
-            userid = idinfo['sub']
-            email = idinfo.get('email')
-            name = idinfo.get('name')
-            # picture = idinfo.get('picture')
+    #         userid = idinfo['sub']
+    #         email = idinfo.get('email')
+    #         name = idinfo.get('name')
+    #         # picture = idinfo.get('picture')
             
-            if not idinfo.get('email_verified'):
-                raise ValueError('Email not verified by Google.')
+    #         if not idinfo.get('email_verified'):
+    #             raise ValueError('Email not verified by Google.')
 
-        except crypt.AppIdentityError:
-            return jsonify({'message': 'Invalid token'}), 401
+    #     except crypt.AppIdentityError:
+    #         return jsonify({'message': 'Invalid token'}), 401
 
-        user = User.query.filter_by(email=email).first()
-        if not user:
-            user = User(
-                email=email,
-                username=name,
-                confirmed=True,
-            )
-            db.session.add(user)
-            db.session.commit()
-            login_user(user)
-            initialize_messages(user.id)
-            return jsonify({'status': "success", "message":"new_user"}), 200
-        else:
-            user.username = name
-            user.confirmed = True
-            db.session.commit()
-            login_user(user)
-            return jsonify({'status': "success", "message":"existing_user"}), 200
+        # user = User.query.filter_by(email=email).first()
+        # if not user:
+        #     user = User(
+        #         email=email,
+        #         username=name,
+        #         confirmed=True,
+        #     )
+        #     db.session.add(user)
+        #     db.session.commit()
+        #     login_user(user)
+        #     initialize_messages(user.id)
+        #     return jsonify({'status': "success", "message":"new_user"}), 200
+        # else:
+        #     user.username = name
+        #     user.confirmed = True
+        #     db.session.commit()
+        #     login_user(user)
+        #     return jsonify({'status': "success", "message":"existing_user"}), 200
 
