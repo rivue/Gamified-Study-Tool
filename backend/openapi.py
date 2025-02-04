@@ -5,7 +5,7 @@ import json
 import os
 
 #### settings ####
-max_retries = 5
+max_retries = 1
 delay = 3
 request_timeout = 60
 
@@ -18,7 +18,10 @@ EMBEDDING_MODEL = "text-embedding-3-small"
 DEFAULT_TEMP = 0.1
 
 def generate_response(user_id, messages, functions=None, function_call="none", model=GPT4, tokens=TOKEN_CAP, temperature=None):
-
+    # print(openai.api_key)
+    # print(f"Current OpenAI API Key: {os.getenv('OPENAI_API_KEY')}")
+    openai.api_key = os.getenv('OPENAI_API_KEY')
+    print(f"Using OpenAI API Key: {openai.api_key}")
     if not openai.api_key:
         raise ValueError("Missing OpenAI API key. Set openai.api_key before calling this function.")
 
@@ -72,6 +75,12 @@ def generate_response(user_id, messages, functions=None, function_call="none", m
         return None
 
 def moderate(user_input):
+
+    openai.api_key = os.getenv('OPENAI_API_KEY')
+    print(f"Using OpenAI API Key: {openai.api_key}")
+    if not openai.api_key:
+        raise ValueError("Missing OpenAI API key. Set openai.api_key before calling this function.")
+
     headers = {
         "Authorization": f"Bearer {openai.api_key}",
         "Content-Type": "application/json"
