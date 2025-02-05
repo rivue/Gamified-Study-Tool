@@ -44,7 +44,7 @@ class User(db.Model, UserMixin):
         ]
 
         completed_lessons = [lesson.lesson_name for lesson in sorted(
-            [l for l in self.lessons if l.completion_date], 
+            [l for l in self.lessons if l.completion_date],
             key=lambda x: x.id, reverse=True)[:100]
         ]
 

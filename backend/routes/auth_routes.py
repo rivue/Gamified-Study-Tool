@@ -1,10 +1,11 @@
 # routes/auth_routes.py
 from datetime import datetime
-from flask import request, jsonify, url_for, redirect
+from flask import request, jsonify, url_for, session, make_response
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import login_user, login_required, logout_user, current_user
+from flask_login import login_required, logout_user, current_user, login_user
 from sqlalchemy.exc import IntegrityError
 import pymysql.err as pymysql_err
+import os
 # from oauth2client import client, crypt
 
 from database.models import db, User
@@ -23,9 +24,19 @@ def init_auth_routes(app):
         password = request.form['password']
         user = User.query.filter_by(email=email).first()
         print(user)
+        print(os.getenv('SECRET_KEY'))
+        print(os.getenv('FLASK_SECRET_KEY'))
         if user and check_password_hash(user.password, password):
-            print(login_user(user))
-            print(current_user.is_authenticated)
+            # print(login_user(user, remember=True))
+            # print(current_user.is_authenticated)
+            login_result = login_user(user, remember=True)
+            print("Login result:", login_result)
+            print("User authenticated:", current_user.is_authenticated)
+            print("User ID in session:", session.get('_user_id'))
+            print("Session:", dict(session))
+            print(f"SECRET_KEY at login      : {app.config['SECRET_KEY']}")
+            # print(f"FLASK_SECRET_KEY at login: {app.config['FLASK_SECRET_KEY']}")
+
             return jsonify({'status': 'success'})
         else:
             return jsonify({'status': 'fail'})
@@ -43,6 +54,45 @@ def init_auth_routes(app):
         else:
             return jsonify({'loggedIn': False, 'userTier': None})
         
+
+    @app.route('/api/test-cookie', methods=['GET'])
+    def test_cookie():
+        # Try to set a cookie
+        resp = make_response(jsonify({'message': 'Testing cookies'}))
+        resp.set_cookie('test_cookie', 'test_value')
+        print("Response cookies:", resp.headers.get('Set-Cookie'))
+        return resp
+
+    @app.route('/api/check-cookie', methods=['GET'])
+    def check_cookie():
+        # Check if cookie exists
+        cookie_value = request.cookies.get('test_cookie')
+        print("Request cookies:", request.cookies) # returns ImmutableMultiDict([])
+        return jsonify({'cookie_value': cookie_value})
+
+    @app.route('/api/test-session', methods=['GET'])
+    def test_session():
+        # Try to set session data
+        session['test_key'] = 'test_value'
+        print("Current session:", dict(session))
+        return jsonify({'message': 'Session set'})
+
+    @app.route('/api/check-session', methods=['GET'])
+    def check_session():
+        # Check if session data persists
+        session_value = session.get('test_key')
+        print("Current session:", dict(session)) # Current session: {}
+        return jsonify({'session_value': session_value})
+
+    @app.route('/api/debug-headers', methods=['GET'])
+    def debug_headers():
+        print("Request headers:", dict(request.headers))
+        print("Cookies:", request.cookies)
+        return jsonify({
+            'headers': dict(request.headers),
+            'cookies': dict(request.cookies),
+            'session': dict(session)
+        })
 
     @app.route('/api/signup', methods=['POST'])
     def signup():

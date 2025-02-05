@@ -8,6 +8,7 @@
           <div class="form-group topic-selection">
             <div class="libgen-title">Topic (What To Learn About)</div>
             <div class="title-bar">
+                asdfasdfasdf
               <input
                 type="text"
                 id="topicInput"
@@ -222,63 +223,123 @@ export default {
       event.target.select();
     },
     handleSubmit() {
-      if (this.topic.trim() === "") {
-        this.topicError = true;
-        return;
-      }
-      this.topicError = false;
-      const urlPattern =
-        /^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)$/;
-      if (urlPattern.test(this.topic)) {
-        const popupStore = usePopupStore();
-        popupStore.showPopup(
-          "We do not currently support links.</br>Try entering the topic of the website instead.</br>Note: This app can teach you about anything, but will not do your homework!"
-        );
-        return;
-      }
-      this.isSubmitting = true;
-      const postData = {
-        topic: this.topic,
-        language: this.language,
-        extraContext: this.extraContext,
-        languageDifficulty: this.languageDifficulty,
-        libraryDifficulty: this.libraryDifficulty,
-        guide: this.currentMentorName,
-      };
-      axios
-        .post("/api/library/generate", postData)
+        axios
+        .get("/api/debug-headers")
         .then((response) => {
-          //console.log(response.data);
-          const libraryId = response.data.library_data.id;
-          this.$router.push(`/library/${libraryId}`);
+          console.log(response.data);
+            console.log("ok as well")
+        //   const libraryId = response.data.library_data.id;
+        //   this.$router.push(`/library/${libraryId}`);
         })
         .catch((error) => {
           console.error("Error:", error);
-          if (error.response && error.response.status === 403) {
-            const popupStore = usePopupStore();
-            popupStore.showPopup(
-              "You have reached the limit.</br>Please login to continue."
-            );
-            this.$router.push("/login");
-          }
-          if (
-            error.response &&
-            error.response.status === 400 &&
-            error.response.data &&
-            error.response.data.error
-          ) {
-            const popupStore = usePopupStore();
-            popupStore.showPopup(error.response.data.error);
-          }
+        //   if (error.response && error.response.status === 403) {
+        //     const popupStore = usePopupStore();
+        //     popupStore.showPopup(
+        //       "You have reached the limit.</br>Please login to continue."
+        //     );
+        //     this.$router.push("/login");
+        //   }
+        //   if (
+        //     error.response &&
+        //     error.response.status === 400 &&
+        //     error.response.data &&
+        //     error.response.data.error
+        //   ) {
+        //     const popupStore = usePopupStore();
+        //     popupStore.showPopup(error.response.data.error);
+        //   }
         })
         .finally(() => {
-          this.isSubmitting = false;
+        //   this.isSubmitting = false;
         });
+    //   if (this.topic.trim() === "") {
+    //     this.topicError = true;
+    //     return;
+    //   }
+    //   this.topicError = false;
+    //   const urlPattern =
+    //     /^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)$/;
+    //   if (urlPattern.test(this.topic)) {
+    //     const popupStore = usePopupStore();
+    //     popupStore.showPopup(
+    //       "We do not currently support links.</br>Try entering the topic of the website instead.</br>Note: This app can teach you about anything, but will not do your homework!"
+    //     );
+    //     return;
+    //   }
+    //   this.isSubmitting = true;
+    //   const postData = {
+    //     topic: this.topic,
+    //     language: this.language,
+    //     extraContext: this.extraContext,
+    //     languageDifficulty: this.languageDifficulty,
+    //     libraryDifficulty: this.libraryDifficulty,
+    //     guide: this.currentMentorName,
+    //   };
+    //   axios
+    //     .post("/api/library/generate", postData)
+    //     .then((response) => {
+    //       //console.log(response.data);
+    //       const libraryId = response.data.library_data.id;
+    //       this.$router.push(`/library/${libraryId}`);
+    //     })
+    //     .catch((error) => {
+    //       console.error("Error:", error);
+    //       if (error.response && error.response.status === 403) {
+    //         const popupStore = usePopupStore();
+    //         popupStore.showPopup(
+    //           "You have reached the limit.</br>Please login to continue."
+    //         );
+    //         this.$router.push("/login");
+    //       }
+    //       if (
+    //         error.response &&
+    //         error.response.status === 400 &&
+    //         error.response.data &&
+    //         error.response.data.error
+    //       ) {
+    //         const popupStore = usePopupStore();
+    //         popupStore.showPopup(error.response.data.error);
+    //       }
+    //     })
+    //     .finally(() => {
+    //       this.isSubmitting = false;
+    //     });
     },
     randomizeTopic() {
-      const randomIndex = Math.floor(Math.random() * this.topics.length);
-      this.topic = this.topics[randomIndex];
-    },
+    //   const randomIndex = Math.floor(Math.random() * this.topics.length);
+    //   this.topic = this.topics[randomIndex];
+    axios
+        .get("/api/test-session")
+        .then(() => {
+          //console.log(response.data);
+            console.log("good")
+        //   const libraryId = response.data.library_data.id;
+        //   this.$router.push(`/library/${libraryId}`);
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+        //   if (error.response && error.response.status === 403) {
+        //     const popupStore = usePopupStore();
+        //     popupStore.showPopup(
+        //       "You have reached the limit.</br>Please login to continue."
+        //     );
+        //     this.$router.push("/login");
+        //   }
+        //   if (
+        //     error.response &&
+        //     error.response.status === 400 &&
+        //     error.response.data &&
+        //     error.response.data.error
+        //   ) {
+        //     const popupStore = usePopupStore();
+        //     popupStore.showPopup(error.response.data.error);
+        //   }
+        })
+        .finally(() => {
+        //   this.isSubmitting = false;
+        });
+},
     toggleDetails() {
       this.showDetails = !this.showDetails;
     },

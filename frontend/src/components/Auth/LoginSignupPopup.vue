@@ -91,7 +91,7 @@ export default {
       const redirectPath = this.$route.query.redirect || "/";
       console.log(this.$route)
       console.log(redirectPath)
-      this.$router.push(redirectPath);
+    //   this.$router.push(redirectPath);
     },
     handleSignupSuccess() {
       const popupStore = usePopupStore();

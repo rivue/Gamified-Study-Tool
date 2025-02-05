@@ -4,10 +4,12 @@ import os
 import openai
 import resend
 from dotenv import load_dotenv
+from datetime import timedelta
 from flask import Flask, jsonify, make_response, send_from_directory, request
 from flask_login import LoginManager
 from flask_migrate import Migrate
 from flask_cors import CORS
+import logging
 
 from database.models import db, User
 from database.upgrade_db import run_upgrades
@@ -18,6 +20,7 @@ app.secret_key = os.getenv('FLASK_SECRET_KEY') # done
 openai.api_key = os.getenv("OPENAI_API_KEY") # done
 resend.api_key = os.getenv('RESEND_API_KEY') # done
 
+print(f"app level secret key: {app.secret_key}")
 # host = os.environ.get('AZURE_MYSQL_HOST')
 # name = os.environ.get('AZURE_MYSQL_NAME')
 # password = os.environ.get('AZURE_MYSQL_PASSWORD')
@@ -30,18 +33,37 @@ resend.api_key = os.getenv('RESEND_API_KEY') # done
 # os.makedirs("instance", exist_ok=True)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['REMEMBER_COOKIE_DURATION'] = timedelta(days=7)
+app.config['FLASK_SECRET_KEY'] = os.getenv('FLASK_SECRET_KEY')
+
+app.config.update(
+    # SESSION_COOKIE_SECURE=True,  # for HTTPS only
+    SESSION_COOKIE_SECURE=False,
+    SESSION_COOKIE_HTTPONLY=True,
+    SESSION_COOKIE_SAMESITE='Lax',
+    # REMEMBER_COOKIE_SECURE=True,
+    REMEMBER_COOKIE_SECURE=False,
+    REMEMBER_COOKIE_HTTPONLY=True,
+    REMEMBER_COOKIE_SAMESITE='Lax'
+)
 
 db.init_app(app)
 migrate = Migrate(app, db)
 CORS(app, origins="*", supports_credentials=True)
 
+logging.basicConfig(level=logging.DEBUG)
+
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
+
 @login_manager.user_loader
 def load_user(user_id):
+    print("hi there")
     session = db.session
     return session.get(User, int(user_id))
+    # return User.query.get(int(user_id))
+    # return session.get(User, int(user_id.id))
 
 print(app.config['SQLALCHEMY_DATABASE_URI'])
 
