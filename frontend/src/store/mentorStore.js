@@ -44,18 +44,21 @@ export const useMentorStore = defineStore('mentorStore', {
         isVisible: false,
     }),
     actions: {
-        getCurrentMentorName() {
+        async getCurrentMentorName() {
             this.currentMentor = "Azalea"
             const auth = useAuthStore();
+            console.log("mentorStore.js why is this being calleadfasdfd")
             if (!auth.loggedIn){
                 return;
             }
             axios.get('/api/mentor')
             .then(response => {
-                // console.log(response);
+                console.log(response);
+                console.log("mentorStore.js why is this being called 2")
                 this.currentMentor = response.data.selectedMentorId;
             })
             .catch(error => {
+                console.log("mentorStore.js why is this being called 3")
                 console.error('Error fetching selected mentor:', error)
             });
         },

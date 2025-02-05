@@ -18,17 +18,17 @@ def download_image(image_url):
     else:
         return None
 
-def upload_file_to_blob(file_content, file_name):
-    print("Uploading file to Azure Blob Storage...")
-    # blob_client = blob_service_client.get_blob_client(container=container_name, blob=file_name)
-    try:
-        blob_client.upload_blob(file_content)
-        print("Upload successful!")
-    except Exception as e:
-        print("Failed to upload:", e)
-        return
-    print(blob_client.url)
-    return blob_client.url
+# def upload_file_to_blob(file_content, file_name):
+    # print("Uploading file to Azure Blob Storage...")
+    # # blob_client = blob_service_client.get_blob_client(container=container_name, blob=file_name)
+    # try:
+    #     blob_client.upload_blob(file_content)
+    #     print("Upload successful!")
+    # except Exception as e:
+    #     print("Failed to upload:", e)
+    #     return
+    # print(blob_client.url)
+    # return blob_client.url
 
 def get_guide_description(guide):
     if guide == "Bubbles":
@@ -56,10 +56,11 @@ def save_image(id, image_url):
         return "Failed to download image"
         
     # Define a unique name for the blob using the given ID
-    blob_name = f"{id}.jpeg"
+    # blob_name = f"{id}.jpeg"
 
     # Upload the image content to Azure Blob Storage
-    blob_url = upload_file_to_blob(image_content, blob_name)
+    # blob_url = upload_file_to_blob(image_content, blob_name)
 
+    blob_url = None
     # Update url in db
     update_library_image(id, blob_url)

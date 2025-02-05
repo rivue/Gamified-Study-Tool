@@ -51,7 +51,9 @@ def init_profile_routes(app):
     @app.route("/api/mentor", methods=["GET"])
     @login_required
     def get_user_mentor():
-        name = dbh.get_mentor_name(current_user.id)
+        print("test")
+        print(current_user.is_authenticated)
+        name = dbh.get_mentor_name(current_user.id) # TODO: PROBLEM
         return jsonify(status="success", selectedMentorId=name)
 
     @app.route("/api/mentor", methods=["POST"])

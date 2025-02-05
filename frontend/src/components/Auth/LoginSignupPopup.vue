@@ -52,7 +52,7 @@ export default {
     };
   },
   mounted() {
-    this.loadGoogleIdentityServices();
+    // this.loadGoogleIdentityServices();
     if (this.loggedIn) {
       const popupStore = usePopupStore();
       popupStore.showPopup(
@@ -74,9 +74,23 @@ export default {
     handleLoginSuccess() {
       const authStore = useAuthStore();
       authStore.login();
-
+    //   console.log("success")
+      console.log(authStore.loggedIn);
+      axios.get('/api/mentor')
+            .then(response => {
+                console.log(response);
+                console.log("mentorStore.js why is this being called 2")
+                this.currentMentor = response.data.selectedMentorId;
+            })
+            .catch(error => {
+                console.log("mentorStore.js why is this being called 3")
+                console.error('Error fetching selected mentor:', error)
+            });
+      console.log(authStore.loggedIn);
+      
       const redirectPath = this.$route.query.redirect || "/";
       console.log(this.$route)
+      console.log(redirectPath)
       this.$router.push(redirectPath);
     },
     handleSignupSuccess() {

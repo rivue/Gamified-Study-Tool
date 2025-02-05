@@ -289,8 +289,9 @@ export const useGameStore = defineStore("gameStore", {
                 }
             } catch (error) {
                 if (error.response && error.response.status === 403) {
+                    console.log(error.response);
                     const popupStore = usePopupStore();
-                    popupStore.showPopup("You have reached the limit.</br>Please login to continue.");
+                    popupStore.showPopup("You have reache;ijo;ijo;ijd the limit.</br>Please login to continue.");
                     return false;
                 }
                 console.error("Error unlocking room:", error);

@@ -127,15 +127,19 @@ def confirm(user_id, token):
 def check_generation_allowed(ip, type):
     hashed_ip = hashlib.sha256(ip.encode()).hexdigest()
     record = IPTracking.query.filter_by(hashed_ip=hashed_ip).first()
+    print("works")
     if record:
         if type == 'library':
             if record.library_generated:
                 if record.library_generated_time and (datetime.now() - record.library_generated_time) < timedelta(hours=1):
+                    print("time bad")
                     return False
             record.library_generated = True
             record.library_generated_time = datetime.now()
         elif type == 'room':
+            print("library")
             if record.room_generated:
+                print("record generated")                
                 if record.room_generated_time and (datetime.now() - record.room_generated_time) < timedelta(hours=1):
                     return False
             record.room_generated = True

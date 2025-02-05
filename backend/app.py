@@ -33,7 +33,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
 migrate = Migrate(app, db)
-CORS(app, origins="*")
+CORS(app, origins="*", supports_credentials=True)
 
 login_manager = LoginManager()
 login_manager.init_app(app)

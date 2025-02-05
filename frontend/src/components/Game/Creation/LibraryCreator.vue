@@ -201,6 +201,7 @@ export default {
   methods: {
     async fetchCurrentMentor() {
       const mentorStore = useMentorStore();
+      console.log("fetchCurrentMentor LibraryCreator.vue")
       mentorStore.getCurrentMentorName();
     },
     changeMentor() {

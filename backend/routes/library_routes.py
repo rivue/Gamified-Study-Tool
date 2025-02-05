@@ -198,9 +198,10 @@ def init_library_routes(app):
         # If no content exists, generate new content
         if not user_id:
             ip = request.remote_addr
-            if not check_generation_allowed(ip, 'room'):
-                return jsonify(status="error", message="Room generation limit reached."), 403
+            # if not check_generation_allowed(ip, 'room'):
+            #     return jsonify(status="error", message="Room generation limit reached."), 403
             
+        print(f"userid: ${user_id}")
         if user_id:
             within_limit, message = is_within_limit(current_user)
             if not within_limit:

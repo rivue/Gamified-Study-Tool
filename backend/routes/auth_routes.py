@@ -22,8 +22,10 @@ def init_auth_routes(app):
         email = request.form['email']
         password = request.form['password']
         user = User.query.filter_by(email=email).first()
+        print(user)
         if user and check_password_hash(user.password, password):
-            login_user(user)
+            print(login_user(user))
+            print(current_user.is_authenticated)
             return jsonify({'status': 'success'})
         else:
             return jsonify({'status': 'fail'})
