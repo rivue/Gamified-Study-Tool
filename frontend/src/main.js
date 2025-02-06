@@ -16,8 +16,10 @@ const routes = [
   { path: '/lessons', component: defineAsyncComponent(() => import('./components/Chat/ChatComponent.vue')), meta: { title: 'Ascendance·☁️| Lessons' } }, 
   { path: '/lesson/:id', component: defineAsyncComponent(() => import('./components/Chat/ChatComponent.vue')), meta: { title: 'Ascendance·☁️| Learning' } },
   
-  // actual games - come back to later, try to access whole game
+  // create library (game)
   { path: '/library', component: defineAsyncComponent(() => import('./components/Game/Creation/LibraryCreator.vue')), meta: { title: 'Ascendance·☁️| Create Library' } },
+  
+  // actual games - come back to later, try to access whole game
   { path: '/library/:id', component: defineAsyncComponent(() => import('./components/Game/NewGame/GamePage.vue')), meta: { title: 'Ascendance·☁️| Explore Library' } },
   
   // statistics basically, % lessons complete, that type thing
@@ -41,10 +43,10 @@ const routes = [
   // choose free vs other membership
   { path: '/plan', component: defineAsyncComponent(() => import('./components/Monetization/PlanPage.vue')), meta: { title: 'Ascendance·☁️| Premium Plans' } },
   
-  // im assuning it is login page
+  // im assuming it is login page
   { path: '/login', component: defineAsyncComponent(() => import('./components/Auth/LoginSignupPopup.vue')), meta: { title: 'Ascendance·☁️| Login/Signup' } },
   
-  // ???
+  // admin stuff, basically users and what not - might be useful later
   { path: '/admin', component: defineAsyncComponent(() => import('./components/Auth/AdminPage.vue')), meta: { title: 'Ascendance·☁️| Admin' } },
 ];
 
@@ -52,7 +54,7 @@ const router = createRouter({
   history: createWebHistory(),
   routes,
 });
-router.beforeEach((to, from//, next
+router.beforeEach((to, from //, next
 
 ) => {
   console.log(from.fullPath, to.fullPath);

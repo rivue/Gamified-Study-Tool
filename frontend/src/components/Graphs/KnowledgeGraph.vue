@@ -8,7 +8,7 @@
 <script>
 import axios from "axios";
 import * as d3 from "d3";
-import { usePopupStore } from "@/store/popupStore";
+// import { usePopupStore } from "@/store/popupStore";
 import { useMessageStore } from "@/store/messageStore";
 
 export default {
@@ -48,8 +48,8 @@ export default {
       } catch (error) {
         console.error("Error fetching graph data:", error);
         this.loading = false;
-        const popupStore = usePopupStore();
-        popupStore.showPopup("No knowledge. <a href='/library'>Go learn.</a>");
+        // const popupStore = usePopupStore();
+        // popupStore.showPopup("No knowledge. <a href='/library'>Go learn.</a>");
       }
     },
 

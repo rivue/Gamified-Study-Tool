@@ -88,17 +88,17 @@ export const useGameStore = defineStore("gameStore", {
                     } else {
                         this.prepareNextGeneratedRooms();
                     }
-                } else if (this.currentQuestion === 4 && !this.finalTest) {
-                    if (this.noGeneratedRooms) {console.log("wehere")
-                        const popupStore = usePopupStore();
-                        popupStore.showPopup("You have reached the limit.</br>Please login to continue.");
-                        return false;
-                    } else {
-                        this.questionVisible = false;
-                        this.factoidVisible = null;
-                        this.stopTimer();
-                        this.showNext = true;
-                    }
+                // TODO } else if (this.currentQuestion === 4 && !this.finalTest) { 
+                //     if (this.noGeneratedRooms) {console.log("wehere")
+                //         const popupStore = usePopupStore();
+                //         popupStore.showPopup("You have reached the limit.</br>Please login to continue.");
+                //         return false;
+                //     } else {
+                //         this.questionVisible = false;
+                //         this.factoidVisible = null;
+                //         this.stopTimer();
+                //         this.showNext = true;
+                //     }
                 } else if (this.currentQuestion === 5 && this.finalTest) {
                     this.questionVisible = false;
                     this.factoidVisible = null;

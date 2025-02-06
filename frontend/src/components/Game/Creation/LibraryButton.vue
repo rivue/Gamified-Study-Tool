@@ -5,16 +5,6 @@
         <div class="library-topic">{{ library.library_topic }}</div>
         <div class="difficulty">{{ library.difficulty }}</div>
       </div>
-      <div class="bottom-info">
-        <div class="stats">
-          <span class="likes">👍 {{ library.likes }}</span>
-          <span class="clicks">👁️ {{ library.clicks }}</span>
-        </div>
-        <div class="language-info">
-          <span>{{ library.language }}</span>
-          <span>{{ library.language_difficulty }}</span>
-        </div>
-      </div>
     </div>
   </button>
 </template>
@@ -30,7 +20,8 @@ export default {
   },
   methods: {
     goToLibrary(id) {
-      this.$router.push("/library/" + id);
+      this.$router.push("/knowledge" + id);
+    // this.$router.push( "/knowledge/" + id);
     },
   },
 };
@@ -78,7 +69,7 @@ export default {
 
 }
 
-.top-info, .bottom-info {
+.top-info {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -99,8 +90,4 @@ export default {
   font-size: 0.8em;
 }
 
-.language-info{
-  display: flex;
-  flex-direction: column;
-}
 </style>
