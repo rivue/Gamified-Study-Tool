@@ -45,7 +45,7 @@ export default {
       email: "",
       password: "",
       confirmPassword: "",
-      buttonText: "Sign up",
+      buttonText: "Sign upsdfsdf",
     };
   },
   methods: {

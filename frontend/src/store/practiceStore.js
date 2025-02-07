@@ -19,10 +19,7 @@ export const useUserStatsStore = defineStore('practiceStore', {
       }
     },
     getStats() {
-      if (this.streak === null || this.exp === null) {
-        console.log("nulls")
-        this.fetchStatsFromBackend();
-      }
+      this.fetchStatsFromBackend();
       console.log(this.courseName)
       return {
         courseName: this.courseName,

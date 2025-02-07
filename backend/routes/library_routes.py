@@ -140,6 +140,7 @@ def init_library_routes(app):
         except Exception as e:
             return jsonify(status="error", message="Failed to generate room content"), 500
 
+
     @app.route("/api/library/<int:library_id>", methods=["GET"])
     def get_library(library_id):
         user_id = current_user.id if not isinstance(current_user, AnonymousUserMixin) else None

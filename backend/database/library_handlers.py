@@ -60,12 +60,13 @@ def get_library_id(library_topic, difficulty, language, language_difficulty, gui
 def get_library(library_id, user_id=None, click=True):
     library = Library.query.get(library_id)
     if not library:
+        
         return jsonify({"message": "Library not found"}), 404
     
     if click:
         library.clicks += 1
         db.session.commit()
-
+        
     library_data = library.as_dict()
     library_data["tutorial"] = True #default
     if user_id:

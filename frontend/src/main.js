@@ -28,6 +28,10 @@ const routes = [
   // knowledge map (probably not going to include yet)
   { path: '/knowledge', component: defineAsyncComponent(() => import('./components/Backstage/KnowledgePage.vue')), meta: { title: 'Ascendance·☁️| Knowledge Map' } },
   
+  // the maps of different courses
+  { path: '/knowledge/:id', component: defineAsyncComponent(() => import('./components/Backstage/KnowledgePage.vue')), meta: { title: 'Ascendance·☁️| Knowledge Map' } },
+
+
   // basically main home page
   { path: '/about', component: defineAsyncComponent(() => import('./components/Footer/AboutPage.vue')), meta: { title: 'Ascendance·☁️| Learn Anything!' } },
   
@@ -106,7 +110,7 @@ router.beforeEach((to, from //, next
   document.title = to.meta.title || 'Ascendance·☁️| Learn Anything!';
 });
 
-axios.defaults.baseURL = 'http://127.0.0.1:5000';
+axios.defaults.baseURL = 'https://obscure-memory-64wr7jgrgrvhr7g4-5000.app.github.dev';
 axios.defaults.withCredentials = true;
 
 const pinia = createPinia()

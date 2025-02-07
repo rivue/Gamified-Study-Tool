@@ -1,5 +1,5 @@
 <template>
-  <button class="library-button" @click="goToLibrary(library.id)" :style="{ backgroundImage: 'url(' + library.image_url + ')' }">
+  <button class="library-button" @click="goToLibrary()" :style="{ backgroundImage: 'url(' + library.image_url + ')' }">
     <div class="info-overlay">
       <div class="top-info">
         <div class="library-topic">{{ library.library_topic }}</div>
@@ -19,8 +19,8 @@ export default {
     },
   },
   methods: {
-    goToLibrary(id) {
-      this.$router.push("/knowledge" + id);
+    goToLibrary() {
+      this.$router.push(`/knowledge/${this.library.id}`);
     // this.$router.push( "/knowledge/" + id);
     },
   },
