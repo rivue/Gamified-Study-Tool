@@ -3,7 +3,6 @@
     <div class="info-overlay">
       <div class="top-info">
         <div class="library-topic">{{ library.library_topic }}</div>
-        <div class="difficulty">{{ library.difficulty }}</div>
       </div>
     </div>
   </button>
@@ -21,7 +20,6 @@ export default {
   methods: {
     goToLibrary() {
       this.$router.push(`/knowledge/${this.library.id}`);
-    // this.$router.push( "/knowledge/" + id);
     },
   },
 };

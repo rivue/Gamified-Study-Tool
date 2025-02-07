@@ -3,6 +3,9 @@ Tool that allows users to input things like lecture recordings, lecture slides, 
 
 IDEAS:
 
+    ideas for name:
+        - name something stone related (bc you are SOLIDIFYING your knowledge (hahahahahah ok im done))
+
     ideas for map themes (possibly):
         - name something stone related (bc you are SOLIDIFYING your knowledge (hahahahahah ok im done))
         - could have the background be a pond / stream or something

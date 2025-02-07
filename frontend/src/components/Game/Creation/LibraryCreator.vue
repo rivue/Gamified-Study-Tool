@@ -247,7 +247,7 @@
         axios
           .post("/api/library/generate", postData)
           .then((response) => {
-            //console.log(response.data);
+            
             const libraryId = response.data.library_data.id;
             this.$router.push(`/library/${libraryId}`);
           })

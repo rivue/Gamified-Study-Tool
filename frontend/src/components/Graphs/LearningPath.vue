@@ -77,16 +77,16 @@
   import { ref } from 'vue'
   import { 
     StarIcon, 
-    BookOpenIcon, 
-    TrophyIcon,
-    ChatBubbleBottomCenterTextIcon,
-    AcademicCapIcon,
-    BeakerIcon,
+    //BookOpenIcon, 
+    //TrophyIcon,
+   // ChatBubbleBottomCenterTextIcon,
+    //AcademicCapIcon,
+   // BeakerIcon,
     ChevronLeftIcon,
     ChevronRightIcon,
-    PuzzlePieceIcon,
-    RocketLaunchIcon,
-    SparklesIcon
+    //PuzzlePieceIcon,
+    //RocketLaunchIcon,
+    //SparklesIcon
   } from '@heroicons/vue/24/solid'
   
   const scrollContainer = ref(null)
