@@ -3,9 +3,10 @@ Tool that allows users to input things like lecture recordings, lecture slides, 
 
 IDEAS:
 
-    ideas for grand plan:
+    ideas for grand plan / future:
         - create cheap vr cardboard cutouts of headsets where you can put your phone --> give to high schools possibly for free once you partner with them
             - not sure where to go from there, lots of places though
+        - say you came up with and built the knowledge graph algorithm on your resume
 
     ideas for name:
         - name something stone related (bc you are SOLIDIFYING your knowledge (hahahahahah ok im done))
@@ -33,16 +34,24 @@ IDEAS:
 TODO list:
     
     general:
-        - change theme / color
+        - change theme / color / name
+        - minor page reorganization (remove header and footer in game page + make page look at least a little better)
 
     - Create course (library) page:
         - add support for links / pdfs / other things and get rid of things like difficulty, tutor, etc...
 
+    Game page:
+        - remove timer
+        - remove likes / clouds / diamonds? 
+            - investigate what they're used for and we can probably use them later
+        - remove header / footer when user is playing a game
+        - change from giving questions from lots and lots of "rooms" to questions from one specific room
+
     - Actual map page:
-        - add a small pop-up menu when you click on it that currently displays nothing but will display the mastery of the course
-        - change room names text to a good color
         - link clicking on the "play" button link to the actual game
         - decorate the map eventually
+        - figure out a way to break up room names into sections either by user request or something else
+
 
 COMPLETED:
     ✅ get frontend to work
@@ -51,6 +60,9 @@ COMPLETED:
     ✅ create a course, but all it displays is the name on a card. when you click on the card (course), you are taken to the previous knowledge graph screen, and it just says the course name. Nothing too fancy just yet
     ✅ make every room_name in a library associated with a stepping stone possibly
     ✅ going off of ^^^ basically finding something to fill list of stepping stones in db
+    ✅ change room names text to a good color
+    ✅ add a small pop-up menu when you click on it that currently displays nothing but will display the course name possibly and the play button
+            and mastery of topics in the course as well (course name could be just the topics)
 
 RESOURCES:
     - node components: https://vueflow.dev/

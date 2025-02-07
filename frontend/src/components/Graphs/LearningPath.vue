@@ -35,6 +35,34 @@
               }"
               @click="handleNodeClick(roomName)"
             >
+              <!-- Tooltip -->
+              <div
+                v-if="selectedRoom === roomName"
+                class="absolute -top-32 left-1/2 -translate-x-1/2 w-64 z-50"
+              >
+                <div class="relative">
+                  <!-- Red close button in top-left -->
+                  <div class="absolute -top-3 -right-3 w-8 h-8 bg-red-500 rounded-full flex items-center justify-center">
+                    <!-- <StarIcon class="w-4 h-4 text-white" /> -->
+                     <span>X</span>
+                  </div>
+                  
+                  <!-- Main tooltip content -->
+                  <div class="bg-green-500 rounded-2xl p-4 text-white shadow-lg">
+                    <div class="font-medium mb-3">{{ formatRoomName(roomName) }}</div>
+                    <button 
+                      @click.stop="startLesson(roomName)"
+                      class="w-full bg-white text-green-500 rounded-xl py-2 px-4 font-medium flex items-center justify-center gap-2 hover:bg-gray-50 transition-colors"
+                    >
+                      <span>PLAY</span>
+                    </button>
+                  </div>
+                  
+                  <!-- Triangle pointer -->
+                  <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-green-500 transform rotate-45" />
+                </div>
+              </div>
+  
               <div class="relative transform-gpu transition-all duration-300 group-hover:scale-105 group-hover:-translate-y-2">
                 <div 
                   class="absolute -bottom-4 left-1/2 -translate-x-1/2 w-40 h-8 rounded-full bg-green-500/20 blur-xl transform-gpu transition-all duration-300 group-hover:bg-green-400/30 group-hover:w-44"
@@ -58,10 +86,6 @@
                     />
                   </div>
                 </div>
-              </div>
-              
-              <div class="absolute -bottom-12 left-1/2 -translate-x-1/2 text-xl font-medium text-center w-48 text-gray-700">
-                {{ formatRoomName(roomName) }}
               </div>
             </div>
           </template>
@@ -95,6 +119,9 @@
   
   // Convert room names to nodes
   const nodes = computed(() => props.roomNames || [])
+  
+  // Track selected room for tooltip
+  const selectedRoom = ref(null)
   
   // Array of icons to cycle through
   const icons = [
@@ -154,8 +181,13 @@
   
   const handleNodeClick = (roomName) => {
     if (!isDragging.value) {
-      emit('nodeSelected', roomName)
+      selectedRoom.value = selectedRoom.value === roomName ? null : roomName
     }
+  }
+  
+  const startLesson = (roomName) => {
+    console.log(`Starting lesson for ${roomName}`)
+    emit('nodeSelected', roomName)
   }
   
   const scroll = (direction) => {

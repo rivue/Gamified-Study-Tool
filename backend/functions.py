@@ -284,7 +284,7 @@ GenerateLibraryRoomNames = {
 
 GenerateLibraryRoom = {
     "name": "generate_library_room",
-    "description": "Generates a library room with 4 factoids and corresponding questions. Each factoid is an interesting snippet related to the room's theme. Two factoids have associated multiple-choice questions testing understanding of the factoid, and two factoids have a missing word denoted by an underscore for the user to fill in, each accompanied by multiple-choice options.",
+    "description": "Generates a library room with 8 factoids and corresponding questions. Each factoid is an interesting snippet related to the room's theme. Four factoids have associated multiple-choice questions testing understanding of the factoid, and four factoids have a missing word denoted by an underscore for the user to fill in, each accompanied by multiple-choice options.",
     "parameters": {
         "type": "object",
         "properties": {
@@ -328,9 +328,9 @@ GenerateLibraryRoom = {
                     },
                     "required": ["factoid_text", "question"]
                 },
-                "minItems": 4,
-                "maxItems": 4,
-                "description": "An array of four objects, each containing a factoid and its corresponding question."
+                "minItems": 8,
+                "maxItems": 8,
+                "description": "An array of eight objects, each containing a factoid and its corresponding question."
             }
         },
         "required": ["factoids"]

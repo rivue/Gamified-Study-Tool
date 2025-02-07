@@ -30,7 +30,6 @@ const routes = [
   // the maps of different courses
   { path: '/knowledge/:id', component: defineAsyncComponent(() => import('./components/Backstage/KnowledgePage.vue')), meta: { title: 'Ascendance·☁️| Knowledge Map' } },
 
-
   // basically main home page
   { path: '/about', component: defineAsyncComponent(() => import('./components/Footer/AboutPage.vue')), meta: { title: 'Ascendance·☁️| Learn Anything!' } },
   
