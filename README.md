@@ -3,6 +3,10 @@ Tool that allows users to input things like lecture recordings, lecture slides, 
 
 IDEAS:
 
+    ideas for grand plan:
+        - create cheap vr cardboard cutouts of headsets where you can put your phone --> give to high schools possibly for free once you partner with them
+            - not sure where to go from there, lots of places though
+
     ideas for name:
         - name something stone related (bc you are SOLIDIFYING your knowledge (hahahahahah ok im done))
 
@@ -27,14 +31,26 @@ IDEAS:
         - possibly take inspiration from btd5 / btd6 / odessey
 
 TODO list:
-    - make every room_name in a library associated with a stepping stone possibly
-    - going off of ^^^ basically finding something to fill list of stepping stones in db
+    
+    general:
+        - change theme / color
+
+    - Create course (library) page:
+        - add support for links / pdfs / other things and get rid of things like difficulty, tutor, etc...
+
+    - Actual map page:
+        - add a small pop-up menu when you click on it that currently displays nothing but will display the mastery of the course
+        - change room names text to a good color
+        - link clicking on the "play" button link to the actual game
+        - decorate the map eventually
 
 COMPLETED:
     ✅ get frontend to work
     ✅ get backend to work
     ✅ get title from library to knowledge (practice) page and make sure you ask ChatGPT for best way to do it (data() vs mounted() vs actions vs computed)
     ✅ create a course, but all it displays is the name on a card. when you click on the card (course), you are taken to the previous knowledge graph screen, and it just says the course name. Nothing too fancy just yet
+    ✅ make every room_name in a library associated with a stepping stone possibly
+    ✅ going off of ^^^ basically finding something to fill list of stepping stones in db
 
 RESOURCES:
     - node components: https://vueflow.dev/

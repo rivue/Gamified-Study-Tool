@@ -2,7 +2,9 @@
     <div class="page-main-container">
         <div v-if="!loading && library">
             <h1 class="page-title">{{ library.data.library_topic }} Learning Map 🗺️</h1>
-            <LearningPath @nodeSelected="handleNodeSelect" />
+            <LearningPath 
+            :room-names="library.data.room_names"
+            @nodeSelected="handleNodeSelect" />
         </div>
         <div v-else-if="loading">
             <p>Loading...</p>
@@ -47,7 +49,8 @@ export default {
                             library_topic: capitalizeWords(response.data.data.library_topic),
                         },
                     };
-                    console.log(response)
+                    
+                    console.log(library.value.data.room_names)
                 } else {
                     throw new Error("Invalid response data");
                 }
