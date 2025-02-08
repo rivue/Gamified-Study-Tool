@@ -46,6 +46,7 @@ TODO list:
             - investigate what they're used for and we can probably use them later
         - remove header / footer when user is playing a game
         - change from giving questions from lots and lots of "rooms" to questions from one specific room
+            - almost done, but need to make library room names have underscores instead so it will redirect and it will generate them
 
     - Actual map page:
         - link clicking on the "play" button link to the actual game
