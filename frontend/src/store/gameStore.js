@@ -84,9 +84,9 @@ export const useGameStore = defineStore("gameStore", {
                 if (this.currentQuestion === 2 && !this.finalTest) {
                     const authStore = useAuthStore();
                     if (authStore.loggedIn) {
-                        this.prepareNextRooms();
+                        // this.prepareNextRooms();
                     } else {
-                        this.prepareNextGeneratedRooms();
+                        // this.prepareNextGeneratedRooms();
                     }
                 } else if (this.currentQuestion === 4 && !this.finalTest) { 
                     if (this.noGeneratedRooms) {console.log("wehere")
@@ -126,34 +126,34 @@ export const useGameStore = defineStore("gameStore", {
             }
             return true;
         },
-        async prepareNextGeneratedRooms() {
-            try {
-                const response = await axios.post("/api/library/available-generated-rooms", { libraryId: this.libraryId });
-                if (response.data.status === "success") {
-                    const allAvailableRooms = response.data.data.rooms || [];
-                    if (allAvailableRooms.length === 0) {
-                        this.noGeneratedRooms = true;
-                        return;
-                    }
-                    allAvailableRooms.forEach((roomName) => {
-                        if (!this.roomStates[roomName]) {
-                            this.roomStates[roomName] = { state: 1, factoids: [] };
-                            this.roomNames.push(roomName);
-                        }
-                    });
-                    const roomsShuffled = [...allAvailableRooms];
-                    for (let i = roomsShuffled.length - 1; i > 0; i--) {
-                        const j = Math.floor(Math.random() * (i + 1));
-                        [roomsShuffled[i], roomsShuffled[j]] = [roomsShuffled[j], roomsShuffled[i]];
-                    }
-                    this.nextRooms = roomsShuffled.slice(0, 3);
-                } else {
-                    console.error("Failed to retrieve next generated rooms:", response.data.message);
-                }
-            } catch (error) {
-                console.error("Error retrieving next generated rooms:", error);
-            }
-        },
+        // async prepareNextGeneratedRooms() {
+        //     try {
+        //         const response = await axios.post("/api/library/available-generated-rooms", { libraryId: this.libraryId });
+        //         if (response.data.status === "success") {
+        //             const allAvailableRooms = response.data.data.rooms || [];
+        //             if (allAvailableRooms.length === 0) {
+        //                 this.noGeneratedRooms = true;
+        //                 return;
+        //             }
+        //             allAvailableRooms.forEach((roomName) => {
+        //                 if (!this.roomStates[roomName]) {
+        //                     this.roomStates[roomName] = { state: 1, factoids: [] };
+        //                     this.roomNames.push(roomName);
+        //                 }
+        //             });
+        //             const roomsShuffled = [...allAvailableRooms];
+        //             for (let i = roomsShuffled.length - 1; i > 0; i--) {
+        //                 const j = Math.floor(Math.random() * (i + 1));
+        //                 [roomsShuffled[i], roomsShuffled[j]] = [roomsShuffled[j], roomsShuffled[i]];
+        //             }
+        //             this.nextRooms = roomsShuffled.slice(0, 3);
+        //         } else {
+        //             console.error("Failed to retrieve next generated rooms:", response.data.message);
+        //         }
+        //     } catch (error) {
+        //         console.error("Error retrieving next generated rooms:", error);
+        //     }
+        // },
         async prepareNextRooms() {
             let roomsToUnlock = 2;
             const unlockedRoomsCount = Object.values(this.roomStates).filter(room => room.state > 1).length;
@@ -218,10 +218,12 @@ export const useGameStore = defineStore("gameStore", {
                 }
             }
         },
-        async fetchLibraryDetails(libraryId) {
+        async fetchLibraryDetails(libraryId, roomNameThing) {
             this.setId(libraryId);
+            
             try {
                 const response = await axios.get(`/api/library/${libraryId}`);
+                // do loadName first in case factoid doesn't exist
                 if (response.data.status === "success") {
                     const data = response.data.data;
                     this.roomNames = data.room_names || [];
@@ -235,15 +237,20 @@ export const useGameStore = defineStore("gameStore", {
                     this.imageUrl = data.image_url || null;
                     this.language = data.language || "English";
                     this.languageDifficulty = data.language_difficulty || "Normal";
-                    this.libraryTopic = data.library_topic || null;
+                    // this.libraryTopic = data.library_topic || null;
+                    this.libraryTopic = roomNameThing;
                     this.likes = data.likes || 0;
                     this.userId = data.user_id || null;
                     this.tutorial = data.tutorial || false;
                     this.roomStates = {};
+                    if (!this.roomNames.includes(roomNameThing)) {
+                        this.roomNames.push(roomNameThing);
+                    }
                     this.roomNames.forEach((roomName) => {
                         let state = 0;
                         if (roomName === this.libraryTopic) {
-                            state = 2;
+                            // state = 2;
+                            state = 1;
                             this.roomStates[roomName] = {
                                 state: state,
                                 factoids: response.data.room_data.factoids || []
@@ -255,10 +262,18 @@ export const useGameStore = defineStore("gameStore", {
                             };
                         }
                     });
+                    if (!this.roomStates[roomNameThing]) {
+                        this.roomStates[roomNameThing] = {
+                            state: 1,
+                            factoids: []
+                        };
+                    }
                     if (this.tutorial) {
                         const popupStore = usePopupStore();
                         popupStore.showLibraryInstructions();
                     }
+                    console.log("fetch")
+                    await this.loadRoom(roomNameThing);
                 } else {
                     console.error("Failed to fetch library details", response);
                 }

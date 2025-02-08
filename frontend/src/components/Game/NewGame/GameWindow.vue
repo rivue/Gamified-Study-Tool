@@ -3,7 +3,7 @@
     <GameStart />
     <FactoidComponent />
     <LibraryQuestion />
-    <NextRoomsComponent/>
+    <!-- <NextRoomsComponent/> -->
   </div>
 </template>
 
@@ -14,13 +14,15 @@ import GameStart from './GameStart.vue';
 import { useGameStore } from "@/store/gameStore";
 import FactoidComponent from "./FactoidComponent.vue";
 import LibraryQuestion from "./LibraryQuestion.vue";
-import NextRoomsComponent from "./NextRoomsComponent.vue";
+// import NextRoomsComponent from "./NextRoomsComponent.vue";
 
 export default {
   name: 'GameWindow',
   components: { GameStart,
     FactoidComponent,
-    LibraryQuestion,NextRoomsComponent },
+    LibraryQuestion,
+    // NextRoomsComponent
+ },
   computed: {
     gameStore() {
       return useGameStore();
@@ -31,8 +33,9 @@ export default {
 
     onMounted(() => {
       const libraryId = route.params.id;
+      const roomName = route.params.roomName;
       const gameStore = useGameStore();
-      gameStore.fetchLibraryDetails(libraryId);
+      gameStore.fetchLibraryDetails(libraryId, roomName);
     });
   },
 };

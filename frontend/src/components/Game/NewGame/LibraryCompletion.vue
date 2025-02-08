@@ -159,7 +159,7 @@ export default {
       this.$router.push("/library");
     },
     navigateBack() {
-      this.gameStore.fetchLibraryDetails(this.gameStore.libraryId);
+      this.gameStore.fetchLibraryDetails(this.gameStore.libraryId, this.gameStore.libraryTopic);
     },
     async navigateExplore() {
       this.exploreLoading = true;

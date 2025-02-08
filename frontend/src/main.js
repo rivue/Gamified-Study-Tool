@@ -20,6 +20,7 @@ const routes = [
   
   // actual games - come back to later, try to access whole game
   { path: '/library/:id', component: defineAsyncComponent(() => import('./components/Game/NewGame/GamePage.vue')), meta: { title: 'Ascendance·☁️| Explore Library' } },
+  { path: '/library/:id/:roomName', component: defineAsyncComponent(() => import('./components/Game/NewGame/GamePage.vue')), meta: { title: 'Ascendance·☁️| Explore Library' } },
   
   // statistics basically, % lessons complete, that type thing
   { path: '/progress', component: defineAsyncComponent(() => import('./components/Backstage/ProgressPage.vue')), meta: { title: 'Ascendance·☁️| Progress' } },
@@ -67,7 +68,8 @@ router.beforeEach((to, from , next) => {
 
   if (to.path.startsWith('/library/') && from.path.startsWith('/library/')) {
     const toLibraryId = to.path.split('/')[2];
-    gameStore.fetchLibraryDetails(toLibraryId);
+    const toRoomName = to.path.split('/')[3];
+    gameStore.fetchLibraryDetails(toLibraryId, toRoomName);
   }
 
   const publicPaths = [
