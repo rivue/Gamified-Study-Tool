@@ -88,17 +88,17 @@ export const useGameStore = defineStore("gameStore", {
                     } else {
                         // this.prepareNextGeneratedRooms();
                     }
-                } else if (this.currentQuestion === 4 && !this.finalTest) { 
-                    if (this.noGeneratedRooms) {console.log("wehere")
-                        const popupStore = usePopupStore();
-                        popupStore.showPopup("You have reached the limit.</br>Please login to continue.");
-                        return false;
-                    } else {
-                        this.questionVisible = false;
-                        this.factoidVisible = null;
-                        this.stopTimer();
-                        this.showNext = true;
-                    }
+                // } else if (this.currentQuestion === 4 && !this.finalTest) { 
+                //     if (this.noGeneratedRooms) {console.log("wehere")
+                //         const popupStore = usePopupStore();
+                //         popupStore.showPopup("You have reached the limit.</br>Please login to continue.");
+                //         return false;
+                //     } else {
+                //         this.questionVisible = false;
+                //         this.factoidVisible = null;
+                //         this.stopTimer();
+                //         this.showNext = true;
+                //     }
                 } else if (this.currentQuestion === 2 && this.finalTest) {
                     this.questionVisible = false;
                     this.factoidVisible = null;
@@ -220,7 +220,7 @@ export const useGameStore = defineStore("gameStore", {
         },
         async fetchLibraryDetails(libraryId, roomNameThing) {
             this.setId(libraryId);
-            
+            console.log("why is nothing working")
             try {
                 const response = await axios.get(`/api/library/${libraryId}`);
                 // do loadName first in case factoid doesn't exist
@@ -239,12 +239,13 @@ export const useGameStore = defineStore("gameStore", {
                     this.languageDifficulty = data.language_difficulty || "Normal";
                     // this.libraryTopic = data.library_topic || null;
                     this.libraryTopic = roomNameThing;
+                    console.log("roomNameThing: ", roomNameThing);
                     this.likes = data.likes || 0;
                     this.userId = data.user_id || null;
                     this.tutorial = data.tutorial || false;
                     this.roomStates = {};
-                    if (!this.roomNames.includes(roomNameThing)) {
-                        this.roomNames.push(roomNameThing);
+                    if (!this.roomNames.includes(this.libraryTopic)) {
+                        this.roomNames.push(this.libraryTopic);
                     }
                     this.roomNames.forEach((roomName) => {
                         let state = 0;
@@ -262,8 +263,9 @@ export const useGameStore = defineStore("gameStore", {
                             };
                         }
                     });
-                    if (!this.roomStates[roomNameThing]) {
-                        this.roomStates[roomNameThing] = {
+                    if (!this.roomStates[this.libraryTopic]) {
+                        console.log("this is bad")
+                        this.roomStates[this.libraryTopic] = {
                             state: 1,
                             factoids: []
                         };
@@ -273,7 +275,7 @@ export const useGameStore = defineStore("gameStore", {
                         popupStore.showLibraryInstructions();
                     }
                     console.log("fetch")
-                    await this.loadRoom(roomNameThing);
+                    await this.loadRoom(this.libraryTopic);
                 } else {
                     console.error("Failed to fetch library details", response);
                 }
@@ -291,6 +293,7 @@ export const useGameStore = defineStore("gameStore", {
                     libraryId: this.libraryId,
                     subtopic: room_name
                 });
+                console.log("roomname: ", room_name, "library topic: " , this.libraryTopic)
                 if (response.data.status === "success") {
                     this.roomStates[room_name].state = 2;
                     this.roomStates[room_name].factoids = response.data.data.factoids;

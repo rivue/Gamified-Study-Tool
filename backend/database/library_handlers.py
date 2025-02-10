@@ -136,6 +136,7 @@ def retrieve_library_room_contents(library_id, room_name):
     factoids = LibraryFactoid.query.filter_by(
         library_id=library_id, room_name=room_name
     ).all()
+    
     if len(factoids) < 4:
         return None
 

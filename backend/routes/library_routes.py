@@ -5,6 +5,7 @@ from flask import request, jsonify
 from flask_login import current_user, AnonymousUserMixin
 from bleach import clean
 from flask_executor import Executor
+import time
 
 from openapi import moderate
 from utils import mask_email, get_client_ip
@@ -108,7 +109,7 @@ def init_library_routes(app):
         room_names_future = executor.submit(lgn.suggest_library_wing, user_id, topic, library_difficulty, language, language_difficulty, extra_context)
 
         # Start image generation task
-        img_url_future = executor.submit(generate_images_task, topic, library_difficulty, guide)
+        # img_url_future = executor.submit(generate_images_task, topic, library_difficulty, guide)
 
         # Generate first room content
         room_future = executor.submit(lgn.generate_room_content, user_id, topic, library_difficulty, language, language_difficulty, extra_context, guide)
@@ -123,19 +124,21 @@ def init_library_routes(app):
         # Create the library
         room_names = room_names_future.result()
         library_response, status_code = lbh.create_library(user_id, topic, room_names, library_difficulty, language, language_difficulty, guide)
-        if status_code == 201:
-            library_id = library_response.get_json().get("library_id")
-            img_url = img_url_future.result()
-            print("saving image..")
-            save_image(library_id, img_url)
-        else:
-            raise Exception("Library creation failed")
-
+        # if status_code == 201:
+        library_id = library_response.get_json().get("library_id")
+            # img_url = img_url_future.result()
+            # print("saving image..")
+            # save_image(library_id, img_url)
+        # else:
+            # raise Exception("Library creation failed")
         try:
+            print("room future result")
             room_contents = room_future.result()
+            print("room future result 2")
             lbh.save_library_room_contents(library_id, topic, room_contents)
+            print("success")
             library = lbh.get_library(library_id, user_id, False)
-
+            print("good")
             return jsonify(status="success", library_data=library.get_json())
         except Exception as e:
             return jsonify(status="error", message="Failed to generate room content"), 500
@@ -191,8 +194,9 @@ def init_library_routes(app):
         if not library_id:
             return jsonify(status="error", message="No library ID provided"), 400
 
+        print("subtopic: " + subtopic)
         # Attempt to retrieve existing room contents
-        existing_content = lbh.retrieve_library_room_contents(library_id, subtopic)
+        existing_content = lbh.retrieve_library_room_contents(library_id, subtopic.replace("-", " "))
         if existing_content:
             return jsonify(status="success", data=existing_content)
         

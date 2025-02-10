@@ -8,6 +8,7 @@
         <!-- Completion message when no more questions -->
         <div v-if="question === null" class="completion-message">
           Congratulations, you've completed all questions in this room!
+          <!-- TODO: navigate back to home screen automatically here -->
         </div>
         <!-- Question text -->
         <div v-else class="question-content">
@@ -112,6 +113,7 @@ export default {
         !Array.isArray(currentFactoid.questions) ||
         currentFactoid.questions.length === 0
       ) {
+
         console.error("No questions available or invalid questions format");
         return null;
       }
@@ -123,6 +125,7 @@ export default {
         !currentQuestion.correct_choice ||
         !Array.isArray(currentQuestion.wrong_choices)
       ) {
+        console.log("this is good I think - replace with actual completion message and exit out of room")
         console.error("Question structure is incomplete or invalid");
         return null;
       }

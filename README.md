@@ -6,6 +6,7 @@ IDEAS:
     ideas for grand plan / future:
         - create cheap vr cardboard cutouts of headsets where you can put your phone --> give to high schools possibly for free once you partner with them
             - not sure where to go from there, lots of places though
+        - see google doc for more plans
         - say you came up with and built the knowledge graph algorithm on your resume
 
     ideas for name:
@@ -38,7 +39,7 @@ TODO list:
         - minor page reorganization (remove header and footer in game page + make page look at least a little better)
 
     - Create course (library) page:
-        - add support for links / pdfs / other things and get rid of things like difficulty, tutor, etc...
+        - add support for links / pdfs / other things and get rid of things like difficulty, tutor, etc... then actually start generating stuff to study
 
     Game page:
         - remove timer
