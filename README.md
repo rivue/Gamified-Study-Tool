@@ -53,6 +53,7 @@ TODO list:
         - see purple text in tablet (continue w/ gemini flash stuff)
             1) give whole textbook to gpt to "split up" (finding a regular nlp alternative would be awesome as well - TextTiling (semantic similarity) or BERT-Topic (topic changes) or BookNLP (best for academic / long-form texts))
             2) store embeddings in pinecone (every paragraph)
+            - make sure text extraction actually works
             3) generate questions per every subchapter / lecture given syllabus (stored in database)
             4) user can re-generate questions easily and for cheap (cheap for me at least cost for user tbd) bc embeddings are precomputed
             5) user should delete things hopefully
