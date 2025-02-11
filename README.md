@@ -37,6 +37,7 @@ TODO list:
     general:
         - change theme / color / name
         - minor page reorganization (remove header and footer in game page + make page look at least a little better)
+        - put image to text ocr thing on resume maybe
 
     - Create course (library) page:
         - add support for links / pdfs / other things and get rid of things like difficulty, tutor, etc... then actually start generating stuff to study
