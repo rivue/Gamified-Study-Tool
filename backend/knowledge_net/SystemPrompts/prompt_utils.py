@@ -87,7 +87,7 @@ def sys_lib_room(library_id):
 
     return system_message
 
-def sys_first_room(subtopic, library_difficulty, language, language_difficulty, extra_context, guide):
+def sys_first_room(subtopic, library_difficulty, language, language_difficulty, extra_context, guide, file_contents):
     current_script_directory = os.path.dirname(os.path.abspath(__file__))
     system_message_path = os.path.join(
         current_script_directory, f"GenerateLibraryRoom.txt"
@@ -96,7 +96,6 @@ def sys_first_room(subtopic, library_difficulty, language, language_difficulty, 
     with open(system_message_path, "r") as file:
         system_message = file.read()
 
-        
     if "{base-persona}" in system_message:
         base_persona_path = os.path.join(current_script_directory, f'Base{guide}.txt')
         with open(base_persona_path, 'r') as file:
@@ -117,5 +116,8 @@ def sys_first_room(subtopic, library_difficulty, language, language_difficulty, 
 
     if "{library-context}" in system_message and extra_context:
         system_message = system_message.replace("{library-context}", "None")
+
+    if "{file-contents}" in system_message and file_contents:
+        system_message = system_message.replace("{file-contents}", "None")
 
     return system_message

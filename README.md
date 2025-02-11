@@ -47,7 +47,14 @@ TODO list:
             - investigate what they're used for and we can probably use them later
         - remove header / footer when user is playing a game
         - change from giving questions from lots and lots of "rooms" to questions from one specific room
-            - almost done, but need to make library room names have underscores instead so it will redirect and it will generate them
+            - almost done, but need to make library room names have underscores instead so it will redirect and it will 
+        plan for textbook stuff:
+        - see purple text in tablet (continue w/ gemini flash stuff)
+            1) give whole textbook to gpt to "split up" (finding a regular nlp alternative would be awesome as well - TextTiling (semantic similarity) or BERT-Topic (topic changes) or BookNLP (best for academic / long-form texts))
+            2) store embeddings in pinecone (every paragraph)
+            3) generate questions per every subchapter / lecture given syllabus (stored in database)
+            4) user can re-generate questions easily and for cheap (cheap for me at least cost for user tbd) bc embeddings are precomputed
+            5) user should delete things hopefully
 
     - Actual map page:
         - link clicking on the "play" button link to the actual game

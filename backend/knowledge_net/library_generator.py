@@ -7,7 +7,7 @@ import functions
 from knowledge_net.math_utils import calculate_cosine_similarities
 import database.library_handlers as lbh
 
-def suggest_library_wing(user_id, selected_node, library_difficulty, language, language_difficulty,extra_context):
+def suggest_library_wing(user_id, selected_node, library_difficulty, language, language_difficulty, extra_context):
     def generate_rooms():
         system_msg = sys_library(library_difficulty, language, language_difficulty,extra_context)
         user_msg = f"Library Wing main topic: {selected_node}."
@@ -67,9 +67,9 @@ def fill_libroom(user_id, room_name, library_id):
 
     return room_contents
 
-def fill_room(user_id, subtopic, library_difficulty, language, language_difficulty, extra_context, guide):
+def fill_room(user_id, subtopic, library_difficulty, language, language_difficulty, extra_context, guide, file_contents):
     def generate_room_contents():
-        system_msg = sys_first_room(subtopic, library_difficulty, language, language_difficulty, extra_context, guide)
+        system_msg = sys_first_room(subtopic, library_difficulty, language, language_difficulty, extra_context, guide, file_contents)
         function = [functions.GenerateLibraryRoom]
         function_call = {"name": function[0]['name']}
         messages = create_message(system_msg, subtopic)

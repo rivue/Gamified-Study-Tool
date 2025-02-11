@@ -273,9 +273,9 @@ GenerateLibraryRoomNames = {
                     },
                     "required": ["room_name"]
                 },
-                "minItems": 24,
-                "maxItems": 24,
-                "description": "An array of twenty four room names."
+                "minItems": 4,
+                "maxItems": 20,
+                "description": "An array of four to thirty room names."
             },
         },
         "required": ["room_names"],

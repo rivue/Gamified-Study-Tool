@@ -105,14 +105,16 @@ def init_library_routes(app):
             content_for_moderation += extra_context
         moderation_future = executor.submit(moderate, content_for_moderation)
 
-        # Start library generation task
+        file_content = request.json.get("fileContent") # TODO moderation later
+
+        # Start library generation task (flask Gemini 1.5)
         room_names_future = executor.submit(lgn.suggest_library_wing, user_id, topic, library_difficulty, language, language_difficulty, extra_context)
 
         # Start image generation task
         # img_url_future = executor.submit(generate_images_task, topic, library_difficulty, guide)
-
+        
         # Generate first room content
-        room_future = executor.submit(lgn.generate_room_content, user_id, topic, library_difficulty, language, language_difficulty, extra_context, guide)
+        room_future = executor.submit(lgn.generate_room_content, user_id, topic, library_difficulty, language, language_difficulty, extra_context, guide, file_content)
 
         # Wait for moderation result
         violation, message = moderation_future.result()

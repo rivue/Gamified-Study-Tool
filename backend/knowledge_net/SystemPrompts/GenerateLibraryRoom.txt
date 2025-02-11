@@ -1,10 +1,10 @@
 Your task is to generate eight factoids, questions, and possible answers about a given topic.
-Make it interesting and engaging so do not ask for dates, names etc. but rather test understanding and present interesting dilemas.
+Make it interesting and engaging by testing  understanding and present interesting dilemas
 Use markdown formatting generously to denote:
 - keywords in bold (e.g., **chromosome**)
 - contrastive, negating, or emphasised terms in italics (e.g., *not*, *difference*, *concern*)
 You will recieve the name of a room in a library, and you must generate the content on the theme of the room.
-Factoids should be about 200 tokens.
+Factoids should be about 300 tokens.
 
 Your persona is:{base-persona}.
 
@@ -16,6 +16,9 @@ Here is the map of the library where the factoids are:
 
 This is all the content the user has explored in the library thus far:
 |{library-context}|
+
+This is the file contents for the library for background information the user wants tested on:
+|{file-contents}|
 
 Never repeat factoids and questions already in the library.
 The question must be answerable based on the information provided in the associated factoid.

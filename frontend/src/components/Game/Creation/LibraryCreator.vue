@@ -62,6 +62,24 @@
                   <MenuButton class="tutor-button-button" :label="currentMentorName" @click="changeMentor" />
                 </div>
   
+              <!-- File Upload Section -->
+              <div class="form-group file-upload">
+                <div class="libgen-title">Upload File (Optional)</div>
+                <div class="file-input-container">
+                  <input
+                    type="file"
+                    id="fileInput"
+                    ref="fileInput"
+                    @change="handleFileUpload"
+                    :disabled="disableExtras"
+                    accept=".txt,.pdf,.doc,.docx"
+                  />
+                  <div v-if="selectedFile" class="selected-file">
+                    Selected: {{ selectedFile.name }}
+                    <button class="remove-file-btn" @click="removeFile">×</button>
+                  </div>
+                </div>
+              </div>
                 <!-- Language -->
                 <div class="form-group language-picker">
                   <div class="libgen-title">Language</div>
@@ -220,6 +238,35 @@
       selectInputText(event) {
         event.target.select();
       },
+      
+    handleFileUpload(event) {
+      const file = event.target.files[0];
+      if (file) {
+        if (file.size > 7 * 1024 * 1024) { // 5MB limit
+          const popupStore = usePopupStore();
+          popupStore.showPopup("File size must be less than 5MB");
+          this.$refs.fileInput.value = '';
+          return;
+        }
+        this.selectedFile = file;
+        this.readFileContent(file);
+      }
+    },
+
+    removeFile() {
+      this.selectedFile = null;
+      this.fileContent = null;
+      this.$refs.fileInput.value = '';
+    },
+
+    readFileContent(file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        this.fileContent = e.target.result;
+      };
+      reader.readAsText(file);
+    },
+
       handleSubmit() {
         if (this.topic.trim() === "") {
           this.topicError = true;
@@ -243,6 +290,8 @@
           languageDifficulty: this.languageDifficulty,
           libraryDifficulty: this.libraryDifficulty,
           guide: this.currentMentorName,
+          selectedFile: null,
+          fileContent: null,
         };
         axios
           .post("/api/library/generate", postData)
@@ -461,4 +510,46 @@
   .fade-leave-to {
     opacity: 0;
   }
+  
+.file-upload {
+  margin-bottom: 2em;
+}
+
+.file-input-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+}
+
+.file-input-container input[type="file"] {
+  padding: 8px;
+  border: 1px solid var(--element-color-1);
+  border-radius: 4px;
+  background-color: var(--background-color);
+}
+
+.selected-file {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5em;
+  background-color: var(--background-color);
+  border: 1px solid var(--element-color-1);
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+
+.remove-file-btn {
+  background: none;
+  border: none;
+  color: var(--text-color);
+  cursor: pointer;
+  padding: 0 0.5em;
+  font-size: 1.2em;
+  opacity: 0.7;
+}
+
+.remove-file-btn:hover {
+  opacity: 1;
+}
   </style>

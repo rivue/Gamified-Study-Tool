@@ -251,7 +251,7 @@ export const useGameStore = defineStore("gameStore", {
                         let state = 0;
                         if (roomName === this.libraryTopic) {
                             // state = 2;
-                            state = 1;
+                            state = 2;
                             this.roomStates[roomName] = {
                                 state: state,
                                 factoids: response.data.room_data.factoids || []

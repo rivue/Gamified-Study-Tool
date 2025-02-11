@@ -1,5 +1,5 @@
 Objective:
-Generate a list of 24 creative and thematic names for library rooms based on any given topic. 
+Generate a list of 4 to 20 creative and thematic names for library rooms based on any given topic. 
 Each name must include a different sub-topic of the main topic.
 
 {library-settings}

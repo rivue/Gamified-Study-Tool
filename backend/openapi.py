@@ -3,6 +3,8 @@ import time
 import requests
 import json
 import os
+import google.generativeai as genai
+from typing import Optional, Dict, List, Union, Any
 
 #### settings ####
 max_retries = 1
@@ -14,12 +16,80 @@ LESSON_TOKENS = 1500
 
 GPT3_5 = "gpt-4o"
 GPT4 = "gpt-4o-mini"
+FLASH1_5 = "gemini-1.5-pro"
 EMBEDDING_MODEL = "text-embedding-3-small"
 DEFAULT_TEMP = 0.1
 
+def init_gemini():
+    """Initialize the Gemini API with credentials"""
+    api_key = os.getenv('GOOGLE_API_KEY')
+    if not api_key:
+        raise ValueError("Missing Google API key. Set GOOGLE_API_KEY environment variable.")
+    genai.configure(api_key=api_key)
+
+def convert_messages_to_gemini(messages: List[Dict[str, str]]) -> str:
+    """Convert OpenAI message format to Gemini format"""
+    formatted_messages = []
+    for msg in messages:
+        role_prefix = ""
+        if msg["role"] == "system":
+            role_prefix = "System: "
+        elif msg["role"] == "user":
+            role_prefix = "Human: "
+        elif msg["role"] == "assistant":
+            role_prefix = "Assistant: "
+        formatted_messages.append(f"{role_prefix}{msg['content']}")
+    return "\n".join(formatted_messages)
+
 def generate_response(user_id, messages, functions=None, function_call="none", model=GPT4, tokens=TOKEN_CAP, temperature=None):
-    # print(openai.api_key)
-    # print(f"Current OpenAI API Key: {os.getenv('OPENAI_API_KEY')}")
+    if model == FLASH1_5:
+        return generate_gemini_response(user_id, messages, tokens, temperature)
+    else:
+        return generate_openai_response(user_id, messages, functions, function_call, model, tokens, temperature)
+
+def generate_gemini_response(user_id, messages, tokens=TOKEN_CAP, temperature=None):
+    """Generate response using Gemini model"""
+    try:
+        init_gemini()
+        
+        # Convert temperature scale from 0-1 to 0-1.0
+        gemini_temperature = temperature if temperature is not None else 0.4
+        
+        # Configure the model
+        model = genai.GenerativeModel(
+            model_name="gemini-1.5-pro",
+            generation_config={
+                "temperature": gemini_temperature,
+                "max_output_tokens": tokens,
+            }
+        )
+        
+        # Convert messages to Gemini format
+        prompt = convert_messages_to_gemini(messages)
+        print(f"Requesting Gemini response for: {prompt}")
+        
+        # Generate response
+        response = model.generate_content(prompt)
+        
+        # Format response to match OpenAI structure
+        formatted_response = {
+            "choices": [{
+                "message": {
+                    "content": response.text,
+                    "role": "assistant"
+                }
+            }]
+        }
+        
+        print(f"Gemini response: {formatted_response}")
+        return formatted_response
+        
+    except Exception as e:
+        print(f"An error occurred with Gemini: {e}")
+        return None
+
+def generate_openai_response(user_id, messages, functions=None, function_call="none", model=GPT4, tokens=TOKEN_CAP, temperature=None):
+    """Generate response using OpenAI models"""
     openai.api_key = os.getenv('OPENAI_API_KEY')
     print(f"Using OpenAI API Key: {openai.api_key}")
     if not openai.api_key:
@@ -45,8 +115,7 @@ def generate_response(user_id, messages, functions=None, function_call="none", m
             if functions:
                 data["functions"] = functions
                 data["function_call"] = function_call
-            #     print(f"{functions} mode {function_call}: \n{messages}")
-            # else:
+
             print(f"Requesting {model} response: ", messages)
 
             response = requests.post(
@@ -73,6 +142,7 @@ def generate_response(user_id, messages, functions=None, function_call="none", m
     else:
         print("Max retries reached. Unable to generate response.")
         return None
+
 
 def moderate(user_input):
 
