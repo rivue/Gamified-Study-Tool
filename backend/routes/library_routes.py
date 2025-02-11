@@ -5,6 +5,15 @@ from flask import request, jsonify
 from flask_login import current_user, AnonymousUserMixin
 from bleach import clean
 from flask_executor import Executor
+# from pdfminer.high_level import extract_text
+import pytesseract
+from pdf2image import convert_from_path
+import pdfplumber
+import PyPDF2
+import fitz
+
+import base64
+import io
 import time
 
 from openapi import moderate
@@ -79,53 +88,196 @@ def init_library_routes(app):
                 return jsonify({"error": "Extra context is too long. Maximum 200 characters allowed."}), 400
 
         # Check for existing library
-        if not extra_context:
-            existing_library = lbh.get_library_id(topic, library_difficulty, language, language_difficulty, guide)
-            if existing_library:
-                # Now check if first room exists
-                existing_content = lbh.retrieve_library_room_contents(existing_library, topic)
-                if existing_content:
-                    return jsonify(status="success", library_id=existing_library)
-                else:
-                    try:
-                        # Generate room content asynchronously
-                        room_future = executor.submit(lgn.generate_libroom_content, user_id, topic, existing_library)
-                        room_contents = room_future.result()
-                        lbh.save_library_room_contents(existing_library, topic, room_contents)
-                        return jsonify(status="success", library_id=existing_library)
-                    except Exception as e:
-                        return jsonify(status="error", message=f"Failed to generate room content {e}"), 500
+        # TODO VVV if not extra_context:
+        #     existing_library = lbh.get_library_id(topic, library_difficulty, language, language_difficulty, guide)
+        #     if existing_library:
+        #         # Now check if first room exists
+        #         existing_content = lbh.retrieve_library_room_contents(existing_library, topic)
+        #         if existing_content:
+        #             return jsonify(status="success", library_id=existing_library)
+        #         else:
+        #             try:
+        #                 # Generate room content asynchronously
+        #                 room_future = executor.submit(lgn.generate_libroom_content, user_id, topic, existing_library)
+        #                 room_contents = room_future.result()
+        #                 lbh.save_library_room_contents(existing_library, topic, room_contents)
+        #                 return jsonify(status="success", library_id=existing_library)
+        #             except Exception as e:
+        #                 return jsonify(status="error", message=f"Failed to generate room content {e}"), 500
 
         if not user_id:
             mark_generation_done(ip, 'library')
         
         # Start moderation task
-        content_for_moderation = topic
-        if extra_context:
-            content_for_moderation += extra_context
-        moderation_future = executor.submit(moderate, content_for_moderation)
+        # TODO vvv content_for_moderation = topic
+        # if extra_context:
+        #     content_for_moderation += extra_context
+        # moderation_future = executor.submit(moderate, content_for_moderation)
 
         file_content = request.json.get("fileContent") # TODO moderation later
+        if not file_content:
+            return jsonify({"error": "No file provided"}), 400
+        
+        # 1) store embeddings in pinecone then get embeddings on a per room basis
+        room_names = request.json.get("roomNames")
+        if room_names:
+            print(room_names)
+        else:
+            return jsonify({"error": f"Must specify room names for now, also we are in the process of breaking things"}), 400
 
         # Start library generation task (flask Gemini 1.5)
-        room_names_future = executor.submit(lgn.suggest_library_wing, user_id, topic, library_difficulty, language, language_difficulty, extra_context)
+        # room_names_future = executor.submit(lgn.suggest_library_wing, user_id, topic, library_difficulty, language, language_difficulty, extra_context)
 
         # Start image generation task
         # img_url_future = executor.submit(generate_images_task, topic, library_difficulty, guide)
         
         # Generate first room content
-        room_future = executor.submit(lgn.generate_room_content, user_id, topic, library_difficulty, language, language_difficulty, extra_context, guide, file_content)
+        # room_future = executor.submit(lgn.generate_room_content, user_id, topic, library_difficulty, language, language_difficulty, extra_context, guide, file_content)
 
         # Wait for moderation result
-        violation, message = moderation_future.result()
-        if violation:
-            if user_id:
-                increment_violations(user_id)
-            return jsonify({"error": f"Message breaks our usage policy. Please check our guidelines.\n{message}"}), 400
+        # TODO vvv violation, message = moderation_future.result()
+        # if violation:
+        #     if user_id:
+        #         increment_violations(user_id)
+        #     return jsonify({"error": f"Message breaks our usage policy. Please check our guidelines.\n{message}"}), 400
 
         # Create the library
-        room_names = room_names_future.result()
-        library_response, status_code = lbh.create_library(user_id, topic, room_names, library_difficulty, language, language_difficulty, guide)
+        # room_names = room_names_future.result()
+        # TODO library_response, status_code = lbh.create_library(user_id, topic, room_names, library_difficulty, language, language_difficulty, guide)
+        print("generate_library 1")
+        
+        # def extract_text_from_pdf(file_content):
+            # try:
+            #     # Handle data URL prefix if present
+            #     if file_content.startswith('data:'):
+            #         # Split header and data part
+            #         parts = file_content.split(',', 1)
+            #         header, data_part = parts[0], parts[1]
+            #         # URL-decode the data part to handle percent-encoded characters
+            #         data_part = unquote(data_part)
+            #         file_content = data_part
+                    
+            #     # Remove any whitespace and newlines
+            #     file_content = file_content.strip()
+                
+            #     # Add padding if needed
+            #     padding_needed = len(file_content) % 4
+            #     if padding_needed:
+            #         file_content += '=' * (4 - padding_needed)
+                
+            #     # Validate ASCII-only characters
+            #     try:
+            #         file_content.encode('ascii')
+            #     except UnicodeEncodeError as e:
+            #         raise ValueError(f"Non-ASCII characters in base64 data: {str(e)}")
+                
+            #     try:
+            #         # Decode base64
+            #         pdf_bytes = base64.b64decode(file_content)
+            #     except Exception as e:
+            #         raise ValueError(f"Base64 decode failed: {str(e)}")
+                
+            #     # Create file stream and ensure it's properly positioned
+            #     file_stream = io.BytesIO(pdf_bytes)
+            #     file_stream.seek(0)  # Ensure we're at the start of the stream
+                
+            #     try:
+            #         # Create PDF reader with strict=False to be more lenient with PDF format
+            #         pdf_reader = PyPDF2.PdfReader(file_stream, strict=False)
+                    
+            #         # Extract text from all pages
+            #         text_parts = []
+            #         for page in pdf_reader.pages:
+            #             try:
+            #                 page_text = page.extract_text()
+            #                 if page_text:
+            #                     text_parts.append(page_text)
+            #             except Exception as e:
+            #                 print(f"Warning: Could not extract text from page: {str(e)}")
+            #                 continue
+                            
+            #         # Join all text parts with newlines
+            #         text = "\n\n".join(text_parts)
+                    
+            #         if not text.strip():
+            #             raise ValueError("No text could be extracted from the PDF")
+                        
+            #         return text.strip()
+                    
+            #     except Exception as e:
+            #         if "EOF marker not found" in str(e):
+            #             # Try an alternative approach with a copy of the stream
+            #             try:
+            #                 file_stream = io.BytesIO(pdf_bytes)
+            #                 pdf_reader = PyPDF2.PdfReader(file_stream)
+            #                 text_parts = []
+            #                 for page in pdf_reader.pages:
+            #                     try:
+            #                         text_parts.append(page.extract_text())
+            #                     except:
+            #                         continue
+            #                 text = "\n\n".join(text_parts)
+            #                 if text.strip():
+            #                     return text.strip()
+            #             except:
+            #                 pass
+                            
+            #         raise ValueError(f"Could not process PDF: {str(e)}")
+                    
+            # except Exception as e:
+            #     raise ValueError(f"Error processing PDF: {str(e)}")
+            # pdf_bytes = base64.b64decode(file_content, validate=True)
+            
+           
+            # Step 2: Convert bytes into a file-like object (BytesIO)
+            # file_stream = BytesIO(pdf_bytes)
+            
+            # text = ""
+            # with pdfplumber.open(file_stream) as pdf:
+            #     for page in pdf.pages:
+            #         text += page.extract_text() + "\n\n"
+            # return text
+            # fitz.open(stream=io.BytesIO(base64.b64decode(file_content, validate=True)), filetype="pdf")
+            # all_text = ""
+            # for page in fitz.pages():
+            #     all_text += page.get_text("text")
+            # return all_text
+
+        # print("file content: " + file_content)
+        
+        def extract_text_from_scanned_pdf(file_content):
+            # pages = convert_from_path(file_path)  # Convert each PDF page to an image
+            # text = "\n\n".join([pytesseract.image_to_string(page) for page in pages])
+            # return text
+            try:
+                # Step 1: Decode base64 string into bytes
+                pdf_bytes = base64.b64decode(file_content, validate=True)
+
+                # Step 2: Convert PDF pages into images
+                images = convert_from_bytes(pdf_bytes)
+
+                # Step 3: Extract text from images using OCR
+                extracted_text = "\n\n".join([pytesseract.image_to_string(img) for img in images])
+
+                return extracted_text
+            except Exception as e:
+                return f"Error extracting text: {str(e)}"
+
+        start = time.time()
+        text = extract_text_from_scanned_pdf(file_content)  # Extract text from PDF
+        end = time.time()
+        print(end-start)
+
+        print("I did something")
+        print("text: " + text[:500])
+        return jsonify({"error": f"No error, we're in the process of breaking things for now😭😭😭"}), 400
+
+        # sections = split_text_into_paragraphs(text)  # Chunk text into sections
+
+        # 4️⃣ Embed & Store Sections in Pinecone
+        # for section in sections:
+            # pinecone_id = store_embedding(library_id, section)
+        
         # if status_code == 201:
         library_id = library_response.get_json().get("library_id")
             # img_url = img_url_future.result()

@@ -55,6 +55,7 @@ TODO list:
             3) generate questions per every subchapter / lecture given syllabus (stored in database)
             4) user can re-generate questions easily and for cheap (cheap for me at least cost for user tbd) bc embeddings are precomputed
             5) user should delete things hopefully
+        - other idea: instead of giving whole textbook to gemini to figure out ideas, just have the user input a syllabus / toc of textbook so we can get the names off the bat, or have an option to specify yourself, or have it make its own based on the input material (this would be better for unorganized courses w/ no syllabus and it would be easy for users - could make specifying yourself the default and have this for paid content?)
 
     - Actual map page:
         - link clicking on the "play" button link to the actual game

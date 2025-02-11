@@ -120,6 +120,40 @@
                   "
                   :disabled="disableExtras"
                 />
+
+                 <!-- Room Names Section -->
+              <div class="form-group room-names">
+                <div class="libgen-title">Room Names (Optional)</div>
+                <div class="room-input-container">
+                  <div class="room-input-wrapper">
+                    <input
+                      type="text"
+                      v-model="newRoomName"
+                      placeholder="Enter room name"
+                      maxlength="40"
+                      :disabled="roomNames.length >= 30 || disableExtras"
+                      @keyup.enter="addRoom"
+                    />
+                    <button 
+                      class="add-room-btn"
+                      @click="addRoom"
+                      :disabled="!newRoomName.trim() || roomNames.length >= 30 || disableExtras"
+                    >
+                      Add
+                    </button>
+                  </div>
+                  <div class="room-count" v-if="roomNames.length > 0">
+                    {{ roomNames.length }}/30 rooms
+                  </div>
+                  <div class="room-chips">
+                    <div v-for="(room, index) in roomNames" :key="index" class="room-chip">
+                      {{ room }}
+                      <button class="remove-room-btn" @click="removeRoom(index)">×</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               </div>
             </div>
           </transition>
@@ -172,6 +206,8 @@
         difficultyLevels: ["Easy", "Normal", "Hard"],
         showDetails: false,
         isSubmitting: false,
+        newRoomName: "",
+        roomNames: [],
       };
     },
     mounted() {
@@ -242,9 +278,9 @@
     handleFileUpload(event) {
       const file = event.target.files[0];
       if (file) {
-        if (file.size > 7 * 1024 * 1024) { // 5MB limit
+        if (file.size > 15 * 1024 * 1024) { // 15MB limit
           const popupStore = usePopupStore();
-          popupStore.showPopup("File size must be less than 5MB");
+          popupStore.showPopup("File size must be less than 15MB");
           this.$refs.fileInput.value = '';
           return;
         }
@@ -266,7 +302,16 @@
       };
       reader.readAsText(file);
     },
-
+       addRoom() {
+      const trimmedName = this.newRoomName.trim();
+      if (trimmedName && this.roomNames.length < 30) {
+        this.roomNames.push(trimmedName);
+        this.newRoomName = "";
+      }
+    },
+    removeRoom(index) {
+      this.roomNames.splice(index, 1);
+    },
       handleSubmit() {
         if (this.topic.trim() === "") {
           this.topicError = true;
@@ -291,7 +336,9 @@
           libraryDifficulty: this.libraryDifficulty,
           guide: this.currentMentorName,
           selectedFile: null,
-          fileContent: null,
+          // fileContent: null,
+          fileContent: this.fileContent,
+          roomNames: this.roomNames
         };
         axios
           .post("/api/library/generate", postData)
@@ -552,4 +599,73 @@
 .remove-file-btn:hover {
   opacity: 1;
 }
-  </style>
+
+.room-input-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+  margin-bottom: 1em;
+}
+
+.room-input-wrapper {
+  display: flex;
+  gap: 0.5em;
+}
+
+.room-input-wrapper input {
+  flex-grow: 1;
+}
+
+.add-room-btn {
+  padding: 8px 16px;
+  background-color: var(--element-color-1);
+  border: none;
+  border-radius: 4px;
+  color: var(--text-color);
+  cursor: pointer;
+}
+
+.add-room-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.room-count {
+  font-size: 0.8em;
+  opacity: 0.7;
+  text-align: right;
+}
+
+.room-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5em;
+}
+
+.room-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  padding: 4px 8px;
+  background-color: var(--element-color-1);
+  border-radius: 16px;
+  font-size: 0.9em;
+}
+
+.remove-room-btn {
+  background: none;
+  border: none;
+  color: var(--text-color);
+  cursor: pointer;
+  padding: 0;
+  font-size: 1.2em;
+  opacity: 0.7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.remove-room-btn:hover {
+  opacity: 1;
+}
+</style>
