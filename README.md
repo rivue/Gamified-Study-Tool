@@ -42,11 +42,13 @@ TODO list:
 
     - Create course (library) page:
         - add support for links / pdfs / other things and get rid of things like difficulty, tutor, etc... then actually start generating stuff to study
+        - instead of 24 room names, have it choose the amount of room names, then feed it into the 
 
     Game page:
         - remove timer
         - remove likes / clouds / diamonds? 
             - investigate what they're used for and we can probably use them later
+<<<<<<< HEAD
         - remove header / footer when user is playing a game
         - change from giving questions from lots and lots of "rooms" to questions from one specific room
             - almost done, but need to make library room names have underscores instead so it will redirect and it will 
@@ -60,11 +62,21 @@ TODO list:
             4) user can re-generate questions easily and for cheap (cheap for me at least cost for user tbd) bc embeddings are precomputed
             5) user should delete things hopefully
         - other idea: instead of giving whole textbook to gemini to figure out ideas, just have the user input a syllabus / toc of textbook so we can get the names off the bat, or have an option to specify yourself, or have it make its own based on the input material (this would be better for unorganized courses w/ no syllabus and it would be easy for users - could make specifying yourself the default and have this for paid content?)
+=======
+        - remove header / footer when user is playing a game 
+>>>>>>> 83dba00 (idk yet)
 
     - Actual map page:
         - link clicking on the "play" button link to the actual game
         - decorate the map eventually
         - figure out a way to break up room names into sections either by user request or something else
+        - idea: have 1 prompt and <num_rooms> seperate outputs
+        - or just make it so that users generate it on the fly with the textbook
+        - other idea: take a picture of the textbook chapter / sub-chapter index, then it generates material based on those
+         along with context (this textbook from this school) as opposed to taking 2085732930 hours to process the whole textbook
+            - 1) use openai's assistant api (pretty expensive)
+            - 2) use gpt embedding api then store embeddings in pinecode and pass relevant sections to gpt to generate relevant questions (extremely cheap, please do this week, its not even that hard)
+            - 3) use images - this could work as well, maybe for free ppl?
 
 
 COMPLETED:
@@ -77,6 +89,7 @@ COMPLETED:
     ✅ change room names text to a good color
     ✅ add a small pop-up menu when you click on it that currently displays nothing but will display the course name possibly and the play button
             and mastery of topics in the course as well (course name could be just the topics)
+    ✅ change from giving questions from lots and lots of "rooms" to questions from one specific room
 
 RESOURCES:
     - node components: https://vueflow.dev/
