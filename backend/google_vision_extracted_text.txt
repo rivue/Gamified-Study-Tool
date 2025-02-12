@@ -1,0 +1,663 @@
+Page 1:
+Automatic Course Generation Tool:
+Core Idea: Build a platform where you can upload documents or other supporting materials (in
+students case a 300 page textbook, in companies case maybe Rules, QnA, policies, something
+like that) then build software which automatically extracts ideas from each chapter / sub chapter
+and breaks them into modules with a quiz / lecture / maybe interactive part (the lectures would
+be videos generated with ai) then there are quizzes at the end of each module, and a bigger test
+for users at the end of each chapter, and would have lots of other stuff that users could learn
+from (drag/drop, matching, small entertaining games, interaction with an Al avatar). Users
+could upload these (the courses) and have other people use them, much like quizlet, and each
+course could have a progress bar, not only telling users how long they are through the textbook,
+but also tell users how many ideas they have covered, like you take one quiz at the end of the
+chapter and it only covers 5/12 ideas or concepts in the chapter, but you take another and
+another quiz until you have fully mastered all ideas in the textbook. Could be like Duolingo in
+that the review / learning process could be entertaining / interactive and also possibly have a
+concept map / network map of all the main ideas not completely unlike Doulingo. Similarly, as
+you progress and advance more in the course, you could be asked harder and harder
+questions, like free response questions that involve multiple things you've learned so far. This
+would be a subscription based thing in order for users to have access to > 3 courses (haven't
+decided on the exact number yet), (I would heavily discount / give it for free to students from my
+school as a trial) but it would alleviate the need for college students to be taught by teachers
+they can't understand, but it could also be useful for homeschooling or advertisement or safety
+training videos, really anything in case that market doesn't work out the way I think it could.
+Why people would use this product:
+Students creating courses for the classes they are taking
+Right now, creating flash cards / studying is boring and tedious. Creating flash
+cards takes lots of valuable time that could be spent studying and on top of that,
+they are stale and cannot be elaborated on. With our Al generated informative
+videos, Doulingo-like learning, and ai companian, I (we) will make learning from a
+boring material like a textbook fun and engaging. Additionally, there are lots of
+productivity tools out there that attempt to gamify habits, but do they really? They
+do not tie directly into reviewing course material and only provide a pretty ui over
+a shit excuse for a basic ToDo list. My (our) product will gamify learning by taking
+the content and make it fun and engaging for all learning styles. Students will use
+our product because it has all of these things in one that these other tools lack
+and will crave my (our) product because it turns their long tedious hours studying
+into a fun game.
+The main competitor I am worried about is turbolearn.ai, but I think our product
+will be superior because all they do is turn lectures into notes and a couple
+flashcards while we actually facilitate the learning process
+Aspects of studying:
+Either have pages of professor-written notes,
+--------------------------------------------------------------------------------
+Page 2:
+or a given section of the textbook to go over (this is where I come in)
+or certain words to memorize (quizlet does this well, but I could make it more
+entertaining possibly)
+or videos to go over (I could do this to by transcribing videos and illustrating them with
+various Al generated images, or grabbing them from google, or straight up extracting any
+diagrams with ai tools). Stable Diffusion could help as well. (Might want to rely on oss
+models for some cases due to cost)
+homework can I help with this? maybe ai interpretor can given context? or maybe that
+is a thing for googles ai assistant or best left for other things
+Reviewing for test → big strength of mine since I would directly be given the source
+material and could make it easy for the student to review assuming they had enough
+time
+Writing essays
+Ideas for later:
+→
+maybe not, but could help with learning content?
+Note: in the far future, this project could go a variety of ways, whether focusing on
+university/grad students, K-12 students, enterprise, joke courses for fun, so I will
+have to see what people either like or use the most and iterate constantly from
+there
+Could be small scale as well, like for small books, emails, information sessions, or
+something
+Or maybe just tell the program how long of a timeline you want to study for
+Build a system that helps users understands how concepts connect across chapters
+(knowledge map) and make an animation whenever you master a sub-module /
+sub-chapter and a bigger animation whenever you master a module chapter similar to
+Doulingo - maybe constellation effects when completing chapter sets
+Could incorporate a feature which unites the concept maps from all the courses
+you have taken into a super large concept map
+Could also have a "world map" of every subject to exist on the platform
+(might be unnecessary tho) or like some sort of ranked competitiveness
+or something
+Show strength of understanding through node size (?) and highlight knowledge gaps that
+need attention
+competitive elements w/ peer progress (maybe with classmates?) and reward systems
+for consistent engagement
+along with maybe mini challenges to unlock new map areas and achievement badges
+within the map (maybe?)
+Create interactive stuff like interactive cell diagrams for biology or ai-powered case study
+discussions for business courses
+add peer review / rating systems and collaborative learning features
+Could sell to professors / K-12 teachers
+Could customize the videos for target audience (make them custom for each user?)
+--------------------------------------------------------------------------------
+Page 3:
+-
+Not the videos themselves, but could have a conversational assistant (actual
+speech / ai avatar, not just a chatbot) that could help users understand a topic in
+an easy to learn manner
+Could incorporate given documents (ex: segment out formulas from pages in the math
+textbook or something - would be pretty advanced tho)
+If relevant to the topic, could supplement with diagrams/pictures/supporting
+documents from other places (google) and possibly have ai generate them - also
+something that is not mvp
+Could add hints and stuff from quizzes and requiz you on topics you struggled with like
+Duolingo
+Could have user select the length of the lesson before going in (<5 min., 5-15, 15-30,
+30+)
+For engineering classes with hard problems, we could break large question up into small
+parts that happen to rely on each other possibly
+Could have the course creator modify the map by adding / deleting nodes, etc.. → for
+course creation, the user would specify the amount of levels for each world, but would be
+able to add/delete / modify things later. This provides a structure for LLM output while
+still minimizing psychological barriers (users will still have to select uploaded files
+anyway)
+Have 3-4 themed worlds (ice, snow, jungle, lava, city, sand, etc...) (modules - one per
+section / test) with 8-12 levels (lectures) possibly with a final boss at the end
+Notify users when their friends pass them on the leaderboard, etc... to illicit some
+feeling. Or when there's 24 hrs left in a monthly / weekly study challenge, send another
+notification or something
+Long Term Goals
+- Get acquired by duolingo ( or udemy or coursera but Doulingo would be the best) NVM
+FUCK ACQUISITION, WRITE DOWN STUFF IN RED HAT NOTEBOOK
+- CES
+Long Term Plans:
+1) Continue validating product
+2) Build landing page
+3) Build refine MVP
+4) Get rapid feedback and repeat this and 3
+5) Once (if) funding from school is acquired, launch to college students as a study tool and
+either partner with content creators, market / build w/ my own personal brand, or build an
+actual social media presence
+6) Make sure high school students use it too
+7) Launch to K - 12 teachers / school districts to help review + augment the process of
+learning the material
+8) (potentially) build out a new type of school to basically replace community college but for
+ambitious, enreprenuerial high school students, like it would give them credit for Gen-ed
+courses while also giving them resources, mentorship, and possibly act as a startup VC
+--------------------------------------------------------------------------------
+Page 4:
+firm. But also give them super cool teachers as well (Mark Rober, Chief ai scientists,
+etc...)
+9) Expand prev, but for entire degree (ex: it gives ABET accredation for engineering) and
+maybe has virtual labs they can access w/ AR / VR/XR glasses that type thing, etc...)
+Also expand it for kids who want the whole degree and maybe for those who aren't as
+entrepreneurial as an alternative to super expensive ($100k) college - basically Musk's
+Ad Astra but virtual
+10) Expand to K - 12 students, and basically get a grip on the entire chain of education,
+toppling College Board and significantly lowering demand for college, lowering cost for
+all.
+11) Expand into other areas, building an in-house indie game studio 1st (maybe this would
+be earlier) then expand into other domains as well. Semi-related ones like psychology
+research, but basically things that are innovative and acquire them from the VC firm to
+build out our conglomerate
+12) Becomd basically Samsng in Chine, but also with a complete chain of control from
+Kindergarten to retirement (students of our school would work in one of our massive
+conglomerate companies) but we also facilitate agency and self-learning and reading
+books in our students and stuff so its not all bad.
+13) Modernize a 200-year out of date system while toppling multiple billion dollar industries
+while becoming so unfathomably rich I couldn't go broke if I spend my whole life
+spending money.
+14) Die and worship the LORD for all of eternity knowing it was all a grain of sand in the
+desert of Heaven
+What would college students use it for?
+Understanding a topic better, and learning it in different ways, although this might be
+better for students in test / concept heavy fields like medicine
+Monetization Strategy:
+Subscription based, and maybe give a portion of income to those that create courses?
+Part of the subscription would be able to change background / color / animations
+of concept map
+B2B: build a platform for enterprise companies so they build trainings or any other
+courses for employees and can eliminate the need to do this by hand, saving lots and
+lots of hours and also potentially making it fun for their employees while in the process
+giving us lots and lots of money.
+MVP: (see mvp tab)
+The Problem:
+--------------------------------------------------------------------------------
+Page 5:
+Students have a variety of ways to study for exams and review content for their classes
+(TurboLearn.ai, Quizlet, Anki). TurboLearn.ai would probably be the biggest competitor |
+guess, but they are only for single lectures?
+The Solution:
+(Short Term) Have a simple but kind of pleasing ui where users can
+1) upload input documents
+and then 2) have the generated course on a different page
+-
+where 2.a) the output is subdivided into different modules and
+submodules (basically horizontal dropdown menus with a title)
+with 2.c) a quiz on each sub-module
+and can 3) save the course to their profile because I am guessing these things
+would be very expensive to create
+(Long Term) Our (my for now) product makes learning fun and engaging by incorporating
+Doulingo-style entertainment methods, making learning fun and engaging. We will use Al
+to create entertaining and informative videos, quite unlike ones that have been
+previously developed - they will not just be ai avatars with eleven labs voiceovers, but
+will include images/videos/pictures/ diagrams from input material, diagrams/graphs /
+pictures that are either Al generated or from google, and will also be interactive such as
+having and are not limited to the following things within the video: multiple choice
+questions, voice / short answer response to answer questions, drag-and-drop questions,
+small entertaining games, other Doulingo-like games, and possibly responsive
+characters among other things we ( I ) will come up with
+Mini-Game ideas
+-
+Fill in the blank
+Matching
+Word scramble
+(Ex: derivative → itevireadr)
+Could use Google textfx or similar
+Fill in the gaps (multiple blanks)
+True/false, but w/ explanation
+Flashcards
+Possibly 2x points during weekends or something?
+Interactive problem solving
+Could be useful for longer problems like engineering hw or something
+App is called "Flux" with a little simplistic light bulb logo that lights up every time you get
+something right / wrong (or "Ripple" and stream with stepping stone theme).
+If you complete a level and get a good grade or something, maybe the level goes from a
+stepping stone with a small ripple to a small wave → whirlpool →ocean or something and
+maybe the stepping stone turns solid gold
+--------------------------------------------------------------------------------
+Page 6:
+Build a platform for VR apps like steam for an app for your phone (VR bc we will use Google
+cardboard headsets and their oss cr software for phones and possibly laptops as well)
+Build the vr apps on the platform for ap classes
+Then possibly build a no low code tool to build these vr apps that ap kids will use to develop On
+Charge a percentage fee from app profit
+--------------------------------------------------------------------------------
+Page 1:
+Automatic Course Generation Tool:
+Core Idea: Build a platform where you can upload documents or other supporting materials (in
+students case a 300 page textbook, in companies case maybe Rules, QnA, policies, something
+like that) then build software which automatically extracts ideas from each chapter / sub chapter
+and breaks them into modules with a quiz / lecture / maybe interactive part (the lectures would
+be videos generated with ai) then there are quizzes at the end of each module, and a bigger test
+for users at the end of each chapter, and would have lots of other stuff that users could learn
+from (drag/drop, matching, small entertaining games, interaction with an Al avatar). Users
+could upload these (the courses) and have other people use them, much like quizlet, and each
+course could have a progress bar, not only telling users how long they are through the textbook,
+but also tell users how many ideas they have covered, like you take one quiz at the end of the
+chapter and it only covers 5/12 ideas or concepts in the chapter, but you take another and
+another quiz until you have fully mastered all ideas in the textbook. Could be like Duolingo in
+that the review / learning process could be entertaining / interactive and also possibly have a
+concept map / network map of all the main ideas not completely unlike Doulingo. Similarly, as
+you progress and advance more in the course, you could be asked harder and harder
+questions, like free response questions that involve multiple things you've learned so far. This
+would be a subscription based thing in order for users to have access to > 3 courses (haven't
+decided on the exact number yet), (I would heavily discount / give it for free to students from my
+school as a trial) but it would alleviate the need for college students to be taught by teachers
+they can't understand, but it could also be useful for homeschooling or advertisement or safety
+training videos, really anything in case that market doesn't work out the way I think it could.
+Why people would use this product:
+Students creating courses for the classes they are taking
+Right now, creating flash cards / studying is boring and tedious. Creating flash
+cards takes lots of valuable time that could be spent studying and on top of that,
+they are stale and cannot be elaborated on. With our Al generated informative
+videos, Doulingo-like learning, and ai companian, I (we) will make learning from a
+boring material like a textbook fun and engaging. Additionally, there are lots of
+productivity tools out there that attempt to gamify habits, but do they really? They
+do not tie directly into reviewing course material and only provide a pretty ui over
+a shit excuse for a basic ToDo list. My (our) product will gamify learning by taking
+the content and make it fun and engaging for all learning styles. Students will use
+our product because it has all of these things in one that these other tools lack
+and will crave my (our) product because it turns their long tedious hours studying
+into a fun game.
+The main competitor I am worried about is turbolearn.ai, but I think our product
+will be superior because all they do is turn lectures into notes and a couple
+flashcards while we actually facilitate the learning process
+Aspects of studying:
+Either have pages of professor-written notes,
+--------------------------------------------------------------------------------
+Page 2:
+or a given section of the textbook to go over (this is where I come in)
+or certain words to memorize (quizlet does this well, but I could make it more
+entertaining possibly)
+or videos to go over (I could do this to by transcribing videos and illustrating them with
+various Al generated images, or grabbing them from google, or straight up extracting any
+diagrams with ai tools). Stable Diffusion could help as well. (Might want to rely on oss
+models for some cases due to cost)
+homework can I help with this? maybe ai interpretor can given context? or maybe that
+is a thing for googles ai assistant or best left for other things
+Reviewing for test → big strength of mine since I would directly be given the source
+material and could make it easy for the student to review assuming they had enough
+time
+Writing essays
+Ideas for later:
+→
+maybe not, but could help with learning content?
+Note: in the far future, this project could go a variety of ways, whether focusing on
+university/grad students, K-12 students, enterprise, joke courses for fun, so I will
+have to see what people either like or use the most and iterate constantly from
+there
+Could be small scale as well, like for small books, emails, information sessions, or
+something
+Or maybe just tell the program how long of a timeline you want to study for
+Build a system that helps users understands how concepts connect across chapters
+(knowledge map) and make an animation whenever you master a sub-module /
+sub-chapter and a bigger animation whenever you master a module chapter similar to
+Doulingo - maybe constellation effects when completing chapter sets
+Could incorporate a feature which unites the concept maps from all the courses
+you have taken into a super large concept map
+Could also have a "world map" of every subject to exist on the platform
+(might be unnecessary tho) or like some sort of ranked competitiveness
+or something
+Show strength of understanding through node size (?) and highlight knowledge gaps that
+need attention
+competitive elements w/ peer progress (maybe with classmates?) and reward systems
+for consistent engagement
+along with maybe mini challenges to unlock new map areas and achievement badges
+within the map (maybe?)
+Create interactive stuff like interactive cell diagrams for biology or ai-powered case study
+discussions for business courses
+add peer review / rating systems and collaborative learning features
+Could sell to professors / K-12 teachers
+Could customize the videos for target audience (make them custom for each user?)
+--------------------------------------------------------------------------------
+Page 3:
+-
+Not the videos themselves, but could have a conversational assistant (actual
+speech / ai avatar, not just a chatbot) that could help users understand a topic in
+an easy to learn manner
+Could incorporate given documents (ex: segment out formulas from pages in the math
+textbook or something - would be pretty advanced tho)
+If relevant to the topic, could supplement with diagrams/pictures/supporting
+documents from other places (google) and possibly have ai generate them - also
+something that is not mvp
+Could add hints and stuff from quizzes and requiz you on topics you struggled with like
+Duolingo
+Could have user select the length of the lesson before going in (<5 min., 5-15, 15-30,
+30+)
+For engineering classes with hard problems, we could break large question up into small
+parts that happen to rely on each other possibly
+Could have the course creator modify the map by adding / deleting nodes, etc.. → for
+course creation, the user would specify the amount of levels for each world, but would be
+able to add/delete / modify things later. This provides a structure for LLM output while
+still minimizing psychological barriers (users will still have to select uploaded files
+anyway)
+Have 3-4 themed worlds (ice, snow, jungle, lava, city, sand, etc...) (modules - one per
+section / test) with 8-12 levels (lectures) possibly with a final boss at the end
+Notify users when their friends pass them on the leaderboard, etc... to illicit some
+feeling. Or when there's 24 hrs left in a monthly / weekly study challenge, send another
+notification or something
+Long Term Goals
+- Get acquired by duolingo ( or udemy or coursera but Doulingo would be the best) NVM
+FUCK ACQUISITION, WRITE DOWN STUFF IN RED HAT NOTEBOOK
+- CES
+Long Term Plans:
+1) Continue validating product
+2) Build landing page
+3) Build refine MVP
+4) Get rapid feedback and repeat this and 3
+5) Once (if) funding from school is acquired, launch to college students as a study tool and
+either partner with content creators, market / build w/ my own personal brand, or build an
+actual social media presence
+6) Make sure high school students use it too
+7) Launch to K - 12 teachers / school districts to help review + augment the process of
+learning the material
+8) (potentially) build out a new type of school to basically replace community college but for
+ambitious, enreprenuerial high school students, like it would give them credit for Gen-ed
+courses while also giving them resources, mentorship, and possibly act as a startup VC
+--------------------------------------------------------------------------------
+Page 4:
+firm. But also give them super cool teachers as well (Mark Rober, Chief ai scientists,
+etc...)
+9) Expand prev, but for entire degree (ex: it gives ABET accredation for engineering) and
+maybe has virtual labs they can access w/ AR / VR/XR glasses that type thing, etc...)
+Also expand it for kids who want the whole degree and maybe for those who aren't as
+entrepreneurial as an alternative to super expensive ($100k) college - basically Musk's
+Ad Astra but virtual
+10) Expand to K - 12 students, and basically get a grip on the entire chain of education,
+toppling College Board and significantly lowering demand for college, lowering cost for
+all.
+11) Expand into other areas, building an in-house indie game studio 1st (maybe this would
+be earlier) then expand into other domains as well. Semi-related ones like psychology
+research, but basically things that are innovative and acquire them from the VC firm to
+build out our conglomerate
+12) Becomd basically Samsng in Chine, but also with a complete chain of control from
+Kindergarten to retirement (students of our school would work in one of our massive
+conglomerate companies) but we also facilitate agency and self-learning and reading
+books in our students and stuff so its not all bad.
+13) Modernize a 200-year out of date system while toppling multiple billion dollar industries
+while becoming so unfathomably rich I couldn't go broke if I spend my whole life
+spending money.
+14) Die and worship the LORD for all of eternity knowing it was all a grain of sand in the
+desert of Heaven
+What would college students use it for?
+Understanding a topic better, and learning it in different ways, although this might be
+better for students in test / concept heavy fields like medicine
+Monetization Strategy:
+Subscription based, and maybe give a portion of income to those that create courses?
+Part of the subscription would be able to change background / color / animations
+of concept map
+B2B: build a platform for enterprise companies so they build trainings or any other
+courses for employees and can eliminate the need to do this by hand, saving lots and
+lots of hours and also potentially making it fun for their employees while in the process
+giving us lots and lots of money.
+MVP: (see mvp tab)
+The Problem:
+--------------------------------------------------------------------------------
+Page 5:
+Students have a variety of ways to study for exams and review content for their classes
+(TurboLearn.ai, Quizlet, Anki). TurboLearn.ai would probably be the biggest competitor |
+guess, but they are only for single lectures?
+The Solution:
+(Short Term) Have a simple but kind of pleasing ui where users can
+1) upload input documents
+and then 2) have the generated course on a different page
+-
+where 2.a) the output is subdivided into different modules and
+submodules (basically horizontal dropdown menus with a title)
+with 2.c) a quiz on each sub-module
+and can 3) save the course to their profile because I am guessing these things
+would be very expensive to create
+(Long Term) Our (my for now) product makes learning fun and engaging by incorporating
+Doulingo-style entertainment methods, making learning fun and engaging. We will use Al
+to create entertaining and informative videos, quite unlike ones that have been
+previously developed - they will not just be ai avatars with eleven labs voiceovers, but
+will include images/videos/pictures/ diagrams from input material, diagrams/graphs /
+pictures that are either Al generated or from google, and will also be interactive such as
+having and are not limited to the following things within the video: multiple choice
+questions, voice / short answer response to answer questions, drag-and-drop questions,
+small entertaining games, other Doulingo-like games, and possibly responsive
+characters among other things we ( I ) will come up with
+Mini-Game ideas
+-
+Fill in the blank
+Matching
+Word scramble
+(Ex: derivative → itevireadr)
+Could use Google textfx or similar
+Fill in the gaps (multiple blanks)
+True/false, but w/ explanation
+Flashcards
+Possibly 2x points during weekends or something?
+Interactive problem solving
+Could be useful for longer problems like engineering hw or something
+App is called "Flux" with a little simplistic light bulb logo that lights up every time you get
+something right / wrong (or "Ripple" and stream with stepping stone theme).
+If you complete a level and get a good grade or something, maybe the level goes from a
+stepping stone with a small ripple to a small wave → whirlpool →ocean or something and
+maybe the stepping stone turns solid gold
+--------------------------------------------------------------------------------
+Page 6:
+Build a platform for VR apps like steam for an app for your phone (VR bc we will use Google
+cardboard headsets and their oss cr software for phones and possibly laptops as well)
+Build the vr apps on the platform for ap classes
+Then possibly build a no low code tool to build these vr apps that ap kids will use to develop On
+Charge a percentage fee from app profit
+--------------------------------------------------------------------------------
+Page 1:
+Automatic Course Generation Tool:
+Core Idea: Build a platform where you can upload documents or other supporting materials (in
+students case a 300 page textbook, in companies case maybe Rules, QnA, policies, something
+like that) then build software which automatically extracts ideas from each chapter / sub chapter
+and breaks them into modules with a quiz / lecture / maybe interactive part (the lectures would
+be videos generated with ai) then there are quizzes at the end of each module, and a bigger test
+for users at the end of each chapter, and would have lots of other stuff that users could learn
+from (drag/drop, matching, small entertaining games, interaction with an Al avatar). Users
+could upload these (the courses) and have other people use them, much like quizlet, and each
+course could have a progress bar, not only telling users how long they are through the textbook,
+but also tell users how many ideas they have covered, like you take one quiz at the end of the
+chapter and it only covers 5/12 ideas or concepts in the chapter, but you take another and
+another quiz until you have fully mastered all ideas in the textbook. Could be like Duolingo in
+that the review / learning process could be entertaining / interactive and also possibly have a
+concept map / network map of all the main ideas not completely unlike Doulingo. Similarly, as
+you progress and advance more in the course, you could be asked harder and harder
+questions, like free response questions that involve multiple things you've learned so far. This
+would be a subscription based thing in order for users to have access to > 3 courses (haven't
+decided on the exact number yet), (I would heavily discount / give it for free to students from my
+school as a trial) but it would alleviate the need for college students to be taught by teachers
+they can't understand, but it could also be useful for homeschooling or advertisement or safety
+training videos, really anything in case that market doesn't work out the way I think it could.
+Why people would use this product:
+Students creating courses for the classes they are taking
+Right now, creating flash cards / studying is boring and tedious. Creating flash
+cards takes lots of valuable time that could be spent studying and on top of that,
+they are stale and cannot be elaborated on. With our Al generated informative
+videos, Doulingo-like learning, and ai companian, I (we) will make learning from a
+boring material like a textbook fun and engaging. Additionally, there are lots of
+productivity tools out there that attempt to gamify habits, but do they really? They
+do not tie directly into reviewing course material and only provide a pretty ui over
+a shit excuse for a basic ToDo list. My (our) product will gamify learning by taking
+the content and make it fun and engaging for all learning styles. Students will use
+our product because it has all of these things in one that these other tools lack
+and will crave my (our) product because it turns their long tedious hours studying
+into a fun game.
+The main competitor I am worried about is turbolearn.ai, but I think our product
+will be superior because all they do is turn lectures into notes and a couple
+flashcards while we actually facilitate the learning process
+Aspects of studying:
+Either have pages of professor-written notes,
+--------------------------------------------------------------------------------
+Page 2:
+or a given section of the textbook to go over (this is where I come in)
+or certain words to memorize (quizlet does this well, but I could make it more
+entertaining possibly)
+or videos to go over (I could do this to by transcribing videos and illustrating them with
+various Al generated images, or grabbing them from google, or straight up extracting any
+diagrams with ai tools). Stable Diffusion could help as well. (Might want to rely on oss
+models for some cases due to cost)
+homework can I help with this? maybe ai interpretor can given context? or maybe that
+is a thing for googles ai assistant or best left for other things
+Reviewing for test → big strength of mine since I would directly be given the source
+material and could make it easy for the student to review assuming they had enough
+time
+Writing essays
+Ideas for later:
+→
+maybe not, but could help with learning content?
+Note: in the far future, this project could go a variety of ways, whether focusing on
+university/grad students, K-12 students, enterprise, joke courses for fun, so I will
+have to see what people either like or use the most and iterate constantly from
+there
+Could be small scale as well, like for small books, emails, information sessions, or
+something
+Or maybe just tell the program how long of a timeline you want to study for
+Build a system that helps users understands how concepts connect across chapters
+(knowledge map) and make an animation whenever you master a sub-module /
+sub-chapter and a bigger animation whenever you master a module chapter similar to
+Doulingo - maybe constellation effects when completing chapter sets
+Could incorporate a feature which unites the concept maps from all the courses
+you have taken into a super large concept map
+Could also have a "world map" of every subject to exist on the platform
+(might be unnecessary tho) or like some sort of ranked competitiveness
+or something
+Show strength of understanding through node size (?) and highlight knowledge gaps that
+need attention
+competitive elements w/ peer progress (maybe with classmates?) and reward systems
+for consistent engagement
+along with maybe mini challenges to unlock new map areas and achievement badges
+within the map (maybe?)
+Create interactive stuff like interactive cell diagrams for biology or ai-powered case study
+discussions for business courses
+add peer review / rating systems and collaborative learning features
+Could sell to professors / K-12 teachers
+Could customize the videos for target audience (make them custom for each user?)
+--------------------------------------------------------------------------------
+Page 3:
+-
+Not the videos themselves, but could have a conversational assistant (actual
+speech / ai avatar, not just a chatbot) that could help users understand a topic in
+an easy to learn manner
+Could incorporate given documents (ex: segment out formulas from pages in the math
+textbook or something - would be pretty advanced tho)
+If relevant to the topic, could supplement with diagrams/pictures/supporting
+documents from other places (google) and possibly have ai generate them - also
+something that is not mvp
+Could add hints and stuff from quizzes and requiz you on topics you struggled with like
+Duolingo
+Could have user select the length of the lesson before going in (<5 min., 5-15, 15-30,
+30+)
+For engineering classes with hard problems, we could break large question up into small
+parts that happen to rely on each other possibly
+Could have the course creator modify the map by adding / deleting nodes, etc.. → for
+course creation, the user would specify the amount of levels for each world, but would be
+able to add/delete / modify things later. This provides a structure for LLM output while
+still minimizing psychological barriers (users will still have to select uploaded files
+anyway)
+Have 3-4 themed worlds (ice, snow, jungle, lava, city, sand, etc...) (modules - one per
+section / test) with 8-12 levels (lectures) possibly with a final boss at the end
+Notify users when their friends pass them on the leaderboard, etc... to illicit some
+feeling. Or when there's 24 hrs left in a monthly / weekly study challenge, send another
+notification or something
+Long Term Goals
+- Get acquired by duolingo ( or udemy or coursera but Doulingo would be the best) NVM
+FUCK ACQUISITION, WRITE DOWN STUFF IN RED HAT NOTEBOOK
+- CES
+Long Term Plans:
+1) Continue validating product
+2) Build landing page
+3) Build refine MVP
+4) Get rapid feedback and repeat this and 3
+5) Once (if) funding from school is acquired, launch to college students as a study tool and
+either partner with content creators, market / build w/ my own personal brand, or build an
+actual social media presence
+6) Make sure high school students use it too
+7) Launch to K - 12 teachers / school districts to help review + augment the process of
+learning the material
+8) (potentially) build out a new type of school to basically replace community college but for
+ambitious, enreprenuerial high school students, like it would give them credit for Gen-ed
+courses while also giving them resources, mentorship, and possibly act as a startup VC
+--------------------------------------------------------------------------------
+Page 4:
+firm. But also give them super cool teachers as well (Mark Rober, Chief ai scientists,
+etc...)
+9) Expand prev, but for entire degree (ex: it gives ABET accredation for engineering) and
+maybe has virtual labs they can access w/ AR / VR/XR glasses that type thing, etc...)
+Also expand it for kids who want the whole degree and maybe for those who aren't as
+entrepreneurial as an alternative to super expensive ($100k) college - basically Musk's
+Ad Astra but virtual
+10) Expand to K - 12 students, and basically get a grip on the entire chain of education,
+toppling College Board and significantly lowering demand for college, lowering cost for
+all.
+11) Expand into other areas, building an in-house indie game studio 1st (maybe this would
+be earlier) then expand into other domains as well. Semi-related ones like psychology
+research, but basically things that are innovative and acquire them from the VC firm to
+build out our conglomerate
+12) Becomd basically Samsng in Chine, but also with a complete chain of control from
+Kindergarten to retirement (students of our school would work in one of our massive
+conglomerate companies) but we also facilitate agency and self-learning and reading
+books in our students and stuff so its not all bad.
+13) Modernize a 200-year out of date system while toppling multiple billion dollar industries
+while becoming so unfathomably rich I couldn't go broke if I spend my whole life
+spending money.
+14) Die and worship the LORD for all of eternity knowing it was all a grain of sand in the
+desert of Heaven
+What would college students use it for?
+Understanding a topic better, and learning it in different ways, although this might be
+better for students in test / concept heavy fields like medicine
+Monetization Strategy:
+Subscription based, and maybe give a portion of income to those that create courses?
+Part of the subscription would be able to change background / color / animations
+of concept map
+B2B: build a platform for enterprise companies so they build trainings or any other
+courses for employees and can eliminate the need to do this by hand, saving lots and
+lots of hours and also potentially making it fun for their employees while in the process
+giving us lots and lots of money.
+MVP: (see mvp tab)
+The Problem:
+--------------------------------------------------------------------------------
+Page 5:
+Students have a variety of ways to study for exams and review content for their classes
+(TurboLearn.ai, Quizlet, Anki). TurboLearn.ai would probably be the biggest competitor |
+guess, but they are only for single lectures?
+The Solution:
+(Short Term) Have a simple but kind of pleasing ui where users can
+1) upload input documents
+and then 2) have the generated course on a different page
+-
+where 2.a) the output is subdivided into different modules and
+submodules (basically horizontal dropdown menus with a title)
+with 2.c) a quiz on each sub-module
+and can 3) save the course to their profile because I am guessing these things
+would be very expensive to create
+(Long Term) Our (my for now) product makes learning fun and engaging by incorporating
+Doulingo-style entertainment methods, making learning fun and engaging. We will use Al
+to create entertaining and informative videos, quite unlike ones that have been
+previously developed - they will not just be ai avatars with eleven labs voiceovers, but
+will include images/videos/pictures/ diagrams from input material, diagrams/graphs /
+pictures that are either Al generated or from google, and will also be interactive such as
+having and are not limited to the following things within the video: multiple choice
+questions, voice / short answer response to answer questions, drag-and-drop questions,
+small entertaining games, other Doulingo-like games, and possibly responsive
+characters among other things we ( I ) will come up with
+Mini-Game ideas
+-
+Fill in the blank
+Matching
+Word scramble
+(Ex: derivative → itevireadr)
+Could use Google textfx or similar
+Fill in the gaps (multiple blanks)
+True/false, but w/ explanation
+Flashcards
+Possibly 2x points during weekends or something?
+Interactive problem solving
+Could be useful for longer problems like engineering hw or something
+App is called "Flux" with a little simplistic light bulb logo that lights up every time you get
+something right / wrong (or "Ripple" and stream with stepping stone theme).
+If you complete a level and get a good grade or something, maybe the level goes from a
+stepping stone with a small ripple to a small wave → whirlpool →ocean or something and
+maybe the stepping stone turns solid gold
+--------------------------------------------------------------------------------
+Page 6:
+Build a platform for VR apps like steam for an app for your phone (VR bc we will use Google
+cardboard headsets and their oss cr software for phones and possibly laptops as well)
+Build the vr apps on the platform for ap classes
+Then possibly build a no low code tool to build these vr apps that ap kids will use to develop On
+Charge a percentage fee from app profit
+--------------------------------------------------------------------------------

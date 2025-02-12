@@ -185,8 +185,8 @@
   import { useMentorStore } from "@/store/mentorStore";
   import CtaButton from "../../Footer/LandingPageComponents/CtaButton.vue";
   import MenuButton from "@/components/Menus/MenuButton.vue";
-  import LibraryBrowser from "./LibraryBrowser.vue";
-  
+  import LibraryBrowser from "./LibraryBrowser.vue";3
+
   export default {
     name: "LibraryCreator",
     components: { CtaButton, LibraryBrowser, MenuButton },
@@ -340,6 +340,7 @@
           fileContent: this.fileContent,
           roomNames: this.roomNames
         };
+       
         axios
           .post("/api/library/generate", postData)
           .then((response) => {

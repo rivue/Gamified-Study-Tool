@@ -8,6 +8,7 @@ IDEAS:
             - not sure where to go from there, lots of places though
         - see google doc for more plans
         - say you came up with and built the knowledge graph algorithm on your resume
+            - Built a custom text extraction pipeline using Optical Character Recognition to extract text from pdf textbooks with 97% accuracy
 
     ideas for name:
         - name something stone related (bc you are SOLIDIFYING your knowledge (hahahahahah ok im done))
@@ -54,6 +55,7 @@ TODO list:
             1) give whole textbook to gpt to "split up" (finding a regular nlp alternative would be awesome as well - TextTiling (semantic similarity) or BERT-Topic (topic changes) or BookNLP (best for academic / long-form texts))
             2) store embeddings in pinecone (every paragraph)
             - make sure text extraction actually works
+            B64 IS WHERE THE PROBLEM IS HAPPENING
             3) generate questions per every subchapter / lecture given syllabus (stored in database)
             4) user can re-generate questions easily and for cheap (cheap for me at least cost for user tbd) bc embeddings are precomputed
             5) user should delete things hopefully

@@ -12,5 +12,5 @@ module.exports = defineConfig({
       filename: 'index.html',
       title: 'Ascendance·☁️| Learn anything'
     }
-  }
+  },
 });
