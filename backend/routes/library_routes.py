@@ -7,13 +7,16 @@ from bleach import clean
 from flask_executor import Executor
 # from pdfminer.high_level import extract_text
 import pytesseract
-from pdf2image import convert_from_path
+import pdf2image
+import pytesseract
+from PIL import Image
 import pdfplumber
-import PyPDF2
+from PyPDF2 import PdfReader
 import fitz
+import re
 
 import base64
-import io
+from io import BytesIO
 import time
 
 from openapi import moderate
@@ -251,29 +254,120 @@ def init_library_routes(app):
             # return text
             try:
                 # Step 1: Decode base64 string into bytes
-                pdf_bytes = base64.b64decode(file_content, validate=True)
+                # print(file_content)
+                # file_content = file_content.decode('utf-8') # or ascii?
+                # file_content = file_content.decode('ascii')
+                # handle event where file is bytes object?
+                # encode object?
+                file_content = file_content.strip()
+                padding = 4 - (len(file_content) % 4)
+                file_content += '=' * padding if padding != 4 else ''
 
+                file_content_bytes = file_content.encode('utf-8')
+                encoded_content = base64.b64encode(file_content_bytes) #, validate=True) # problem
+                # encoded_content_str = encoded_content.decode('utf-8')
+                decoded_content = base64.b64decode(encoded_content)
+
+                pages = pdf2image.convert_from_bytes(decoded_content)
+                total_text = ""
+
+                # Process each page (image) with OCR
+                for page in pages:
+                    text = pytesseract.image_to_string(page)
+
+                    # Print the OCR result for each page
+                    if text:
+                        print(text)
+                    total_text += text
+
+                # Write the extracted text to a file
+                if total_text:
+                    with open('./debug.txt', 'w', encoding='utf-8') as text_file:
+                        text_file.write(total_text)
+                else:
+                    print("No text extracted from the PDF.")
+
+                # print(encoded_content_str)
+                # with open("./debug.pdf", "wb") as f: # good
+                #     f.write(decoded_content)
+                    # file_content_bytes = bad
+                # with open('./debug.pdf', 'wb') as pdf_file:
+                #     pdf_file.write(decoded_content)
+
+                # with open('decoded_textbook.pdf', 'rb') as file:
+                
+                # Open and process the PDF
+                # with BytesIO(decoded_content) as pdf_file:
+                #     with pdfplumber.open(pdf_file) as pdf:
+                #         for page_num, page in enumerate(pdf.pages):
+                #             extracted_text = page.extract_text()  # Extract text from each page
+
+                #             # Print out the extracted text for debugging
+                #             if extracted_text:
+                #                 print(f"Text from page {page_num + 1}:")
+                #                 print(extracted_text)  # Print extracted text from each page
+                #                 total_text += extracted_text  # Append the extracted text to the accumulator
+                #             else:
+                #                 print(f"No text extracted from page {page_num + 1}")  # Notify if no text is found
+
+                # # After processing all pages, check if any text was accumulated
+                # if total_text:
+                #     # Print the entire extracted text (optional) for debugging
+                #     print("Full extracted text from the PDF:")
+                #     print(total_text)
+
+                #     # Write the accumulated text to a file
+                #     with open('./debug.txt', 'w', encoding='utf-8') as text_file:
+                #         text_file.write(total_text)
+                # else:
+                #     print("No text was extracted from any page of the PDF.")
+                
                 # Step 2: Convert PDF pages into images
-                images = convert_from_bytes(pdf_bytes)
-
+                # images = convert_from_bytes(pdf_bytes)
+                # print(images)
+                # print("^^^images")
                 # Step 3: Extract text from images using OCR
-                extracted_text = "\n\n".join([pytesseract.image_to_string(img) for img in images])
+                # extracted_text = "\n\n".join([pytesseract.image_to_string(img) for img in images])
+                
+                # extracted_text = extracted_text.encode("utf-8", "ignore").decode("utf-8")
 
-                return extracted_text
+                # extracted_text = unicodedata.normalize("NFKD", extracted_text)
+                # extracted_text = extracted_text.encode("ascii", "ignore").decode("utf-8")
+                # extracted_text = extracted_text.encode("ascii", "replace").decode("utf-8")
+
+                return total_text
             except Exception as e:
                 return f"Error extracting text: {str(e)}"
 
-        start = time.time()
+        def split_text_into_sections(text, min_sentences=5):
+            sentences = re.split(r'(?<=[.!?])\s+', text)  # Split by punctuation
+            sections = []
+            temp_section = []
+
+            for sentence in sentences:
+                temp_section.append(sentence)
+                if len(temp_section) >= min_sentences:
+                    sections.append(" ".join(temp_section))
+                    temp_section = []
+
+            if temp_section:
+                sections.append(" ".join(temp_section))  # Add leftover text
+
+            return sections
+
         text = extract_text_from_scanned_pdf(file_content)  # Extract text from PDF
-        end = time.time()
-        print(end-start)
-
+        print(text)
+        # print(repr(text))
+        # sections = split_text_into_sections(text)  # Chunk text into sections
         print("I did something")
-        print("text: " + text[:500])
+        # print(sections[250])
+        # print(sections[600])
+        # print(sections[800])
+        # print(sections[900])
+        # print(len(sections[0]))
+        # print(sections[0])
+        # print(sections)
         return jsonify({"error": f"No error, we're in the process of breaking things for now😭😭😭"}), 400
-
-        # sections = split_text_into_paragraphs(text)  # Chunk text into sections
-
         # 4️⃣ Embed & Store Sections in Pinecone
         # for section in sections:
             # pinecone_id = store_embedding(library_id, section)
