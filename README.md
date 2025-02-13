@@ -53,7 +53,7 @@ TODO list:
         plan for textbook stuff:
         - see purple text in tablet (continue w/ gemini flash stuff)
             1) give whole textbook to gpt to "split up" ✅
-            2) store embeddings in pinecone (every paragraph)
+            2) store embeddings in pinecone (every paragraph) (currently working on 🏗️)
             3) generate questions per every subchapter / lecture given syllabus (stored in database)
             4) user can re-generate questions easily and for cheap (cheap for me at least cost for user tbd) bc embeddings are precomputed
             5) user should delete things hopefully
