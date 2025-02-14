@@ -9,6 +9,9 @@ IDEAS:
         - see google doc for more plans
         - say you came up with and built the knowledge graph algorithm on your resume
             - Built a custom text extraction pipeline using Optical Character Recognition to extract text from pdf textbooks with 97% accuracy
+        - more advanced processing for Masters / PhD level topics (ask chatgpt, but mainly re-ranking, structured search, 
+            and advanced reasonding-based prompt engineering to capture cross-section dependencies) 
+        - investigate into late-chunking or late-interaction for vector embedding
 
     ideas for name:
         - name something stone related (bc you are SOLIDIFYING your knowledge (hahahahahah ok im done))
@@ -40,26 +43,41 @@ TODO list:
         - minor page reorganization (remove header and footer in game page + make page look at least a little better)
         - put image to text ocr thing on resume maybe
 
-    - Create course (library) page:
+    create course (library) page:
         - add support for links / pdfs / other things and get rid of things like difficulty, tutor, etc... then actually start generating stuff to study
 
-    Game page:
+    game page:
         - remove timer
         - remove likes / clouds / diamonds? 
             - investigate what they're used for and we can probably use them later
         - remove header / footer when user is playing a game
         - change from giving questions from lots and lots of "rooms" to questions from one specific room
-            - almost done, but need to make library room names have underscores instead so it will redirect and it will 
+            - almost done, but need to make library room names have underscores instead so it will redirect and it will
+
+    uploading / retrieving submitted materials:
         plan for textbook stuff:
         - see purple text in tablet (continue w/ gemini flash stuff)
             1) give whole textbook to gpt to "split up" ✅
-            2) store embeddings in pinecone (every paragraph) (currently working on 🏗️)
-            3) generate questions per every subchapter / lecture given syllabus (stored in database)
+            2) store embeddings in pinecone (every paragraph) ✅
+            3) generate questions per every subchapter / lecture given syllabus (stored in database) (currently working on 🏗️)
+                
             4) user can re-generate questions easily and for cheap (cheap for me at least cost for user tbd) bc embeddings are precomputed
             5) user should delete things hopefully
-        - other idea: instead of giving whole textbook to gemini to figure out ideas, just have the user input a syllabus / toc of textbook so we can get the names off the bat, or have an option to specify yourself, or have it make its own based on the input material (this would be better for unorganized courses w/ no syllabus and it would be easy for users - could make specifying yourself the default and have this for paid content?)
+        - other idea: instead of giving whole textbook to gemini to figure out ideas, just have the user input a syllabus / toc of
+         textbook so we can get the names off the bat, or have an option to specify yourself, 
+        or have it make its own based on the input material (this would be better for unorganized courses w/ no 
+        syllabus and it would be easy for users - could make specifying yourself the default and have this for paid content?)
+        - optimize sectioning (e: citations should not be ignored as opposed to taking up lots of sections possibly)
+            not completely sure how to do this yet
+            - DEFINETELY invoke parallel processing somehow
+            - INCREASE pinecone batch insert as well
+            - not sure how to handle max context window - if its that long anyway - probably either just take the first 500 words or split it up
+            or something
+            - run basic nlp to determine if it is a question of substance or just citations / index / whatever
+                - for citations for example, you could cite them in the problem.
 
-    - Actual map page:
+
+    actual map page:
         - link clicking on the "play" button link to the actual game
         - decorate the map eventually
         - figure out a way to break up room names into sections either by user request or something else
