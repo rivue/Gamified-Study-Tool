@@ -50,29 +50,14 @@ from openai import OpenAI
 import os
 from tqdm import tqdm
 import time
-client = vision.ImageAnnotatorClient()
-pdf_path = "./shorterbook.pdf"
 
-batch_size = 20  # Adjust to optimize for Google Vision API cost (higher = better)
 
-def is_scanned_pdf(pdf_path):
-    """
-    Determines if the PDF is scanned (image-based) or digital (text-based).
-    Returns True if scanned, False if digital.
-    """
-    doc = fitz.open(pdf_path)
-    for page in doc:
-        text = page.get_text("text")
-        if text.strip():  # If text exists, it's a digital PDF
-            return False
-    return True  # No text found, likely a scanned PDF
-
-def clean_text(text):
+def clean_text(text): # put in --> utils.py
     """Remove unwanted unicode artifacts like [U+202C] and other non-standard characters."""
     text = re.sub(r"\[U\+\w{4,5}\]", "", text)  # Remove unicode markers
     return text.strip()
 
-def split_into_sentences(text):
+def split_into_sentences(text): # put in --> utils.py
     """
     Split text into sentences using regex pattern that handles common abbreviations
     and multiple punctuation cases.
@@ -98,8 +83,8 @@ def create_sections(sentences, sentences_per_section=4):
         section = sentences[i:i + sentences_per_section]
         sections.append(' '.join(section))
     return sections
-
-def process_extracted_text(input_file, output_file):
+        
+def process_extracted_text(input_file, output_file): # --> document/process_document.py
     """
     Read extracted text file, break into 8-sentence sections,
     and save to new file.
@@ -131,14 +116,18 @@ def process_extracted_text(input_file, output_file):
         print(f"❌ Error: Could not find input file: {input_file}")
     except Exception as e:
         print(f"❌ Error processing text: {str(e)}")
+    except FileNotFoundError:
+        print(f"❌ Error: Could not find input file: {input_file}")
+    except Exception as e:
+        print(f"❌ Error processing text: {str(e)}")
 
-def get_embedding(text, model="text-embedding-3-small"):
+def get_embedding(text, model="text-embedding-3-small"): # --> should go in openapi.py
     """Get embedding for text using OpenAI's API"""
     client = OpenAI()
     text = text.replace("\n", " ")
     return client.embeddings.create(input=[text], model=model).data[0].embedding
 
-def init_pinecone():
+def init_pinecone(): # --> where to initialize?
     """Initialize Pinecone client and ensure index exists"""
     try:
         pc = Pinecone(api_key=os.getenv("PINECONE_API_KEY"), grpc=True)
@@ -259,50 +248,50 @@ def insert_sections_to_pinecone_parallel(sections, num_workers=4):
         print(f"❌ Error: {str(e)}")
 
 # # Open PDF
-# doc = fitz.open(pdf_path)
+doc = fitz.open(pdf_path)
 
-# # **Check if PDF is scanned or digital**
-# if is_scanned_pdf(pdf_path):
-#     print("📄 Detected Scanned PDF - Extracting text using OCR...")
-#     extracted_text = ""
+# **Check if PDF is scanned or digital**
+if is_scanned_pdf(pdf_path):
+    print("📄 Detected Scanned PDF - Extracting text using OCR...")
+    extracted_text = ""
 
-#     for i in range(0, max(len(doc), 100), batch_size):
-#         batch = doc[i : i + batch_size]
-#         print(f"Processing pages {i + 1} to {i + len(batch)}...")
+    for i in range(0, max(len(doc), 100), batch_size):
+        batch = doc[i : i + batch_size]
+        print(f"Processing pages {i + 1} to {i + len(batch)}...")
 
-#         for j, page in enumerate(batch):
-#             # Convert PDF page to an image
-#             pix = page.get_pixmap(dpi=100)
-#             img_bytes = pix.tobytes("png")
+        for j, page in enumerate(batch):
+            # Convert PDF page to an image
+            pix = page.get_pixmap(dpi=100)
+            img_bytes = pix.tobytes("png")
 
-#             # Send image to Google Vision API
-#             image = vision.Image(content=img_bytes)
-#             response = client.text_detection(image=image)
+            # Send image to Google Vision API
+            image = vision.Image(content=img_bytes)
+            response = client.text_detection(image=image)
 
-#             # Extract and clean text
-#             text = response.text_annotations[0].description if response.text_annotations else "No text detected"
-#             text = clean_text(text)
+            # Extract and clean text
+            text = response.text_annotations[0].description if response.text_annotations else "No text detected"
+            text = clean_text(text)
 
-#             extracted_text += f"Page {i + j + 1}:\n{text}\n{'-'*80}\n"
+            extracted_text += f"Page {i + j + 1}:\n{text}\n{'-'*80}\n"
 
-#         # Save partially extracted text every batch to free memory
-#         with open("google_vision_extracted_text.txt", "a", encoding="utf-8") as file:
-#             file.write(extracted_text)
-#             extracted_text = ""  # Clear variable
+        # Save partially extracted text every batch to free memory
+        with open("google_vision_extracted_text.txt", "a", encoding="utf-8") as file:
+            file.write(extracted_text)
+            extracted_text = ""  # Clear variable
 
-#         time.sleep(1)  # Prevent excessive API requests
+        time.sleep(1)  # Prevent excessive API requests
 
-# else:
-#     print("📑 Detected Digital PDF - Extracting text directly...")
-#     extracted_text = ""
-#     for page_num in range(len(doc)):
-#         text = doc[page_num].get_text("text")
-#         text = clean_text(text)
-#         extracted_text += f"Page {page_num + 1}:\n{text}\n{'-'*80}\n"
-
-# # **Save final extracted text**
-# with open("google_vision_extracted_text.txt", "a", encoding="utf-8") as file:
-#     file.write(extracted_text)
+else:
+    print("📑 Detected Digital PDF - Extracting text directly...")
+    extracted_text = ""
+    for page_num in range(len(doc)):
+        text = doc[page_num].get_text("text")
+        text = clean_text(text)
+        extracted_text += f"Page {page_num + 1}:\n{text}\n{'-'*80}\n"
+#  **Save final extracted text**
+with open("google_vision_extracted_text.txt", "a", encoding="utf-8") as file:
+    file.write(extracted_text)
+ ### ^^^ focus on this stuff for now, make sure it works, then move to other stuff ^^^
 
 # # if __name__ == "__main__":
 # input_file = "google_vision_extracted_text.txt"

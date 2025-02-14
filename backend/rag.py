@@ -44,7 +44,7 @@ class RAGQuerySystem:
         try:
             system_prompt = """You are a helpful assistant that answers questions based on the provided context. 
             Always base your answers on the given context and acknowledge if the context doesn't contain enough 
-            information to fully answer the question. If you use information from the context, try to indicate 
+            information to fully answer the question. If you use information from the context, try to indicate
             which context number you're referring to."""
             print(context)
             response = self.client.chat.completions.create(

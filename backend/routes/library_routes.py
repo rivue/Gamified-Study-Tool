@@ -147,6 +147,7 @@ def init_library_routes(app):
         # Create the library
         # room_names = room_names_future.result()
         # TODO library_response, status_code = lbh.create_library(user_id, topic, room_names, library_difficulty, language, language_difficulty, guide)
+        # TODO add textbook / document embeddings to pinecone w/ library id fro library_response
         print("generate_library 1")
         
         # def extract_text_from_pdf(file_content):

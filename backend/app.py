@@ -20,6 +20,7 @@ app.secret_key = os.getenv('FLASK_SECRET_KEY') # done
 openai.api_key = os.getenv("OPENAI_API_KEY") # done
 resend.api_key = os.getenv('RESEND_API_KEY') # done
 
+
 print(f"app level secret key: {app.secret_key}")
 # host = os.environ.get('AZURE_MYSQL_HOST')
 # name = os.environ.get('AZURE_MYSQL_NAME')
@@ -49,7 +50,7 @@ app.config.update(
 
 db.init_app(app)
 migrate = Migrate(app, db)
-CORS(app, origins="*", supports_credentials=True)
+CORS(app, origins="*", supports_credentials=True) # TODO: replace w/ actual frontend URL and make sure it work
 
 logging.basicConfig(level=logging.DEBUG)
 
