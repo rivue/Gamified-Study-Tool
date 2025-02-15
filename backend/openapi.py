@@ -5,6 +5,7 @@ import json
 import os
 import google.generativeai as genai
 from typing import Optional, Dict, List, Union, Any
+from openai import OpenAI
 
 #### settings ####
 max_retries = 1
@@ -221,7 +222,11 @@ def get_embeddings(strings_list):
     except requests.RequestException as e:
         print(f"Request failed: {e}")
         return None
-    
+
+def get_embedding(text, model="text-embedding-3-small"):
+    """Get embedding for text using OpenAI API."""
+    client = OpenAI()
+    return client.embeddings.create(input=[text], model=model).data[0].embedding
 
 def get_image(prompt):
     # Enhance the prompt 

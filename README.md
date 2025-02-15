@@ -45,6 +45,8 @@ TODO list:
 
     create course (library) page:
         - add support for links / pdfs / other things and get rid of things like difficulty, tutor, etc... then actually start generating stuff to study
+        - after user submits something and is waiting, display a loading bar or wheel or something letting the user know that it is generating
+        - figure out how to make it so that it generates {inputed} number of courses
 
     game page:
         - remove timer
@@ -53,6 +55,7 @@ TODO list:
         - remove header / footer when user is playing a game
         - change from giving questions from lots and lots of "rooms" to questions from one specific room
             - almost done, but need to make library room names have underscores instead so it will redirect and it will
+        - make it give more than 8 eventually
 
     uploading / retrieving submitted materials:
         plan for textbook stuff:
@@ -61,7 +64,10 @@ TODO list:
             2) store embeddings in pinecone (every paragraph) ✅
                 2.5) build a small ai rag chatbot to test out that everything I did so far works (it does) ✅
             3) generate questions per every subchapter / lecture given syllabus (stored in database) (currently working on 🏗️)
-
+                - what to do if document generation fails?
+                - USER HAS TO BE LOGGED IN TO GENERATE A LIBRARY
+                - add multiple file upload later
+                - add delete file from library feature
             4) user can re-generate questions easily and for cheap (cheap for me at least cost for user tbd) bc embeddings are precomputed
             5) user should delete things hopefully
         - other idea: instead of giving whole textbook to gemini to figure out ideas, just have the user input a syllabus / toc of
@@ -72,6 +78,7 @@ TODO list:
             not completely sure how to do this yet
             - DEFINETELY invoke parallel processing somehow
             - INCREASE pinecone batch insert as well
+            - what do 
             - not sure how to handle max context window - if its that long anyway - probably either just take the first 500 words or split it up
             or something
             - run basic nlp to determine if it is a question of substance or just citations / index / whatever

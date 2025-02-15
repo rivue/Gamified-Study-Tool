@@ -285,22 +285,12 @@
           return;
         }
         this.selectedFile = file;
-        this.readFileContent(file);
       }
     },
 
     removeFile() {
       this.selectedFile = null;
-      this.fileContent = null;
       this.$refs.fileInput.value = '';
-    },
-
-    readFileContent(file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        this.fileContent = e.target.result;
-      };
-      reader.readAsText(file);
     },
        addRoom() {
       const trimmedName = this.newRoomName.trim();
@@ -327,22 +317,28 @@
           );
           return;
         }
+        
         this.isSubmitting = true;
-        const postData = {
-          topic: this.topic,
-          language: this.language,
-          extraContext: this.extraContext,
-          languageDifficulty: this.languageDifficulty,
-          libraryDifficulty: this.libraryDifficulty,
-          guide: this.currentMentorName,
-          selectedFile: null,
-          // fileContent: null,
-          fileContent: this.fileContent,
-          roomNames: this.roomNames
-        };
-       
+
+       const formData = new FormData();
+
+       formData.append("topic", this.topic);
+       formData.append("language", this.language);
+       formData.append("extraContext", this.extraContext);
+       formData.append("languageDifficulty", this.languageDifficulty);
+       formData.append("libraryDifficulty", this.libraryDifficulty);
+       formData.append("guide", this.currentMentorName);
+       formData.append("selectedFile", this.selectedFile); // TODO textbook, could easily add support for > 1 input file later
+       formData.append("roomNames", JSON.stringify(this.roomNames));  // Convert array to string
+        
+       console.log(formData.get("selectedFile"));
+
         axios
-          .post("/api/library/generate", postData)
+          .post("/api/library/generate", formData, {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          })
           .then((response) => {
             
             const libraryId = response.data.library_data.id;

@@ -54,23 +54,6 @@ def clean_text(text):
     text = re.sub(r"\[U\+\w{4,5}\]", "", text)  # Remove unicode markers
     return text.strip()
 
-def split_into_sentences(text):
-    """
-    Split text into sentences using regex pattern that handles common abbreviations
-    and multiple punctuation cases. Mainly used for text extraction from PDFs.
-    """
-    # Remove page markers and separators
-    text = re.sub(r'Page \d+:\n', '', text)
-    text = re.sub(r'-{80}\n', '', text)
-    
-    # Pattern for splitting sentences while preserving abbreviations
-    pattern = r'(?<![A-Z][a-z]\.)(?<=\.|\?|\!)\s+(?=[A-Z])'
-    sentences = re.split(pattern, text)
-    
-    # Clean up sentences
-    sentences = [s.strip() for s in sentences if s.strip()]
-    return sentences
-
 def get_client_ip():
     forwarded_ip = request.headers.get("X-Forwarded-For")
     if forwarded_ip:
