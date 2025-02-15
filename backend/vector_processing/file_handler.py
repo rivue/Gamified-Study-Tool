@@ -9,7 +9,7 @@ def process_document(selected_files, library_id=None):
         raise ValueError("Library ID is required to process the document.")
 
     # Open PDF
-    doc = fitz.open(stream=selected_files.read(), filetype="pdf")
+    doc = fitz.open(stream=selected_files, filetype="pdf")
     try:
         # **Check if PDF is scanned or digital**
         is_scanned = not any(page.get_text("text").strip() for page in doc)

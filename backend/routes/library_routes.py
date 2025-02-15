@@ -114,7 +114,7 @@ def init_library_routes(app):
         else:
             return jsonify({"error": f"Must specify room names for now, also we are in the process of breaking things"}), 400
 
-        selected_file = request.files.get("selectedFile")
+        selected_file = request.files.get("selectedFile").read()
         if not selected_file:
             return jsonify({"error": "No file provided (request.json)"}), 400
 
@@ -136,6 +136,8 @@ def init_library_routes(app):
         # Start image generation task
         # img_url_future = executor.submit(generate_images_task, topic, library_difficulty, guide)
 
+        # process_document works here
+
         # Wait for moderation result
         # TODO vvv 
         violation, message = moderation_future.result()
@@ -147,14 +149,16 @@ def init_library_routes(app):
         # Create the library
         room_names = room_names_future.result()
 
-        # TODO
+        # here works for process_document
+
+        # TODO 
         library_response, status_code = lbh.create_library(user_id, topic, room_names, library_difficulty, language, language_difficulty, guide)
         print("generate_library 1")
 
         
         if status_code == 201:
             
-            library_id = library_response.get_json().get("library_id")
+            library_id = library_response.get_json().get("library_id") # fails still the line before this
             # extract text, get embeddings, and store in pinecone w/ associated library id
             process_document(selected_file, library_id) # 4 is the library_id
             # this is where I can do the file content
