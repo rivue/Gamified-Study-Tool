@@ -155,7 +155,6 @@ def init_library_routes(app):
         library_response, status_code = lbh.create_library(user_id, topic, room_names, library_difficulty, language, language_difficulty, guide)
         print("generate_library 1")
 
-        
         if status_code == 201:
             
             library_id = library_response.get_json().get("library_id") # fails still the line before this
