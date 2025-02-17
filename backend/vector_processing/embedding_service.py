@@ -1,4 +1,4 @@
-from pinecone.grpc import PineconeGRPC as Pinecone
+from pinecone.grpc import PineconeGRPC, GRPCClientConfig
 from pinecone import ServerlessSpec
 import time
 import concurrent.futures
@@ -39,12 +39,16 @@ def insert_sections_to_pinecone_parallel(sections, library_id, batch_size=100, n
 def init_pinecone():
     """Initialize Pinecone client and ensure index exists"""
     try:
-        pc = Pinecone(api_key=os.getenv("PINECONE_API_KEY"), grpc=True)
+        pc = PineconeGRPC(api_key=os.getenv("PINECONE_API_KEY"), 
+        grpc=True, host="http://localhost:5081"
+        )
         index_name = "testing-index"
         
         try:
             # Try to get the existing index directly
-            index = pc.Index(index_name)
+            # index = pc.Index(index_name)
+            index_host = pc.describe_index(index_name).host
+            index = pc.Index(host=index_host, grpc_config=GRPCClientConfig(secure=False))
             print(f"Connected to existing index: {index_name}")
             return index
             

@@ -109,8 +109,13 @@
     RocketLaunchIcon,
     SparklesIcon
   } from '@heroicons/vue/24/solid'
+  import { useRouter } from 'vue-router';
   
   const props = defineProps({
+    libraryId: {
+      type: Number,
+      required: true
+    },
     roomNames: {
       type: Array,
       required: true
@@ -122,6 +127,10 @@
   
   // Track selected room for tooltip
   const selectedRoom = ref(null)
+
+  const library_id = props.libraryId;
+
+  const router = useRouter();
   
   // Array of icons to cycle through
   const icons = [
@@ -187,6 +196,7 @@
   
   const startLesson = (roomName) => {
     console.log(`Starting lesson for ${roomName}`)
+    router.push(`/library/${library_id}/${roomName}`)
     emit('nodeSelected', roomName)
   }
   

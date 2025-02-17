@@ -328,8 +328,8 @@ GenerateLibraryRoom = {
                     },
                     "required": ["factoid_text", "question"]
                 },
-                "minItems": 8,
-                "maxItems": 8,
+                "minItems": 4,
+                "maxItems": 4,
                 "description": "An array of eight objects, each containing a factoid and its corresponding question."
             }
         },

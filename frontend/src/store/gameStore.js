@@ -251,7 +251,7 @@ export const useGameStore = defineStore("gameStore", {
                         let state = 0;
                         if (roomName === this.libraryTopic) {
                             // state = 2;
-                            state = 2;
+                            state = 1;
                             this.roomStates[roomName] = {
                                 state: state,
                                 factoids: response.data.room_data.factoids || []
@@ -309,7 +309,7 @@ export const useGameStore = defineStore("gameStore", {
                 if (error.response && error.response.status === 403) {
                     console.log(error.response);
                     const popupStore = usePopupStore();
-                    popupStore.showPopup("You have reache;ijo;ijo;ijd the limit.</br>Please login to continue.");
+                    popupStore.showPopup("You have reached the limit.</br>Please login to continue.");
                     return false;
                 }
                 console.error("Error unlocking room:", error);

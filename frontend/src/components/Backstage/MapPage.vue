@@ -3,6 +3,7 @@
         <div v-if="!loading && library">
             <h1 class="page-title">{{ library.data.library_topic }} Learning Map 🗺️</h1>
             <LearningPath 
+            :libraryId="library.data.id"
             :room-names="library.data.room_names"
             @nodeSelected="handleNodeSelect" />
         </div>
@@ -29,7 +30,7 @@ function capitalizeWords(str) {
 }
 
 export default {
-    name: "KnowledgePage",
+    name: "MapPage",
     components: {LearningPath},
     setup() {
         const route = useRoute();

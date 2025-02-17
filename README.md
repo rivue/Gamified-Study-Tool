@@ -12,6 +12,7 @@ IDEAS:
         - more advanced processing for Masters / PhD level topics (ask chatgpt, but mainly re-ranking, structured search, 
             and advanced reasonding-based prompt engineering to capture cross-section dependencies) 
         - investigate into late-chunking or late-interaction for vector embedding
+        - also add multimodal and >1 file input for library / course creation
 
     ideas for name:
         - name something stone related (bc you are SOLIDIFYING your knowledge (hahahahahah ok im done))
@@ -62,12 +63,20 @@ TODO list:
         - see purple text in tablet (continue w/ gemini flash stuff)
             1) give whole textbook to gpt to "split up" ✅
             2) store embeddings in pinecone (every paragraph) ✅
-                2.5) build a small ai rag chatbot to test out that everything I did so far works (it does) ✅
+                2.1) build a small ai rag chatbot to test out that everything I did so far works (it does) ✅
             3) generate questions per every subchapter / lecture given syllabus (stored in database) (currently working on 🏗️)
+                3.1) integrate rag stuff with backend ✅
+                3.3) clean out db (pinecone as well) and modify rooms based on user input of rooms
+                -   FIX WEIRD THING THAT LETS USERS GENERATE ROOMS WHICH ARE NOT A PART OF A GIVEN LIBRARY W/ LIBRARY ID (in generate_room in library_routes.py)
+                    as opposed to 24 randomly generated rooms 
+                3.4) add rag retrieval to rooms
+                
                 - what to do if document generation fails?
                 - USER HAS TO BE LOGGED IN TO GENERATE A LIBRARY
                 - add multiple file upload later
                 - add delete file from library feature
+                - user can change room name? possibly
+                - make sure every thing is created successfully before adding anything to database possibly?
             4) user can re-generate questions easily and for cheap (cheap for me at least cost for user tbd) bc embeddings are precomputed
             5) user should delete things hopefully
         - other idea: instead of giving whole textbook to gemini to figure out ideas, just have the user input a syllabus / toc of

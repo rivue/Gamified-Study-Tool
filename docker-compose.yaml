@@ -1,0 +1,11 @@
+services:
+  index1:
+    image: ghcr.io/pinecone-io/pinecone-index:latest
+    environment:
+      PORT: 5080
+      INDEX_TYPE: serverless
+      DIMENSION: 1536 
+      METRIC: cosine
+    ports:
+      - "5081:5081"
+    platform: linux/amd64

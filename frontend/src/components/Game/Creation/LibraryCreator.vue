@@ -329,7 +329,8 @@
        formData.append("libraryDifficulty", this.libraryDifficulty);
        formData.append("guide", this.currentMentorName);
        formData.append("selectedFile", this.selectedFile); // TODO textbook, could easily add support for > 1 input file later
-       formData.append("roomNames", JSON.stringify(this.roomNames));  // Convert array to string
+       this.roomNames.forEach(room => formData.append("roomNames", room));
+    //    formData.append("roomNames", JSON.stringify(this.roomNames));  // Convert array to string
         
        console.log(formData.get("selectedFile"));
 

@@ -7,6 +7,7 @@ from bleach import clean
 from flask_executor import Executor
 import fitz
 import re
+import concurrent.futures
 
 import base64
 from io import BytesIO
@@ -107,21 +108,24 @@ def init_library_routes(app):
 
         if not user_id:
             mark_generation_done(ip, 'library')
+            # TODO make it so you have to be logged in to do anything
         
-        room_names = request.form.get("roomNames")
+        room_names = request.form.getlist('roomNames')
         if room_names:
             print(room_names)
         else:
             return jsonify({"error": f"Must specify room names for now, also we are in the process of breaking things"}), 400
+        
+        try :
+            selected_file = request.files.get("selectedFile").read()
+            if not selected_file:
+                return jsonify({"error": "No file provided (request.json)"}), 400
 
-        selected_file = request.files.get("selectedFile").read()
-        if not selected_file:
-            return jsonify({"error": "No file provided (request.json)"}), 400
-
-        if "selectedFile" not in request.files:
-            print(request.files)
-            return jsonify({"error": "No file provided (not in request.files)"}), 400
-
+            if "selectedFile" not in request.files:
+                print(request.files)
+                return jsonify({"error": "No file provided (not in request.files)"}), 400
+        except Exception as e:
+            return jsonify({"error": f"Error reading file: {str(e)}"}), 400
 
         # Start moderation task
         # TODO vvv 
@@ -131,12 +135,8 @@ def init_library_routes(app):
         moderation_future = executor.submit(moderate, content_for_moderation)
 
         # Start library generation task (flask Gemini 1.5)
-        room_names_future = executor.submit(lgn.suggest_library_wing, user_id, topic, library_difficulty, language, language_difficulty, extra_context)
-
-        # Start image generation task
-        # img_url_future = executor.submit(generate_images_task, topic, library_difficulty, guide)
-
-        # process_document works here
+        # TODO Maybe in the case where we are extracting it from a table of contents / syllabus?
+        # room_names_future = executor.submit(lgn.suggest_library_wing, user_id, topic, library_difficulty, language, language_difficulty, extra_context)
 
         # Wait for moderation result
         # TODO vvv 
@@ -147,51 +147,72 @@ def init_library_routes(app):
             return jsonify({"error": f"Message breaks our usage policy. Please check our guidelines.\n{message}"}), 400
 
         # Create the library
-        room_names = room_names_future.result()
+        # TODO Maybe in the case where we are extracting it from a table of contents / syllabus?
+        # room_names = room_names_future.result()
 
-        # here works for process_document
-
-        # TODO 
+        # TODO (room_names is already from frontend)
+        # Creates library database object
         library_response, status_code = lbh.create_library(user_id, topic, room_names, library_difficulty, language, language_difficulty, guide)
-        print("generate_library 1")
+
+        print("before library_response")
 
         if status_code == 201:
             
-            library_id = library_response.get_json().get("library_id") # fails still the line before this
-            # extract text, get embeddings, and store in pinecone w/ associated library id
-            process_document(selected_file, library_id) # 4 is the library_id
-            # this is where I can do the file content
-            # TODO add textbook / document embeddings to pinecone w/ library id from library_response
-            return jsonify({"error": f"No error, we're in the process of breaking things for now😭😭😭"}), 400
-            # img_url = img_url_future.result()
-            # print("saving image..")
-            # save_image(library_id, img_url)
+            library_id = library_response.get_json().get("library_id")
+
+            # process_document(selected_file, library_id) # extract embeddings + and upload to pinecone
+            # return jsonify({"error": f"No error, we're in the process of breaking things for now😭😭😭"}), 400
         else:
             raise Exception("Library creation failed")
 
         try:
 
-        # Generate first room content # DOCUMENTS MUST BE SUCCESSFULLY UPLOADED BEFORE THIS IS CALLED
-        # room_future = executor.submit(lgn.generate_room_content, user_id, topic, library_difficulty, language, language_difficulty, extra_context, guide, file_content)
-        # Note: these are the actual questions of the room
-        
-            print("room future result")
-            room_contents = room_future.result()
-            print("room future result 2")
-            lbh.save_library_room_contents(library_id, topic, room_contents)
-            print("success")
-            library = lbh.get_library(library_id, user_id, False)
-            print("good")
-            return jsonify(status="success", library_data=library.get_json())
+            futures_dict = {}
+            for room_name in room_names:
+                print(f"room names: {room_names}")
+                print(f"room names: {room_name}")
+                future = executor.submit(lgn.generate_room_content, user_id, room_name, library_difficulty, language, language_difficulty, extra_context, guide, selected_file)
+                futures_dict[future] = room_name
+
+            completed_rooms = {}
+            for future in concurrent.futures.as_completed(futures_dict):
+                
+                room_name = futures_dict[future]
+                
+                try:
+                    room_contents = future.result()
+            
+                    lbh.save_library_room_contents(library_id, room_name, room_contents)
+                    completed_rooms[room_name] = True
+                    print(f"Successfully generated and saved content for room: {room_name}")
+
+                except Exception as e:
+                    
+                    print(f"Error generating content for room {room_name}: {str(e)}")
+                    completed_rooms[room_name] = False
+
+            # Check if all rooms were successfully completed
+            if all(completed_rooms.values()):
+                print("all")
+                library = lbh.get_library(library_id, user_id, False)
+                return jsonify(status="success", library_data=library.get_json())
+            else:
+                failed_rooms = [room for room, success in completed_rooms.items() if not success]
+                return jsonify(
+                    status="partial_success",
+                    message=f"Failed to generate content for rooms: {', '.join(failed_rooms)}",
+                    library_data=library_response.get_json()
+                )
+
         except Exception as e:
-            return jsonify(status="error", message="Failed to generate room content"), 500
+            return jsonify(status="error", message=f"Failed to generate room content: {str(e)}"), 500
 
 
     @app.route("/api/library/<int:library_id>", methods=["GET"])
     def get_library(library_id):
         user_id = current_user.id if not isinstance(current_user, AnonymousUserMixin) else None
         library = lbh.get_library(library_id, user_id)
-
+        print("get_library 1")
         if not library:
             return jsonify(status="error", message="Library not found"), 404
 
@@ -203,11 +224,11 @@ def init_library_routes(app):
         # If there's a default image and the click count is divisible by 4, queue up image generation
         if response.json['has_default_image'] and library.get_json().get("clicks") % 4 == 0:
             executor.submit(generate_images_task, library_id)
-
+        ("get_library 2")
         # Retrieve library data
         library_data = library.get_json()
         library_topic = library_data.get("library_topic")
-
+        print("get_library 3")
         # Attempt to retrieve existing room contents
         room_data = lbh.retrieve_library_room_contents(library_id, library_topic)
         if not room_data:
@@ -258,6 +279,16 @@ def init_library_routes(app):
             return jsonify(status="error", message="Please login to continue."), 400
 
         try:
+            library_response = get_library(library_id)
+            if not library_response or library_response.status_code == "error":
+                return jsonify(status="error", message="Can only generate library rooms for valid libraries"), 400
+
+            library_data = library_response.get_json()
+            room_list = library_data.get('room_data', [])
+            print(room_list)
+            if not subtopic in room_list:
+                return jsonify(status="error", message="Can only generate library rooms for valid libraries"), 400
+
             generated_content = lgn.generate_libroom_content(user_id, subtopic, library_id)
             lbh.save_library_room_contents(library_id, subtopic, generated_content)
             existing_content = lbh.retrieve_library_room_contents(library_id, subtopic)
