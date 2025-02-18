@@ -67,8 +67,6 @@ TODO list:
             3) generate questions per every subchapter / lecture given syllabus (stored in database) (currently working on 🏗️)
                 3.1) integrate rag stuff with backend ✅
                 3.3) clean out db (pinecone as well) and modify rooms based on user input of rooms
-                -   FIX WEIRD THING THAT LETS USERS GENERATE ROOMS WHICH ARE NOT A PART OF A GIVEN LIBRARY W/ LIBRARY ID (in generate_room in library_routes.py)
-                    as opposed to 24 randomly generated rooms 
                 3.4) add rag retrieval to rooms
                 
                 - what to do if document generation fails?
@@ -77,6 +75,8 @@ TODO list:
                 - add delete file from library feature
                 - user can change room name? possibly
                 - make sure every thing is created successfully before adding anything to database possibly?
+                - reorganize pinecone processing stuff maybe a bit (put pinecone stuff in a pinecone file?)
+                - make it generate a consistent number of questions per topic
             4) user can re-generate questions easily and for cheap (cheap for me at least cost for user tbd) bc embeddings are precomputed
             5) user should delete things hopefully
         - other idea: instead of giving whole textbook to gemini to figure out ideas, just have the user input a syllabus / toc of

@@ -30,7 +30,7 @@ class RAGQuerySystem:
             print(f"Error querying Pinecone: {e}")
             return []
     
-    def format_context(self, matches):
+    def format_context(self, matches): # added to retrieval.py
         """Format the retrieved contexts into a single string"""
         contexts = []
         for i, match in enumerate(matches, 1):
@@ -39,7 +39,7 @@ class RAGQuerySystem:
             contexts.append(f"Context {i} (Relevance: {score:.2f}):\n{text}\n")
         return "\n".join(contexts)
     
-    def generate_response(self, query, context):
+    def generate_response(self, query, context): # not needed I think
         """Generate a response using ChatGPT with the retrieved context"""
         try:
             system_prompt = """You are a helpful assistant that answers questions based on the provided context. 
@@ -66,7 +66,7 @@ class RAGQuerySystem:
             print(f"Error generating response: {e}")
             return "Sorry, I encountered an error generating the response."
     
-    def query_and_respond(self, query, top_k=5):
+    def query_and_respond(self, query, top_k=5): # added in retrieval.py
         """Main function to process a query and generate a response"""
         print(f"🔍 Searching for relevant context...")
         matches = self.query_pinecone(query, top_k=top_k)

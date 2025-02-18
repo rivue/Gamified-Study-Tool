@@ -20,6 +20,7 @@ import knowledge_net.library_generator as lgn
 from images.library_imager import generate_images_task, save_image
 from database.user_handler import increment_violations, is_within_limit, check_generation_allowed, mark_generation_done
 from vector_processing.file_handler import process_document
+from vector_processing.retrieval import query_and_respond_pinecone
 
 def init_library_routes(app):
 
@@ -159,9 +160,8 @@ def init_library_routes(app):
         if status_code == 201:
             
             library_id = library_response.get_json().get("library_id")
-
-            # process_document(selected_file, library_id) # extract embeddings + and upload to pinecone
-            # return jsonify({"error": f"No error, we're in the process of breaking things for now😭😭😭"}), 400
+            print("library_id after status_code")
+            process_document(selected_file, library_id) # extract embeddings + and upload to pinecone
         else:
             raise Exception("Library creation failed")
 
@@ -171,11 +171,13 @@ def init_library_routes(app):
             for room_name in room_names:
                 print(f"room names: {room_names}")
                 print(f"room names: {room_name}")
-                future = executor.submit(lgn.generate_room_content, user_id, room_name, library_difficulty, language, language_difficulty, extra_context, guide, selected_file)
+                rag_context = query_and_respond_pinecone(room_name, library_id)
+                future = executor.submit(lgn.generate_room_content, user_id, room_name, library_difficulty, language, language_difficulty, extra_context, guide, rag_context)
                 futures_dict[future] = room_name
 
             completed_rooms = {}
             for future in concurrent.futures.as_completed(futures_dict):
+                print("future")
                 
                 room_name = futures_dict[future]
                 
@@ -185,6 +187,7 @@ def init_library_routes(app):
                     lbh.save_library_room_contents(library_id, room_name, room_contents)
                     completed_rooms[room_name] = True
                     print(f"Successfully generated and saved content for room: {room_name}")
+                    # return jsonify({"error": f"No error, we're in the process of breaking things for now😭😭😭"}), 400
 
                 except Exception as e:
                     

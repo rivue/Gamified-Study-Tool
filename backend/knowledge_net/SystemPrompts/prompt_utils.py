@@ -118,6 +118,6 @@ def sys_first_room(subtopic, library_difficulty, language, language_difficulty, 
         system_message = system_message.replace("{library-context}", "None")
 
     if "{file-contents}" in system_message and file_contents:
-        system_message = system_message.replace("{file-contents}", "None")
+        system_message = system_message.replace("{file-contents}", file_contents)
 
     return system_message
