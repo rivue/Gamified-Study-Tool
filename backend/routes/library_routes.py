@@ -284,8 +284,9 @@ def init_library_routes(app):
                 return jsonify(status="error", message="Can only generate library rooms for valid libraries"), 400
 
             library_data = library_response.get_json()
-            room_list = library_data.get('room_data', [])
-            print(room_list)
+            room_list = library_data.get('data', {}).get('room_names', [])
+
+            print(f"room_names: {room_list}")
             if not subtopic in room_list:
                 return jsonify(status="error", message="Can only generate library rooms for valid libraries"), 400
 
