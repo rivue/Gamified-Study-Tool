@@ -32,11 +32,8 @@ def init_library_routes(app):
         # User checks
         user_id = current_user.id if not isinstance(current_user, AnonymousUserMixin) else None
         if not user_id:
-            ip = request.remote_addr
-            ip = get_client_ip()
-            if not check_generation_allowed(ip, 'library'):
-                return jsonify(status="error", message="Library generation limit reached."), 403
-
+            return jsonify(status="error", message="Must be logged in to generate libraries."), 403
+        
         # Topic checks
         topic = request.form.get("topic")
         if not topic:
@@ -107,9 +104,6 @@ def init_library_routes(app):
                     except Exception as e:
                         return jsonify(status="error", message=f"Failed to generate room content {e}"), 500
 
-        if not user_id:
-            mark_generation_done(ip, 'library')
-            # TODO make it so you have to be logged in to do anything
         
         room_names = request.form.getlist('roomNames')
         if room_names:

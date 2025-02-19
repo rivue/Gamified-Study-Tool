@@ -49,7 +49,10 @@ export default {
     openRoom(roomName) {
       if (this.gameStore.roomStates[roomName].state === 2) {
         this.gameStore.openRoom(roomName);
-      }
+      } 
+    //   else {
+        // this.$router.push("/home")
+    //   }
     },
   },
 };

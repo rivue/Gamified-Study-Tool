@@ -1,6 +1,7 @@
 <!-- App.vue -->
 <template>
   <div class="app-container" :class="themeClass">
+    <div v-if="!hideHeaderFooter">
     <TopBar />
     <SubHeader
       v-if="loggedIn & shouldShowChat & subheaderExists"
@@ -8,17 +9,18 @@
     />
     <SideMenu />
     <MentorSelection/>
+    </div>
 
     <div class="main-content">
       <div class="another" @scroll="onScroll">
         <!-- Routes -->
         <router-view v-if="shouldShowRouterView"></router-view>
         <about-page v-else/>
-        <InfoPopup />
-        <AdPopup />
+        <InfoPopup/>
+        <AdPopup/>
       </div>
     </div>
-    <BottomBar v-if="!loggedIn | !shouldShowChat" />
+    <BottomBar v-if="( !loggedIn | !shouldShowChat) && !hideHeaderFooter" />
   </div>
 </template>
 
@@ -87,6 +89,9 @@ export default {
     );
   },
   computed: {
+    hideHeaderFooter() {
+        return this.$route.meta.hideHeaderFooter;
+    },
     forceUpdateKey() {
       const messageStore = useMessageStore();
       return messageStore.progress;

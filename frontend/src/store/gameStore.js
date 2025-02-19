@@ -39,7 +39,8 @@ export const useGameStore = defineStore("gameStore", {
         timerActive: false,
         bestTime: 0,
         completion: 0,
-        noGeneratedRooms: false
+        noGeneratedRooms: false,
+        libraryError: false,
     }),
     actions: {
         setId(libraryId) {
@@ -58,13 +59,11 @@ export const useGameStore = defineStore("gameStore", {
             this.showStart = false;
             this.questionVisible = true;
             this.factoidVisible = null;
-            this.startTimer();
         },
         showGameInfo() {
             this.showStart = true;
             this.questionVisible = false;
             this.factoidVisible = null;
-            this.stopTimer();
         },
         toggleFactoid() {
             if (this.showStart || this.showNext) return;
@@ -275,9 +274,10 @@ export const useGameStore = defineStore("gameStore", {
                         popupStore.showLibraryInstructions();
                     }
                     console.log("fetch")
-                    await this.loadRoom(this.libraryTopic);
+                    this.libraryError = !(await this.loadRoom(this.libraryTopic));
                 } else {
                     console.error("Failed to fetch library details", response);
+
                 }
             } catch (error) {
                 console.error("Error fetching library details:", error);
@@ -299,6 +299,7 @@ export const useGameStore = defineStore("gameStore", {
                     this.roomStates[room_name].factoids = response.data.data.factoids;
                 } else {
                     console.error(`Failed to unlock room ${room_name}: ${response.data.message}`);
+                    this.roomStates[room_name].state = 0; // forgot what state means, I'm just trying to throw an error message in NextRoomscomponent
                     if (response.data.status === 403) {
                         const popupStore = usePopupStore();
                         popupStore.showPopup("You have reached the limit.</br>Please login to continue.");
@@ -328,7 +329,6 @@ export const useGameStore = defineStore("gameStore", {
             const authStore = useAuthStore();
             authStore.cloudTokens += 1;
             this.questionVisible = true;
-            this.startTimer();
             this.roomStates[room_name].state = 3;
             if (room_name === "Final Test Room") {
                 this.finalTest = true;
@@ -341,7 +341,6 @@ export const useGameStore = defineStore("gameStore", {
             }
         },
         endGame() {
-            this.stopTimer();
             const userStatsStore = useUserStatsStore();
             userStatsStore.resetStats();
             const completedRooms = Object.keys(this.roomStates).filter(
@@ -350,7 +349,7 @@ export const useGameStore = defineStore("gameStore", {
             let data = {
                 libraryId: this.libraryId,
                 score: this.score,
-                time: this.timeSpent,
+                time: 500,
                 completed: completedRooms
             };
             axios
@@ -365,28 +364,6 @@ export const useGameStore = defineStore("gameStore", {
                 .catch(error => {
                     console.error("Error sending game end data:", error);
                 });
-        },
-        startTimer() {
-            if (!this.timer) {
-                this.timer = setInterval(() => {
-                    if (this.timerActive) {
-                        this.timeSpent++;
-                    }
-                }, 1000);
-            }
-            this.timerActive = true;
-        },
-        stopTimer() {
-            this.timerActive = false;
-        },
-        resetTimer() {
-            this.stopTimer();
-            this.timeSpent = 0;
-        },
-        formattedTime() {
-            const minutes = Math.floor(this.timeSpent / 60);
-            const seconds = this.timeSpent % 60;
-            return `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
         },
         resetGameState() {
             this.libraryId = null;
@@ -417,7 +394,6 @@ export const useGameStore = defineStore("gameStore", {
             this.bestTime = 0;
             this.completion = 0;
             this.noGeneratedRooms = false;
-            this.resetTimer();
         }
     }
 });

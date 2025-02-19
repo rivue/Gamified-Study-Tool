@@ -3,7 +3,6 @@
     <GameStart />
     <FactoidComponent />
     <LibraryQuestion />
-    <!-- <NextRoomsComponent/> -->
   </div>
 </template>
 
@@ -14,7 +13,6 @@ import GameStart from './GameStart.vue';
 import { useGameStore } from "@/store/gameStore";
 import FactoidComponent from "./FactoidComponent.vue";
 import LibraryQuestion from "./LibraryQuestion.vue";
-// import NextRoomsComponent from "./NextRoomsComponent.vue";
 
 export default {
   name: 'GameWindow',
@@ -36,6 +34,10 @@ export default {
       const roomName = route.params.roomName;
       const gameStore = useGameStore();
       gameStore.fetchLibraryDetails(libraryId, roomName);
+      if (gameStore.libraryError) {
+        this.$router.push(`/library/${libraryId}`);
+        // TODO redirect if room name was invalid  or couldn't fetch room or something
+      }
     });
   },
 };

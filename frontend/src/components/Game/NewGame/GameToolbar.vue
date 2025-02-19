@@ -9,34 +9,26 @@
     <div v-if="visible" class="game-toolbar">
       <!-- Left side: Likes and Clouds -->
       <div class="left-side">
-        <button
+        <!-- <button
           class="toolbar-btn like-button"
           :style="{ color: isLiked ? 'var(--highlight-color)' : '' }"
           @click="likeLib"
         >
           {{ likeText }}
-        </button>
-        <div class="toolbar-btn" @click="navToPlans">☁️{{ discovery }}</div>
+        </button> -->
+        <!-- <div class="toolbar-btn" @click="navToPlans">☁️{{ discovery }}</div>☁️ -->
       </div>
 
       <!-- Right side: Score and Time -->
       <div class="right-side score-container">
-        <span
+        <!-- <span
           class="score"
           :class="{ 
             'animating-score': isScoreAnimating
           }"
         >
           💎{{ score }}
-        </span>
-        <span
-          class="time-spent"
-          :class="{ 
-            'animating-time': isTimeAnimating 
-          }"
-        >
-          ⏳{{ formattedTime }}
-        </span>
+        </span> -->
       </div>
     </div>
 
@@ -65,7 +57,6 @@ export default {
     const gameStore = useGameStore();
     const authStore = useAuthStore();
     const isScoreAnimating = ref(false);
-    const isTimeAnimating = ref(false);
 
     watch(
       () => gameStore.score,
@@ -79,23 +70,10 @@ export default {
       }
     );
 
-    watch(
-      () => gameStore.timeSpent,
-      (newVal, oldVal) => {
-        if (newVal !== oldVal) {
-          isTimeAnimating.value = true;
-          setTimeout(() => {
-            isTimeAnimating.value = false;
-          }, 300);
-        }
-      }
-    );
-
     return {
       gameStore,
       authStore,
       isScoreAnimating,
-      isTimeAnimating,
     };
   },
   computed: {
@@ -110,9 +88,6 @@ export default {
     },
     likeText() {
       return this.isLiked ? "Liked 👍" : "Like 👍";
-    },
-    formattedTime() {
-      return this.gameStore.formattedTime();
     },
     visible(){
       return !this.gameStore.completed;
@@ -149,7 +124,7 @@ export default {
   text-align: center;
   font-size: 1.2em;
   font-weight: bold;
-  padding-top: 5px;
+  padding-top: 10px;
   color: var(--text-color);
 }
 
@@ -177,15 +152,8 @@ export default {
 }
 
 .score,
-.time-spent {
-  font-weight: bold;
-  transition: color 0.3s ease-in-out;
-}
 
 .animating-score,
-.animating-time {
-  animation: pulse 0.3s ease-in-out forwards;
-}
 
 @keyframes pulse {
   0% {
