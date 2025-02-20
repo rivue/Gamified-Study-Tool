@@ -1,6 +1,6 @@
 <template>
     <div class="game-window">
-        <GameStart />
+        <!-- <GameStart /> -->
         <FactoidComponent />
         <LibraryQuestion />
     </div>
@@ -8,7 +8,7 @@
 
 <script>
 import { onMounted, ref } from 'vue';
-import GameStart from './GameStart.vue';
+// import GameStart from './GameStart.vue';
 import FactoidComponent from "./FactoidComponent.vue";
 import LibraryQuestion from "./LibraryQuestion.vue";
 import { useRoute, useRouter } from 'vue-router';
@@ -17,10 +17,11 @@ import { useGameStore } from "@/store/gameStore";
 export default {
     name: 'GameWindow',
     components: {
-        GameStart,
+        // GameStart,
         FactoidComponent,
         LibraryQuestion,
     },
+
     setup() {
         const route = useRoute();
         const router = useRouter();
@@ -31,20 +32,22 @@ export default {
             const libraryId = route.params.id;
             const roomName = route.params.roomName;
             try {
-                // Wait for the async action to finish
+                
                 await gameStore.fetchLibraryDetails(libraryId, roomName);
 
             } catch (error) {
                 console.error("Error fetching library details:", error);
-                router.push(`/knowledge/${libraryId}`);
+                router.push(`/lessons/${libraryId}`);
 
             } finally {
-                loading.value = false;  // Stop loading when the action is complete
+                loading.value = false;
             }
 
             if (gameStore.libraryError) {
                 // If there was an error, navigate away
-                router.push(`/knowledge/${libraryId}`);
+                router.push(`/lessons/${libraryId}`);
+            } else {
+                gameStore.startGame();
             }
         });
 

@@ -244,7 +244,7 @@ export default {
                 .then((response) => {
 
                     const libraryId = response.data.library_data.id;
-                    this.$router.push(`/library/${libraryId}`);
+                    this.$router.push(`/lessons/${libraryId}`);
                 })
                 .catch((error) => {
                     console.error("Error:", error);

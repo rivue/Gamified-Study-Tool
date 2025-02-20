@@ -107,7 +107,6 @@ TODO list:
             not completely sure how to do this yet
             - DEFINETELY invoke parallel processing somehow
             - INCREASE pinecone batch insert as well
-            - what do 
             - not sure how to handle max context window - if its that long anyway - probably either just take the first 500 words or split it up
             or something
             - run basic nlp to determine if it is a question of substance or just citations / index / whatever
@@ -139,6 +138,7 @@ COMPLETED:
     ✅ remove timer, likes, clouds, and diamonds from game screen 
     ✅ add X button to exit out of game and navigate back to game / course map
     ✅ figured out why a room name of the name of the library kept generating and fixed it
+    ✅ remove description and game image popup upon initial game page load
 
     rag stuff:
     1) give whole textbook to gpt to "split up" ✅

@@ -82,7 +82,7 @@ export const useGameStore = defineStore("gameStore", {
                 if (this.currentQuestion === 2 && !this.finalTest) {
                     console.log("TODO") // TODO this is just a placeholder
                    
-                } else if (this.currentQuestion === 2 && this.finalTest) {
+                } else if (this.currentQuestion === 2){// && this.finalTest) {
                     this.questionVisible = false;
                     this.factoidVisible = null;
                     this.endGame();
@@ -145,10 +145,10 @@ export const useGameStore = defineStore("gameStore", {
                         factoids: response.data.room_data.factoids || []
                     };
                     
-                    if (this.tutorial) {
-                        const popupStore = usePopupStore();
-                        popupStore.showLibraryInstructions();
-                    }
+                    // if (this.tutorial) {
+                    //     const popupStore = usePopupStore();
+                    //     popupStore.showLibraryInstructions();
+                    // }
                     
                 } else {
                     this.libraryError = true;

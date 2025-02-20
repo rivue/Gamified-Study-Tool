@@ -84,7 +84,7 @@
         }, 300);
       },
       closeQuestion() {
-        this.$router.push(`/knowledge/${this.$route.params.id}`);
+        this.$router.push(`/lessons/${this.$route.params.id}`);
       },
       format(content) {
         let regex;

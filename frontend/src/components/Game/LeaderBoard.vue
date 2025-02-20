@@ -27,7 +27,7 @@
             <td>{{ score.time }}s</td>
             <td>{{ score.email }}</td>
             <td v-if="!isLibraryMode">
-              <router-link :to="`/library/${score.library_id}`">
+              <router-link :to="`/lessons/${score.library_id}`">
                 #{{ score.library_id }}
               </router-link>
             </td>
@@ -95,7 +95,7 @@ export default {
   },
   methods: {
     checkRoute() {
-      // Check if route matches /library/:id
+      // Check if route matches /lessons/:id
       if (this.$route.params && this.$route.params.id) {
         const id = parseInt(this.$route.params.id, 10);
         if (!isNaN(id)) {

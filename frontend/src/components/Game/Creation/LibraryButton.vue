@@ -19,7 +19,7 @@ export default {
   },
   methods: {
     goToLibrary() {
-      this.$router.push(`/knowledge/${this.library.id}`);
+      this.$router.push(`/lessons/${this.library.id}`);
     },
   },
 };

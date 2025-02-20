@@ -194,7 +194,7 @@ export default {
 
         // Set the room names in the store
         this.loading = false;
-        this.$router.push(`/library/${libraryId}`);
+        this.$router.push(`/lessons/${libraryId}`);
       } catch (error) {
         this.loading = false;
       }

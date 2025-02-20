@@ -7,14 +7,30 @@
 </template>
 
   <script>
+
+import { useGameStore } from "@/store/gameStore";
+
 import GameWindow from "./GameWindow.vue";
 import LibraryCompletion from './LibraryCompletion.vue';
 import GameToolbar from './GameToolbar.vue';
+import { onBeforeRouteLeave } from "vue-router";
 
 export default 
   {
   name: "GamePage",
   components: { GameWindow,LibraryCompletion, GameToolbar },
+
+
+    setup() {
+        const gameStore = useGameStore();
+    
+        onBeforeRouteLeave((to, from, next) => {
+            console.log("successfully unmounted");
+            gameStore.resetGameState();
+            next();
+        });
+
+    },
 };
 </script>
   

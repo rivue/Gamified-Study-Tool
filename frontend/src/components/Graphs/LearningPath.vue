@@ -196,7 +196,7 @@
   
   const startLesson = (roomName) => {
     console.log(`Starting lesson for ${roomName}`)
-    router.push(`/library/${library_id}/${roomName}`)
+    router.push(`/lessons/${library_id}/${roomName}`)
     emit('nodeSelected', roomName)
   }
   
