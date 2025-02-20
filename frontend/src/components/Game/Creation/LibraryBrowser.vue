@@ -1,11 +1,11 @@
 <template>
   <div class="library-browser">
-    <LibraryCarousel title="My Libraries" :libraries="myLibraries" v-if="loggedIn & browsingLibraries"/>
+    <LibraryCarousel title="My Courses" :libraries="myLibraries" v-if="loggedIn & browsingLibraries"/>
     <LibraryCarousel
-      title="Most Liked Libraries"
+      title="Most Liked Courses"
       :libraries="mostLikedLibraries"
     />
-    <LibraryCarousel title="Newest Libraries" :libraries="newestLibraries" />
+    <LibraryCarousel title="Newest Courses" :libraries="newestLibraries" />
   </div>
 </template>
 

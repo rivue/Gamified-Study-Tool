@@ -5,7 +5,6 @@
         <div class="landing-title">Learn Anything!</div>
         <div class="landing-subtitle">Where Curious Minds Play to Learn.</div>
       </div>
-      <library-creator />
     </div>
     <div class="landing-page-2">
       <div class="features-container">
@@ -50,16 +49,9 @@
         </div>
         </div>
       </transition>
-      <!-- <img :src="openaiPath" alt="Powered by OpenAI" class="openai" /> -->
+      <img :src="openaiPath" alt="Powered by OpenAI" class="openai" />
       <div class="faq-container">
         <FaqComponent />
-      </div>
-      <div class="cta-container" @click="redirectLogin">
-        <CtaButton />
-      </div>
-      <plan-page />
-      <div class="cta-container" @click="redirectLogin">
-        <CtaButton />
       </div>
     </div>
   </div>
@@ -73,18 +65,14 @@ import CtaButton from "./LandingPageComponents/CtaButton.vue";
 import FaqComponent from "./LandingPageComponents/FaqComponent.vue";
 // import SharedContent from "./LandingPageComponents/SharedContent.vue";
 import FeaturesComponent from "./LandingPageComponents/FeaturesComponent.vue";
-import LibraryCreator from "../Game/Creation/LibraryCreator.vue";
-import PlanPage from "../Monetization/PlanPage.vue";
 
 export default {
-  name: "AboutPage",
+  name: "HomePage",
   components: {
     CtaButton,
     FaqComponent,
     // SharedContent,
     FeaturesComponent,
-    LibraryCreator,
-    PlanPage,
   },
   data() {
     return {
@@ -123,7 +111,7 @@ export default {
     redirectLogin() {
       const authStore = useAuthStore();
       if (authStore.loggedIn) {
-        this.$router.push("/lessons");
+        this.$router.push("/library");
       }
       else{
         this.$router.push("/login");

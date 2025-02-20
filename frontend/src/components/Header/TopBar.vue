@@ -3,7 +3,7 @@
   <div
     class="top-bar"
   >
-    <router-link to="/about">
+    <router-link to="/">
       <img
         :src="logoPath"
         alt="Ascendance Logo"

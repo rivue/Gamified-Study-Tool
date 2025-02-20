@@ -9,7 +9,7 @@
       <template v-slot:icon>&#128274;</template>
     </SideMenuButton>
     <SideMenuButton
-      label="Library"
+      label="My Library"
       :isSelected="isRouteActive('/library')"
       @click="openRoute('/library')"
     >
@@ -39,13 +39,14 @@
     >
       <template v-slot:icon>&#128200;</template>
     </SideMenuButton>
-    <SideMenuButton
+    <!-- <SideMenuButton
       label="About"
       :isSelected="isRouteActive('/about')"
       @click="openRoute('/about')"
-    >
+    > 
+    TODO add about back in
       <template v-slot:icon>&#128065;</template>
-    </SideMenuButton>
+    </SideMenuButton> -->
     <SideMenuButton
       label="Contact"
       :isSelected="isRouteActive('/contact')"

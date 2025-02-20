@@ -15,7 +15,7 @@
       <div class="another" @scroll="onScroll">
         <!-- Routes -->
         <router-view v-if="shouldShowRouterView"></router-view>
-        <about-page v-else/>
+        <home-page v-else/>
         <InfoPopup/>
         <AdPopup/>
       </div>
@@ -32,7 +32,7 @@ import SubHeader from "./components/Header/SubHeader.vue";
 import InfoPopup from "./components/Menus/InfoPopup.vue";
 import AdPopup from "./components/Monetization/AdPopup.vue";
 import MentorSelection from "./components/Backstage/MentorSelection.vue";
-import AboutPage from './components/Footer/AboutPage.vue';
+import HomePage from './components/Footer/HomePage.vue';
 import { useAuthStore } from "@/store/authStore";
 import { useMenuStore } from "@/store/menuStore";
 import { useThemeStore } from "@/store/themeStore";
@@ -55,7 +55,7 @@ export default {
     InfoPopup,
     AdPopup,
     MentorSelection,
-    AboutPage
+    HomePage
   },
   mounted() {
     this.handleVisibilityChange = () => {

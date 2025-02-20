@@ -98,7 +98,7 @@ export default {
       popupStore.showPopup(
         "Registration email sent!\n Please click the link in the email to start your ascent."
       );
-      this.$router.push("/about");
+      this.$router.push("/");
     },
     loadGoogleIdentityServices() {
       if (window.google && window.google.accounts) {

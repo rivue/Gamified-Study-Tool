@@ -44,7 +44,6 @@ TODO list:
     
     general:
         - change theme / color / name
-        - page / route reorganization (working on rn 🏗️ - see tablet) 
         - ability to "star" / "favorite" a course
         - fix low / moderate / high vulnerabilities for npm packages in frontend
         - redirects / url stuff (ex: 
@@ -52,6 +51,9 @@ TODO list:
             "/library/:id/:roomName/:anythingHereShouldRedirect"
             etc...
         )
+        - make footer smaller
+        - contact image on main sidebar?
+        - significant ui rehaul ***
 
     create course (library) page:
         - add support for links / pdfs / other things and get rid of things like difficulty, tutor, etc... then actually start generating stuff to study
@@ -63,11 +65,56 @@ TODO list:
         - and possibly a hint button as well (3 hints per question?)
         - make it give more than 4 or 8 questions eventually
         - instead of having it flipped, just put the main contents on the page possibly? and ask them to use their applied knowledge?
+        - fix the issue where anywhere on a card exits the lesson as opposed to just the red x
         - instead of multiple choice, have it where users can drag / drop for an answer slot:
             (deepseek recomendations):
             - Add haptic feedback on drop (vibration for correct/wrong).
             - Use gravity physics (e.g., answers "fall" into the slot with a bounce).
             - Animated rewards: Slot glows/explodes with confetti on correct answers.
+        - once I add a second type of "game", make it "shuffle" the questions once it gets the
+            8 or so least seen so that the questions seem random and they aren't just the same multiple choice every time
+        - make the underscores ___ visible in the questions
+        - "games":
+            - one word free answer (make gpt come up with variations so people aren't pissed off w/ super close answers, ex:
+                NCSU, ncsu, NC State, North Carolina State University, etc... or maybe use basic nlp to check?)
+            - multiple options in a row: like with duolingo where you are given 10 or so options and you pick 4 or 5 and they have to be 
+                in a specific order. this might be somewhat tricky to implement cus I have to implement drag-and-drop at the same time, so I might have to 
+                think of a couple others in the mean time
+            - matching pairs possibly, not sure how that would work
+            - only two options as opposed to 4
+            - play duolingo for inspiration
+            - true / false
+            - correct the statement / choose the correct portion of a paragrah / two students have different opinions make them choose the correct one
+            - time attack mode option - questions might be a little easier possibly or not
+            - image based questions - not sure how that would work how how we would ensure accuracy
+            - drag-and-drop labels (label the x axis, y axis, identify what the mean is, etc...)
+            - hotspot questions (click on X in this diagram)
+            - sentence completion
+            - category sorting (sort these into mammals, birds, and reptiles) - could be for easier questions
+            - timeline creation - drag and drop events
+            - venn diagram sorting - sort these things into squares, circles, or both
+            - fill in the table (a periodic table w/ missing elements)
+            - analogies: newton is to physics as darwin is to ___
+            - debate mode: users choose a side in a debate and answer questions to support their argument
+            - case studies: users analyze a real-world scenario and answer questions based on it
+            - hypothesis testing: users propose a hypothesis and answer questions to test it
+            - multi-step problem (would get to this later down the line)
+            - creative writing (this would be hard w/o llms - maybe could use rlly advanced nlp to detect it? or ask chatgpt to give it things to look for)
+            - compare and contrast two items
+            - predict the outcome
+            - error detection (users identify and correct errors in a passage, equation, or diagram)
+            - ranking tasks: users rank tasks on order of importance, size, or chronology
+            - mind mapping: users create a mind map by connecting related ideas
+            - math / chemistry equation builder
+            - historical role-playing: answer questions based on the perspective of a historical figure
+            - build a circuit by connecting components
+            - analyze a passage from a book and answer questions based on it
+            - geography pinpoint: users click on a map to answer geography questions (where is paris)
+            - physics simulation: users adjust variables in a simulation and answer questions about the outcome
+            - users analyze a legal case and answer questions about the ruling or implications
+            - users design a solution to an engineering problem (eg: build a bridge that can support 100kg)
+            - users answer questions about the steps of the scientific method based on a given experiment
+
         - unlockable card grid:
             Pros:
                 - Visual progression (users see their journey mapped out).
@@ -112,7 +159,6 @@ TODO list:
             - run basic nlp to determine if it is a question of substance or just citations / index / whatever
                 - for citations for example, you could cite them in the problem.
 
-
     actual map page:
         - decorate the map eventually
         - figure out a way to break up room names into sections either by user request or something else
@@ -139,6 +185,7 @@ COMPLETED:
     ✅ add X button to exit out of game and navigate back to game / course map
     ✅ figured out why a room name of the name of the library kept generating and fixed it
     ✅ remove description and game image popup upon initial game page load
+    ✅ page / route reorganization
 
     rag stuff:
     1) give whole textbook to gpt to "split up" ✅

@@ -1,7 +1,7 @@
 <template>
     <div class="library-gen-page">
         <div class="form-container" @keydown.enter="handleSubmit">
-            <h1 v-if="libgenRoute">Create a Library to Explore</h1>
+            <h1 v-if="libgenRoute">Create a Course to Explore</h1>
             <!-- Topic Selection -->
             <div class="libgen-create">
                 <div class="libgen-section">
