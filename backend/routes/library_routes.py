@@ -5,16 +5,12 @@ from flask import request, jsonify
 from flask_login import current_user, AnonymousUserMixin
 from bleach import clean
 from flask_executor import Executor
-import fitz
-import re
 import concurrent.futures
 
-import base64
 from io import BytesIO
-import time
 
 from openapi import moderate
-from utils import mask_email, get_client_ip
+from utils import mask_email
 import database.library_handlers as lbh
 import knowledge_net.library_generator as lgn
 from images.library_imager import generate_images_task, save_image
@@ -149,8 +145,6 @@ def init_library_routes(app):
         # Creates library database object
         library_response, status_code = lbh.create_library(user_id, topic, room_names, library_difficulty, language, language_difficulty, guide)
 
-        print("before library_response")
-
         if status_code == 201:
             
             library_id = library_response.get_json().get("library_id")
@@ -163,8 +157,6 @@ def init_library_routes(app):
 
             futures_dict = {}
             for room_name in room_names:
-                print(f"room names: {room_names}")
-                print(f"room names: {room_name}")
                 rag_context = query_and_respond_pinecone(room_name, library_id)
                 future = executor.submit(lgn.generate_room_content, user_id, room_name, library_difficulty, language, language_difficulty, extra_context, guide, rag_context)
                 futures_dict[future] = room_name
@@ -190,7 +182,6 @@ def init_library_routes(app):
 
             # Check if all rooms were successfully completed
             if all(completed_rooms.values()):
-                print("all")
                 library = lbh.get_library(library_id, user_id, False)
                 return jsonify(status="success", library_data=library.get_json())
             else:
@@ -207,9 +198,12 @@ def init_library_routes(app):
 
     @app.route("/api/library/<int:library_id>", methods=["GET"])
     def get_library(library_id):
+        
+        library_topic = request.args.get("library_topic", None)
+
         user_id = current_user.id if not isinstance(current_user, AnonymousUserMixin) else None
         library = lbh.get_library(library_id, user_id)
-        print("get_library 1")
+        
         if not library:
             return jsonify(status="error", message="Library not found"), 404
 
@@ -221,25 +215,29 @@ def init_library_routes(app):
         # If there's a default image and the click count is divisible by 4, queue up image generation
         if response.json['has_default_image'] and library.get_json().get("clicks") % 4 == 0:
             executor.submit(generate_images_task, library_id)
-        ("get_library 2")
+            
         # Retrieve library data
         library_data = library.get_json()
-        library_topic = library_data.get("library_topic")
-        print("get_library 3")
+
         # Attempt to retrieve existing room contents
-        room_data = lbh.retrieve_library_room_contents(library_id, library_topic)
-        if not room_data:
-            try:
-                # If no content exists, generate the room content
-                room_contents = lgn.generate_libroom_content(
-                    user_id,
-                    library_topic,
-                    library_id
-                )
-                lbh.save_library_room_contents(library_id, library_topic, room_contents)
-                room_data = room_contents
-            except Exception as e:
-                return jsonify(status="error", message="Failed to generate room content"), 500
+        room_data = None
+        if library_topic:
+            room_data = lbh.retrieve_library_room_contents(library_id, library_topic)
+            if not room_data:
+                if library_topic in library_data.get('room_names', []):
+                    try:
+                        # If no content exists, generate the room content
+                        room_contents = lgn.generate_libroom_content(
+                            user_id,
+                            library_topic,
+                            library_id
+                        )
+                        lbh.save_library_room_contents(library_id, library_topic, room_contents)
+                        room_data = room_contents
+                    except Exception as e:
+                        return jsonify(status="error", message="Failed to generate room content"), 500
+                else:
+                    return jsonify(status="error", message="Room not found"), 404
 
         return jsonify(status="success", data=library_data, room_data=room_data)
         

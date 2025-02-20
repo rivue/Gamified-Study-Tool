@@ -58,7 +58,6 @@ const router = createRouter({
   routes,
 });
 router.beforeEach((to, from , next) => {
-  console.log(from.fullPath, to.fullPath);
   const authStore = useAuthStore();
   const gameStore = useGameStore();
 

@@ -20,5 +20,6 @@ build/
 *.bak
 
 duolingo-venv-thing/
+study-tool/
 
 key.json

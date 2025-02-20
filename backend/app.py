@@ -16,9 +16,9 @@ from database.upgrade_db import run_upgrades
 
 load_dotenv()
 app = Flask(__name__, static_folder='../frontend/dist')
-app.secret_key = os.getenv('FLASK_SECRET_KEY') # done
-openai.api_key = os.getenv("OPENAI_API_KEY") # done
-resend.api_key = os.getenv('RESEND_API_KEY') # done
+app.secret_key = os.getenv('FLASK_SECRET_KEY')
+openai.api_key = os.getenv("OPENAI_API_KEY")
+resend.api_key = os.getenv('RESEND_API_KEY')
 
 
 print(f"app level secret key: {app.secret_key}")
@@ -60,7 +60,6 @@ login_manager.login_view = 'login'
 
 @login_manager.user_loader
 def load_user(user_id):
-    print("hi there")
     session = db.session
     return session.get(User, int(user_id))
     # return User.query.get(int(user_id))

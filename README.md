@@ -46,6 +46,12 @@ TODO list:
         - change theme / color / name
         - page / route reorganization (working on rn 🏗️ - see tablet) 
         - ability to "star" / "favorite" a course
+        - fix low / moderate / high vulnerabilities for npm packages in frontend
+        - redirects / url stuff (ex: 
+            "/knowledge/:id/:anythingHereShouldRedirect"
+            "/library/:id/:roomName/:anythingHereShouldRedirect"
+            etc...
+        )
 
     create course (library) page:
         - add support for links / pdfs / other things and get rid of things like difficulty, tutor, etc... then actually start generating stuff to study
@@ -132,6 +138,7 @@ COMPLETED:
     ✅ hide header / footer from game when user is playing a game
     ✅ remove timer, likes, clouds, and diamonds from game screen 
     ✅ add X button to exit out of game and navigate back to game / course map
+    ✅ figured out why a room name of the name of the library kept generating and fixed it
 
     rag stuff:
     1) give whole textbook to gpt to "split up" ✅
