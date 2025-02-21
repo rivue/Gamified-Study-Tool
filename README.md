@@ -54,6 +54,7 @@ TODO list:
         - make footer smaller
         - contact image on main sidebar?
         - significant ui rehaul ***
+        - change gpt 40-mini to deepseek
 
     create course (library) page:
         - add support for links / pdfs / other things and get rid of things like difficulty, tutor, etc... then actually start generating stuff to study
