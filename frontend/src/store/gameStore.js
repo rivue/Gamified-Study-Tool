@@ -115,6 +115,7 @@ export const useGameStore = defineStore("gameStore", {
             try {
                 const response = await axios.get(`/api/library/${libraryId}`, {params: {library_topic: roomNameThing}});
                 // do loadName first in case factoid doesn't exist
+                console.log("response: ", response);
                 if (response.data.status === "success") {
                     if (response.data.data === null) {
                         // if for some reason roomNameThing is null

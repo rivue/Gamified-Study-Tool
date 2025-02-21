@@ -284,7 +284,7 @@ GenerateLibraryRoomNames = {
 
 GenerateLibraryRoom = {
     "name": "generate_library_room",
-    "description": "Generates a library room with 4 factoids and corresponding questions. Each factoid is an interesting snippet related to the room's theme. Two factoids have associated multiple-choice questions testing understanding of the factoid, and two factoids have a missing word denoted by an underscore for the user to fill in, each accompanied by multiple-choice options.",
+    "description": "Generates a library room with 3 factoids and corresponding questions. all factoids are of type 'one_word_answer' , which means no wrong choices and up to 7 small variations in the same answer in correct_choice (ex: gt, georgia tech, georgia institute of technology, etc..).",
     "parameters": {
         "type": "object",
         "properties": {
@@ -302,40 +302,106 @@ GenerateLibraryRoom = {
                             "properties": {
                                 "type": {
                                     "type": "string",
-                                    "enum": ["multiple_choice", "fill_in_the_blank"],
-                                    "description": "The type of question: 'multiple_choice' or 'fill_in_the_blank'."
+                                    "enum": ["one_word_answer"],
+                                    "description": "The type of question: 'one_word_answer'"
                                 },
                                 "text": {
                                     "type": "string",
-                                    "description": "The text of the question. For 'fill_in_the_blank' questions, this must contain an underscore (_) where the answer should go."
+                                    "description": "The text of the question."
                                 },
                                 "correct_choice": {
-                                    "type": "string",
-                                    "description": "The correct choice for the question or the correct word/phrase that fills in the blank."
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    },
+                                    "minItems": 1,
+                                    "maxItems": 7,
+                                    "description": "An array of correct answers. This may include up to 7 acceptable variations of the correct word or phrase (gt, Georgia Tech, georgia-Tech, georgiatech, etc...)."
                                 },
                                 "wrong_choices": {
                                     "type": "array",
                                     "items": {
                                         "type": "string"
                                     },
-                                    "minItems": 3,
+                                    "minItems": 0,
                                     "maxItems": 3,
-                                    "description": "Three incorrect choices for the question."
+                                    "description": "Wrong choices for the question. For 'one_word_answer', do not provide any wrong choices (preferably omit)."
                                 }
                             },
-                            "required": ["type", "text", "correct_choice", "wrong_choices"]
+                            "required": ["type", "text", "correct_choice"]
                         }
                     },
                     "required": ["factoid_text", "question"]
                 },
-                "minItems": 4,
-                "maxItems": 4,
-                "description": "An array of four objects, each containing a factoid and its corresponding question."
+                "minItems": 3,
+                "maxItems": 3,
+                "description": "An array of 3 objects, each containing a factoid and its corresponding question."
             }
         },
         "required": ["factoids"]
     }
 }
+
+# VVV COME BACK TO VVV
+# GenerateLibraryRoom = {
+#     "name": "generate_library_room",
+#     "description": "Generates a library room with 9 factoids and corresponding questions. Each factoid is an interesting snippet related to the room's theme. Three factoids have associated multiple-choice questions testing understanding of the factoid, three factoids have a missing word denoted by an underscore for the user to fill in, each accompanied by multiple-choice options. and three factoids can be 'one_word_answer' type, which means no wrong choices and up to 7 small variations in the same answer in correct_choice (ex: gt, georgia tech, georgia institute of technology, etc..).",
+#     "parameters": {
+#         "type": "object",
+#         "properties": {
+#             "factoids": {
+#                 "type": "array",
+#                 "items": {
+#                     "type": "object",
+#                     "properties": {
+#                         "factoid_text": {
+#                             "type": "string",
+#                             "description": "A snippet of an interesting fact related to the library room's theme, up to 200 tokens in length."
+#                         },
+#                         "question": {
+#                             "type": "object",
+#                             "properties": {
+#                                 "type": {
+#                                     "type": "string",
+#                                     "enum": ["multiple_choice", "fill_in_the_blank", "one_word_answer"],
+#                                     "description": "The type of question: 'one_word_answer', 'multiple_choice' or 'fill_in_the_blank'."
+#                                 },
+#                                 "text": {
+#                                     "type": "string",
+#                                     "description": "The text of the question. For 'fill_in_the_blank' questions, this must contain three underscores (___) where the answer should go."
+#                                 },
+#                                 "correct_choice": {
+#                                     "type": "array",
+#                                     "items": {
+#                                         "type": "string"
+#                                     },
+#                                     "minItems": 1,
+#                                     "maxItems": 7,
+#                                     "description": "An array of correct answers. For 'multiple_choice' or 'fill_in_the_blank', typically this is a single string (1 item). For 'one_word_answer', this may include up to 7 acceptable variations of the correct word or phrase (gt, Georgia Tech, georgia-Tech, georgiatech, etc...)."
+#                                 },
+#                                 "wrong_choices": {
+#                                     "type": "array",
+#                                     "items": {
+#                                         "type": "string"
+#                                     },
+#                                     "minItems": 0,
+#                                     "maxItems": 3,
+#                                     "description": "Wrong choices for the question. Provide exactly 3 for 'multiple_choice' or 'fill_in_the_blank'. For 'one_word_answer', do not provide any wrong choices (preferably omit)."
+#                                 }
+#                             },
+#                             "required": ["type", "text", "correct_choice"]
+#                         }
+#                     },
+#                     "required": ["factoid_text", "question"]
+#                 },
+#                 "minItems": 9,
+#                 "maxItems": 9,
+#                 "description": "An array of 9 objects, each containing a factoid and its corresponding question."
+#             }
+#         },
+#         "required": ["factoids"]
+#     }
+# }
 
 
 # GenerateLibraryRoom = {

@@ -55,6 +55,9 @@ TODO list:
         - contact image on main sidebar?
         - significant ui rehaul ***
         - change gpt 40-mini to deepseek
+        - maybe do something that caps length of vector embedding response, like chops it off after 1k tokens / characters or something
+        - implement claude or deepseek with the AI prompting
+        - add redirect to newly generated lesson once it finishes loading the library
 
     create course (library) page:
         - add support for links / pdfs / other things and get rid of things like difficulty, tutor, etc... then actually start generating stuff to study

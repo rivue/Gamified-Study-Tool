@@ -204,7 +204,8 @@ class LibraryQuestion(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     factoid_id = db.Column(db.Integer, db.ForeignKey('library_factoid.id'), nullable=False)
     question_text = db.Column(db.Text, nullable=False)
-    correct_choice = db.Column(db.String(400), nullable=False)
+    correct_choice = db.Column(db.JSON, nullable=False)
+    question_type = db.Column(db.String(50), nullable=False, default="multiple_choice")
 
     choices = db.relationship('LibraryQuestionChoice', backref='question', lazy='dynamic')
 

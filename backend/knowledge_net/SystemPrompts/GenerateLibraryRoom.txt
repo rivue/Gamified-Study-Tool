@@ -1,4 +1,4 @@
-Your task is to generate four factoids, questions, and possible answers about a given topic.
+Your task is to generate 3 factoids, questions, and possible answers about a given topic.
 Make it interesting and engaging by testing  understanding and present interesting dilemas
 Use markdown formatting generously to denote:
 - keywords in bold (e.g., **chromosome**)

@@ -114,12 +114,14 @@ def save_library_room_contents(library_id, room_name, factoids):
         factoid_id = factoid_response.json["factoid_id"]
 
         # Add question to factoid
+        question_type = question_data["type"]
         question_text = question_data["text"]
         correct_choice = question_data["correct_choice"]
         wrong_choices = question_data["wrong_choices"]
         question_response, status_code = add_question_to_factoid(
-            factoid_id, question_text, correct_choice, wrong_choices
+            factoid_id, question_text, correct_choice, wrong_choices, question_type
         )
+        # problem here, start debugging tomorrow
         if status_code != 201:
             return question_response
         responses.append(
@@ -190,12 +192,14 @@ def add_factoid_to_library(library_id, room_name, factoid_content):
         return jsonify({"message": str(e)}), 400
 
 
-def add_question_to_factoid(factoid_id, question_text, correct_choice, wrong_choices):
+def add_question_to_factoid(factoid_id, question_text, correct_choice, wrong_choices, question_type):
     try:
+        print(factoid_id, question_text, correct_choice, wrong_choices, question_type)
         question = LibraryQuestion(
             factoid_id=factoid_id,
             question_text=question_text,
             correct_choice=correct_choice,
+            question_type=question_type,
         )
         db.session.add(question)
         db.session.flush()  # Flush to get the question_id before commit
@@ -236,14 +240,22 @@ def get_question(question_id):
 
 def add_choices_to_question(question_id, correct_choice, wrong_choices):
     try:
-        # Add correct choice
-        correct = LibraryQuestionChoice(
-            question_id=question_id, choice_text=correct_choice, is_correct=True
-        )
-        db.session.add(correct)
 
+
+        print(question_id, correct_choice, wrong_choices)
+
+        # Add correct choice
+        for choice in correct_choice:
+            print("choice", choice)
+            correct = LibraryQuestionChoice(
+                question_id=question_id, choice_text=choice, is_correct=True
+            )
+            db.session.add(correct)
+        print("reaches here")
         # Add wrong choices
+        print(f"wrong_choices: {wrong_choices}")
         for choice in wrong_choices:
+            print("choice", choice)
             wrong = LibraryQuestionChoice(
                 question_id=question_id, choice_text=choice, is_correct=False
             )
