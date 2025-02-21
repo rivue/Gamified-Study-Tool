@@ -284,7 +284,7 @@ GenerateLibraryRoomNames = {
 
 GenerateLibraryRoom = {
     "name": "generate_library_room",
-    "description": "Generates a library room with 3 factoids and corresponding questions. all factoids are of type 'one_word_answer' , which means no wrong choices and up to 7 small variations in the same answer in correct_choice (ex: gt, georgia tech, georgia institute of technology, etc..).",
+    "description": "Generates a library room with 9 factoids and corresponding questions, evenly distributed among three question types.",
     "parameters": {
         "type": "object",
         "properties": {
@@ -302,12 +302,12 @@ GenerateLibraryRoom = {
                             "properties": {
                                 "type": {
                                     "type": "string",
-                                    "enum": ["one_word_answer"],
-                                    "description": "The type of question: 'one_word_answer'"
+                                    "enum": ["fill_in_the_blank", "multiple_choice", "one_word_answer"],
+                                    "description": "The type of question. Must have an even distrubution: 3 of each type across all factoids"
                                 },
                                 "text": {
                                     "type": "string",
-                                    "description": "The text of the question."
+                                    "description": "The text of the question. Use '___' for blanks for 'fill_in_the_blank' answers"
                                 },
                                 "correct_choice": {
                                     "type": "array",
@@ -315,27 +315,27 @@ GenerateLibraryRoom = {
                                         "type": "string"
                                     },
                                     "minItems": 1,
-                                    "maxItems": 7,
-                                    "description": "An array of correct answers. This may include up to 7 acceptable variations of the correct word or phrase (gt, Georgia Tech, georgia-Tech, georgiatech, etc...)."
+                                    "maxItems": 7, 
+                                    "description": "For 'one_word_answer' questions, an array of 1-7 acceptable variations of the correct answer. For other question types, an array with exactly one correct answer.",
                                 },
                                 "wrong_choices": {
                                     "type": "array",
                                     "items": {
                                         "type": "string"
                                     },
+                                    "description": "Three incorrect choices for multiple_choice and fill_in_the_blank questions. Not used for one_word_answer questions.",
                                     "minItems": 0,
                                     "maxItems": 3,
-                                    "description": "Wrong choices for the question. For 'one_word_answer', do not provide any wrong choices (preferably omit)."
                                 }
                             },
-                            "required": ["type", "text", "correct_choice"]
+                            "required": ["type", "text", "correct_choice"],
                         }
                     },
                     "required": ["factoid_text", "question"]
                 },
-                "minItems": 3,
-                "maxItems": 3,
-                "description": "An array of 3 objects, each containing a factoid and its corresponding question."
+                "minItems": 9,
+                "maxItems": 9,
+                "description": "An array of 9 objects, each containing a factoid and its corresponding question."
             }
         },
         "required": ["factoids"]

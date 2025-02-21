@@ -82,7 +82,7 @@ export const useGameStore = defineStore("gameStore", {
                 if (this.currentQuestion === 2 && !this.finalTest) {
                     console.log("TODO") // TODO this is just a placeholder
                    
-                } else if (this.currentQuestion === 2){// && this.finalTest) {
+                } else if (this.currentQuestion === 2) { // && this.finalTest) {
                     this.questionVisible = false;
                     this.factoidVisible = null;
                     this.endGame();
@@ -110,10 +110,12 @@ export const useGameStore = defineStore("gameStore", {
             return true;
         },
         async fetchLibraryDetails(libraryId, roomNameThing) {
+            
             this.setId(libraryId);
-            console.log("why is nothing working")
+            
             try {
                 const response = await axios.get(`/api/library/${libraryId}`, {params: {library_topic: roomNameThing}});
+
                 // do loadName first in case factoid doesn't exist
                 console.log("response: ", response);
                 if (response.data.status === "success") {
@@ -136,7 +138,7 @@ export const useGameStore = defineStore("gameStore", {
                     this.languageDifficulty = data.language_difficulty || "Normal";
                     // this.libraryTopic = data.library_topic || null;
                     this.libraryTopic = roomNameThing;
-                    console.log("roomNameThing: ", roomNameThing);
+                    // console.log("roomNameThing: ", roomNameThing);
                     this.likes = data.likes || 0;
                     this.userId = data.user_id || null;
                     this.tutorial = data.tutorial || false;

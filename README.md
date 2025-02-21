@@ -58,6 +58,9 @@ TODO list:
         - maybe do something that caps length of vector embedding response, like chops it off after 1k tokens / characters or something
         - implement claude or deepseek with the AI prompting
         - add redirect to newly generated lesson once it finishes loading the library
+        - copy openais font?
+        - make sure "Knowledge Map" and "Lessons" either actually link somewhere or are handled properly
+        - *possibly* add a slider to each course based on how lenient the course creator wants the fuzzy string matcher to be (for misspelled words)
 
     create course (library) page:
         - add support for links / pdfs / other things and get rid of things like difficulty, tutor, etc... then actually start generating stuff to study

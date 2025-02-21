@@ -117,7 +117,10 @@ def save_library_room_contents(library_id, room_name, factoids):
         question_type = question_data["type"]
         question_text = question_data["text"]
         correct_choice = question_data["correct_choice"]
-        wrong_choices = question_data["wrong_choices"]
+
+        # wrong_choices = question_data["wrong_choices"]
+        wrong_choices = question_data.get("wrong_choices", [])
+
         question_response, status_code = add_question_to_factoid(
             factoid_id, question_text, correct_choice, wrong_choices, question_type
         )
@@ -139,9 +142,9 @@ def retrieve_library_room_contents(library_id, room_name):
         library_id=library_id, room_name=room_name
     ).all()
     
-    if len(factoids) < 4:
+    if len(factoids) < 3:
         return None
-
+    print(f"factoids: {factoids}")
     room_contents = []
     for factoid in factoids:
         questions = []
@@ -165,6 +168,7 @@ def retrieve_library_room_contents(library_id, room_name):
                     "question_text": question.question_text,
                     "correct_choice": correct_choice,
                     "wrong_choices": wrong_choices,
+                    "question_type": question.question_type,
                 }
             )
         room_contents.append(
@@ -194,7 +198,6 @@ def add_factoid_to_library(library_id, room_name, factoid_content):
 
 def add_question_to_factoid(factoid_id, question_text, correct_choice, wrong_choices, question_type):
     try:
-        print(factoid_id, question_text, correct_choice, wrong_choices, question_type)
         question = LibraryQuestion(
             factoid_id=factoid_id,
             question_text=question_text,
@@ -251,9 +254,7 @@ def add_choices_to_question(question_id, correct_choice, wrong_choices):
                 question_id=question_id, choice_text=choice, is_correct=True
             )
             db.session.add(correct)
-        print("reaches here")
-        # Add wrong choices
-        print(f"wrong_choices: {wrong_choices}")
+            
         for choice in wrong_choices:
             print("choice", choice)
             wrong = LibraryQuestionChoice(

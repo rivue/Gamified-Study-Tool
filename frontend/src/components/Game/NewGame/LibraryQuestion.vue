@@ -1,155 +1,200 @@
 <template>
     <transition name="fade">
-      <div v-if="questionVisible" class="question-overlay" @click="closeQuestion">
-        <div class="question-backdrop">
-          <!-- Close (X) button -->
-          <div class="close-button" @click.stop="closeQuestion">×</div>
-          <!-- Info icon moved to top right -->
-          <div class="info-icon">i</div>
-          <!-- Completion message when no more questions -->
-          <div v-if="question === null" class="completion-message">
-            Congratulations, you've completed all questions in this room!
-            <!-- TODO: navigate back to home screen automatically here -->
-          </div>
-          <!-- Question text -->
-          <div v-else class="question-content">
-            <p v-html="question.text"></p>
-          </div>
-          <!-- Choices -->
-          <div v-if="question !== null" class="choices-container">
-            <div v-for="(choice, index) in question.choices" :key="index">
-              <button
-                :class="{
-                  correct: choice === answerState.correct,
-                  wrong: choice === answerState.wrong,
-                  disabledButton: isDisabled
-                }"
-                :disabled="isDisabled"
-                @click.stop="submitAnswer(choice)"
-                v-html="choice"
-              ></button>
+        <div v-if="questionVisible" class="question-overlay">
+            <div class="question-backdrop">
+                <div class="close-button" @click.stop="closeQuestion">×</div>
+                <div class="info-icon" @click="flipQuestion">i</div>
+                <!-- Completion message when no more questions -->
+                <div v-if="question === null" class="completion-message">
+                    Congratulations, you've completed all questions in this room!
+                </div>
+                <div v-else class="question-content">
+                    <p v-html="question.text"></p>
+                </div>
+
+                <div v-if="question !== null" class="choices-container" :class="{ 'shake': isShaking }">
+                    <div v-if="question.type === 'one_word_answer'" class="input-container">
+                        <input 
+                            type="text" 
+                            v-model="userAnswer"
+                            @keyup.enter="submitOneWordAnswer"
+                            :class="{
+                                'correct': answerState.correct,
+                                'wrong': answerState.wrong
+                            }"
+                            :disabled="isDisabled"
+                            placeholder="Type your answer..."
+                        >
+                        <button
+                            class="submit-btn"
+                            @click="submitOneWordAnswer"
+                            :disabled="isDisabled || !userAnswer.trim()"
+                        >
+                            Submit
+                        </button>
+                    </div>
+                    <div v-else v-for="(choice, index) in question.choices" :key="index">
+                        <button :class="{
+                            correct: choice === answerState.correct,
+                            wrong: choice === answerState.wrong,
+                            disabledButton: isDisabled
+                        }" :disabled="isDisabled" @click.stop="submitAnswer(choice)" v-html="choice"></button>
+                    </div>
+                </div>
             </div>
-          </div>
         </div>
-      </div>
     </transition>
-  </template>
-  
-  <script>
-  // Script section remains unchanged
-  import { useGameStore } from "@/store/gameStore";
-  
-  export default {
+</template>
+
+<script>
+import { useGameStore } from "@/store/gameStore";
+import stringSimilarity from 'string-similarity';
+
+export default {
     name: "LibraryQuestion",
     data() {
-      return {
-        answerState: {
-          correct: null,
-          wrong: null,
-        },
-        isDisabled: false,
-      };
+        return {
+            answerState: {
+                correct: null,
+                wrong: null,
+            },
+            isDisabled: false,
+            userAnswer: "",
+            isShaking: false
+        };
     },
     methods: {
-      shuffleArray(array) {
-        for (let i = array.length - 1; i > 0; i--) {
-          const j = Math.floor(Math.random() * (i + 1));
-          [array[i], array[j]] = [array[j], array[i]];
-        }
-      },
-      submitAnswer(choice) {
-        const store = useGameStore();
-        const correct =
-          store.factoids[store.currentQuestion].questions[0].correct_choice;
-  
-        if (correct === choice) {
-          this.answerState.correct = choice;
-          this.answerState.wrong = null;
-        } else {
-          this.answerState.wrong = choice;
-          this.answerState.correct = null;
-          this.isDisabled = true;
-          setTimeout(() => {
-            this.isDisabled = false;
-          }, 1000);
-        }
-  
-        setTimeout(() => {
-          if (store.answerAttempt(correct === choice)) {
+        shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        },
+        submitOneWordAnswer() {
+            if (this.isDisabled || !this.userAnswer.trim()) return;
+            
+            const processedAnswer = this.userAnswer.trim().toLowerCase();
+            const store = useGameStore();
+            const correctAnswer = store.factoids[store.currentQuestion].questions[0].correct_choice.toLowerCase();
+            
+            // Using string-similarity (Levenshtein Distance) to compare answers - threshold of 0.50 (50% similar)
+            const similarity = stringSimilarity.compareTwoStrings(processedAnswer, correctAnswer);
+            const isCorrect = similarity > 0.70;
+            
+            this.submitAnswer(this.userAnswer, isCorrect);
+        },
+        submitAnswer(choice, isOneWordAnswer = false) {
+            const store = useGameStore();
+            const correct = store.factoids[store.currentQuestion].questions[0].correct_choice;
+            const isCorrect = isOneWordAnswer ? choice : correct === choice;
+
+            if (isCorrect) {
+                this.answerState.correct = choice;
+                this.answerState.wrong = null;
+            } else {
+                this.answerState.wrong = choice;
+                this.answerState.correct = null;
+                this.isDisabled = true;
+                this.isShaking = true;
+                
+                setTimeout(() => {
+                    this.isShaking = false;
+                    this.isDisabled = false;
+                    if (isOneWordAnswer) {
+                        this.userAnswer = "";
+                    }
+                    this.answerState.wrong = null;
+                }, 1000);
+            }
+
+            setTimeout(() => {
+                if (store.answerAttempt(isCorrect)) {
+                    this.resetState();
+                } else {
+                    this.$router.push("/login");
+                }
+            }, 300);
+        },
+        resetState() {
             this.answerState.wrong = null;
             this.answerState.correct = null;
-          } else {
-            this.$router.push("/login");
-          }
-        }, 300);
-      },
-      closeQuestion() {
-        this.$router.push(`/lessons/${this.$route.params.id}`);
-      },
-      format(content) {
-        let regex;
-        regex = /\*\*([^*]*?)\*\*/g;
-        content = content.replace(regex, "<strong>$1</strong>");
-        regex = /_([^_]*?)_|\*([^*]*?)\*/g;
-        content = content.replace(regex, "<em>$1$2</em>");
-        return content;
-      },
+            this.userAnswer = "";
+            this.isShaking = false;
+        },
+        flipQuestion() {
+            const store = useGameStore();
+            store.toggleFactoid();
+            this.resetState();
+        },
+        closeQuestion() {
+            this.$router.push(`/lessons/${this.$route.params.id}`);
+        },
+        format(content) {
+            let regex;
+            regex = /\*\*([^*]*?)\*\*/g;
+            content = content.replace(regex, "<strong>$1</strong>");
+            regex = /_([^_]*?)_|\*([^*]*?)\*/g;
+            content = content.replace(regex, "<em>$1$2</em>");
+            return content;
+        },
     },
     computed: {
-      question() {
-        const store = useGameStore();
-        if (store.currentQuestion === null) return null;
-        const currentFactoid = store.factoids[store.currentQuestion];
-  
-        if (
-          !currentFactoid ||
-          !Array.isArray(currentFactoid.questions) ||
-          currentFactoid.questions.length === 0
-        ) {
-          console.error("No questions available or invalid questions format");
-          return null;
-        }
-  
-        const currentQuestion = currentFactoid.questions[0];
-        if (
-          !currentQuestion ||
-          !currentQuestion.question_text ||
-          !currentQuestion.correct_choice ||
-          !Array.isArray(currentQuestion.wrong_choices)
-        ) {
-          console.log("this is good I think - replace with actual completion message and exit out of room")
-          console.error("Question structure is incomplete or invalid");
-          return null;
-        }
-  
-        const choices = [
-          currentQuestion.correct_choice,
-          ...currentQuestion.wrong_choices,
-        ];
-        this.shuffleArray(choices);
-  
-        return {
-          text: this.format(currentQuestion.question_text),
-          choices: choices.map((choice) => this.format(choice)),
-        };
-      },
-      questionVisible() {
-        const store = useGameStore();
-        return store.questionVisible;
-      },
+        question() {
+            const store = useGameStore();
+            if (store.currentQuestion === null) return null;
+            const currentFactoid = store.factoids[store.currentQuestion];
+
+            if (
+                !currentFactoid ||
+                !Array.isArray(currentFactoid.questions) ||
+                currentFactoid.questions.length === 0
+            ) {
+                console.error("No questions available or invalid questions format");
+                return null;
+            }
+            const currentQuestion = currentFactoid.questions[0];
+            if (
+                !currentQuestion ||
+                !currentQuestion.question_text ||
+                !currentQuestion.correct_choice ||
+                !currentQuestion.question_type ||
+                !Array.isArray(currentQuestion.wrong_choices)
+            ) {
+                console.log("this is good I think - replace with actual completion message and exit out of room")
+                console.error("Question structure is incomplete or invalid");
+                return null;
+            }
+
+            const choices = [
+                currentQuestion.correct_choice,
+                ...currentQuestion.wrong_choices,
+            ];
+            this.shuffleArray(choices);
+
+            return {
+                text: this.format(currentQuestion.question_text),
+                choices: choices.map((choice) => this.format(choice)),
+                type: currentQuestion.question_type,
+            };
+        },
+        questionVisible() {
+            const store = useGameStore();
+            return store.questionVisible;
+        },
     },
-  };
-  </script>
-  
-  <style scoped>
-  .completion-message {
+};
+</script>
+
+<style scoped>
+.completion-message {
     text-align: center;
     font-size: 1.4em;
     color: var(--highlight-color);
-  }
-  
-  .question-overlay {
-    position: fixed; /* Changed from absolute to fixed */
+}
+
+.question-overlay {
+    position: fixed;
+    /* Changed from absolute to fixed */
     top: 0;
     left: 0;
     width: 100%;
@@ -158,27 +203,33 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: rgba(0, 0, 0, 0.5); /* Added semi-transparent background */
-  }
-  
-  .question-backdrop {
+    background-color: rgba(0, 0, 0, 0.5);
+    /* Added semi-transparent background */
+}
+
+.question-backdrop {
     position: relative;
     background-color: var(--background-haze);
-    padding: 2em; /* Increased padding */
+    padding: 2em;
+    /* Increased padding */
     display: flex;
     justify-content: center;
     align-items: center;
     flex-direction: column;
     box-shadow: 0 16px 16px var(--background-color-2t),
-      0 -16px 16px var(--background-color-2t);
-    width: 80%; /* Set width to 80% of viewport */
-    max-width: 800px; /* Maximum width */
-    min-height: 60vh; /* Minimum height */
-    border-radius: 12px; /* Added rounded corners */
-  }
-  
-  /* New close button styles */
-  .close-button {
+        0 -16px 16px var(--background-color-2t);
+    width: 80%;
+    /* Set width to 80% of viewport */
+    max-width: 800px;
+    /* Maximum width */
+    min-height: 60vh;
+    /* Minimum height */
+    border-radius: 12px;
+    /* Added rounded corners */
+}
+
+/* New close button styles */
+.close-button {
     position: absolute;
     top: 10px;
     left: 10px;
@@ -192,17 +243,18 @@
     font-size: 24px;
     cursor: pointer;
     transition: background-color 0.2s;
-  }
-  
-  .close-button:hover {
+}
+
+.close-button:hover {
     background: rgba(255, 0, 0, 1);
-  }
-  
-  /* Moved info icon to top right */
-  .info-icon {
+}
+
+/* Moved info icon to top right */
+.info-icon {
     position: absolute;
     top: 10px;
-    right: 10px; /* Changed from left to right */
+    right: 10px;
+    /* Changed from left to right */
     width: 30px;
     height: 30px;
     background: rgba(255, 255, 255, 0.3);
@@ -212,109 +264,173 @@
     font-weight: bold;
     cursor: pointer;
     transition: background-color 0.2s;
-  }
-  
-  .info-icon:hover {
+}
+
+.info-icon:hover {
     background: rgba(255, 255, 255, 0.5);
-  }
-  
-  .question-content {
+}
+
+.question-content {
     text-align: center;
     width: 90%;
-    padding: 30px; /* Increased padding */
+    padding: 30px;
+    /* Increased padding */
     border-radius: 12px;
-    background-image: linear-gradient(
-      to right,
-      var(--background-color-2t),
-      var(--background-color-1t)
-    );
+    background-image: linear-gradient(to right,
+            var(--background-color-2t),
+            var(--background-color-1t));
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     z-index: 111;
-    font-size: 1.4em; /* Increased font size */
+    font-size: 1.4em;
+    /* Increased font size */
     margin: 20px 0;
-  }
-  
-  .choices-container {
+}
+
+.choices-container {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 20px; /* Increased gap */
+    gap: 20px;
+    /* Increased gap */
     width: 90%;
     margin-top: 30px;
-  }
-  
-  button {
-    padding: 20px; /* Increased padding */
+}
+
+button {
+    padding: 20px;
+    /* Increased padding */
     width: 100%;
     height: 100%;
     border: none;
     background-color: var(--background-color-1t);
     border: 1px solid var(--background-color-2t);
-    font-size: 1.2em; /* Increased font size */
+    font-size: 1.2em;
+    /* Increased font size */
     border-radius: 12px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     cursor: pointer;
     transition: all ease 0.2s;
-  }
-  
-  button:hover {
+}
+
+button:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
-  }
-  
-  button.correct {
+}
+
+button.correct {
     background-color: green;
     color: white;
-  }
-  
-  button.wrong {
+}
+
+button.wrong {
     background-color: red;
     color: white;
-  }
-  
-  .fade-enter-active,
-  .fade-leave-active {
+}
+
+.fade-enter-active,
+.fade-leave-active {
     transition: opacity 0.3s;
-  }
-  
-  .fade-enter-from,
-  .fade-leave-to {
+}
+
+.fade-enter-from,
+.fade-leave-to {
     opacity: 0;
-  }
-  
-  button.disabledButton {
+}
+
+button.disabledButton {
     pointer-events: none;
     animation: fadeDisable 1s forwards;
-  }
-  
-  @keyframes fadeDisable {
+}
+
+@keyframes fadeDisable {
     0% {
-      opacity: 1;
+        opacity: 1;
     }
+
     50% {
-      opacity: 0.5;
+        opacity: 0.5;
     }
+
     100% {
-      opacity: 1;
+        opacity: 1;
     }
-  }
-  
-  /* Added responsive design for smaller screens */
-  @media (max-width: 768px) {
+}
+
+/* Added responsive design for smaller screens */
+@media (max-width: 768px) {
     .question-backdrop {
-      width: 95%;
-      padding: 1em;
+        width: 95%;
+        padding: 1em;
     }
-  
+
     .choices-container {
-      grid-template-columns: 1fr; /* Stack buttons on mobile */
+        grid-template-columns: 1fr;
+        /* Stack buttons on mobile */
     }
-  
+
     .question-content {
-      font-size: 1.2em;
+        font-size: 1.2em;
     }
-  
+
     button {
-      font-size: 1em;
+        font-size: 1em;
     }
-  }
-  </style>
+}
+.input-container {
+    grid-column: 1 / -1;
+    display: flex;
+    gap: 10px;
+    width: 100%;
+}
+
+input {
+    flex: 1;
+    padding: 20px;
+    font-size: 1.2em;
+    border: 1px solid var(--background-color-2t);
+    border-radius: 12px;
+    background-color: var(--background-color-1t);
+    transition: all 0.3s ease;
+}
+
+input:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--highlight-color);
+}
+
+input.correct {
+    background-color: green;
+    color: white;
+    border-color: green;
+}
+
+input.wrong {
+    background-color: red;
+    color: white;
+    border-color: red;
+}
+
+.submit-btn {
+    padding: 20px 30px;
+    white-space: nowrap;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-10px); }
+    75% { transform: translateX(10px); }
+}
+
+.shake {
+    animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+@media (max-width: 768px) {
+    .input-container {
+        flex-direction: column;
+    }
+    
+    .submit-btn {
+        width: 100%;
+    }
+}
+</style>

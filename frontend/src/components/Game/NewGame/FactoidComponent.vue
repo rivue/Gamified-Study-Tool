@@ -1,6 +1,6 @@
 <!-- Factoid.vue -->
 <template>
-  <div v-if="factoidVisible != null && factoidText" class="factoid-overlay" @click="closeFactoid">
+  <div v-if="factoidVisible != null && factoidText" class="factoid-overlay" @click="flipFactoid">
   <div class="factoid-box">
     <div class="factoid-content">
       <p v-html="factoidText"></p>
@@ -23,7 +23,7 @@ export default {
     },
     factoidText() {
       const store = useGameStore();
-      let content =store.factoids[store.factoidVisible]?.factoid_text || 'No factoid text'
+      let content = store.factoids[store.factoidVisible]?.factoid_text || 'No factoid text'
       // Bold
       let regex;
       regex = /\*\*([^*]*?)\*\*/g;
@@ -36,7 +36,7 @@ export default {
     }
   },
   methods: {
-    closeFactoid () {
+    flipFactoid () {
       const store = useGameStore();
       store.toggleFactoid();
     }
