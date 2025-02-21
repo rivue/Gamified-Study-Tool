@@ -79,7 +79,7 @@ export const useGameStore = defineStore("gameStore", {
                 this.score += this.multiplier;
                 this.multiplier += 1;
                 this.currentQuestion += 1;
-                if (this.currentQuestion === 2 && !this.finalTest) {
+                if (this.currentQuestion && !this.finalTest) {
                     console.log("TODO") // TODO this is just a placeholder
                    
                 } else if (this.currentQuestion === 2) { // && this.finalTest) {

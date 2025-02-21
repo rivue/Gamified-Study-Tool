@@ -61,6 +61,8 @@ TODO list:
         - copy openais font?
         - make sure "Knowledge Map" and "Lessons" either actually link somewhere or are handled properly
         - *possibly* add a slider to each course based on how lenient the course creator wants the fuzzy string matcher to be (for misspelled words)
+        - fix progress bar (random amount gained might be nice along with fetching a random amount of questions (5-9))
+        - redirect home when user is done
 
     create course (library) page:
         - add support for links / pdfs / other things and get rid of things like difficulty, tutor, etc... then actually start generating stuff to study
@@ -82,8 +84,6 @@ TODO list:
             8 or so least seen so that the questions seem random and they aren't just the same multiple choice every time
         - make the underscores ___ visible in the questions
         - "games":
-            - one word free answer (make gpt come up with variations so people aren't pissed off w/ super close answers, ex:
-                NCSU, ncsu, NC State, North Carolina State University, etc... or maybe use basic nlp to check?)
             - multiple options in a row: like with duolingo where you are given 10 or so options and you pick 4 or 5 and they have to be 
                 in a specific order. this might be somewhat tricky to implement cus I have to implement drag-and-drop at the same time, so I might have to 
                 think of a couple others in the mean time
@@ -193,6 +193,8 @@ COMPLETED:
     ✅ figured out why a room name of the name of the library kept generating and fixed it
     ✅ remove description and game image popup upon initial game page load
     ✅ page / route reorganization
+    ✅ one word short answer (make gpt come up with variations so people aren't pissed off w/ super close answers, ex:
+        NCSU, ncsu, NC State, North Carolina State University, etc... or maybe use basic nlp to check?)
 
     rag stuff:
     1) give whole textbook to gpt to "split up" ✅
@@ -205,3 +207,5 @@ COMPLETED:
 
 RESOURCES:
     - node components: https://vueflow.dev/
+    - how to use openai functions: https://platform.openai.com/docs/guides/function-calling?example=get-weather
+    - my google doc: https://docs.google.com/document/d/1MvOFHL8wQBdvFlOhxfWZcTMGbxHWUpuhCqqbmpGXRUA/edit?tab=t.oc5pfrbekfi2
