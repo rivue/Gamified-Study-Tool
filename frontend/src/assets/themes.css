@@ -39,24 +39,76 @@
 } */
 
 :root {
-    --background-color: #1d7f74; /* Dark teal background */
-    --background-color-rgb: 29, 127, 116; /* RGB for dark teal background */
-    --background-haze: #1d7f74; /* Dark teal haze */
-    --background-button-haze: #1d7f74; /* Dark teal button haze */
-    --background-color-1t: #1d7f74; /* Accent teal for contrast */
-    --background-color-2t: #1d7f74; /* Accent teal */
-    --element-color-1: #1d7f74; /* Light teal for UI elements */
-    --element-color-2: #1d7f74; /* Accent teal for highlights */
-    --highlight-color: #1d7f74; /* Highlight color in teal */
-    --text-color: #ffffff; /* White text */
-    --text-color-rgb: 255, 255, 255; /* RGB for white text */
-    --gold-color: #ffd804cc; /* Optional gold accent color */
+    /* Primary Brand Colors - Teal */
+    --color-primary: #1A8B7F;
+    --color-primary-light: #33B2A5;
+    --color-primary-lighter: #66C5BC;
+    --color-primary-dark: #156F66;
+    --color-primary-darker: #10534C;
+  
+    /* Secondary Colors - Purple for Achievements/Rewards */
+    --color-secondary: #9F7AEA;
+    --color-secondary-light: #BFA3F7;
+    --color-secondary-lighter: #DFD1FB;
+    --color-secondary-dark: #7F62BB;
+    --color-secondary-darker: #475569;
+  
+    /* Success Colors - Green for Progress */
+    --color-success: #48BB78;
+    --color-success-light: #4ADE80;
+    --color-success-lighter: #86EFAC;
+    --color-success-dark: #3B9562;
+    --color-success-darker: #2C6F4A;
+  
+    /* Primary Background Color - Light Teal */
+    --background-color: var(--color-primary-dark); /* Light teal background */
+    --background-color-rgb: 16, 83, 76; /* RGB for dark teal background */
+    --background-haze: #66C5BC; /* Light teal haze */
+    --background-button-haze: #66C5BC; /* Light teal button haze */
     
-    --light-text: #ffffff; /* White text for better contrast on dark teal */
-    --light-highlight: #1d7f74; /* Light teal highlights */
-    --black-back: #101216; /* Very dark gray/black for footer or header */
+    /* Darker Teal for Accents and Contrast */
+    --background-color-1t: var(--color-primary-dark); /* Darker teal for contrast */
+    --background-color-2t: var(--color-primary-darker); /* Darker teal for deeper contrast */
+    --element-color-1: #33B2A5; /* Light teal for UI elements */
+    --element-color-2: #10534C; /* Light teal for highlights and borders */
+        
+    /* Highlight and Special Colors */
+    --highlight-color: #cea8fc; /* Light purple highlight */
+        
+    /* Text and Text Colors */
+    --text-color: #f0f8ff; /* White text for high contrast */
+    --text-color-rgb: 240, 248, 255; /* RGB for white text */
+        
+    /* Gold Accent Color (Optional) */
+    --gold-color: #ffd804cc; /* Optional gold accent color for additional highlights */
+        
+    /* Light and Highlight Text Colors */
+    --light-text: #f0f8ff; /* White text for readability */
+    --light-highlight: #cea8fc; /* Light purple for highlighted text */
+        
+    /* Footer and Dark Background Color */
+    --black-back: #0e0c14; /* Dark gray/black for footer or header */
+    
 }
 
+/* :root {
+    --background-color: #0e0c14;
+    --background-color-rgb: 14, 12, 20;
+    --background-haze: #0e0c14ef;
+    --background-button-haze: #0e0c14ba;
+    --background-color-1t: #4a148c42;
+    --background-color-2t: #6a34b942;
+    --element-color-1: #4a148c;
+    --element-color-2: #6a34b9;
+    --highlight-color: #cea8fc;
+    --text-color: #f0f8ff;
+    --text-color-rgb: 240, 248, 255;
+    --gold-color: #ffd804cc;
+    
+    --light-text: #f0f8ff;
+    --light-highlight: #cea8fc;
+    --black-back: #0e0c14;
+}
 
 /* 
 body {
