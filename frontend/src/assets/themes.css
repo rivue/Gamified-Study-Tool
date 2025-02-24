@@ -182,7 +182,7 @@ button:focus, input:focus, textarea:focus {
 .light-theme {
     --background-color: #f0f8ff;
     --background-color-rgb: 240, 248, 255;
-    --background-haze: #f0f8ffef;
+    --background-haze: #f0f8ef;
     --background-button-haze: #f0f8ffba;
     --background-color-1t: #2a14ff42;
     --background-color-2t: #dad1ff42;

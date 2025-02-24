@@ -76,7 +76,7 @@ export default {
   border-radius: 8px;
   opacity: 0;
   transform: translateY(-60px);
-  background: var(--element-color-1);
+  background: var(--background-color-2t);
   transition: opacity 0.8s ease-out, transform 0.8s ease-out,
     border-color 0.3s ease, background-color 0.3s ease;
 

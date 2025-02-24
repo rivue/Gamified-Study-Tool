@@ -173,6 +173,127 @@ export default {
 </script>
 
 <style scoped>
+/* Add these to your existing <style> section */
+
+body {
+    background-color: var(--background-color);
+    color: var(--text-color);
+}
+
+.landing-title {
+    color: var(--light-text);
+    font-weight: 800;
+    text-shadow: 2px 2px 4px rgba(0, 172, 193, 0.1);
+}
+
+.landing-subtitle {
+    color: var(--element-color-1);
+    font-weight: 600;
+}
+
+.feature-card {
+    background: var(--feature-gradient);
+    border: 2px solid rgba(38, 198, 218, 0.2);
+    border-radius: 16px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0, 172, 193, 0.1);
+}
+
+.feature-card:hover {
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 8px 15px rgba(0, 172, 193, 0.2);
+}
+
+.button {
+    color: var(--element-color-1);
+    font-weight: 600;
+    transition: all 0.3s ease;
+    position: relative;
+    padding-bottom: 2px;
+}
+
+.button::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: 0;
+    left: 0;
+    background-color: var(--element-color-2);
+    transition: width 0.3s ease;
+}
+
+.button:hover::after {
+    width: 100%;
+}
+
+.button-active {
+    color: var(--highlight-color);
+}
+
+.button-active::after {
+    width: 100%;
+    background-color: var(--highlight-color);
+}
+
+.value-content {
+    background: rgba(224, 242, 241, 0.5);
+    border-radius: 12px;
+    padding: 1.5em;
+    border: 1px solid rgba(0, 172, 193, 0.2);
+    box-shadow: 0 4px 6px rgba(0, 172, 193, 0.05);
+}
+
+.cta-button {
+    background: var(--button-gradient);
+    color: var(--light-text);
+    border: none;
+    border-radius: 25px;
+    padding: 12px 24px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0, 172, 193, 0.2);
+}
+
+.cta-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 172, 193, 0.3);
+}
+
+/* Additional styles for gamification */
+
+.achievement-icon {
+    color: var(--gold-color);
+    font-size: 1.5em;
+    margin-right: 0.5em;
+}
+
+.progress-bar {
+    background-color: var(--background-color-2t);
+    border-radius: 10px;
+    height: 10px;
+    overflow: hidden;
+}
+
+.progress-bar-fill {
+    background-color: var(--element-color-2);
+    height: 100%;
+    transition: width 0.5s ease;
+}
+
+/* Animation for value content */
+.fade-enter-active,
+.fade-leave-active {
+    transition: all 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
+    transform: translateY(10px);
+}
 .landing-container {
   display: flex;
   flex-direction: column;
@@ -390,7 +511,7 @@ export default {
 /* Add these to your existing <style> section */
 
 .landing-title {
-    background: linear-gradient(120deg, var(--text-color), var(--highlight-color));
+    background: linear-gradient(120deg, var(--text-color), var(--text-color));
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
