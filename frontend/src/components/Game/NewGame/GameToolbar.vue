@@ -79,7 +79,7 @@ export default {
   computed: {
     progressBarWidth() {
         const initialProgress = Math.floor(Math.random() * (17 - 8 + 1)) + 8;
-    return `${Math.min( initialProgress + ( (this.gameStore.currentQuestion - (initialProgress/100)) / this.gameStore.factoids.length)*100, 100)}%`;
+    return `${Math.min( initialProgress + ( (this.gameStore.currentQuestion - ( initialProgress / 100 )) / this.gameStore.factoids.length ) * 100, 100)}%`;
   },
     score() {
       return this.gameStore.score + " (+" + this.gameStore.multiplier + ")";

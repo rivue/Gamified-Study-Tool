@@ -55,8 +55,8 @@ TODO list:
         - contact image on main sidebar?
         - significant ui rehaul ***
         - change gpt 40-mini to deepseek
-        - maybe do something that caps length of vector embedding response, like chops it off after 1k tokens / characters or something
-        - implement claude or deepseek with the AI prompting
+        - maybe do something that caps length of vector embedding response, like chops off anything after 1k tokens / characters or something
+        - implement deepseek with the AI prompting
         - add redirect to newly generated lesson once it finishes loading the library
         - copy openais font?
         - make sure "Knowledge Map" and "Lessons" either actually link somewhere or are handled properly
@@ -71,9 +71,8 @@ TODO list:
     game page:
         - investigate into what clouds and diamonds in game screen were used for so I can probably use them later
         - remove time from db then remove all references to "timer", "end time" or "starting time" in gameStore.js
-        - and possibly a hint button as well (3 hints per question?)
-        - make it give more than 4 or 8 questions eventually
-        - instead of having it flipped, just put the main contents on the page possibly? and ask them to use their applied knowledge?
+        - add possibly a hint button as well (3 hints per question?)
+        - instead of having to flip the factoid card, just put the main contents on the question card possibly? and ask them to use their applied knowledge, or give it to them as hints or something
         - fix the issue where anywhere on a card exits the lesson as opposed to just the red x
         - instead of multiple choice, have it where users can drag / drop for an answer slot:
             (deepseek recomendations):
@@ -84,33 +83,37 @@ TODO list:
             8 or so least seen so that the questions seem random and they aren't just the same multiple choice every time
         - make the underscores ___ visible in the questions
         - "games":
+            - compare and contrast two items / scenarios (list of items / cards and sort them into categories)
+            - analogies: newton is to physics as darwin is to ___ <-- would be super similar to already existing ones
+            - ranking tasks: users rank tasks on order of importance, size, or chronology
+            - timeline creation - drag and drop events <-- maybe would be good after we get a couple others down
+            - category sorting (sort these into mammals, birds, and reptiles) - could be for easier questions
+                like sort the statements into whether they are true / false, etc...
+            - true / false <-- rlly good
+            - sentence completion <-- kind of similar to one word answer? maybe you type it in the sentence or something?
+                maybe it can be more drag / drop later?
+            - matching pairs possibly, not sure how that would work with longer questions
+            - could vary option amount (2-7 options)
+            - users could have to select multiple options (select 1-5 out of 5-8, etc...)
+            -
             - multiple options in a row: like with duolingo where you are given 10 or so options and you pick 4 or 5 and they have to be 
                 in a specific order. this might be somewhat tricky to implement cus I have to implement drag-and-drop at the same time, so I might have to 
                 think of a couple others in the mean time
-            - matching pairs possibly, not sure how that would work
-            - only two options as opposed to 4
             - play duolingo for inspiration
-            - true / false
             - correct the statement / choose the correct portion of a paragrah / two students have different opinions make them choose the correct one
             - time attack mode option - questions might be a little easier possibly or not
             - image based questions - not sure how that would work how how we would ensure accuracy
             - drag-and-drop labels (label the x axis, y axis, identify what the mean is, etc...)
             - hotspot questions (click on X in this diagram)
-            - sentence completion
-            - category sorting (sort these into mammals, birds, and reptiles) - could be for easier questions
-            - timeline creation - drag and drop events
             - venn diagram sorting - sort these things into squares, circles, or both
             - fill in the table (a periodic table w/ missing elements)
-            - analogies: newton is to physics as darwin is to ___
             - debate mode: users choose a side in a debate and answer questions to support their argument
             - case studies: users analyze a real-world scenario and answer questions based on it
             - hypothesis testing: users propose a hypothesis and answer questions to test it
             - multi-step problem (would get to this later down the line)
-            - creative writing (this would be hard w/o llms - maybe could use rlly advanced nlp to detect it? or ask chatgpt to give it things to look for)
-            - compare and contrast two items
             - predict the outcome
+            - creative writing (this would be hard w/o llms - maybe could use rlly advanced nlp to detect it? or ask chatgpt to give it things to look for)
             - error detection (users identify and correct errors in a passage, equation, or diagram)
-            - ranking tasks: users rank tasks on order of importance, size, or chronology
             - mind mapping: users create a mind map by connecting related ideas
             - math / chemistry equation builder
             - historical role-playing: answer questions based on the perspective of a historical figure
