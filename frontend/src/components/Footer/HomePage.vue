@@ -9,7 +9,8 @@
     <div class="landing-page-2">
       <div class="features-container">
         <FeaturesComponent />
-      </div>
+    </div>
+    <FeatureGrid />
       <div class="cta-container" @click="redirectLogin">
         <CtaButton />
       </div>
@@ -63,6 +64,7 @@ import { useThemeStore } from "@/store/themeStore";
 import { useAuthStore } from "@/store/authStore";
 import CtaButton from "./LandingPageComponents/CtaButton.vue";
 import FaqComponent from "./LandingPageComponents/FaqComponent.vue";
+import FeatureGrid from "./LandingPageComponents/FeatureGrid.vue";
 // import SharedContent from "./LandingPageComponents/SharedContent.vue";
 import FeaturesComponent from "./LandingPageComponents/FeaturesComponent.vue";
 
@@ -72,6 +74,7 @@ export default {
     CtaButton,
     FaqComponent,
     // SharedContent,
+    FeatureGrid,
     FeaturesComponent,
   },
   data() {
