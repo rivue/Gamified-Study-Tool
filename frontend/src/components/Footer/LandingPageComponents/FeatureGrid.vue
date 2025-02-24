@@ -123,7 +123,7 @@
     max-width: 1200px;
     margin: 0 auto;
     padding: 4rem 1rem;
-    background-color: #002329;
+    background-color: var(--background-color);
   }
   
   .header-container {
@@ -168,7 +168,7 @@
     align-items: flex-start;
     padding: 1.5rem;
     border-radius: 0.5rem;
-    background-color: var(--background-color);
+    background-color: var(--background-color-1t);
     border: 1px solid #134e4a;
     transition: all 0.3s ease;
   }
