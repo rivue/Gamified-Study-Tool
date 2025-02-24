@@ -386,4 +386,66 @@ export default {
     transform: translateY(0);
   }
 }
+
+/* Add these to your existing <style> section */
+
+.landing-title {
+    background: linear-gradient(120deg, var(--text-color), var(--highlight-color));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 30px rgba(216, 180, 254, 0.1);
+}
+
+.landing-subtitle {
+    color: var(--text-color);
+    opacity: 0.9;
+    text-shadow: 0 0 20px rgba(216, 180, 254, 0.1);
+}
+
+.feature-card {
+    background: var(--feature-gradient);
+    border: 1px solid rgba(124, 58, 237, 0.1);
+    backdrop-filter: blur(10px);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(124, 58, 237, 0.15);
+}
+
+.button {
+    position: relative;
+    color: var(--text-color);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.button-active {
+    opacity: 1;
+    color: var(--highlight-color);
+}
+
+.button:hover {
+    transform: translateX(5px);
+}
+
+.value-content {
+    background: rgba(109, 40, 217, 0.05);
+    border-radius: 12px;
+    padding: 1.5em;
+    border: 1px solid rgba(124, 58, 237, 0.1);
+}
+
+.cta-button {
+    background: var(--button-gradient);
+    border: none;
+    box-shadow: 0 4px 20px rgba(124, 58, 237, 0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.cta-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(124, 58, 237, 0.3);
+}
 </style>

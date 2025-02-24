@@ -76,16 +76,18 @@ export default {
   border-radius: 8px;
   opacity: 0;
   transform: translateY(-60px);
+  background: var(--element-color-1);
   transition: opacity 0.8s ease-out, transform 0.8s ease-out,
     border-color 0.3s ease, background-color 0.3s ease;
+
 }
 
-/* .feature:hover,
+.feature:hover,
 .feature.selected {
   background: var(--background-color-1t);
   border: 1px solid #ccc;
   
-} */
+}
 
 .feature.visible {
   animation: fadeSlideIn 0.3s ease-out forwards;
