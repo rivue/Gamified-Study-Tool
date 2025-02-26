@@ -1,6 +1,7 @@
 from datetime import datetime
 from flask import jsonify
 from sqlalchemy import func, distinct
+import random
 from database.models import (
     db,
     User,
@@ -185,14 +186,24 @@ def retrieve_library_room_contents(library_id, room_name, user_id):
     if not curr_state:
         return None
     print("after curr_state check")
-    curr_state = curr_state["lesson_state"]
-    factoids = LibraryFactoid.query.filter_by(
-        library_id=library_id, room_name=room_name, lesson_name=f"factoid_set_{curr_state}"
-    ).all()
     
+    if curr_state["lesson_state"] > curr_state["num_lessons"]:
+        # User has completed all lessons, randomly get 7-9 factoids
+        all_factoids = LibraryFactoid.query.filter_by(
+            library_id=library_id, room_name=room_name
+        ).all()
+        
+        # Randomly select between 7-9 factoids or all if less than 7
+        num_factoids = min(random.randint(7, 9), len(all_factoids))
+        factoids = random.sample(all_factoids, num_factoids) if len(all_factoids) >= num_factoids else all_factoids
+    else:
+        # Get factoids for the current lesson state
+        factoids = LibraryFactoid.query.filter_by(
+            library_id=library_id, room_name=room_name, lesson_name=f"factoid_set_{curr_state['lesson_state']}"
+        ).all()
+        
     if len(factoids) < 3:
         return None
-    
     print(f"factoids: {factoids}")
 
     room_contents = []
@@ -267,7 +278,7 @@ def increase_lesson_state(user_id, library_id, room_name):
         return None, False  # State not found
     
     # Check if lesson_state can be increased
-    if state.lesson_state < state.num_lessons:
+    if state.lesson_state <= state.num_lessons:
         state.lesson_state += 1
         db.session.commit()
         return state, True
@@ -412,39 +423,42 @@ def is_center_room(library_id, room_name):
         return jsonify({"message": "Library not found"}), 404
     return room_name == library.library_topic
 
-def update_game_end(user_id, library_id, score,time, completed_rooms,  is_complete):
+def update_game_end(user_id, library_id, room_name):#, score,time, completed_rooms, is_complete):
     try:
         user = User.query.get(user_id)
+
         if not user:
             return jsonify({'status': 'error', 'message': 'User not found'}), 404
         
-        existing_completion = LibraryCompletion.query.filter_by(library_id=library_id, user_id=user_id).first()
-        if existing_completion:
-            if is_complete and not existing_completion.is_complete:
-                existing_completion.is_complete = is_complete
-                existing_completion.completion_date = datetime.utcnow()
-            if score > existing_completion.score:
-                existing_completion.score = score
-                user.experience_points += (score - existing_completion.score)
-            if time < existing_completion.time:
-                existing_completion.time = time
+        increase_lesson_state(user_id, library_id, room_name)
+
+        # existing_completion = LibraryCompletion.query.filter_by(library_id=library_id, user_id=user_id).first()
+        # if existing_completion:
+        #     if is_complete and not existing_completion.is_complete:
+        #         existing_completion.is_complete = is_complete
+        #         existing_completion.completion_date = datetime.utcnow()
+        #     if score > existing_completion.score:
+        #         existing_completion.score = score
+        #         user.experience_points += (score - existing_completion.score)
+        #     if time < existing_completion.time:
+        #         existing_completion.time = time
                 
-            # Update completed_rooms
-            current_completed = set(existing_completion.completed_rooms.split(",")) if existing_completion.completed_rooms else set()
-            current_completed.update(completed_rooms)
-            existing_completion.completed_rooms = ",".join(sorted(current_completed))
-        else:
-            new_completion = LibraryCompletion(
-                library_id=library_id,
-                user_id=user_id,
-                score=score,
-                time=time,
-                completed_rooms=",".join(sorted(completed_rooms)) if completed_rooms else None,
-                is_complete=is_complete,
-                completion_date=datetime.utcnow() if is_complete else None
-            )
-            db.session.add(new_completion)
-            user.experience_points += score
+        #     # Update completed_rooms
+        #     current_completed = set(existing_completion.completed_rooms.split(",")) if existing_completion.completed_rooms else set()
+        #     current_completed.update(completed_rooms)
+        #     existing_completion.completed_rooms = ",".join(sorted(current_completed))
+        # else:
+        #     new_completion = LibraryCompletion(
+        #         library_id=library_id,
+        #         user_id=user_id,
+        #         score=score,
+        #         time=time,
+        #         completed_rooms=",".join(sorted(completed_rooms)) if completed_rooms else None,
+        #         is_complete=is_complete,
+        #         completion_date=datetime.utcnow() if is_complete else None
+        #     )
+        #     db.session.add(new_completion)
+        #     user.experience_points += score
 
         db.session.commit()
         return jsonify({'status': 'success', 'message': 'Game ended and recorded successfully.'}), 200

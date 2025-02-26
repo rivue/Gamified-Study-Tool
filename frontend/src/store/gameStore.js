@@ -83,7 +83,9 @@ export const useGameStore = defineStore("gameStore", {
                 if (this.currentQuestion && !this.finalTest) {
                     console.log("TODO") // TODO this is just a placeholder
                    
-                } else if (this.currentQuestion === 2) { // && this.finalTest) {
+                } 
+                if (this.currentQuestion === this.factoids.length) { // && this.finalTest) {
+                    console.log("mark of success")
                     this.questionVisible = false;
                     this.factoidVisible = null;
                     this.endGame();
@@ -225,16 +227,25 @@ export const useGameStore = defineStore("gameStore", {
             }
         },
         endGame() {
+            // TODO IF % CORRECT ON THE FIRST TRY IS < 80% OR WHATEVER, THEN GIVE LESS REWARDS, REDIRECT TO PAGE, AND DON'T ADVANCE LESSON
+            if (this.incorrectQuestionAnswers.length > 3) {
+                return;
+            }
             const userStatsStore = useUserStatsStore();
             userStatsStore.resetStats();
-            const completedRooms = Object.keys(this.roomStates).filter(
-                roomName => this.roomStates[roomName].state === 3
-            );
+            
+            // const completedRooms = Object.keys(this.roomStates).filter(
+                // roomName => this.roomStates[roomName].state === 3
+            // );
+
             let data = {
                 libraryId: this.libraryId,
-                score: this.score,
-                time: 500,
-                completed: completedRooms
+                roomName: this.libraryTopic,
+                
+                // libraryId: this.libraryId,
+                // score: this.score,
+                // time: 500,
+                // completed: completedRooms
             };
             axios
                 .post(`/api/library/end`, data)

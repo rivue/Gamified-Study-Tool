@@ -328,19 +328,21 @@ def init_library_routes(app):
     def end_game():
         data = request.get_json()
         library_id = data.get('libraryId')
-        score = data.get('score')
-        time = data.get('time')
-        completed_rooms = data.get('completed', []) 
+        room_name = data.get('roomName')
+
+        # score = data.get('score')
+        # time = data.get('time')
+        # completed_rooms = data.get('completed', []) 
         
         user_id = current_user.id if not isinstance(current_user, AnonymousUserMixin) else None
         if not user_id:
             return jsonify({'status': 'error', 'message': "Not logged in..."}), 401
         
-        if library_id is None or score is None:
+        if library_id is None: # or score is None:
             return jsonify({'status': 'error', 'message': 'Missing libraryId or score'}), 400
 
         try:
-            response, status = lbh.update_game_end(user_id, library_id, score, time, completed_rooms, True)
+            response, status = lbh.update_game_end(user_id, library_id, room_name) # score, time, completed_rooms, True)
             return response, status
         except Exception as e:
             return jsonify({'status': 'error', 'message': str(e)}), 500

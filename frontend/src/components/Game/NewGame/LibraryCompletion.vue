@@ -4,10 +4,10 @@
       <div v-if="firstPage" class="pre-completion-content">
         <div class="celebratory-message">🎉 Congratulations! 🎉</div>
         <UserStats />
-          <div class="time-spent">Final time: {{ formattedTime }}s</div>
+          <!-- <div class="time-spent">Final time: {{ formattedTime }}s</div> -->
         <div class="cta-container">
           <CtaButton
-            buttonText="Continue"
+            buttonText="Back To Map"
             @click="nextPage"
             :isSubmitting="isSubmitting"
           />
@@ -153,7 +153,8 @@ export default {
       this.showLeaderBoard = true;
     },
     nextPage() {
-      this.page = 1;
+        this.$router.push(`/lessons/${this.gameStore.libraryId}`);
+        this.page = 1;
     },
     navigateLibrary() {
       this.$router.push("/library");

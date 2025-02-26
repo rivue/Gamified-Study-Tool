@@ -13,7 +13,7 @@ delay = 3
 request_timeout = 60
 
 TOKEN_CAP = 500
-LESSON_TOKENS = 3500
+LESSON_TOKENS = 5000
 
 GPT3_5 = "gpt-4o"
 GPT4 = "gpt-4o-mini"

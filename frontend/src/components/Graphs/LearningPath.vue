@@ -49,12 +49,17 @@
                   
                   <!-- Main tooltip content -->
                   <div class="bg-green-500 rounded-2xl p-4 text-white shadow-lg">
-                    <div class="font-medium mb-3">{{ formatRoomName(roomName) }} <br> lesson {{ roomData[index].lesson_state }} / {{ roomData[index].num_lessons }}</div>
+                    <div class="font-medium mb-3">{{ formatRoomName(roomName) }} <br> 
+                        <span v-if="roomData[index].lesson_state <= roomData[index].num_lessons">
+                            lesson {{ roomData[index].lesson_state }} / {{ roomData[index].num_lessons }}
+                        </span>
+                    </div>
                     <button 
                       @click.stop="startLesson(roomName)"
                       class="w-full bg-white text-green-500 rounded-xl py-2 px-4 font-medium flex items-center justify-center gap-2 hover:bg-gray-50 transition-colors"
                     >
-                      <span>PLAY</span>
+                      <span v-if="roomData[index].lesson_state <= roomData[index].num_lessons">PLAY</span>
+                      <span v-else>REVIEW</span>
                     </button>
                   </div>
                   
