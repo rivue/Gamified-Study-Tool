@@ -8,6 +8,7 @@ from database.models import (
     LibraryFactoid,
     LibraryQuestion,
     LibraryQuestionChoice,
+    LibraryRoomState,
     LibraryCompletion
 )
 
@@ -99,52 +100,101 @@ def get_library_details(library_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-def save_library_room_contents(library_id, room_name, factoids):
-    responses = []
-    for item in factoids["factoids"]:
-        factoid_content = item["factoid_text"]
-        question_data = item["question"]
+def get_library_room_state(user_id, library_id, room_name=None):
 
-        # Add factoid to library
-        factoid_response, status_code = add_factoid_to_library(
-            library_id, room_name, factoid_content
-        )
-        if status_code != 201:
-            return factoid_response
-        factoid_id = factoid_response.json["factoid_id"]
+    if not room_name: # for all rooms (ex: map page)
+        room_states = LibraryRoomState.query.filter_by(
+            user_id=user_id,
+            library_id=library_id
+        ).all()
 
-        # Add question to factoid
-        question_type = question_data["type"]
-        question_text = question_data["text"]
-        correct_choice = question_data["correct_choice"]
+        return [s.as_dict() for s in room_states]
+    
+    else: # for a specific room
+        state = LibraryRoomState.query.filter_by(
+            user_id=user_id,
+            library_id=library_id,
+            room_name=room_name
+        ).first()
+        return state.as_dict() if state else None
 
-        # wrong_choices = question_data["wrong_choices"]
-        wrong_choices = question_data.get("wrong_choices", [])
+def save_library_room_contents(library_id, room_name, lessons, user_id):
+    
+    try:
+        responses = []
+        for factoid_set_index in range(len(lessons["lessons"])):
+            lesson_name = "factoid_set_" + str(factoid_set_index + 1)
 
-        question_response, status_code = add_question_to_factoid(
-            factoid_id, question_text, correct_choice, wrong_choices, question_type
-        )
-        # problem here, start debugging tomorrow
-        if status_code != 201:
-            return question_response
-        responses.append(
-            {
-                "factoid_response": factoid_response.json,
-                "question_response": question_response.json,
-            }
-        )
+            # generate library room state for each factoid_set_index
+            add_library_room_state(user_id, library_id, room_name, len(lessons["lessons"]), initial_lesson_state=factoid_set_index + 1)
 
-    return jsonify(status="success", data=responses)
+            for item in lessons["lessons"][factoid_set_index]["factoids"]:
+                print(f"item: {item}")
+                factoid_content = item["factoid_text"]
+                question_data = item["question"]
+                print("after lesson_name")
+                # Add factoid to library
+                factoid_response, status_code = add_factoid_to_library(
+                    library_id, room_name, factoid_content, lesson_name
+                )
+                print(f"factoid_response: {factoid_response}")
+                if status_code != 201:
+                    return factoid_response
+                factoid_id = factoid_response.json["factoid_id"]
+                print(f"factoid_id: {factoid_id}")
+                # Add question to factoid
+                question_type = question_data["type"]
+                question_text = question_data["text"]
+                correct_choice = question_data["correct_choice"]
+                
+                # wrong_choices = question_data["wrong_choices"]
+                wrong_choices = question_data.get("wrong_choices", [])
+
+                question_response, status_code = add_question_to_factoid(
+                    factoid_id, question_text, correct_choice, wrong_choices, question_type
+                )
+                print(f"question_response: {question_response}")
+                # problem here, start debugging tomorrow
+                if status_code != 201:
+                    return question_response
+                responses.append(
+                    {
+                        "factoid_response": factoid_response.json,
+                        "question_response": question_response.json,
+                    }
+                )
+
+        return jsonify(status="success", data=responses)
+    
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"message": str(e)}), 400
 
 
-def retrieve_library_room_contents(library_id, room_name):
+def retrieve_library_room_contents(library_id, room_name, user_id):
+    print("hi")
+    # user HAS to be logged
+    if not user_id:
+        return None
+
+    # query lesson room state map
+    # map user id, library id, and room name in map to retrieve state
+    # send state and factoids for that state back
+    curr_state = get_library_room_state(user_id, library_id, room_name)
+    print(f"curr_state: {curr_state}")
+    if not curr_state:
+        return None
+    print("after curr_state check")
+    curr_state = curr_state["lesson_state"]
     factoids = LibraryFactoid.query.filter_by(
-        library_id=library_id, room_name=room_name
+        library_id=library_id, room_name=room_name, lesson_name=f"factoid_set_{curr_state}"
     ).all()
     
     if len(factoids) < 3:
         return None
+    
     print(f"factoids: {factoids}")
+
     room_contents = []
     for factoid in factoids:
         questions = []
@@ -172,16 +222,62 @@ def retrieve_library_room_contents(library_id, room_name):
                 }
             )
         room_contents.append(
-            {"factoid_text": factoid.factoid_content, "questions": questions}
+            {"factoid_text": factoid.factoid_content, "questions": questions, "room_state": curr_state}
         )
 
     return {"room_name": room_name, "factoids": room_contents}
 
+def add_library_room_state(user_id, library_id, room_name, num_lessons, initial_lesson_state=1):
 
-def add_factoid_to_library(library_id, room_name, factoid_content):
+    # Check if a record already exists for this user, library, and room
+    existing_state = LibraryRoomState.query.filter_by(
+        user_id=user_id,
+        library_id=library_id,
+        room_name=room_name
+    ).first()
+    
+    if existing_state:
+        return existing_state  # Return existing state without creating a duplicate
+    
+    # Create new library room state
+    new_state = LibraryRoomState(
+        user_id=user_id,
+        library_id=library_id,
+        room_name=room_name,
+        num_lessons=num_lessons,
+        lesson_state=initial_lesson_state
+    )
+    
+    # Add to database and commit
+    db.session.add(new_state)
+    db.session.commit()
+    
+    return new_state
+
+def increase_lesson_state(user_id, library_id, room_name):
+
+    # Get the state for this user, library, and room
+    state = LibraryRoomState.query.filter_by(
+        user_id=user_id,
+        library_id=library_id,
+        room_name=room_name
+    ).first()
+    
+    if not state:
+        return None, False  # State not found
+    
+    # Check if lesson_state can be increased
+    if state.lesson_state < state.num_lessons:
+        state.lesson_state += 1
+        db.session.commit()
+        return state, True
+    
+    return state, False  # Lesson state already at maximum
+
+def add_factoid_to_library(library_id, room_name, factoid_content, lesson_name):
     try:
         factoid = LibraryFactoid(
-            library_id=library_id, room_name=room_name, factoid_content=factoid_content
+            library_id=library_id, room_name=room_name, factoid_content=factoid_content, lesson_name=lesson_name
         )
         db.session.add(factoid)
         db.session.commit()

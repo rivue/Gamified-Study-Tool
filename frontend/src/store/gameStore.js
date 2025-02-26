@@ -7,6 +7,7 @@ import { useUserStatsStore } from "@/store/userStatsStore";
 
 export const useGameStore = defineStore("gameStore", {
     state: () => ({
+        userStateData: null,
         libraryId: null,
         roomStates: {},
         currentRoom: null,
@@ -119,13 +120,16 @@ export const useGameStore = defineStore("gameStore", {
                 // do loadName first in case factoid doesn't exist
                 console.log("response: ", response);
                 if (response.data.status === "success") {
-                    if (response.data.data === null) {
+                    if (response.data.data === null && response.data.room_data === null) {
                         // if for some reason roomNameThing is null
                         this.libraryError = true;
                         console.error("Failed to fetch library details", response);
                         return;
                     }
+                    console.log(response.data.room_data)
                     const data = response.data.data;
+                    this.userStateData = response.data.room_data;
+                    console.log(this.userStateData);
                     this.score = data.score || 0;
                     this.bestTime = data.best_time || 0;
                     this.completion = data.completion || 0;
@@ -246,6 +250,7 @@ export const useGameStore = defineStore("gameStore", {
                 });
         },
         resetGameState() {
+            this.userStateData = null;
             this.libraryId = null;
             this.roomStates = {};
             this.currentRoom = null;

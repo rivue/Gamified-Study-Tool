@@ -49,7 +49,7 @@
                   
                   <!-- Main tooltip content -->
                   <div class="bg-green-500 rounded-2xl p-4 text-white shadow-lg">
-                    <div class="font-medium mb-3">{{ formatRoomName(roomName) }}</div>
+                    <div class="font-medium mb-3">{{ formatRoomName(roomName) }} <br> lesson {{ roomData[index].lesson_state }} / {{ roomData[index].num_lessons }}</div>
                     <button 
                       @click.stop="startLesson(roomName)"
                       class="w-full bg-white text-green-500 rounded-xl py-2 px-4 font-medium flex items-center justify-center gap-2 hover:bg-gray-50 transition-colors"
@@ -118,6 +118,10 @@
     },
     roomNames: {
       type: Array,
+      required: true
+    },
+    roomData: {
+      type: Object,
       required: true
     }
   })

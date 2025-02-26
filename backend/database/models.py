@@ -170,14 +170,23 @@ class Library(db.Model):
 
     factoids = db.relationship('LibraryFactoid', backref='library')
 
-class LibraryRoomState(db.Model):
+class LibraryRoomState(db.Model): # maps users to states of rooms they are in
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     library_id = db.Column(db.Integer, db.ForeignKey('library.id'), nullable=False)
     room_name = db.Column(db.String(200), nullable=False)
-    state = db.Column(db.Integer, default=0)  # 0-locked, 1-unlocked, 2-opened, 3-completed
-    current_question_index = db.Column(db.Integer, nullable=True)
-    answered_questions = db.Column(db.JSON, default=list, nullable=False)
+    num_lessons = db.Column(db.Integer, nullable=False)
+    lesson_state = db.Column(db.Integer, nullable=False)  # 1-state 1, 2-state 2, 3-state 3, 4-state 4, etc...
+
+    def as_dict(self):
+        return {
+            "id": self.id,
+            "user_id": self.user_id,
+            "library_id": self.library_id,
+            "room_name": self.room_name,
+            "num_lessons": self.num_lessons,
+            "lesson_state": self.lesson_state
+        }
 
 class LibraryCompletion(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -196,6 +205,7 @@ class LibraryFactoid(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     library_id = db.Column(db.Integer, db.ForeignKey('library.id'), nullable=False)
     room_name = db.Column(db.String(200), nullable=False)
+    lesson_name = db.Column(db.String(200), nullable=False)
     factoid_content = db.Column(db.Text, nullable=False)
 
     questions = db.relationship('LibraryQuestion', backref='factoid')

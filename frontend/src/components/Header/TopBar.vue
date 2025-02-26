@@ -149,11 +149,6 @@ export default {
     width: 24px;
 }
 
-.menu-btn.icon-btn:hover {
-    color: var(--element-color-3);
-    transform: translateY(-1px);
-}
-
 .menu-btn.text-btn {
     min-width: 100px;
     /* ensures consistent button width */

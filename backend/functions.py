@@ -284,63 +284,80 @@ GenerateLibraryRoomNames = {
 
 GenerateLibraryRoom = {
     "name": "generate_library_room",
-    "description": "Generates a library room with 9 factoids and corresponding questions, evenly distributed among three question types.",
+    "description": "Generates a library room with 2 lessons.",
     "parameters": {
         "type": "object",
         "properties": {
-            "factoids": {
+            "lessons": {
                 "type": "array",
+                "minItems": 2,
+                "maxItems": 2,
+                "description": "An array of 2 lessons, where each lesson contains 9 factoids and questions.",
                 "items": {
                     "type": "object",
                     "properties": {
-                        "factoid_text": {
-                            "type": "string",
-                            "description": "A snippet of an interesting fact related to the library room's theme, up to 200 tokens in length."
-                        },
-                        "question": {
-                            "type": "object",
-                            "properties": {
-                                "type": {
-                                    "type": "string",
-                                    "enum": ["fill_in_the_blank", "multiple_choice", "one_word_answer"],
-                                    "description": "The type of question. Must have an even distrubution: 3 of each type across all factoids"
-                                },
-                                "text": {
-                                    "type": "string",
-                                    "description": "The text of the question. Use '___' for blanks for 'fill_in_the_blank' answers"
-                                },
-                                "correct_choice": {
-                                    "type": "array",
-                                    "items": {
-                                        "type": "string"
+                        # "lesson_name": {
+                        #     "type": "string",
+                        #     "description": "A short name for the lesson within the library room."
+                        # },
+                        "factoids": {
+                            "type": "array",
+                            "minItems": 9,
+                            "maxItems": 9,
+                            "description": "An array of 9 objects, each containing a factoid and its corresponding question.",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "factoid_text": {
+                                        "type": "string",
+                                        "description": "A snippet of an interesting fact related to the lesson's theme, up to 200 tokens in length."
                                     },
-                                    "minItems": 1,
-                                    "maxItems": 7, 
-                                    "description": "For 'one_word_answer' questions, an array of 1-7 acceptable variations of the correct answer. For other question types, an array with exactly one correct answer.",
+                                    "question": {
+                                        "type": "object",
+                                        "properties": {
+                                            "type": {
+                                                "type": "string",
+                                                "enum": ["fill_in_the_blank", "multiple_choice", "one_word_answer"],
+                                                "description": "The type of question. Must have an even distribution: 3 of each type across all factoids."
+                                            },
+                                            "text": {
+                                                "type": "string",
+                                                "description": "The text of the question. Use '___' for blanks for 'fill_in_the_blank' answers."
+                                            },
+                                            "correct_choice": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "string"
+                                                },
+                                                "minItems": 1,
+                                                "maxItems": 7,
+                                                "description": "For 'one_word_answer' questions, an array of 1-7 acceptable variations of the correct answer. For other question types, an array with exactly one correct answer."
+                                            },
+                                            "wrong_choices": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "string"
+                                                },
+                                                "minItems": 0,
+                                                "maxItems": 3,
+                                                "description": "Three incorrect choices for multiple_choice and fill_in_the_blank questions. Not used for one_word_answer questions."
+                                            }
+                                        },
+                                        "required": ["type", "text", "correct_choice"]
+                                    }
                                 },
-                                "wrong_choices": {
-                                    "type": "array",
-                                    "items": {
-                                        "type": "string"
-                                    },
-                                    "description": "Three incorrect choices for multiple_choice and fill_in_the_blank questions. Not used for one_word_answer questions.",
-                                    "minItems": 0,
-                                    "maxItems": 3,
-                                }
-                            },
-                            "required": ["type", "text", "correct_choice"],
+                                "required": ["factoid_text", "question"]
+                            }
                         }
                     },
-                    "required": ["factoid_text", "question"]
-                },
-                "minItems": 9,
-                "maxItems": 9,
-                "description": "An array of 9 objects, each containing a factoid and its corresponding question."
+                    "required": ["lesson_name", "factoids"]
+                }
             }
         },
-        "required": ["factoids"]
+        "required": ["lessons"]
     }
 }
+
 
 # VVV COME BACK TO VVV
 # GenerateLibraryRoom = {
