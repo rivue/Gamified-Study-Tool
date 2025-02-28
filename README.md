@@ -54,7 +54,7 @@ TODO list:
         - make footer smaller
         - contact image on main sidebar?
         - significant ui rehaul ***
-        - change gpt 40-mini to deepseek
+        - change gpt 4o-mini to deepseek
         - maybe do something that caps length of vector embedding response, like chops off anything after 1k tokens / characters or something
         - implement deepseek with the AI prompting
         - add redirect to newly generated lesson once it finishes loading the library
@@ -63,6 +63,7 @@ TODO list:
         - *possibly* add a slider to each course based on how lenient the course creator wants the fuzzy string matcher to be (for misspelled words)
         - fix progress bar (random amount gained might be nice along with fetching a random amount of questions (5-9))
         - redirect home when user is done
+        - loading bars (for courses)
 
     create course (library) page:
         - add support for links / pdfs / other things and get rid of things like difficulty, tutor, etc... then actually start generating stuff to study

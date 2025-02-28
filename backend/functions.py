@@ -284,15 +284,15 @@ GenerateLibraryRoomNames = {
 
 GenerateLibraryRoom = {
     "name": "generate_library_room",
-    "description": "Generates a library room with 2-5 lessons.",
+    "description": "Generates a library room with 3 lessons.",
     "parameters": {
         "type": "object",
         "properties": {
             "lessons": {
                 "type": "array",
                 "minItems": 3,
-                "maxItems": 5,
-                "description": "An array of 2 lessons, where each lesson contains 9 factoids and questions.",
+                "maxItems": 3,
+                "description": "An array of 3 different lessons, where each lesson contains 9 factoids and questions.",
                 "items": {
                     "type": "object",
                     "properties": {

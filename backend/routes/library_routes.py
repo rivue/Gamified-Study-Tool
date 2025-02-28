@@ -44,11 +44,11 @@ def init_library_routes(app):
         library_difficulty = request.form.get("libraryDifficulty")
         VALID_DIFFICULTIES = ["Easy", "Normal", "Hard"]
         if not library_difficulty:
-            library_difficulty = "Easy"
+            library_difficulty = "Normal"
         else:
             library_difficulty = clean(library_difficulty)
             if library_difficulty not in VALID_DIFFICULTIES:
-                library_difficulty = "Easy"
+                library_difficulty = "Normal"
 
 
         # Guide checks

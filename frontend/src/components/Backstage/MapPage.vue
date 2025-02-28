@@ -5,8 +5,7 @@
             <LearningPath 
             :libraryId="library.data.id"
             :room-names="library.data.room_names"
-            :room-data="library.room_data"
-            @nodeSelected="handleNodeSelect" />
+            :room-data="library.room_data" />
         </div>
         <div v-else-if="loading">
             <p>Loading...</p>
@@ -45,6 +44,7 @@ export default {
                 const response = await axios.get(`/api/library/${libraryId}`);
                 console.log("response: ", response);
                 if (response.data && response.data.data && response.data.room_data) {
+
                     library.value = {
                         ...response.data,
                         data: {
@@ -55,7 +55,7 @@ export default {
                     
                     console.log(library.value.data.room_names)
                 } else {
-                    throw new Error("Invalid response data");
+                    // throw new Error("Invalid response data");
                 }
             } catch (error) {
                 // Handle the error

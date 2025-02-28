@@ -11,7 +11,7 @@ import { onMounted, ref } from 'vue';
 // import GameStart from './GameStart.vue';
 import FactoidComponent from "./FactoidComponent.vue";
 import LibraryQuestion from "./LibraryQuestion.vue";
-import { useRoute, useRouter } from 'vue-router';
+import { useRoute } from 'vue-router';
 import { useGameStore } from "@/store/gameStore";
 
 export default {
@@ -24,7 +24,7 @@ export default {
 
     setup() {
         const route = useRoute();
-        const router = useRouter();
+        // const router = useRouter();
         const gameStore = useGameStore();
         const loading = ref(true);
 
@@ -37,7 +37,7 @@ export default {
 
             } catch (error) {
                 console.error("Error fetching library details:", error);
-                router.push(`/lessons/${libraryId}`);
+                // router.push(`/lessons/${libraryId}`);
 
             } finally {
                 loading.value = false;
@@ -45,7 +45,7 @@ export default {
 
             if (gameStore.libraryError) {
                 // If there was an error, navigate away
-                router.push(`/lessons/${libraryId}`);
+                // router.push(`/lessons/${libraryId}`);
             } else {
                 gameStore.startGame();
             }

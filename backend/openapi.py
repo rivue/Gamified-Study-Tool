@@ -10,10 +10,10 @@ from openai import OpenAI
 #### settings ####
 max_retries = 1
 delay = 3
-request_timeout = 60
+request_timeout = 300
 
-TOKEN_CAP = 500
-LESSON_TOKENS = 5000
+TOKEN_CAP = 5000
+LESSON_TOKENS = 15000
 
 GPT3_5 = "gpt-4o"
 GPT4 = "gpt-4o-mini"

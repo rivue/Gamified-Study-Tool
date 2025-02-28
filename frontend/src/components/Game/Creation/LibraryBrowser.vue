@@ -1,11 +1,11 @@
 <template>
   <div class="library-browser">
     <LibraryCarousel title="My Courses" :libraries="myLibraries" v-if="loggedIn & browsingLibraries"/>
-    <LibraryCarousel
+    <!-- <LibraryCarousel
       title="Most Liked Courses"
       :libraries="mostLikedLibraries"
-    />
-    <LibraryCarousel title="Newest Courses" :libraries="newestLibraries" />
+    /> -->
+    <!-- <LibraryCarousel title="Newest Courses" :libraries="newestLibraries" /> -->
   </div>
 </template>
 
@@ -35,8 +35,8 @@ export default {
       axios
         .get("/api/libraries")
         .then((response) => {
-          this.mostLikedLibraries = response.data.most_liked;
-          this.newestLibraries = response.data.latest;
+        //   this.mostLikedLibraries = response.data.most_liked;
+        //   this.newestLibraries = response.data.latest;
 
           if (this.loggedIn){
             this.myLibraries = response.data.mine;

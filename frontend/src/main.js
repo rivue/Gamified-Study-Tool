@@ -4,7 +4,7 @@ import { createPinia } from 'pinia'
 import App from './App.vue';
 import { createRouter, createWebHistory } from 'vue-router';
 import { useAuthStore } from "@/store/authStore";
-import { useGameStore } from "@/store/gameStore";
+// import { useGameStore } from "@/store/gameStore";
 import './assets/styles.css';
 import './assets/themes.css';
 import axios from 'axios';
@@ -22,7 +22,7 @@ const routes = [
     //   { path: '/lessons', component: defineAsyncComponent(() => import('./components/Chat/ChatComponent.vue')), meta: { title: 'Ascendance·☁️| Lessons' } }, 
     //   { path: '/lesson/:id', component: defineAsyncComponent(() => import('./components/Chat/ChatComponent.vue')), meta: { title: 'Ascendance·☁️| Learning' } },
     { path: '/lessons/:id/:roomName', component: defineAsyncComponent(() => import('./components/Game/NewGame/GamePage.vue')), meta: { title: 'Ascendance·☁️| Explore Library', hideHeaderFooter: true } },
-    { path: '/lessons/:id', component: defineAsyncComponent(() => import('./components/Backstage/MapPage.vue')), meta: { title: 'Ascendance·☁️| Explore Library' } },
+    { path: '/lessons/:id', component: defineAsyncComponent(() => import('./components/Backstage/MapPage.vue')), meta: { title: 'Ascendance·☁️| Explore Library', requiresCreator: true } },
 
     // create library (game)
     { path: '/library', component: defineAsyncComponent(() => import('./components/Game/Creation/LibraryCreator.vue')), meta: { title: 'Ascendance·☁️| Create Library' } },
@@ -64,19 +64,19 @@ const router = createRouter({
     history: createWebHistory(),
     routes,
 });
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
     const authStore = useAuthStore();
-    const gameStore = useGameStore();
+    // const gameStore = useGameStore();
 
-    if (from.path.startsWith('/library/')) {
-        gameStore.resetGameState();
-    }
+    // if (from.path.startsWith('/library/')) {
+    //     gameStore.resetGameState();
+    // }
 
-    if (to.path.startsWith('/library/') && from.path.startsWith('/library/')) {
-        const toLibraryId = to.path.split('/')[2];
-        const toRoomName = to.path.split('/')[3];
-        gameStore.fetchLibraryDetails(toLibraryId, toRoomName);
-    }
+    // if (to.path.startsWith('/library/') && from.path.startsWith('/library/')) {
+    //     const toLibraryId = to.path.split('/')[2];
+    //     const toRoomName = to.path.split('/')[3];
+    //     gameStore.fetchLibraryDetails(toLibraryId, toRoomName);
+    // }
 
     const publicPaths = [
         '/',
@@ -91,6 +91,31 @@ router.beforeEach((to, from, next) => {
         !publicPaths.includes(to.path) &&
         !to.path.startsWith('/lesson/') &&
         !to.path.startsWith('/library') && !to.path.startsWith('/lessons');
+
+    if (to.meta.requiresCreator && to.params.id) {
+        // Only proceed with this check if the user is logged in
+        if (authStore.loggedIn) {
+            try {
+                // Check if the user is the creator of the library
+                const response = await axios.get(`/api/library/${to.params.id}`);
+                if (response.data && response.data.data && response.data.data.user_id !== authStore.userId) {
+                        console.log(`${response.data.data.user_id}`)
+                        console.log(`response.data: ${response.data} response.data.data: ${response.data.data} response.data.data.created_by: ${response.data.data.user_id} authStore.userId: ${authStore.userId}`);
+                        // User is not the creator, redirect to lessons or home
+                        return next('/');
+                    }
+            } catch (error) {
+                console.error("Error checking library permissions:", error);
+                return next('/');
+            }
+        } else {
+            // If not logged in and the route requires creator access, redirect to login
+            return next({
+                path: '/login',
+                query: { redirect: to.fullPath },
+            });
+        }
+    }
 
     if (authStore.loggedIn && to.path === '/login') {
         // Redirect authenticated users away from the login page
