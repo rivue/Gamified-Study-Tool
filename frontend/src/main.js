@@ -96,17 +96,21 @@ router.beforeEach(async (to, from, next) => {
         // Only proceed with this check if the user is logged in
         if (authStore.loggedIn) {
             try {
+                
                 // Check if the user is the creator of the library
                 const response = await axios.get(`/api/library/${to.params.id}`);
-                if (response.data && response.data.data && response.data.data.user_id !== authStore.userId) {
-                        console.log(`${response.data.data.user_id}`)
-                        console.log(`response.data: ${response.data} response.data.data: ${response.data.data} response.data.data.created_by: ${response.data.data.user_id} authStore.userId: ${authStore.userId}`);
-                        // User is not the creator, redirect to lessons or home
-                        return next('/');
-                    }
+                if (response.data && 
+                    response.data.data && 
+                    response.data.data.user_id == authStore.userId) {
+                        // User is the creator, continues as per usual
+                        return next();
+                } else { // invalid data 
+                    return next('/library');
+                }
+                    
             } catch (error) {
                 console.error("Error checking library permissions:", error);
-                return next('/');
+                return next('/library');
             }
         } else {
             // If not logged in and the route requires creator access, redirect to login
