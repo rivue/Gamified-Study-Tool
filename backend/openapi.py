@@ -12,7 +12,7 @@ max_retries = 1
 delay = 3
 request_timeout = 300
 
-TOKEN_CAP = 5000
+TOKEN_CAP = 15000
 LESSON_TOKENS = 15000
 
 GPT3_5 = "gpt-4o"

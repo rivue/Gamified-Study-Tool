@@ -50,15 +50,16 @@
                   <!-- Main tooltip content -->
                   <div class="bg-green-500 rounded-2xl p-4 text-white shadow-lg">
                     <div class="font-medium mb-3">{{ formatRoomName(roomName) }} <br> 
-                        <span v-if="roomData[index].lesson_state <= roomData[index].num_lessons">
-                            lesson {{ roomData[index].lesson_state }} / {{ roomData[index].num_lessons }}
+                        <span v-if="getRoomData(roomName) && getRoomData(roomName).lesson_state <= getRoomData(roomName).num_lessons">
+                            lesson {{ getRoomData(roomName).lesson_state }} / {{ getRoomData(roomName).num_lessons }}
+                            
                         </span>
                     </div>
                     <button 
                       @click.stop="startLesson(roomName)"
                       class="w-full bg-white text-green-500 rounded-xl py-2 px-4 font-medium flex items-center justify-center gap-2 hover:bg-gray-50 transition-colors"
                     >
-                      <span v-if="roomData[index].lesson_state <= roomData[index].num_lessons">PLAY</span>
+                      <span v-if="getRoomData(roomName) && getRoomData(roomName).lesson_state <= getRoomData(roomName).num_lessons">PLAY</span>
                       <span v-else>REVIEW</span>
                     </button>
                   </div>
@@ -136,10 +137,22 @@
   
   // Track selected room for tooltip
   const selectedRoom = ref(null)
-
+  
   const library_id = props.libraryId;
-
+  
   const router = useRouter();
+  
+  // Function to get the corresponding room data by room name
+  const getRoomData = (roomName) => {
+    // Find the room data where room_name matches roomName
+    for (let i = 0; i < props.roomData.length; i++) {
+      if (props.roomData[i].room_name === roomName) {
+        return props.roomData[i];
+      }
+    }
+    // Return null if not found
+    return null;
+  }
   
   // Array of icons to cycle through
   const icons = [
@@ -219,6 +232,11 @@
       left: direction === 'left' ? currentScroll - scrollAmount : currentScroll + scrollAmount,
       behavior: 'smooth'
     })
+  }
+  
+  // Handle scroll event (if needed)
+  const handleScroll = () => {
+    // Implement if needed
   }
   
   const emit = defineEmits(['nodeSelected'])

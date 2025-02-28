@@ -10,6 +10,7 @@ from flask_login import LoginManager
 from flask_migrate import Migrate
 from flask_cors import CORS
 import logging
+import sys
 
 from database.models import db, User
 from database.upgrade_db import run_upgrades
@@ -19,7 +20,6 @@ app = Flask(__name__, static_folder='../frontend/dist')
 app.secret_key = os.getenv('FLASK_SECRET_KEY')
 openai.api_key = os.getenv("OPENAI_API_KEY")
 resend.api_key = os.getenv('RESEND_API_KEY')
-
 
 print(f"app level secret key: {app.secret_key}")
 # host = os.environ.get('AZURE_MYSQL_HOST')
@@ -52,7 +52,22 @@ db.init_app(app)
 migrate = Migrate(app, db)
 CORS(app, origins="*", supports_credentials=True) # TODO: replace w/ actual frontend URL and make sure it work
 
-logging.basicConfig(level=logging.DEBUG)
+class LoggerWriter:
+    def __init__(self, level):
+        self.level = level
+
+    def write(self, message):
+        if message != '\n':
+            self.level(message)
+
+    def flush(self):
+        pass
+
+sys.stdout = LoggerWriter(logging.info)
+sys.stderr = LoggerWriter(logging.error)
+
+logging.basicConfig(filename='./debug123.log', level=logging.DEBUG)
+# logging.basicConfig(filename='./app.log', level=logging.DEBUG)
 
 login_manager = LoginManager()
 login_manager.init_app(app)

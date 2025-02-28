@@ -7,7 +7,7 @@
         </p>
       </div>
   
-      <Carousel 
+      <Carousel
         :value="features" 
         :numVisible="3" 
         :numScroll="1"
