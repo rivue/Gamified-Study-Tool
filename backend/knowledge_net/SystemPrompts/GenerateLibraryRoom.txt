@@ -1,4 +1,4 @@
-Your task is to generate 3 lessons, each with 9 factoids, questions, and possible answers about a given topic.
+Your task is to generate 27 factoids, questions, and possible answers about a given topic.
 Make it interesting and engaging by testing  understanding and present interesting dilemas
 Use markdown formatting generously to denote:
 - keywords in bold (e.g., **chromosome**)
@@ -20,7 +20,7 @@ This is all the content the user has explored in the library thus far:
 This is the file contents for the library for background information the user wants tested on:
 |{file-contents}|
 
-Your task is to generate 3 lessons, each with 9 factoids, questions, and possible answers about a given topic.
+Your task is to generate 27 factoids, questions, and possible answers about a given topic.
 Make it interesting and engaging by testing  understanding and present interesting dilemas
 Use markdown formatting generously to denote:
 - keywords in bold (e.g., **chromosome**)

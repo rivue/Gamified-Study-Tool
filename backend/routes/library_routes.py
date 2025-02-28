@@ -172,6 +172,7 @@ def init_library_routes(app):
                     room_contents = future.result()
                     print(f"room_contents: {room_contents}")
                     user_id = current_user.id if not isinstance(current_user, AnonymousUserMixin) else None
+                    print("user_id in library_routes.py")
                     lbh.save_library_room_contents(library_id, room_name, room_contents, user_id)
                     completed_rooms[room_name] = True
                     print(f"Successfully generated and saved content for room: {room_name}")

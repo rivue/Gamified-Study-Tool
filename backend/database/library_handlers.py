@@ -2,6 +2,7 @@ from datetime import datetime
 from flask import jsonify
 from sqlalchemy import func, distinct
 import random
+import math
 from database.models import (
     db,
     User,
@@ -121,54 +122,63 @@ def get_library_room_state(user_id, library_id, room_name=None):
 
 def save_library_room_contents(library_id, room_name, lessons, user_id):
     
+    print("save_library_room_contents")
     try:
         responses = []
-        for factoid_set_index in range(len(lessons["lessons"])):
-            lesson_name = "factoid_set_" + str(factoid_set_index + 1)
+        num_lessons = 3
+        add_library_room_state(user_id, library_id, room_name, num_lessons)
+        # print([item for index, item in enumerate(lessons["factoids"]["items"])])
+        print(lessons)
+        print(lessons["factoids"])
+        print(lessons["factoids"][3])
+        print("####")
+        # for lesson in range(num_lessons*9):
+        for index, item in enumerate(lessons["factoids"]):
+        
+            lesson_name = "factoid_set_" + str(math.floor(index/9) + 1)
+            # print([item for index, item in enumerate(lessons["factoids"]["items"])])
+            print(f"item: {item}")
+            print(f"######")
+            factoid_content = item["factoid_text"]
+            question_data = item["question"]
+            print("after lesson_name")
+            # Add factoid to library
+            factoid_response, status_code = add_factoid_to_library(
+                library_id, room_name, factoid_content, lesson_name
+            )
+            print(f"factoid_response: {factoid_response}")
+            if status_code != 201:
+                return factoid_response
+            factoid_id = factoid_response.json["factoid_id"]
+            print(f"factoid_id: {factoid_id}")
+            # Add question to factoid
+            question_type = question_data["type"]
+            question_text = question_data["text"]
+            correct_choice = question_data["correct_choice"]
+            
+            # wrong_choices = question_data["wrong_choices"]
+            wrong_choices = question_data.get("wrong_choices", [])
 
-            # generate library room state for each factoid_set_index
-            add_library_room_state(user_id, library_id, room_name, len(lessons["lessons"]), initial_lesson_state=factoid_set_index + 1)
-
-            for item in lessons["lessons"][factoid_set_index]["factoids"]:
-                print(f"item: {item}")
-                factoid_content = item["factoid_text"]
-                question_data = item["question"]
-                print("after lesson_name")
-                # Add factoid to library
-                factoid_response, status_code = add_factoid_to_library(
-                    library_id, room_name, factoid_content, lesson_name
-                )
-                print(f"factoid_response: {factoid_response}")
-                if status_code != 201:
-                    return factoid_response
-                factoid_id = factoid_response.json["factoid_id"]
-                print(f"factoid_id: {factoid_id}")
-                # Add question to factoid
-                question_type = question_data["type"]
-                question_text = question_data["text"]
-                correct_choice = question_data["correct_choice"]
-                
-                # wrong_choices = question_data["wrong_choices"]
-                wrong_choices = question_data.get("wrong_choices", [])
-
-                question_response, status_code = add_question_to_factoid(
-                    factoid_id, question_text, correct_choice, wrong_choices, question_type
-                )
-                print(f"question_response: {question_response}")
-                # problem here, start debugging tomorrow
-                if status_code != 201:
-                    return question_response
-                responses.append(
-                    {
-                        "factoid_response": factoid_response.json,
-                        "question_response": question_response.json,
-                    }
-                )
+            question_response, status_code = add_question_to_factoid(
+                factoid_id, question_text, correct_choice, wrong_choices, question_type
+            )
+            print(f"question_response: {question_response}")
+            # problem here, start debugging tomorrow
+            if status_code != 201:
+                return question_response
+            responses.append(
+                {
+                    "factoid_response": factoid_response.json,
+                    "question_response": question_response.json,
+                }
+            )
 
         return jsonify(status="success", data=responses)
     
     except Exception as e:
         db.session.rollback()
+        print("Exception save_library_room_contents")
+        print("message: ", str(e))
         return jsonify({"message": str(e)}), 400
 
 

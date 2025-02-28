@@ -284,77 +284,65 @@ GenerateLibraryRoomNames = {
 
 GenerateLibraryRoom = {
     "name": "generate_library_room",
-    "description": "Generates a library room with 3 lessons.",
+    "description": "Generates EXACTLY 27 unique factoids with questions. Count them explicitly to ensure 27.",
     "parameters": {
         "type": "object",
         "properties": {
-            "lessons": {
+            "factoids": {
                 "type": "array",
-                "minItems": 3,
-                "maxItems": 3,
-                "description": "An array of 3 different lessons, where each lesson contains 9 factoids and questions.",
+                "minItems": 27,
+                "maxItems": 27,
+               "description": "27 factoids numbered sequentially (Factoid #1 to #27). Never fewer than 27. Generate all 27 even if it requires extending earlier patterns. You may repeat or reword a question if necessary.",
                 "items": {
                     "type": "object",
                     "properties": {
-                        # "lesson_name": {
-                        #     "type": "string",
-                        #     "description": "A short name for the lesson within the library room."
-                        # },
-                        "factoids": {
-                            "type": "array",
-                            "minItems": 9,
-                            "maxItems": 9,
-                            "description": "An array of 9 objects, each containing a factoid and its corresponding question.",
-                            "items": {
-                                "type": "object",
-                                "properties": {
-                                    "factoid_text": {
-                                        "type": "string",
-                                        "description": "A snippet of an interesting fact related to the lesson's theme, up to 200 tokens in length."
-                                    },
-                                    "question": {
-                                        "type": "object",
-                                        "properties": {
-                                            "type": {
-                                                "type": "string",
-                                                "enum": ["fill_in_the_blank", "multiple_choice", "one_word_answer"],
-                                                "description": "The type of question. Must have an even distribution: 3 of each type across all factoids."
-                                            },
-                                            "text": {
-                                                "type": "string",
-                                                "description": "The text of the question. Use '___' for blanks for 'fill_in_the_blank' answers."
-                                            },
-                                            "correct_choice": {
-                                                "type": "array",
-                                                "items": {
-                                                    "type": "string"
-                                                },
-                                                "minItems": 1,
-                                                "maxItems": 7,
-                                                "description": "For 'one_word_answer' questions, an array of 1-7 acceptable variations of the correct answer. For other question types, an array with exactly one correct answer."
-                                            },
-                                            "wrong_choices": {
-                                                "type": "array",
-                                                "items": {
-                                                    "type": "string"
-                                                },
-                                                "minItems": 0,
-                                                "maxItems": 3,
-                                                "description": "Three incorrect choices for multiple_choice and fill_in_the_blank questions. Not used for one_word_answer questions."
-                                            }
-                                        },
-                                        "required": ["type", "text", "correct_choice"]
-                                    }
+                        "factoid_number": {
+                            "type": "integer",
+                            "description": "Explicit counter from 1 to 27. REQUIRED for validation."
+                        },
+                        "factoid_text": {
+                            "type": "string",
+                            "description": "A snippet of an interesting fact related to the lesson's theme, up to 200 tokens in length."
+                        },
+                        "question": {
+                            "type": "object",
+                            "properties": {
+                                "type": {
+                                    "type": "string",
+                                    "enum": ["fill_in_the_blank", "multiple_choice", "one_word_answer"],
+                                    "description": "Distribute evenly: 9 of each type across 27 factoids (9×3 types)."
                                 },
-                                "required": ["factoid_text", "question"]
-                            }
+                                "text": {
+                                    "type": "string",
+                                    "description": "The text of the question. Use '___' for blanks for 'fill_in_the_blank' answers."
+                                },
+                                "correct_choice": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    },
+                                    "minItems": 1,
+                                    "maxItems": 7,
+                                    "description": "For 'one_word_answer' questions, an array of 1-7 acceptable variations of the correct answer. For other question types, an array with exactly one correct answer."
+                                },
+                                "wrong_choices": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    },
+                                    "minItems": 0,
+                                    "maxItems": 3,
+                                    "description": "Three incorrect choices for multiple_choice and fill_in_the_blank questions. Not used for one_word_answer questions."
+                                }
+                            },
+                            "required": ["type", "text", "correct_choice"]
                         }
                     },
-                    "required": ["lesson_name", "factoids"]
+                    "required": ["factoid_text", "question"]
                 }
             }
         },
-        "required": ["lessons"]
+        "required": ["factoids"]
     }
 }
 
