@@ -49,10 +49,10 @@
 
                     <!-- Room Names Section -->
                     <div class="form-group room-names">
-                        <div class="libgen-title">Room Names</div>
+                        <div class="libgen-title">Stepping Stone Names</div>
                         <div class="room-input-container">
                             <div class="room-input-wrapper">
-                                <input type="text" v-model="newRoomName" placeholder="Enter room name"
+                                <input type="text" v-model="newRoomName" placeholder="Enter stepping stone names"
                                     :class="{ 'input-error': roomError || roomTypingError || roomSpaceError }"
                                     maxlength="40" :disabled="roomNames.length >= 30 || disableExtras"
                                     @keyup.enter="addRoom" />
@@ -69,6 +69,9 @@
                                     {{ room }}
                                     <button class="remove-room-btn" @click="removeRoom(index)">×</button>
                                 </div>
+                            </div>
+                            <div class="helper-text">
+                                🐙 Stepping stone = 1 lecture, textbook chapter, etc...
                             </div>
                             <div class="helper-text" v-if="roomNames.length < 30">
                                 🐙 Don't worry about adding all rooms or files now - you can generate more later!

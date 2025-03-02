@@ -5,6 +5,7 @@ IDEAS:
 
     ideas for grand plan / future:
         - create cheap vr cardboard cutouts of headsets where you can put your phone --> give to high schools possibly for free once you partner with them
+            - have to think specifically of who / what to target for MVP, etc... so as little time as possibly gets wasted building something that either 1) is outside of my domain of expertise or 2) other people might build (repeat of unclear jupyterhub research)
             - not sure where to go from there, lots of places though
         - see google doc for more plans
         - say you came up with and built the knowledge graph algorithm on your resume
@@ -18,7 +19,8 @@ IDEAS:
             - also add multimodal and >1 file input for library / course creation
 
     ideas for name:
-        - name something stone related (bc you are SOLIDIFYING your knowledge (hahahahahah ok im done))
+        - name something stone related for the actual lessons (bc you are SOLIDIFYING your knowledge (hahahahahah ok im done))
+        - rivue (ReInvent VirtUal Education --> go public w/ the acronym when I start the cardboard thing)
 
     ideas for map themes (possibly):
         - name something stone related (bc you are SOLIDIFYING your knowledge (hahahahahah ok im done))
@@ -41,37 +43,40 @@ IDEAS:
         - possibly take inspiration from btd5 / btd6 / odessey
 
 TODO list:
-    
-    general:
-        - change theme / color / name
-        - ability to "star" / "favorite" a course
-        - fix low / moderate / high vulnerabilities for npm packages in frontend
+
+    MVP CLEANUP LIST:
         - redirects / url stuff (ex: 
             "/knowledge/:id/:anythingHereShouldRedirect"
             "/library/:id/:roomName/:anythingHereShouldRedirect"
             etc...
         )
+        - fix low / moderate / high vulnerabilities for npm packages in frontend 
+        - ascendence --> rivue (everywhere on the site and in the file system)
+        - make sure "Knowledge Map", "Lessons", and other dashboard things either actually link somewhere or are handled properly
+        - fix progress bar (random amount gained might be nice along with fetching a random amount of questions (5-9))
+        - maybe do something that caps length of vector embedding response, like chops off anything after 1k tokens / characters or something
+        - loading bars / wheels possibly (at least look into) (for course creation and for other stuff as well)
+        - weird redirect for when user is logged in and try to navigate to a library which doesn't exist or no permissions (102 in main.js) ex: /lessons/234234
+            fix w/ a loading state or something, prob pretty easy
+    
+    general:
+        - change theme / color / name
+        - ability to "star" / "favorite" a course
         - make footer smaller and look better
         - contact image on main sidebar?
         - significant ui rehaul *** --> kinnu, duolingo, saved instagram design reels etc..
             - copy openais font?
-        - change gpt 4o-mini to deepseek or other model for cost --> look into custom api / llm specifically designed for education or review or whatever
-        - maybe do something that caps length of vector embedding response, like chops off anything after 1k tokens / characters or something
-        - add redirect to newly generated lesson once it finishes loading the library
-        - make sure "Knowledge Map", "Lessons", and other dashboard things either actually link somewhere or are handled properly
+        - change gpt 4o-mini to deepseek (deepseek once I test reliable function calling / parsing) or other model for cost
+        - eventually look into custom api / llm specifically designed for education or review or whatever
         - *possibly* add a slider to each course based on how lenient the course creator wants the fuzzy string matcher to be (for misspelled words)
-        - fix progress bar (random amount gained might be nice along with fetching a random amount of questions (5-9))
         - improve completion screen a bit
-        - loading bars (for course creation and for other stuff as well)
-        - weird redirect for when user is logged in and try to navigate to a library which doesn't exist or no permissions (102 in main.js) ex: /lessons/234234
-            fix w/ a loading state or something, prob pretty easy
-        - gray out the explore button until someone adds at least one room name
-        - switch "room names" to "lectures" in create library page
         - add support for .txt files for the create library thing
-        - add ability to create rooms / "lectures" once you create a library, and mention that in the "add rooms" page (ex: "*lectures can be added within the library*")
         - clean up minor ui thing with learning nodes (when you click on the popup to play the games, for some reason it still highlights the node)
         - modify section splitting logic (5 sentences --> 1k characters or 200 words max or whatever.)
-        - only fetch most 10 recent factoids, or summary of factoids or something when doing room generation
+        - only fetch most 30 recent factoids, or summary of factoids or something when doing room generation
+        - one word short answer (make gpt come up with variations so people aren't pissed off w/ super close answers, ex:
+        NCSU, ncsu, NC State, North Carolina State University, etc... or maybe use basic nlp to check?)
+        - all the other routes and stuff (contact / submit feedback, terms & policies, buying subscription, settings)
 
     create course (library) page:
         - add support for links / pdfs / other things and get rid of things like difficulty, tutor, etc... then actually start generating stuff to study
@@ -82,7 +87,6 @@ TODO list:
         - remove time from db then remove all references to "timer", "end time" or "starting time" in gameStore.js
         - add possibly a hint button as well (3 hints per question?)
         - instead of having to flip the factoid card, just put the main contents on the question card possibly? and ask them to use their applied knowledge, or give it to them as hints or something
-        - fix the issue where anywhere on a card exits the lesson as opposed to just the red x
         - instead of multiple choice, have it where users can drag / drop for an answer slot:
             (deepseek recomendations):
             - Add haptic feedback on drop (vibration for correct/wrong).
@@ -157,16 +161,14 @@ TODO list:
                 - make sure every thing is created successfully before adding anything to database possibly?
                 - reorganize pinecone processing stuff maybe a bit (put pinecone stuff in a pinecone file?)
                 - error handling. and lots of it.
-                - make finished library redirect to library map
                 - support links for more context possibly? (maybe it would be more of a room specific thing?)
                 - fix weird website not working issue (I think it happens right after login)
                 - remove image stuff for library and replace with plain color (user can choose color, maybe something out of 12 or something)
                 - add times_seen variable in the library factoid database when a user "sees" the question so we can start giving the user the least seen 8 out of 20 questions each time or something
-                - all the other routes and stuff (contact / submit feedback, terms & policies, buying subscription, settings)
             4) user can re-generate questions easily and for cheap (cheap for me at least cost for user tbd) bc embeddings are precomputed
             5) user should delete things hopefully
         - other idea: instead of giving whole textbook to gemini to figure out ideas, just have the user input a syllabus / toc of
-         textbook so we can get the names off the bat, or have an option to specify yourself, 
+         textbook so we can get the names off the bat, or have an option to specify yourself,
         or have it make its own based on the input material (this would be better for unorganized courses w/ no 
         syllabus and it would be easy for users - could make specifying yourself the default and have this for paid content?)
         - optimize sectioning (e: citations should not be ignored as opposed to taking up lots of sections possibly)
@@ -205,8 +207,10 @@ COMPLETED:
     ✅ figured out why a room name of the name of the library kept generating and fixed it
     ✅ remove description and game image popup upon initial game page load
     ✅ page / route reorganization
-    ✅ one word short answer (make gpt come up with variations so people aren't pissed off w/ super close answers, ex:
-        NCSU, ncsu, NC State, North Carolina State University, etc... or maybe use basic nlp to check?)
+    ✅ gray out the explore button until someone adds at least one room name
+    ✅ switch "room names" to "lectures" in create library page
+    ✅ add ability to create rooms / "lectures" once you create a library, and mention that in the "add rooms" page (ex: "*lectures can be added within the library*")
+    ✅ fix the issue where anywhere on a card exits the lesson as opposed to just the red x
 
     rag stuff:
     1) give whole textbook to gpt to "split up" ✅

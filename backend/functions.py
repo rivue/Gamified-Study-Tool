@@ -322,8 +322,8 @@ GenerateLibraryRoom = {
                                         "type": "string"
                                     },
                                     "minItems": 1,
-                                    "maxItems": 7,
-                                    "description": "For 'one_word_answer' questions, an array of 1-7 acceptable variations of the correct answer. For other question types, an array with exactly one correct answer."
+                                    "maxItems": 1,
+                                    "description": "An array with exactly one correct answer."
                                 },
                                 "wrong_choices": {
                                     "type": "array",
