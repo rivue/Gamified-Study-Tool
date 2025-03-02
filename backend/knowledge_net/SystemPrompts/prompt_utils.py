@@ -41,7 +41,7 @@ def sys_library(library_difficulty, language, language_difficulty, extra_context
 
     return system_message
 
-def sys_lib_room(library_id):
+def sys_lib_room(library_id, file_contents):
     current_script_directory = os.path.dirname(os.path.abspath(__file__))
     system_message_path = os.path.join(
         current_script_directory, f"GenerateLibraryRoom.txt"
@@ -84,6 +84,9 @@ def sys_lib_room(library_id):
             content_str = content_dict['library_content']
             if content_str:
                 system_message = system_message.replace("{library-context}", content_str)
+    
+    if "{file-contents}" in system_message and file_contents:
+        system_message = system_message.replace("{file-contents}", file_contents)
 
     return system_message
 

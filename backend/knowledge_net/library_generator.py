@@ -1,11 +1,11 @@
 from flask import jsonify
 import numpy as np
-from openapi import generate_response, get_embeddings, LESSON_TOKENS, GPT4
+from openapi import generate_response, LESSON_TOKENS, GPT4
 from message_handler import create_message
 from knowledge_net.SystemPrompts.prompt_utils import sys_library, sys_lib_room, sys_first_room
 import functions
-from knowledge_net.math_utils import calculate_cosine_similarities
-import database.library_handlers as lbh
+# from knowledge_net.math_utils import calculate_cosine_similarities
+# import database.library_handlers as lbh
 
 def suggest_library_wing(user_id, selected_node, library_difficulty, language, language_difficulty, extra_context):
     def generate_rooms():
@@ -40,9 +40,9 @@ def suggest_library_wing(user_id, selected_node, library_difficulty, language, l
 
 # rooms
     
-def fill_libroom(user_id, room_name, library_id):
+def fill_libroom(user_id, room_name, library_id, file_content):
     def generate_room_contents():
-        system_msg = sys_lib_room(library_id)
+        system_msg = sys_lib_room(library_id, file_content)
         user_msg = room_name
         function = [functions.GenerateLibraryRoom]
         function_call = {"name": function[0]['name']}
@@ -67,11 +67,11 @@ def fill_libroom(user_id, room_name, library_id):
 
     return room_contents
 
-def fill_room(user_id, subtopic, library_difficulty, language, language_difficulty, extra_context, guide, file_contents):
+def fill_room(user_id, subtopic, library_difficulty, language, language_difficulty, extra_context, guide, file_content):
     def generate_room_contents():
 
         # sys_first_room returns the actual message to send to the llm
-        system_msg = sys_first_room(subtopic, library_difficulty, language, language_difficulty, extra_context, guide, file_contents)
+        system_msg = sys_first_room(subtopic, library_difficulty, language, language_difficulty, extra_context, guide, file_content)
         function = [functions.GenerateLibraryRoom]
         function_call = {"name": function[0]['name']}
         messages = create_message(system_msg, subtopic)
@@ -95,9 +95,9 @@ def fill_room(user_id, subtopic, library_difficulty, language, language_difficul
 
     return room_contents
 
-def generate_libroom_content(user_id, subtopic, library_id):
+def generate_libroom_content(user_id, subtopic, library_id, file_content):
     # Generate room content
-    generated_content = fill_libroom(user_id, subtopic, library_id)
+    generated_content = fill_libroom(user_id, subtopic, library_id, file_content)
     if generated_content:
         return generated_content
     else:

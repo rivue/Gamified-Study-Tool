@@ -67,7 +67,7 @@ def generate_gemini_response(user_id, messages, tokens=TOKEN_CAP, temperature=No
         
         # Convert messages to Gemini format
         prompt = convert_messages_to_gemini(messages)
-        print(f"Requesting Gemini response for: {prompt}")
+        # print(f"Requesting Gemini response for: {prompt}")
         
         # Generate response
         response = model.generate_content(prompt)
@@ -82,7 +82,7 @@ def generate_gemini_response(user_id, messages, tokens=TOKEN_CAP, temperature=No
             }]
         }
         
-        print(f"Gemini response: {formatted_response}")
+        # print(f"Gemini response: {formatted_response}")
         return formatted_response
         
     except Exception as e:
@@ -92,7 +92,7 @@ def generate_gemini_response(user_id, messages, tokens=TOKEN_CAP, temperature=No
 def generate_openai_response(user_id, messages, functions=None, function_call="none", model=GPT4, tokens=TOKEN_CAP, temperature=None):
     """Generate response using OpenAI models"""
     openai.api_key = os.getenv('OPENAI_API_KEY')
-    print(f"Using OpenAI API Key: {openai.api_key}")
+    # print(f"Using OpenAI API Key: {openai.api_key}")
     if not openai.api_key:
         raise ValueError("Missing OpenAI API key. Set openai.api_key before calling this function.")
 
@@ -117,7 +117,7 @@ def generate_openai_response(user_id, messages, functions=None, function_call="n
                 data["functions"] = functions
                 data["function_call"] = function_call
 
-            print(f"Requesting {model} response: ", messages)
+            # print(f"Requesting {model} response: ", messages)
 
             response = requests.post(
                 "https://api.openai.com/v1/chat/completions",
@@ -128,7 +128,7 @@ def generate_openai_response(user_id, messages, functions=None, function_call="n
 
             if response.status_code == 200:
                 response_data = response.json()
-                print(response_data)
+                # print(response_data)
                 return response_data
             else:
                 print(f"Request failed with status code {response.status_code}: {response.json()}")
@@ -161,7 +161,7 @@ def moderate(user_input):
         "input": user_input
     }
 
-    print(f"Attempting moderation of {user_input}")
+    # print(f"Attempting moderation of {user_input}")
     for attempt in range(max_retries):
         try:
             print(f"(Attempt {attempt + 1}/{max_retries})...")
@@ -176,7 +176,7 @@ def moderate(user_input):
                 response_data = response.json()
                 output = response_data["results"][0]
                 violation = output["flagged"] or any(score > 0.25 for score in output["category_scores"].values())
-                print(f"Moderation completed successfully.\n{response_data}")
+                # print(f"Moderation completed successfully.\n{response_data}")
                 return violation, output
             else:
                 print(f"Request failed with status code {response.status_code}. Retrying...")
@@ -196,7 +196,7 @@ def moderate(user_input):
 ##### EMBEDDINGS #####
 
 def get_embeddings(strings_list):
-    print(f"embedding {strings_list}")
+    # print(f"embedding {strings_list}")
     if not strings_list:
         return None
     headers = {
@@ -265,7 +265,7 @@ def get_image(prompt):
 
             if response.status_code == 200:
                 response_data = response.json()
-                print(response_data['images'][0]['url'])
+                # print(response_data['images'][0]['url'])
                 return response_data['images'][0]['url']
             else:
                 print(f"Request failed with status code {response.status_code}: {response.json()}")

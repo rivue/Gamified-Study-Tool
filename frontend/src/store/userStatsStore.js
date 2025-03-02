@@ -20,10 +20,10 @@ export const useUserStatsStore = defineStore('userStats', {
     },
     getStats() {
       if (this.streak === null || this.exp === null) {
-        console.log("nulls")
+        // console.log("nulls")
         this.fetchStatsFromBackend();
       }
-      console.log(this.exp, this.ste)
+    //   console.log(this.exp, this.ste)
       return {
         streak: this.streak,
         exp: this.exp,

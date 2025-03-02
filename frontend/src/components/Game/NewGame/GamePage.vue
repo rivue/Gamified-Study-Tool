@@ -1,12 +1,12 @@
 <template>
-<div class="game-page">
-<game-toolbar/>
-<game-window/>
-<library-completion/>
-</div>
+    <div class="game-page">
+        <game-toolbar />
+        <game-window />
+        <library-completion />
+    </div>
 </template>
 
-  <script>
+<script>
 
 import { useGameStore } from "@/store/gameStore";
 
@@ -15,29 +15,29 @@ import LibraryCompletion from './LibraryCompletion.vue';
 import GameToolbar from './GameToolbar.vue';
 import { onBeforeRouteLeave } from "vue-router";
 
-export default 
-  {
-  name: "GamePage",
-  components: { GameWindow,LibraryCompletion, GameToolbar },
+export default
+    {
+        name: "GamePage",
+        components: { GameWindow, LibraryCompletion, GameToolbar },
 
 
-    setup() {
-        const gameStore = useGameStore();
-    
-        onBeforeRouteLeave((to, from, next) => {
-            console.log("successfully unmounted");
-            gameStore.resetGameState();
-            next();
-        });
+        setup() {
+            const gameStore = useGameStore();
 
-    },
-};
+            onBeforeRouteLeave((to, from, next) => {
+                console.log("successfully unmounted");
+                gameStore.resetGameState();
+                next();
+            });
+
+        },
+    };
 </script>
-  
+
 <style scoped>
-.game-page{
-  display: flex;
-  flex-direction: column;
-  width: 100%;
+.game-page {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
 }
 </style>

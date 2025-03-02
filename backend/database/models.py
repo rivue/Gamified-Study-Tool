@@ -1,5 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
+from sqlalchemy import JSON
+from sqlalchemy.ext.mutable import MutableList
 from datetime import datetime
 import hashlib
 import random
@@ -165,7 +167,7 @@ class Library(db.Model):
     clicks = db.Column(db.Integer, default=0)
     likes = db.Column(db.Integer, default=0)
 
-    room_names = db.Column(db.JSON, nullable=False)
+    room_names = db.Column(MutableList.as_mutable(JSON), nullable=False)
     image_url = db.Column(db.String(200), nullable=False, default=DEFAULT_IMAGE_URL)
 
     factoids = db.relationship('LibraryFactoid', backref='library')

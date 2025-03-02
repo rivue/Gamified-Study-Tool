@@ -51,22 +51,27 @@ TODO list:
             "/library/:id/:roomName/:anythingHereShouldRedirect"
             etc...
         )
-        - make footer smaller
+        - make footer smaller and look better
         - contact image on main sidebar?
-        - significant ui rehaul ***
-        - change gpt 4o-mini to deepseek
+        - significant ui rehaul *** --> kinnu, duolingo, saved instagram design reels etc..
+            - copy openais font?
+        - change gpt 4o-mini to deepseek or other model for cost --> look into custom api / llm specifically designed for education or review or whatever
         - maybe do something that caps length of vector embedding response, like chops off anything after 1k tokens / characters or something
-        - implement deepseek with the AI prompting
         - add redirect to newly generated lesson once it finishes loading the library
-        - copy openais font?
-        - make sure "Knowledge Map" and "Lessons" either actually link somewhere or are handled properly
+        - make sure "Knowledge Map", "Lessons", and other dashboard things either actually link somewhere or are handled properly
         - *possibly* add a slider to each course based on how lenient the course creator wants the fuzzy string matcher to be (for misspelled words)
         - fix progress bar (random amount gained might be nice along with fetching a random amount of questions (5-9))
-        - redirect home when user is done
-        - loading bars (for courses)
+        - improve completion screen a bit
+        - loading bars (for course creation and for other stuff as well)
         - weird redirect for when user is logged in and try to navigate to a library which doesn't exist or no permissions (102 in main.js) ex: /lessons/234234
             fix w/ a loading state or something, prob pretty easy
         - gray out the explore button until someone adds at least one room name
+        - switch "room names" to "lectures" in create library page
+        - add support for .txt files for the create library thing
+        - add ability to create rooms / "lectures" once you create a library, and mention that in the "add rooms" page (ex: "*lectures can be added within the library*")
+        - clean up minor ui thing with learning nodes (when you click on the popup to play the games, for some reason it still highlights the node)
+        - modify section splitting logic (5 sentences --> 1k characters or 200 words max or whatever.)
+        - only fetch most 10 recent factoids, or summary of factoids or something when doing room generation
 
     create course (library) page:
         - add support for links / pdfs / other things and get rid of things like difficulty, tutor, etc... then actually start generating stuff to study

@@ -170,12 +170,12 @@ def init_library_routes(app):
                 
                 try:
                     room_contents = future.result()
-                    print(f"room_contents: {room_contents}")
+                    # print(f"room_contents: {room_contents}")
                     user_id = current_user.id if not isinstance(current_user, AnonymousUserMixin) else None
-                    print("user_id in library_routes.py")
+                    # print("user_id in library_routes.py")
                     lbh.save_library_room_contents(library_id, room_name, room_contents, user_id)
                     completed_rooms[room_name] = True
-                    print(f"Successfully generated and saved content for room: {room_name}")
+                    # print(f"Successfully generated and saved content for room: {room_name}")
 
                 except Exception as e:
                     
@@ -223,8 +223,8 @@ def init_library_routes(app):
 
         # Attempt to retrieve existing room contents
         room_data = None
-        print("library api")
-        print(library_topic)
+        # print("library api")
+        # print(library_topic)
         if library_topic:
             room_data = lbh.retrieve_library_room_contents(library_id, library_topic, user_id)
             if not room_data:
@@ -251,34 +251,51 @@ def init_library_routes(app):
     @app.route("/api/library/room", methods=["POST"])
     def generate_room():
         user_id = current_user.id if not isinstance(current_user, AnonymousUserMixin) else None
-        data = request.get_json()
-        subtopic = data.get("subtopic")
-        library_id = data.get("libraryId")
+        subtopic = request.form.get("roomName")
+        library_id = request.form.get("libraryId")
 
         if not subtopic:
             return jsonify(status="error", message="No subtopic provided"), 400
         if not library_id:
             return jsonify(status="error", message="No library ID provided"), 400
 
-        print("subtopic: " + subtopic)
+        try:
+            # Check if "file" is in request.files
+            if "file" not in request.files:
+                return jsonify({"error": "No file provided (not in request.files)"}), 400
+
+            # Get the file
+            file = request.files["file"]
+
+            # Check if the file is empty
+            if file.filename == "":
+                return jsonify({"error": "No file selected"}), 400
+
+            # Read the file
+            selected_file = file.read()
+
+        except Exception as e:
+            return jsonify({"error": f"Error reading file: {str(e)}"}), 400
+        
         # Attempt to retrieve existing room contents
-        existing_content = lbh.retrieve_library_room_contents(library_id, subtopic.replace("-", " "))
+        existing_content = lbh.retrieve_library_room_contents(library_id, subtopic, user_id) # .replace("-", " "))
+
         if existing_content:
             return jsonify(status="success", data=existing_content)
         
-        # If no content exists, generate new content
+        # If no content exists, fetch new content
         if not user_id:
             ip = request.remote_addr # TODO ip stuff?
             # if not check_generation_allowed(ip, 'room'):
-            #     return jsonify(status="error", message="Room generation limit reached."), 403
+            return jsonify(status="error", message="Must be signed in."), 403
             
-        print(f"userid: ${user_id}")
-        if user_id:
-            within_limit, message = is_within_limit(current_user)
-            if not within_limit:
-                return jsonify({"error": message}), 429
-        elif not lbh.is_center_room(library_id, subtopic):
-            return jsonify(status="error", message="Please login to continue."), 400
+        # print(f"userid: ${user_id}")
+        # if user_id:
+        #     within_limit, message = is_within_limit(current_user)
+        #     if not within_limit:
+        #         return jsonify({"error": message}), 429
+        # elif not lbh.is_center_room(library_id, subtopic):
+        #     return jsonify(status="error", message="Please login to continue."), 400
 
         try:
             library_response = get_library(library_id)
@@ -288,16 +305,39 @@ def init_library_routes(app):
             library_data = library_response.get_json()
             room_list = library_data.get('data', {}).get('room_names', [])
 
-            print(f"room_names: {room_list}")
-            if not subtopic in room_list:
-                return jsonify(status="error", message="Can only generate library rooms for valid libraries"), 400
+            # print(f"room_names: {room_list}")
 
-            generated_content = lgn.generate_libroom_content(user_id, subtopic, library_id)
-            lbh.save_library_room_contents(library_id, subtopic, generated_content)
-            existing_content = lbh.retrieve_library_room_contents(library_id, subtopic)
-            if not user_id:
-                mark_generation_done(ip, 'room')
+            # if not subtopic in room_list:
+                # return jsonify(status="error", message="Can only generate library rooms for valid libraries"), 400
+
+            if selected_file:
+                process_document(selected_file, library_id)
+                rag_context = query_and_respond_pinecone(subtopic, library_id)
+                generated_content = lgn.generate_libroom_content(user_id, subtopic, library_id, rag_context)
+                # print("selected_file")
+            else:
+                generated_content = lgn.generate_libroom_content(user_id, subtopic, library_id, rag_context=None) # need generate_room_content(user_id, topic, library_difficulty, language, language_difficulty, extra_context, guide, rag_context): 
+            
+            if not generated_content:
+                # print("generated_content lbr")
+                return jsonify(status="error", message="Failed to generate room content"), 500
+
+            # print("lbg_save_contents")
+            # print(f"generated_content: {generated_content}")
+            
+            # response, status_code = lbh.add_room_name_to_library(library_id, subtopic)
+            
+            # if not response or status_code != 200:
+            #     return jsonify(status="error", message="Failed to save room content"), 500
+            
+            lbh.save_library_room_contents(library_id, subtopic, generated_content, user_id)
+            # print("save_libroom_contents")
+            existing_content = lbh.retrieve_library_room_contents(library_id, subtopic, user_id)
+            # print("existing_content")
             return jsonify(status="success", data=existing_content)
+            # if not user_id:
+            #     mark_generation_done(ip, 'room')
+            # return jsonify(status="success", data=existing_content)
         except Exception as e:
             return jsonify(status="error", message=f"Failed to generate content {e}"), 500
     

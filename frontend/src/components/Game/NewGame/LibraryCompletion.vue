@@ -3,7 +3,7 @@
     <div v-if="completionVisible" class="completion-overlay">
       <div v-if="firstPage" class="pre-completion-content">
         <div class="celebratory-message">🎉 Congratulations! 🎉</div>
-        <UserStats />
+        <!-- <UserStats /> -->
           <!-- <div class="time-spent">Final time: {{ formattedTime }}s</div> -->
         <div class="cta-container">
           <CtaButton
@@ -39,13 +39,13 @@
           <div class="nav-row">
             <button class="nav-button" @click="navigateLibrary">🏛 New</button>
             <div class="separator">|</div>
-            <button
+            <!-- <button
               class="nav-button"
               @click="navigateExplore"
               :disabled="exploreLoading"
-            >
-              {{ exploreLoading ? "⏳Loading" : "🔍Suggest again" }}
-            </button>
+            > -->
+              <!-- {{ exploreLoading ? "⏳Loading" : "🔍Suggest again" }}
+            </button> -->
             <div class="separator">|</div>
             <button class="nav-button" @click="navigateMap">🗺️Map</button>
           </div>
@@ -100,7 +100,7 @@ import { useAuthStore } from "@/store/authStore";
 import { useMessageStore } from "@/store/messageStore";
 import { useGameStore } from "@/store/gameStore";
 import CyclingContentButton from "../Creation/CyclingContentButton.vue";
-import UserStats from "../../Graphs/UserStats.vue";
+// import UserStats from "../../Graphs/UserStats.vue";
 import CtaButton from "../../Footer/LandingPageComponents/CtaButton.vue";
 import LeaderBoard from "../LeaderBoard.vue";
 
@@ -120,7 +120,7 @@ export default {
   },
   components: {
     CyclingContentButton,
-    UserStats,
+    // UserStats,
     CtaButton,
     LeaderBoard,
   },
@@ -162,25 +162,25 @@ export default {
     navigateBack() {
       this.gameStore.fetchLibraryDetails(this.gameStore.libraryId, this.gameStore.libraryTopic);
     },
-    async navigateExplore() {
-      this.exploreLoading = true;
-      const url = `/api/explore?name=${this.gameStore.roomNames[12]}`;
-      axios
-        .get(url)
-        .then((response) => {
-          if (response.data && response.data.suggestions) {
-            this.suggestions = response.data.suggestions;
-          } else {
-            console.error("No suggestions...");
-          }
-        })
-        .catch((error) => {
-          console.error("Error fetching suggestions: ", error);
-        })
-        .finally(() => {
-          this.exploreLoading = false;
-        });
-    },
+    // async navigateExplore() {
+    //   this.exploreLoading = true;
+    //   const url = `/api/explore?name=${this.gameStore.roomNames[12]}`;
+    //   axios
+    //     .get(url)
+    //     .then((response) => {
+    //       if (response.data && response.data.suggestions) {
+    //         this.suggestions = response.data.suggestions;
+    //       } else {
+    //         console.error("No suggestions...");
+    //       }
+    //     })
+    //     .catch((error) => {
+    //       console.error("Error fetching suggestions: ", error);
+    //     })
+    //     .finally(() => {
+    //       this.exploreLoading = false;
+    //     });
+    // },
     async startSuggestion(suggestion) {
       if (this.loading) return;
 
@@ -266,7 +266,7 @@ export default {
   watch: {
     completionVisible(newValue) {
       if (newValue) {
-        this.navigateExplore();
+    //     this.navigateExplore();
       }
     },
   },

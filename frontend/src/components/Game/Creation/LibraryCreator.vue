@@ -9,12 +9,19 @@
                         <div class="libgen-title">Course name</div>
                         <div class="title-bar">
                             <input type="text" id="topicInput" ref="topicInput" v-model="topic"
-                                :class="{ 'input-error': topicError }" placeholder="What to learn about" maxlength="100"
-                                @focus="selectInputText" @paste="handlePaste" />
+                                :class="{ 'input-error': topicError || topicTypingError || topicSpaceError }"
+                                placeholder="What to learn about" maxlength="100" @focus="selectInputText"
+                                @paste="handlePaste" />
                         </div>
                         <!-- Error Message -->
                         <div v-if="topicError" class="error-message">
                             Please enter a topic.
+                        </div>
+                        <div v-if="topicTypingError" class="error-message">
+                            Topic can only have spaces or letters.
+                        </div>
+                        <div v-if="topicSpaceError" class="error-message">
+                            Topic must not start or end with a space.
                         </div>
                     </div>
                 </div>
@@ -28,10 +35,13 @@
                             <div class="libgen-title">Upload File</div>
                             <div class="file-input-container">
                                 <input type="file" id="fileInput" ref="fileInput" @change="handleFileUpload"
-                                    :disabled="disableExtras" accept=".txt,.pdf,.doc,.docx" />
+                                    :disabled="disableExtras" accept=".pdf" />
                                 <div v-if="selectedFile" class="selected-file">
                                     Selected: {{ selectedFile.name }}
                                     <button class="remove-file-btn" @click="removeFile">×</button>
+                                </div>
+                                <div class="helper-text">
+                                    🐙 Only accepting .pdf files that are 500kb or less for now - we're still building!
                                 </div>
                             </div>
                         </div>
@@ -43,8 +53,9 @@
                         <div class="room-input-container">
                             <div class="room-input-wrapper">
                                 <input type="text" v-model="newRoomName" placeholder="Enter room name"
-                                    :class="{ 'input-error': roomError }" maxlength="40"
-                                    :disabled="roomNames.length >= 30 || disableExtras" @keyup.enter="addRoom" />
+                                    :class="{ 'input-error': roomError || roomTypingError || roomSpaceError }"
+                                    maxlength="40" :disabled="roomNames.length >= 30 || disableExtras"
+                                    @keyup.enter="addRoom" />
                                 <button class="add-room-btn" @click="addRoom"
                                     :disabled="!newRoomName.trim() || roomNames.length >= 30 || disableExtras">
                                     Add
@@ -59,9 +70,9 @@
                                     <button class="remove-room-btn" @click="removeRoom(index)">×</button>
                                 </div>
                             </div>
-                        </div>
-                        <div v-if="roomError" class="error-message">
-                            Please specify a room.
+                            <div class="helper-text" v-if="roomNames.length < 30">
+                                🐙 Don't worry about adding all rooms or files now - you can generate more later!
+                            </div>
                         </div>
                     </div>
 
@@ -70,7 +81,8 @@
 
             <!-- CTA Button -->
             <div class="cta-container">
-                <CtaButton :buttonText="submitButtonText" @click="handleSubmit" :isSubmitting="isSubmitting" />
+                <CtaButton :buttonText="submitButtonText" @click="handleSubmit"
+                    :isSubmitting="buttonDisabled.isSubmitting || buttonDisabled.noRooms" />
             </div>
             <library-browser />
         </div>
@@ -98,21 +110,28 @@ export default {
         return {
             topic: "",
             topicError: false,
+            topicTypingError: false,
+            topicSpaceError: false,
             roomError: false,
+            roomTypingError: false,
+            roomSpaceError: false,
             safeTopics: [
                 "Innovative breakdance moves",
                 "How to identify misinformation",
                 "Origins of the Olympic games",
             ],
             libraryDifficulty: "",
-            isSubmitting: false,
+            buttonDisabled: {
+                noRooms: true,
+                isSubmitting: false,
+            },
             selectedFile: null,
             newRoomName: "",
             roomNames: [],
         };
     },
     mounted() {
-        this.libraryDifficulty = "Easy";
+        this.libraryDifficulty = "Normal";
         if (this.computedTopics.length > 0 && this.$refs.topicInput) {
             this.typingInterval = startTypingEffect(
                 this.$refs.topicInput,
@@ -139,7 +158,17 @@ export default {
             return this.$route.path === "/library";
         },
         submitButtonText() {
-            return this.isSubmitting ? "Loading (~45s)" : "Explore!";
+
+            if (this.buttonDisabled.isSubmitting) {
+                return "Loading (~45s)";
+            }
+            else if (this.buttonDisabled.noRooms) {
+                return "Add at least one room to get started!";
+            }
+            else {
+                return "Explore!";
+            }
+            // return this.isSubmitting ? this.isSubmitting.isEmpty ? "hi there" : "Loading (~45s)" : "Explore!";
         },
         disableExtras() {
             const authStore = useAuthStore();
@@ -180,12 +209,26 @@ export default {
         addRoom() {
             const trimmedName = this.newRoomName.trim();
             if (trimmedName && this.roomNames.length < 30) {
+                this.roomError = false;
+                this.roomTypingError = !/^[a-zA-Z ]+$/.test(trimmedName);
+                if (this.roomTypingError) {
+                    return;
+                }
+                this.roomSpaceError = trimmedName[0] === " " || trimmedName[trimmedName.length - 1] === " ";
+                if (this.roomSpaceError) {
+                    return;
+                }
                 this.roomNames.push(trimmedName);
+                this.buttonDisabled.noRooms = false;
+                console.log("asd;lfkjasdf")
                 this.newRoomName = "";
             }
         },
         removeRoom(index) {
             this.roomNames.splice(index, 1);
+            if (this.roomNames.length === 0) {
+                this.buttonDisabled.noRooms = true; // disables submit button until roomNames is not empty (must have room names to submit)
+            }
         },
         handleSubmit() {
             const authStore = useAuthStore();
@@ -198,17 +241,43 @@ export default {
                 );
                 return;
             }
+
             if (this.topic.trim() === "") {
                 this.topicError = true;
-                console.log("topicError")
                 return;
             }
             this.topicError = false;
+            this.topicTypingError = !/^[a-zA-Z ]+$/.test(this.topic);
+            if (this.topicTypingError) {
+                return;
+            }
+            this.topicSpaceError = this.topic[0] === " " || this.topic[this.topic.length - 1] === " ";
+            if (this.topicSpaceError) {
+                console.log("topic space error");
+                return;
+            }
+
             if (this.roomNames.length === 0) {
                 this.roomError = true;
                 return;
             }
+            for (let roomName of this.roomNames) {
+                if (roomName.trim() === "") {
+                    this.roomError = true;
+                    return;
+                }
+            }
             this.roomError = false;
+            this.roomTypingError = this.roomNames.some(roomName => !/^[a-zA-Z ]+$/.test(roomName));
+            if (this.roomTypingError) {
+                return;
+            }
+            this.roomSpaceError = this.roomNames.some(roomName => roomName[0] === " " || roomName[roomName.length - 1] === " ");
+            if (this.roomSpaceError) {
+                console.log("room space error");
+                return;
+            }
+
             const urlPattern =
                 /^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)$/;
             if (urlPattern.test(this.topic)) {
@@ -219,7 +288,7 @@ export default {
                 return;
             }
 
-            this.isSubmitting = true;
+            this.buttonDisabled.isSubmitting = true;
 
             const formData = new FormData();
 
@@ -266,7 +335,7 @@ export default {
                     }
                 })
                 .finally(() => {
-                    this.isSubmitting = false;
+                    this.buttonDisabled.isSubmitting = false;
                 });
         },
     },
@@ -492,5 +561,13 @@ input[type="text"] {
 
 .remove-room-btn:hover {
     opacity: 1;
+}
+
+.helper-text {
+    font-size: 0.8em;
+    opacity: 0.7;
+    margin-top: 0.5em;
+    text-align: center;
+    color: var(--text-color);
 }
 </style>

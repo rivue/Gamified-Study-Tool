@@ -126,19 +126,19 @@ def save_library_room_contents(library_id, room_name, lessons, user_id):
     try:
         responses = []
         num_lessons = 3
-        add_library_room_state(user_id, library_id, room_name, num_lessons)
-        # print([item for index, item in enumerate(lessons["factoids"]["items"])])
-        print(lessons)
-        print(lessons["factoids"])
-        print(lessons["factoids"][3])
-        print("####")
-        # for lesson in range(num_lessons*9):
-        for index, item in enumerate(lessons["factoids"]):
+        response, status = add_room_name_to_library(library_id, room_name)
+
+        if not response or status != 200:
+            return jsonify(status="error", message="Failed to add room name to library"), 200
         
+        add_library_room_state(user_id, library_id, room_name, num_lessons)
+
+        for index, item in enumerate(lessons["factoids"]):
+            
             lesson_name = "factoid_set_" + str(math.floor(index/9) + 1)
-            # print([item for index, item in enumerate(lessons["factoids"]["items"])])
+            
             print(f"item: {item}")
-            print(f"######")
+
             factoid_content = item["factoid_text"]
             question_data = item["question"]
             print("after lesson_name")
@@ -183,7 +183,7 @@ def save_library_room_contents(library_id, room_name, lessons, user_id):
 
 
 def retrieve_library_room_contents(library_id, room_name, user_id):
-    print("hi")
+
     # user HAS to be logged
     if not user_id:
         return None
@@ -341,6 +341,36 @@ def add_question_to_factoid(factoid_id, question_text, correct_choice, wrong_cho
         db.session.rollback()
         return jsonify({"message": str(e)}), 400
 
+def add_room_name_to_library(library_id, new_room_name):
+    try:
+        # Get the library
+        library = Library.query.get(library_id)
+        if not library:
+            return jsonify({"error": "Library not found"}), 404
+
+        # Initialize room_names if null
+        if library.room_names is None:
+            library.room_names = []
+
+        # Check for duplicates
+        if new_room_name in library.room_names:
+            return jsonify({"warning": f"Room '{new_room_name}' already exists in this library"}), 400
+
+        # Add new room name
+        library.room_names.append(new_room_name) # doesn't work?
+
+        # Commit changes
+        db.session.commit()
+        library = Library.query.get(library_id)
+        
+        return jsonify({"message": "Room added successfully", "library_id": library_id, "new_room_name": new_room_name}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({
+            "error": f"Failed to add room: {str(e)}",
+            "library_id": library_id
+        }), 500
 
 def get_factoid(factoid_id):
     factoid = LibraryFactoid.query.get(factoid_id)

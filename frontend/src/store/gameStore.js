@@ -175,10 +175,16 @@ export const useGameStore = defineStore("gameStore", {
                     console.error(`Trying to load ${room_name} in state ${this.roomStates[room_name].state}.`);
                     return;
                 }
-                const response = await axios.post("/api/library/room", {
-                    libraryId: this.libraryId,
-                    subtopic: room_name
-                });
+                const formdata = new FormData();
+                formdata.append("libraryId", this.libraryId);
+                formdata.append("subtopic", room_name);
+                const response = await axios.post("/api/library/room", formdata);
+                
+                // const response = await axios.post("/api/library/room", {
+                //     libraryId: this.libraryId,
+                //     subtopic: room_name
+                // });
+
                 console.log("roomname: ", room_name, "library topic: " , this.libraryTopic)
                 if (response.data.status === "success") {
                     this.roomStates[room_name].state = 2;
@@ -233,7 +239,7 @@ export const useGameStore = defineStore("gameStore", {
             }
             const userStatsStore = useUserStatsStore();
             userStatsStore.resetStats();
-            
+
             // const completedRooms = Object.keys(this.roomStates).filter(
                 // roomName => this.roomStates[roomName].state === 3
             // );
