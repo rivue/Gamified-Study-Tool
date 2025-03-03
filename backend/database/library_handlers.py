@@ -122,7 +122,6 @@ def get_library_room_state(user_id, library_id, room_name=None):
 
 def save_library_room_contents(library_id, room_name, lessons, user_id):
     
-    print("save_library_room_contents")
     try:
         responses = []
         num_lessons = 3
@@ -354,7 +353,7 @@ def add_room_name_to_library(library_id, new_room_name):
 
         # Check for duplicates
         if new_room_name in library.room_names:
-            return jsonify({"warning": f"Room '{new_room_name}' already exists in this library"}), 400
+            return jsonify({"warning": f"Room '{new_room_name}' already exists in this library"}), 200
 
         # Add new room name
         library.room_names.append(new_room_name) # doesn't work?

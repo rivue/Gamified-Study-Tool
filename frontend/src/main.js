@@ -10,7 +10,6 @@ import './assets/themes.css';
 import axios from 'axios';
 
 const routes = [
-
     // root
     { path: '/', component: defineAsyncComponent(() => import('./components/Footer/HomePage.vue')), meta: { title: 'Ascendance·☁️| Create Library' } },
 
@@ -21,8 +20,53 @@ const routes = [
     // llm chatbot = not necessary for me
     //   { path: '/lessons', component: defineAsyncComponent(() => import('./components/Chat/ChatComponent.vue')), meta: { title: 'Ascendance·☁️| Lessons' } }, 
     //   { path: '/lesson/:id', component: defineAsyncComponent(() => import('./components/Chat/ChatComponent.vue')), meta: { title: 'Ascendance·☁️| Learning' } },
-    { path: '/lessons/:id/:roomName', component: defineAsyncComponent(() => import('./components/Game/NewGame/GamePage.vue')), meta: { title: 'Ascendance·☁️| Explore Library', hideHeaderFooter: true } },
-    { path: '/lessons/:id', component: defineAsyncComponent(() => import('./components/Backstage/MapPage.vue')), meta: { title: 'Ascendance·☁️| Explore Library', requiresCreator: true } },
+    { 
+        path: '/lessons/:id/:roomName', 
+        component: defineAsyncComponent(() => import('./components/Game/NewGame/GamePage.vue')), 
+        meta: { title: 'Ascendance·☁️| Explore Library', hideHeaderFooter: true },
+        beforeEnter: async (to, from, next) => {
+            try {
+                // Validate that the library ID exists
+                const response = await axios.get(`/api/library/${to.params.id}`);
+                if (response.data && response.data.status === "success") {
+                    // Check if roomName exists in the library
+                    const roomList = response.data.data.room_names || [];
+                    if (roomList.includes(to.params.roomName)) {
+                        next();
+                    } else {
+                        // Room doesn't exist, redirect to library page
+                        next(`/lessons/${to.params.id}`);
+                    }
+                } else {
+                    // Library doesn't exist
+                    next('/library');
+                }
+            } catch (error) {
+                console.error("Failed to validate library/room:", error);
+                next('/library');
+            }
+        }
+    },
+    { 
+        path: '/lessons/:id', 
+        component: defineAsyncComponent(() => import('./components/Backstage/MapPage.vue')), 
+        meta: { title: 'Ascendance·☁️| Explore Library', requiresCreator: true },
+        beforeEnter: async (to, from, next) => {
+            try {
+                // Validate that the library ID exists
+                const response = await axios.get(`/api/library/${to.params.id}`);
+                if (response.data && response.data.status === "success") {
+                    next();
+                } else {
+                    // Library doesn't exist
+                    next('/library');
+                }
+            } catch (error) {
+                console.error("Failed to validate library:", error);
+                next('/library');
+            }
+        }
+    },
 
     // create library (game)
     { path: '/library', component: defineAsyncComponent(() => import('./components/Game/Creation/LibraryCreator.vue')), meta: { title: 'Ascendance·☁️| Create Library' } },
@@ -39,7 +83,6 @@ const routes = [
 
     // the maps of different courses
     //   { path: '/knowledge/:id', component: defineAsyncComponent(() => import('./components/Backstage/MapPage.vue')), meta: { title: 'Ascendance·☁️| Knowledge Map' } },
-
 
     // submit feedback
     { path: '/contact', component: defineAsyncComponent(() => import('./components/Footer/ContactPage.vue')), meta: { title: 'Ascendance·☁️| Contact Us' } },
@@ -58,12 +101,20 @@ const routes = [
 
     // admin stuff, basically users and what not - might be useful later
     { path: '/admin', component: defineAsyncComponent(() => import('./components/Auth/AdminPage.vue')), meta: { title: 'Ascendance·☁️| Admin' } },
+    
+    // Catch-all for 404 errors
+    { 
+        path: '/:pathMatch(.*)*', 
+        component: defineAsyncComponent(() => import('./components/Footer/HomePage.vue')),
+        meta: { title: 'Ascendance·☁️| Page Not Found' } 
+    }
 ];
 
 const router = createRouter({
     history: createWebHistory(),
     routes,
 });
+
 router.beforeEach(async (to, from, next) => {
     const authStore = useAuthStore();
     // const gameStore = useGameStore();
@@ -96,7 +147,6 @@ router.beforeEach(async (to, from, next) => {
         // Only proceed with this check if the user is logged in
         if (authStore.loggedIn) {
             try {
-                
                 // Check if the user is the creator of the library
                 const response = await axios.get(`/api/library/${to.params.id}`);
                 if (response.data && 

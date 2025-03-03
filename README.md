@@ -58,6 +58,8 @@ TODO list:
         - loading bars / wheels possibly (at least look into) (for course creation and for other stuff as well)
         - weird redirect for when user is logged in and try to navigate to a library which doesn't exist or no permissions (102 in main.js) ex: /lessons/234234
             fix w/ a loading state or something, prob pretty easy
+        - error handling, and lots of it (how to handle failed document generation, other errors, etc...)
+            - error handling for not finding any context when loading stone names in library?
     
     general:
         - change theme / color / name

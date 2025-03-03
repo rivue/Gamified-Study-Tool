@@ -173,6 +173,7 @@ def init_library_routes(app):
                     # print(f"room_contents: {room_contents}")
                     user_id = current_user.id if not isinstance(current_user, AnonymousUserMixin) else None
                     # print("user_id in library_routes.py")
+                    print(f"room_contents library_routes 176: {room_contents}")
                     lbh.save_library_room_contents(library_id, room_name, room_contents, user_id)
                     completed_rooms[room_name] = True
                     # print(f"Successfully generated and saved content for room: {room_name}")
@@ -236,6 +237,7 @@ def init_library_routes(app):
                             library_topic,
                             library_id
                         )
+                        print(f"room_contents library_routes 240: {room_contents}")
                         lbh.save_library_room_contents(library_id, library_topic, room_contents)
                         room_data = room_contents
                     except Exception as e:
@@ -318,9 +320,12 @@ def init_library_routes(app):
             else:
                 generated_content = lgn.generate_libroom_content(user_id, subtopic, library_id, rag_context=None) # need generate_room_content(user_id, topic, library_difficulty, language, language_difficulty, extra_context, guide, rag_context): 
             
+            
             if not generated_content:
                 # print("generated_content lbr")
                 return jsonify(status="error", message="Failed to generate room content"), 500
+            
+            print(f"room_contents library_routes 328: {generated_content}")
 
             # print("lbg_save_contents")
             # print(f"generated_content: {generated_content}")
