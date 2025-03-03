@@ -46,7 +46,7 @@ TODO list:
 
     MVP CLEANUP LIST:
        
-        - fix low / moderate / high vulnerabilities for npm packages in frontend 
+        - fix low / moderate / high vulnerabilities for npm packages in frontend (down to 8 from 26 so yay)
         - ascendence --> rivue (everywhere on the site and in the file system)
         - make sure "Knowledge Map", "Lessons", and other dashboard things either actually link somewhere or are handled properly
         - fix progress bar (random amount gained might be nice along with fetching a random amount of questions (5-9))
