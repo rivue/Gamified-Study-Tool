@@ -45,11 +45,7 @@ IDEAS:
 TODO list:
 
     MVP CLEANUP LIST:
-        - redirects / url stuff (ex: 
-            "/knowledge/:id/:anythingHereShouldRedirect"
-            "/library/:id/:roomName/:anythingHereShouldRedirect"
-            etc...
-        )
+       
         - fix low / moderate / high vulnerabilities for npm packages in frontend 
         - ascendence --> rivue (everywhere on the site and in the file system)
         - make sure "Knowledge Map", "Lessons", and other dashboard things either actually link somewhere or are handled properly
@@ -222,6 +218,13 @@ COMPLETED:
         3.1) integrate rag stuff with backend ✅
         3.3) enable modification of rooms based on user input of rooms ✅
         3.4) add rag retrieval to rooms ✅
+
+    MVP CLEANUP LIST:
+    ✅ redirects / url stuff + 404 page (ex: 
+            "/knowledge/:id/:anythingHereShouldRedirect"
+            "/library/:id/:roomName/:anythingHereShouldRedirect"
+            etc...
+        )
 
 RESOURCES:
     - node components: https://vueflow.dev/

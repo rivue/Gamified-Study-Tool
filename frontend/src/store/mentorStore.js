@@ -101,7 +101,7 @@ export const useMentorStore = defineStore('mentorStore', {
         },
         hide() {
             this.isVisible = false;
-            console.log("hid")
+            // console.log("hid")
         },
     },
 });
