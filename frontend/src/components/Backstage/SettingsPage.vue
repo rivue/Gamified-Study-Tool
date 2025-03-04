@@ -11,7 +11,7 @@
       </div>
     </div>
 
-    <div class="profile-section">
+    <!-- <div class="profile-section">
       <h2 class="section-title">Subscription Tier</h2>
       <div class="half-n-half">
         <TierButton />
@@ -56,14 +56,14 @@
         label="Update Tutor Profile"
         @click="updateProfile('tutor')"
       />
-    </div>
+    </div> -->
   </div>
 </template>
 
   <script>
 import axios from "axios";
 import MenuButton from "@/components/Menus/MenuButton.vue";
-import TierButton from "@/components/Menus/TierButton.vue";
+// import TierButton from "@/components/Menus/TierButton.vue";
 import { useMentorStore } from "@/store/mentorStore";
 import { useAuthStore } from "@/store/authStore";
 import { usePopupStore } from "@/store/popupStore";
@@ -82,7 +82,7 @@ export default {
   },
   components: {
     MenuButton,
-    TierButton,
+    // TierButton,
   },
   async mounted() {
     this.fetchProfile();

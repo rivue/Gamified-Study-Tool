@@ -17,6 +17,7 @@
           height="16"
         />
       </button>
+      <!-- TODO twitter link vvv -->
       <!-- <span class="separator">·</span>
       <a
         href="https://twitter.com/AscendanceCloud"
@@ -51,7 +52,7 @@
         >Terms and Policies</router-link
       >
       <span class="separator">·</span>
-      <p>© 2025 Ascendance.</p></div>
+      <p>© 2025 Rivue.ai</p></div>
       <!-- <div><p class="sincere-msg">Made with ❤️ for knowing and doing.</p></div> -->
     </div>
   </div>

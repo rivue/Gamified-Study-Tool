@@ -1,10 +1,10 @@
 # email_templates.py
 
 Registration = {
-    "from": "Ascendance·☁️ <miko@ascendance.cloud>",
-    "subject": "Welcome to Ascendance·☁️",
-    "bcc":"miko@ascendance.cloud",
-    "html": """
+    "from": "Rivue ",#TODO email <miko@ascendance.cloud>",
+    "subject": "Welcome to Rivue",
+    "bcc":"",#TODO email ,"miko@ascendance.cloud",
+    "html": """,
     <html>
         <head>
             <style>
@@ -43,12 +43,12 @@ Registration = {
         <body>
             <div class="email-container">
                 <div class="header">
-                    <h1>Welcome to Ascendance·☁️</h1>
+                    <h1>Welcome to Rivue</h1>
                 </div>
                 <div class="content">
-                    <p>Dear Ascendant,</p>
+                    <p>Dear Rivuer,</p>
                     <p>
-                        You're on the brink of an incredible journey! We're thrilled to have you aboard Ascendance.cloud, where your potential is limitless, and every challenge is a new opportunity for growth.
+                        You're on the brink of an incredible journey! We're thrilled to have you aboard Rivue, where your potential is limitless, and every challenge is a new opportunity for growth.
                     </p>
                     <p>
                         Please confirm your email address to start ascending to new heights:
@@ -59,24 +59,23 @@ Registration = {
                     </p>
                     <p>
                         Embrace your journey,<br>
-                        The Ascendance.cloud Team
+                        The Rivue.ai Team
                     </p>
                 </div>
                 <div class="footer">
                     <p>
                         Stay connected:<br>
-                        <a href="https://twitter.com/AscendanceCloud">Twitter/X</a> | <a href="https://discord.gg/HWaYnvTp34">Discord</a>
                     </p>
                 </div>
             </div>
         </body>
     </html>
     """,
-    "text": """Welcome to Ascendance.cloud
+    "text": """Welcome to Rivue.ai
 
-Dear Ascendant,
+Dear Rivuer,
 
-You're on the brink of an incredible journey! We're thrilled to have you aboard Ascendance.cloud, where your potential is limitless, and every challenge is a new opportunity for growth.
+You're on the brink of an incredible journey! We're thrilled to have you aboard Rivue.ai, where your potential is limitless, and every challenge is a new opportunity for growth.
 
 Please confirm your email address to start ascending to new heights:
 [Confirm Email] {{ confirmation_link }}
@@ -84,5 +83,7 @@ Please confirm your email address to start ascending to new heights:
 If you have any questions or need assistance, our mentorship team is here for you every step of the way.
 
 Embrace your journey,
-The Ascendance.cloud Team"""
+The Rivue.ai Team"""
 }
+
+# TODO add beneath "stay connected" <a href="https://twitter.com/AscendanceCloud">Twitter/X</a> | <a href="https://discord.gg/HWaYnvTp34">Discord</a>

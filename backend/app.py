@@ -29,7 +29,7 @@ print(f"app level secret key: {app.secret_key}")
 # if host and name and password and user:
 #     uri = f'mysql+pymysql://{user}:{password}@{host}/{name}'
 # else:
-#     uri = os.environ.get('SQLALCHEMY_DATABASE_URI', 'mysql+pymysql://root:password@localhost/ascendance')
+#     uri = os.environ.get('SQLALCHEMY_DATABASE_URI', 'mysql+pymysql://root:password@localhost/rivue')
 
 # os.makedirs("instance", exist_ok=True)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'

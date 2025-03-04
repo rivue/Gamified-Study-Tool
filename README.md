@@ -45,10 +45,10 @@ IDEAS:
 TODO list:
 
     MVP CLEANUP LIST:
-       
-        - fix low / moderate / high vulnerabilities for npm packages in frontend (down to 8 from 26 so yay)
         - ascendence --> rivue (everywhere on the site and in the file system)
-        - make sure "Knowledge Map", "Lessons", and other dashboard things either actually link somewhere or are handled properly
+            - create email for product and modify email_templates 
+        - go through TODOs
+        - figure out prod building and gcp and possibly nginx / rabbit / zeromq or whatever
         - fix progress bar (random amount gained might be nice along with fetching a random amount of questions (5-9))
         - maybe do something that caps length of vector embedding response, like chops off anything after 1k tokens / characters or something
         - loading bars / wheels possibly (at least look into) (for course creation and for other stuff as well)
@@ -58,6 +58,7 @@ TODO list:
             - error handling for not finding any context when loading stone names in library?
     
     general:
+        - implement "feedback" tab (note: requires email oath, and email domain and possibly twitter and stuff as well)
         - change theme / color / name
         - ability to "star" / "favorite" a course
         - make footer smaller and look better
@@ -225,6 +226,11 @@ COMPLETED:
             "/library/:id/:roomName/:anythingHereShouldRedirect"
             etc...
         )
+    ✅ fix low / moderate / high vulnerabilities for npm packages in frontend (down to 8 from 26 so yay)
+            - anything in dev dependencies are probably fine (vue-cli-... or vue/component...)
+            TODO USE npm audit --only=prod for this, 0 vulnerabilities = good
+    ✅ make sure "Knowledge Map", "Lessons", and other dashboard things either actually link somewhere or are handled properly
+    
 
 RESOURCES:
     - node components: https://vueflow.dev/

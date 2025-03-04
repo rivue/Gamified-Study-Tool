@@ -9,4 +9,4 @@ Allow: /terms$
 Allow: /contact$
 Allow: /plan$
 Allow: /library$
-Sitemap: https://ascendance.cloud/sitemap.xml
+Sitemap: https://rivue.ai/sitemap.xml

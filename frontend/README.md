@@ -1,4 +1,4 @@
-# Ascendance·☁️
+# Rivue
 
 ## Project setup
 ```

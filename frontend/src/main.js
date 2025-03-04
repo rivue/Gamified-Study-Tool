@@ -11,41 +11,41 @@ import axios from 'axios';
 
     // basically main home page
     // TODO eventually add back in - maybe like talk abt the struggle of school and / or my background or something
-    // { path: '/about', component: defineAsyncComponent(() => import('./components/Footer/MainPage.vue')), meta: { title: 'Ascendance·☁️| Learn Anything!' } },
-    // { path: '/', component: defineAsyncComponent(() => import('./components/Footer/MainPage.vue')), meta: { title: 'Ascendance·☁️| Learn Anything!' } },
+    // { path: '/about', component: defineAsyncComponent(() => import('./components/Footer/MainPage.vue')), meta: { title: Rivue.ai | Learn Anything!' } },
+    // { path: '/', component: defineAsyncComponent(() => import('./components/Footer/MainPage.vue')), meta: { title: Rivue.ai | Learn Anything!' } },
 
     // { 
     //     path: '/:pathMatch(.*)*', 
     //     component: defineAsyncComponent(() => import('./components/Footer/HomePage.vue')),
-    //     meta: { title: 'Ascendance·☁️| Page Not Found' } 
+    //     meta: { title: Rivue.ai | Page Not Found' } 
     // }
     // llm chatbot = not necessary for me
-    //   { path: '/lessons', component: defineAsyncComponent(() => import('./components/Chat/ChatComponent.vue')), meta: { title: 'Ascendance·☁️| Lessons' } }, 
-    //   { path: '/lesson/:id', component: defineAsyncComponent(() => import('./components/Chat/ChatComponent.vue')), meta: { title: 'Ascendance·☁️| Learning' } },
+    //   { path: '/lessons', component: defineAsyncComponent(() => import('./components/Chat/ChatComponent.vue')), meta: { title: Rivue.ai | Lessons' } }, 
+    //   { path: '/lesson/:id', component: defineAsyncComponent(() => import('./components/Chat/ChatComponent.vue')), meta: { title: Rivue.ai | Learning' } },
 
 
     // actual games - come back to later, try to access whole game
-    //   { path: '/library/:id', component: defineAsyncComponent(() => import('./components/Game/NewGame/GamePage.vue')), meta: { title: 'Ascendance·☁️| Explore Library' } },
-    //   { path: '/library/:id/:roomName', component: defineAsyncComponent(() => import('./components/Game/NewGame/GamePage.vue')), meta: { title: 'Ascendance·☁️| Explore Library', hideHeaderFooter: true } },
+    //   { path: '/library/:id', component: defineAsyncComponent(() => import('./components/Game/NewGame/GamePage.vue')), meta: { title: Rivue.ai | Explore Library' } },
+    //   { path: '/library/:id/:roomName', component: defineAsyncComponent(() => import('./components/Game/NewGame/GamePage.vue')), meta: { title: Rivue.ai | Explore Library', hideHeaderFooter: true } },
 // knowledge map (probably not going to include yet)
-//   { path: '/knowledge', component: defineAsyncComponent(() => import('./components/Backstage/MapPage.vue')), meta: { title: 'Ascendance·☁️| Knowledge Map' } },
+//   { path: '/knowledge', component: defineAsyncComponent(() => import('./components/Backstage/MapPage.vue')), meta: { title: Rivue.ai | Knowledge Map' } },
 
 // the maps of different courses
-//   { path: '/knowledge/:id', component: defineAsyncComponent(() => import('./components/Backstage/MapPage.vue')), meta: { title: 'Ascendance·☁️| Knowledge Map' } },
+//   { path: '/knowledge/:id', component: defineAsyncComponent(() => import('./components/Backstage/MapPage.vue')), meta: { title: Rivue.ai | Knowledge Map' } },
 // { path: '/:pathMatch(.*)*', redirect: '/' },
 
 // Catch-all for 404 errors
 // { 
 //     path: '/:pathMatch(.*)*', 
 //     component: defineAsyncComponent(() => import('./components/Footer/HomePage.vue')),
-//     meta: { title: 'Ascendance·☁️| Page Not Found' } 
+//     meta: { title: 'Rivue.ai | Page Not Found' } 
 // }
     const routes = [
         // Main routes
         {
             path: '/lessons/:id/:roomName',
             component: defineAsyncComponent(() => import('./components/Game/NewGame/GamePage.vue')),
-            meta: { title: 'Ascendance·☁️| Explore Library', hideHeaderFooter: true },
+            meta: { title: 'Rivue.ai | Explore Library', hideHeaderFooter: true },
             beforeEnter: async (to, from, next) => {
                 try {
                     const response = await axios.get(`/api/library/${to.params.id}`);
@@ -64,7 +64,7 @@ import axios from 'axios';
         { 
             path: '/lessons/:id',
             component: defineAsyncComponent(() => import('./components/Backstage/MapPage.vue')), 
-            meta: { title: 'Ascendance·☁️| Explore Library', requiresCreator: true },
+            meta: { title: 'Rivue.ai | Explore Library', requiresCreator: true },
             beforeEnter: async (to, from, next) => {
                 try {
                     const response = await axios.get(`/api/library/${to.params.id}`);
@@ -77,29 +77,29 @@ import axios from 'axios';
         },
         
         // Simple routes
-        { path: '/library', component: defineAsyncComponent(() => import('./components/Game/Creation/LibraryCreator.vue')), meta: { title: 'Ascendance·☁️| Create Library' } },
-        { path: '/progress', component: defineAsyncComponent(() => import('./components/Backstage/ProgressPage.vue')), meta: { title: 'Ascendance·☁️| Progress' } },
-        { path: '/contact', component: defineAsyncComponent(() => import('./components/Footer/ContactPage.vue')), meta: { title: 'Ascendance·☁️| Contact Us' } },
-        { path: '/settings', component: defineAsyncComponent(() => import('./components/Backstage/SettingsPage.vue')), meta: { title: 'Ascendance·☁️| Settings' } },
-        { path: '/terms', component: defineAsyncComponent(() => import('./components/Footer/TermsAndPoliciesPage.vue')), meta: { title: 'Ascendance·☁️| Terms and Policies' } },
-        { path: '/plan', component: defineAsyncComponent(() => import('./components/Monetization/PlanPage.vue')), meta: { title: 'Ascendance·☁️| Premium Plans' } },
-        { path: '/login', component: defineAsyncComponent(() => import('./components/Auth/LoginSignupPopup.vue')), meta: { title: 'Ascendance·☁️| Login/Signup' } },
-        { path: '/admin', component: defineAsyncComponent(() => import('./components/Auth/AdminPage.vue')), meta: { title: 'Ascendance·☁️| Admin' } },
+        { path: '/library', component: defineAsyncComponent(() => import('./components/Game/Creation/LibraryCreator.vue')), meta: { title: 'Rivue.ai | Create Library' } },
+        // { path: '/progress', component: defineAsyncComponent(() => import('./components/Backstage/ProgressPage.vue')), meta: { title: 'Rivue.ai | Progress' } },
+        // { path: '/contact', component: defineAsyncComponent(() => import('./components/Footer/ContactPage.vue')), meta: { title: 'Rivue.ai | Contact Us' } },
+        { path: '/settings', component: defineAsyncComponent(() => import('./components/Backstage/SettingsPage.vue')), meta: { title: 'Rivue.ai | Settings' } },
+        // { path: '/terms', component: defineAsyncComponent(() => import('./components/Footer/TermsAndPoliciesPage.vue')), meta: { title: 'Rivue.ai | Terms and Policies' } },
+        // { path: '/plan', component: defineAsyncComponent(() => import('./components/Monetization/PlanPage.vue')), meta: { title: 'Rivue.ai | Premium Plans' } },
+        { path: '/login', component: defineAsyncComponent(() => import('./components/Auth/LoginSignupPopup.vue')), meta: { title: 'Rivue.ai | Login/Signup' } },
+        // { path: '/admin', component: defineAsyncComponent(() => import('./components/Auth/AdminPage.vue')), meta: { title: 'Rivue.ai | Admin' } },
         
         // Redirects
-        { path: '/lessons', redirect: '/' },
+        // { path: '/lessons', redirect: '/' },
         { path: '/lessons/:pathMatch(.*)*', redirect: '/' },
         { path: '/library/:pathMatch(.*)*', redirect: '/library' },
-        { path: '/progress/:pathMatch(.*)*', redirect: '/progress' },
-        { path: '/contact/:pathMatch(.*)*', redirect: '/contact' },
+        // { path: '/progress/:pathMatch(.*)*', redirect: '/progress' },
+        // { path: '/contact/:pathMatch(.*)*', redirect: '/contact' },
         { path: '/settings/:pathMatch(.*)*', redirect: '/settings' },
-        { path: '/terms/:pathMatch(.*)*', redirect: '/terms' },
-        { path: '/plan/:pathMatch(.*)*', redirect: '/plans' },
+        // { path: '/terms/:pathMatch(.*)*', redirect: '/terms' },
+        // { path: '/plan/:pathMatch(.*)*', redirect: '/plan' },
         { path: '/login/:pathMatch(.*)*', redirect: '/login' },
-        { path: '/admin/:pathMatch(.*)*', redirect: '/admin' },
+        // { path: '/admin/:pathMatch(.*)*', redirect: '/admin' },
         
         // Catch-all route - must be last!
-        { path: '/:patMatch(.*)*', component: defineAsyncComponent(() => import('./components/Backstage/404.vue')), meta: { title: 'Ascendance·☁️| Admin' } },
+        { path: '/:pathMatch(.*)*', component: defineAsyncComponent(() => import('./components/Backstage/404.vue')), meta: { title: 'Rivue.ai | Admin' } },
 
     ];
 
@@ -182,7 +182,7 @@ router.beforeEach(async (to, from, next) => {
         next();
     }
 
-    document.title = to.meta.title || 'Ascendance·☁️| Learn Anything!';
+    document.title = to.meta.title || 'Rivue.ai | Learn Anything!';
 });
 
 // axios.defaults.baseURL = 'https://obscure-memory-64wr7jgrgrvhr7g4-5000.app.github.dev';

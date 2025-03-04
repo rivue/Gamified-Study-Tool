@@ -5,14 +5,14 @@
         </router-link>
 
         <div class="menu-buttons">
-            <router-link to="/library" custom v-slot="{ navigate }">
-                <button class="menu-btn" @click="navigate" aria-label="menu action 1">
+            <!-- <router-link to="/library" custom v-slot="{ navigate }"> -->
+                <!-- <button class="menu-btn" @click="navigate" aria-label="menu action 1">
                     My Library
-                </button>
-            </router-link>
-            <button class="menu-btn" @click="toggleSideMenu" aria-label="menu action 2">
+                </button> -->
+            <!-- </router-link> -->
+            <!-- <button class="menu-btn" @click="toggleSideMenu" aria-label="menu action 2">
                 Contact
-            </button>
+            </button> -->
             <button class="menu-btn icon-btn" @click="toggleSideMenu" aria-label="side menu">
                 <span class="menu-line"></span>
                 <span class="menu-line"></span>
@@ -32,28 +32,22 @@ export default {
         logoPath() {
             const themeStore = useThemeStore();
             return themeStore.darkMode
-                ? require("@/assets/images/ascendance_logo-black.png")
-                : require("@/assets/images/ascendance_logo.png");
+                ? require("@/assets/images/rivueai_logo-black.png")
+                : require("@/assets/images/rivueai_logo.png");
         },
         pageTitle() {
             if (this.$route.path.includes("lesson/")) {
-                // return "Ascendance (rivur)·📖";
-                return "rivur.";
+                return "rivue.";
             } else if (this.$route.path.includes("challenge/")) {
-                // return "Ascendance (rivur)·🎯";
-                return "rivur.";
+                return "rivue.";
             } else if (this.$route.path.includes("progress/")) {
-                // return "Ascendance (rivur)·📈";
-                return "rivur.";
+                return "rivue.";
             } else if (this.$route.path.includes("achievements/")) {
-                // return "Ascendance (rivur)·🏅";
-                return "rivur.";
+                return "rivue.";
             } else if (this.$route.path.includes("settings/")) {
-                // return "Ascendance (rivur)·🔧";
-                return "rivur.";
+                return "rivue.";
             } else {
-                // return "Ascendance·(rivur)☁️";
-                return "rivur.";
+                return "rivue.";
             }
         },
     },

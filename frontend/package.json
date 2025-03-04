@@ -5,7 +5,8 @@
     "scripts": {
         "serve": "vue-cli-service serve --no-hot",
         "build": "vue-cli-service build",
-        "lint": "vue-cli-service lint"
+        "lint": "vue-cli-service lint",
+        "postinstall": "patch-package"
     },
     "dependencies": {
         "@heroicons/vue": "^2.2.0",
@@ -33,7 +34,9 @@
         "@vue/cli-plugin-eslint": "~5.0.8",
         "@vue/cli-service": "~5.0.8",
         "eslint": "^8.0.0",
-        "eslint-plugin-vue": "^9.25.0"
+        "eslint-plugin-vue": "^9.25.0",
+        "patch-package": "^8.0.0",
+        "postinstall-postinstall": "^2.1.0"
     },
     "eslintConfig": {
         "root": true,

@@ -1,5 +1,6 @@
 <template>
   <aside :class="{ 'slide-out': sideMenuOpen }" class="side-menu">
+    
     <SideMenuButton
       v-if="!loggedIn"
       label="Log in"
@@ -8,6 +9,7 @@
     >
       <template v-slot:icon>&#128274;</template>
     </SideMenuButton>
+
     <SideMenuButton
       label="My Library"
       :isSelected="isRouteActive('/library')"
@@ -15,30 +17,32 @@
     >
       <template v-slot:icon>🏛</template>
     </SideMenuButton>
-    <SideMenuButton
+
+    <!-- <SideMenuButton
       v-if="loggedIn"
       label="Lessons"
       :isSelected="isRouteActive('/lessons')"
       @click="openRoute('/lessons')"
     >
       <template v-slot:icon>&#128172;</template>
-    </SideMenuButton>
-    <SideMenuButton
+    </SideMenuButton> -->
+
+    <!-- <SideMenuButton
       v-if="loggedIn"
       label="Knowledge Map"
       :isSelected="isRouteActive('/knowledge')"
       @click="openRoute('/knowledge')"
     >
       <template v-slot:icon>🗺️</template>
-    </SideMenuButton>
-    <SideMenuButton
+    </SideMenuButton> -->
+    <!-- <SideMenuButton
       v-if="loggedIn"
       label="Progress"
       :isSelected="isRouteActive('/progress')"
       @click="openRoute('/progress')"
     >
       <template v-slot:icon>&#128200;</template>
-    </SideMenuButton>
+    </SideMenuButton> -->
     <!-- <SideMenuButton
       label="About"
       :isSelected="isRouteActive('/about')"
@@ -47,20 +51,20 @@
     TODO add about back in
       <template v-slot:icon>&#128065;</template>
     </SideMenuButton> -->
-    <SideMenuButton
+    <!-- <SideMenuButton
       label="Contact"
       :isSelected="isRouteActive('/contact')"
       @click="openRoute('/contact')"
     >
       <template v-slot:icon>&#9993;</template>
-    </SideMenuButton>
-    <SideMenuButton
+    </SideMenuButton> -->
+    <!-- <SideMenuButton
       label="Terms & Policies"
       :isSelected="isRouteActive('/terms')"
       @click="openRoute('/terms')"
     >
       <template v-slot:icon>&#128279;</template>
-    </SideMenuButton>
+    </SideMenuButton> -->
     <SideMenuButton
       v-if="loggedIn"
       label="Settings"

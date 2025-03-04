@@ -17,7 +17,7 @@ export default {
                     icon: "🆓",
                     title: "Free",
                     description:
-                        "The generous free plan lets you enjoy all the content on Ascendance.",
+                        "The generous free plan lets you enjoy all the content on Rivue.ai",
                 },
                 {
                     icon: "🎓",

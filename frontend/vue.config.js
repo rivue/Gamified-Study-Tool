@@ -10,7 +10,7 @@ module.exports = defineConfig({
       entry: 'src/main.js',
       template: 'public/index.html',
       filename: 'index.html',
-      title: 'Ascendance·☁️| Learn anything'
+      title: 'Rivue.ai | Learn anything'
     }
   },
 });

@@ -138,14 +138,14 @@
     <div class="page-main-section">
       <h1>Privacy Policy</h1>
       <p>
-        At Ascendance.cloud, your privacy is important to us. This Privacy
+        At Rivue.ai, your privacy is important to us. This Privacy
         Policy explains how we collect, use, disclose, and safeguard your
         information when you visit our website and use our services.
       </p>
 
       <h2>Information We Collect</h2>
       <p>
-        When you use Ascendance.cloud, we collect the following information:
+        When you use Rivue.ai, we collect the following information:
       </p>
       <ul>
         <li>Email Address: To create and manage your account, and to display
