@@ -49,8 +49,7 @@ TODO list:
             - create email for product and modify email_templates 
         - go through TODOs
         - figure out prod building and gcp and possibly nginx / rabbit / zeromq or whatever
-        - fix progress bar (random amount gained might be nice along with fetching a random amount of questions (5-9))
-        - maybe do something that caps length of vector embedding response, like chops off anything after 1k tokens / characters or something
+
         - loading bars / wheels possibly (at least look into) (for course creation and for other stuff as well)
         - weird redirect for when user is logged in and try to navigate to a library which doesn't exist or no permissions (102 in main.js) ex: /lessons/234234
             fix w/ a loading state or something, prob pretty easy
@@ -58,6 +57,9 @@ TODO list:
             - error handling for not finding any context when loading stone names in library?
     
     general:
+        - ADD SHAD-CN
+        - add default background if you scroll to far (like in main page if you scroll too far down)
+        - eventually add footer back (note: requires light mode, discord link, donate link (or we could just not do that), everything in contact page, terms page, copyright(?), and possibly twitter link if we decide to do that)
         - implement "feedback" tab (note: requires email oath, and email domain and possibly twitter and stuff as well)
         - change theme / color / name
         - ability to "star" / "favorite" a course
@@ -210,6 +212,7 @@ COMPLETED:
     ✅ switch "room names" to "lectures" in create library page
     ✅ add ability to create rooms / "lectures" once you create a library, and mention that in the "add rooms" page (ex: "*lectures can be added within the library*")
     ✅ fix the issue where anywhere on a card exits the lesson as opposed to just the red x
+    ✅ maybe do something that caps length of vector embedding response, like chops off anything after 1k tokens / characters or something (limited response to 10 questions)
 
     rag stuff:
     1) give whole textbook to gpt to "split up" ✅

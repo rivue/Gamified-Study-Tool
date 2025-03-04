@@ -2,7 +2,7 @@
 <template>
   <div class="app-footer">
     <div class="footer-top">
-      <router-link to="/about" class="text-link">About</router-link>
+      <!-- <router-link to="/about" class="text-link">About</router-link>
       <span class="separator">·</span>
       <router-link to="/contact" class="text-link">Contact</router-link>
       <span class="separator">·</span>
@@ -16,7 +16,7 @@
           width="16"
           height="16"
         />
-      </button>
+      </button> -->
       <!-- TODO twitter link vvv -->
       <!-- <span class="separator">·</span>
       <a
@@ -32,8 +32,8 @@
           height="12"
         />
       </a> -->
-      <span class="separator">·</span>
-      <a
+      <!-- <span class="separator">·</span> -->
+      <!-- <a
         href="https://discord.gg/SSGygda5DX"
         target="_blank"
         rel="noopener noreferrer"
@@ -45,14 +45,13 @@
           width="16"
           height="16"
         />
-      </a>
-    </div>
-    <div class="footer-bottom">
-      <div class="footer-top"><router-link to="/terms" class="text-link"
-        >Terms and Policies</router-link
-      >
-      <span class="separator">·</span>
-      <p>© 2025 Rivue.ai</p></div>
+      </a> -->
+    <!-- </div> -->
+    <!-- <div class="footer-bottom"> -->
+      <!-- <div class="footer-top"> -->
+        <!-- <router-link to="/terms" class="text-link">Terms and Policies</router-link> -->
+      <!-- <span class="separator">·</span> -->
+      <!-- <p>© 2025 Rivue.ai</p></div> -->
       <!-- <div><p class="sincere-msg">Made with ❤️ for knowing and doing.</p></div> -->
     </div>
   </div>

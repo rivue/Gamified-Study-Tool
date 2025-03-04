@@ -429,8 +429,13 @@ def get_library_content(library_id):
     factoids = LibraryFactoid.query.filter_by(library_id=library_id).all()
     content_list = []
     
+    # Randomly select up to 10 factoids # if we select all of them they get super 
+    # long for the prompt, although this might result in duplicate questions
+    if len(factoids) > 10:
+        factoids = random.sample(factoids, 10)
+    
     for factoid in factoids:
-        factoid_content = f"Factoid: {factoid.factoid_content}\n"
+        factoid_content = factoid.factoid_content
         questions = LibraryQuestion.query.filter_by(factoid_id=factoid.id).all()
         
         for question in questions:

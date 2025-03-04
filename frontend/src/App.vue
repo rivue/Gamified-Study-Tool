@@ -20,14 +20,14 @@
         <AdPopup/>
       </div>
     </div>
-    <BottomBar v-if="( !loggedIn | !shouldShowChat) && !hideHeaderFooter" />
+    <!-- <BottomBar v-if="( !loggedIn | !shouldShowChat) && !hideHeaderFooter" /> -->
   </div>
 </template>
 
 <script>
 import TopBar from "./components/Header/TopBar.vue";
 import SideMenu from "./components/Header/SideMenu.vue";
-import BottomBar from "./components/Footer/BottomBar.vue";
+// import BottomBar from "./components/Footer/BottomBar.vue";
 import SubHeader from "./components/Header/SubHeader.vue";
 import InfoPopup from "./components/Menus/InfoPopup.vue";
 import AdPopup from "./components/Monetization/AdPopup.vue";
@@ -50,7 +50,7 @@ export default {
   components: {
     TopBar,
     SideMenu,
-    BottomBar,
+    // BottomBar,
     SubHeader,
     InfoPopup,
     AdPopup,
