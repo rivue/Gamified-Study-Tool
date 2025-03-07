@@ -74,7 +74,8 @@ export default {
     handleLoginSuccess() {
         const authStore = useAuthStore();
         authStore.login();
-        this.$router.push("/library"); // TODO eventually redirect to the most recent course
+        const redirectPath = this.$route.query.redirect || "/";
+        this.$router.push(redirectPath); // TODO eventually redirect to the most recent course
     },
     
     handleSignupSuccess() {

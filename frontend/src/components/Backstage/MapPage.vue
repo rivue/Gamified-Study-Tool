@@ -1,7 +1,7 @@
 <template>
     <div class="page-main-container">
         <div v-if="!loading && library">
-            <h1 class="page-title">{{ library.data.library_topic }} Learning Map 🗺️</h1>
+            <h1 class="page-title">{{ library.data.library_topic }} Lessons</h1>
             <LearningPath 
             :libraryId="library.data.id"
             :room-names="library.data.room_names"

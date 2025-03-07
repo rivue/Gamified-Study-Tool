@@ -346,11 +346,13 @@ export default {
 </script>
 
 <style scoped>
+
 .library-gen-page {
-    height: 100%;
-    width: 100%;
     display: flex;
-    align-items: center;
+    justify-content: flex-start;  /* Align content at the top */
+    display: flex;
+    flex-direction: column;
+    width: 100%;
 }
 
 .libgen-section {
@@ -369,10 +371,8 @@ export default {
 }
 
 .libgen-create {
-    display: flex;
     flex-direction: column;
     align-items: center;
-    height: 100%;
     width: 100%;
     max-width: 720px;
     margin: 0 auto;
@@ -382,6 +382,7 @@ export default {
     display: flex;
     flex-direction: column;
     width: 100%;
+    margin-bottom: 1em;
 }
 
 .libgen-title {
@@ -441,8 +442,9 @@ input[type="text"] {
 }
 
 .cta-container {
-    margin-top: 2em;
-    margin-bottom: 1em;
+    width: 100%;
+    max-width: 720px;
+    margin: 0 auto;
 }
 
 .toggle-button {

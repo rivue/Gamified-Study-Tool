@@ -15,7 +15,7 @@
       :isSelected="isRouteActive('/library')"
       @click="openRoute('/library')"
     >
-      <template v-slot:icon>🏛</template>
+      <!-- <template v-slot:icon>🏛</template> -->
     </SideMenuButton>
 
     <!-- <SideMenuButton
@@ -71,7 +71,7 @@
       :isSelected="isRouteActive('/settings')"
       @click="openRoute('/settings')"
     >
-      <template v-slot:icon>&#128295;</template>
+      <!-- <template v-slot:icon>&#128295;</template> -->
     </SideMenuButton>
   </aside>
 </template>

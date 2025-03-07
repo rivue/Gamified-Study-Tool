@@ -14,8 +14,8 @@
           <div class="col-date">Created at</div>
           <div class="col-actions"></div>
         </div>
-  
-        <div 
+
+        <div
           v-for="library in paginatedLibraries" 
           :key="library.id" 
           class="library-item"
@@ -163,6 +163,7 @@
   
   <style scoped>
   .library-list {
+    margin-top: 100px;
     padding: 24px;
     background: var(--background-color-1);
     border-radius: 12px;

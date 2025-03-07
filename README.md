@@ -49,15 +49,18 @@ TODO list:
             - create email for product and modify email_templates 
         - go through TODOs
         - figure out prod building and gcp and possibly nginx / rabbit / zeromq or whatever
-
-        - loading bars / wheels possibly (at least look into) (for course creation and for other stuff as well)
+        - remove clicks and likes from a course, and Created at, and triple dots in "My Courses" tab
+      
         - weird redirect for when user is logged in and try to navigate to a library which doesn't exist or no permissions (102 in main.js) ex: /lessons/234234
             fix w/ a loading state or something, prob pretty easy
         - error handling, and lots of it (how to handle failed document generation, other errors, etc...)
             - error handling for not finding any context when loading stone names in library?
+            - ask chatgpt for what to do idk
     
     general:
+        - ACCOUNT FOR MOBILE SCREEN SIZES!!
         - ADD SHAD-CN
+        - include question prompt generation (e.g. make the answer choices very similar to what you think the user would think, etc...)
         - add default background if you scroll to far (like in main page if you scroll too far down)
         - eventually add footer back (note: requires light mode, discord link, donate link (or we could just not do that), everything in contact page, terms page, copyright(?), and possibly twitter link if we decide to do that)
         - implement "feedback" tab (note: requires email oath, and email domain and possibly twitter and stuff as well)
@@ -109,11 +112,11 @@ TODO list:
             - matching pairs possibly, not sure how that would work with longer questions
             - could vary option amount (2-7 options)
             - users could have to select multiple options (select 1-5 out of 5-8, etc...)
-            -
+            
             - multiple options in a row: like with duolingo where you are given 10 or so options and you pick 4 or 5 and they have to be 
                 in a specific order. this might be somewhat tricky to implement cus I have to implement drag-and-drop at the same time, so I might have to 
                 think of a couple others in the mean time
-            - play duolingo for inspiration
+            - play duolingo / kinnu for inspiration
             - correct the statement / choose the correct portion of a paragrah / two students have different opinions make them choose the correct one
             - time attack mode option - questions might be a little easier possibly or not
             - image based questions - not sure how that would work how how we would ensure accuracy
@@ -233,6 +236,9 @@ COMPLETED:
             - anything in dev dependencies are probably fine (vue-cli-... or vue/component...)
             TODO USE npm audit --only=prod for this, 0 vulnerabilities = good
     ✅ make sure "Knowledge Map", "Lessons", and other dashboard things either actually link somewhere or are handled properly
+    ✅ loading bars / wheels possibly (at least look into) (for course creation and for other stuff as well)
+        ✅ added loading component to every frontend route, no matter if valid or invalid, in case routes take too long to fetch,
+        which covers cases where you have to fetch from api
     
 
 RESOURCES:

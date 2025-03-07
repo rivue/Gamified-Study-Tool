@@ -4,6 +4,7 @@ import { createPinia } from 'pinia'
 import App from './App.vue';
 import { createRouter, createWebHistory } from 'vue-router';
 import { useAuthStore } from "@/store/authStore";
+import { useLoadingStore } from "@/store/loadingStore";
 // import { useGameStore } from "@/store/gameStore";
 import './assets/styles.css';
 import './assets/themes.css';
@@ -99,7 +100,7 @@ import axios from 'axios';
         // { path: '/admin/:pathMatch(.*)*', redirect: '/admin' },
         
         // Catch-all route - must be last!
-        { path: '/:pathMatch(.*)*', component: defineAsyncComponent(() => import('./components/Backstage/404.vue')), meta: { title: 'Rivue.ai | Admin' } },
+        { path: '/:pathMatch(.*)*', component: defineAsyncComponent(() => import('./components/Backstage/404.vue')), meta: { title: 'Rivue.ai' } },
 
     ];
 
@@ -110,6 +111,9 @@ const router = createRouter({
 
 router.beforeEach(async (to, from, next) => {
     const authStore = useAuthStore();
+
+    const loading = useLoadingStore()
+    if (!from.matched.length) loading.start()
     // const gameStore = useGameStore();
 
     // if (from.path.startsWith('/library/')) {
@@ -139,11 +143,18 @@ router.beforeEach(async (to, from, next) => {
         // Only proceed with this check if the user is logged in
         if (authStore.loggedIn) {
             try {
+                let user = 0;
+                const curr_user = await axios.get('/api/check-auth');
+                if (curr_user.data.userId) {
+                    user = curr_user.data.userId;
+                } else {
+                    return next('/login');
+                }
                 // Check if the user is the creator of the library
                 const response = await axios.get(`/api/library/${to.params.id}`);
                 if (response.data && 
                     response.data.data && 
-                    response.data.data.user_id == authStore.userId) {
+                    response.data.data.user_id == user) {
                         // User is the creator, continues as per usual
                         return next();
                 } else { // invalid data 
@@ -184,6 +195,11 @@ router.beforeEach(async (to, from, next) => {
 
     document.title = to.meta.title || 'Rivue.ai | Learn Anything!';
 });
+
+router.afterEach(() => {
+    const loading = useLoadingStore()
+    loading.finish()
+})
 
 // axios.defaults.baseURL = 'https://obscure-memory-64wr7jgrgrvhr7g4-5000.app.github.dev';
 axios.defaults.baseURL = 'http://localhost:5000';

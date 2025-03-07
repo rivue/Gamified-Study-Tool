@@ -44,14 +44,14 @@ export default {
   width: 300px;
   transition: all 0.3s ease;
   opacity: 0;
-  pointer-events: none;
+  /* pointer-events: none; */
   z-index: 99;
 }
 
 .slide-out {
   right: -280px;
   opacity: 1;
-  pointer-events: auto;
+  /* pointer-events: auto; */
 }
 </style>
   
