@@ -46,13 +46,11 @@ TODO list:
 
     MVP CLEANUP LIST:
         - ascendence --> rivue (everywhere on the site and in the file system)
-            - create email for product and modify email_templates 
+            - pretty much done, just need to create email for product and modify email_templates
         - go through TODOs
         - figure out prod building and gcp and possibly nginx / rabbit / zeromq or whatever
-        - remove clicks and likes from a course, and Created at, and triple dots in "My Courses" tab
       
-        - weird redirect for when user is logged in and try to navigate to a library which doesn't exist or no permissions (102 in main.js) ex: /lessons/234234
-            fix w/ a loading state or something, prob pretty easy
+        - remove clicks and likes from a course, and created at, and triple dots in "My Courses" tab
         - error handling, and lots of it (how to handle failed document generation, other errors, etc...)
             - error handling for not finding any context when loading stone names in library?
             - ask chatgpt for what to do idk
@@ -239,7 +237,8 @@ COMPLETED:
     ✅ loading bars / wheels possibly (at least look into) (for course creation and for other stuff as well)
         ✅ added loading component to every frontend route, no matter if valid or invalid, in case routes take too long to fetch,
         which covers cases where you have to fetch from api
-    
+    ✅ weird redirect for when user is logged in and try to navigate to a library which doesn't exist or no permissions (102 in main.js) ex: /lessons/234234
+            fix w/ a loading state or something, prob pretty easy
 
 RESOURCES:
     - node components: https://vueflow.dev/
