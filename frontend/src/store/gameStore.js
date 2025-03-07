@@ -80,10 +80,6 @@ export const useGameStore = defineStore("gameStore", {
                 this.score += this.multiplier;
                 this.multiplier += 1;
                 this.currentQuestion += 1;
-                if (this.currentQuestion && !this.finalTest) {
-                    console.log("TODO") // TODO this is just a placeholder
-                   
-                } 
                 if (this.currentQuestion === this.factoids.length) { // && this.finalTest) {
                     console.log("mark of success")
                     this.questionVisible = false;
@@ -233,7 +229,6 @@ export const useGameStore = defineStore("gameStore", {
             }
         },
         endGame() {
-            // TODO IF % CORRECT ON THE FIRST TRY IS < 80% OR WHATEVER, THEN GIVE LESS REWARDS, REDIRECT TO PAGE, AND DON'T ADVANCE LESSON
             if (this.incorrectQuestionAnswers.length > 3) {
                 return;
             }

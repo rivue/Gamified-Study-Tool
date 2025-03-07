@@ -226,4 +226,3 @@ class LibraryQuestionChoice(db.Model):
     question_id = db.Column(db.Integer, db.ForeignKey('library_question.id'), nullable=False)
     choice_text = db.Column(db.String(400), nullable=False)
     is_correct = db.Column(db.Boolean, default=False)
-

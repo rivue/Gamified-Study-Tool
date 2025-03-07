@@ -5,37 +5,53 @@ import concurrent.futures
 import os
 import random
 from openapi import get_embedding
+import httpx
 
-def insert_sections_to_pinecone_parallel(sections, library_id, batch_size=100, num_workers=5):
+def insert_sections_to_pinecone_parallel(sections, library_id, batch_size=100, num_workers=5, max_retries=3):
+    """Parallelized embedding and upserting to Pinecone with error handling and retry logic.""" 
+    # Validate that sections is a list of strings 
+    if not isinstance(sections, list) or not all(isinstance(sec, str) for sec in sections): raise ValueError("Sections must be a list of strings.")
+    
     """Parallelized embedding and upserting to Pinecone."""
     index = init_pinecone()
-
+  
     def embed_and_insert(batch, batch_start_idx):
-        """Process and insert a batch of sections."""
-        embeddings = [get_embedding(section) for section in batch]
-        
-        vectors = [
-            {
-                'id': f"{time.time() * 1000}_{random.randint(1000, 9999)}", 
-                'values': emb,
-                'metadata': {'text': sec, 'library_id': library_id}
-            } 
-        for i, (sec, emb) in enumerate(zip(batch, embeddings))]
-                   
-        index.upsert(vectors=vectors, # namespace="library_{library_id}"
-        )
-        print(f"✅ Inserted batch of {len(vectors)} sections")
+        """Process and insert a batch of sections with retries."""
+        retries = 0
+        while retries < max_retries:
+            try:
+                # Generate embeddings for each section; each call may raise an exception
+                embeddings = [get_embedding(section) for section in batch]
+                vectors = [{
+                    'id': f"{int(time.time()*1000)}_{random.randint(1000, 9999)}",
+                    'values': emb,
+                    'metadata': {'text': sec, 'library_id': library_id}
+                } for sec, emb in zip(batch, embeddings)]
+                
+                # Upsert vectors to Pinecone
+                index.upsert(vectors=vectors)
+                print(f"Inserted batch of {len(vectors)} sections.")
+                break  # exit loop if successful
+            except httpx.HTTPError as http_err:
+                retries += 1
+                print(f"HTTP error during upsert: {http_err}. Retrying {retries}/{max_retries}...")
+                time.sleep(2 ** retries)
+            except Exception as e:
+                retries += 1
+                print(f"Error during embedding/upsert: {e}. Retrying {retries}/{max_retries}...")
+                time.sleep(2 ** retries)
+        else:
+            print(f"Failed to upsert batch after {max_retries} retries.")
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=num_workers) as executor:
-        batches = [sections[i:i + batch_size] for i in range(0, len(sections), batch_size)]
-        futures = {executor.submit(embed_and_insert, batch, i * batch_size): i for i, batch in enumerate(batches)}
-
+        batches = [sections[i:i+batch_size] for i in range(0, len(sections), batch_size)]
+        futures = {executor.submit(embed_and_insert, batch, i*batch_size): i for i, batch in enumerate(batches)}
         for future in concurrent.futures.as_completed(futures):
             try:
                 future.result()
             except Exception as e:
-                print(f"❌ Error inserting batch: {str(e)}")
-    
+                print(f"Error processing a batch: {e}")
+        
 def init_pinecone():
     """Initialize Pinecone client and ensure index exists"""
     try:

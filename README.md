@@ -47,10 +47,10 @@ TODO list:
     MVP CLEANUP LIST:
         - ascendence --> rivue (everywhere on the site and in the file system)
             - pretty much done, just need to create email for product and modify email_templates
-        - go through TODOs
+        - go through TODOs (again once emails are taken care of)
         - figure out prod building and gcp and possibly nginx / rabbit / zeromq or whatever
+        - change CORS(origins="*") to the actual frontend url in app.py
       
-        - remove clicks and likes from a course, and created at, and triple dots in "My Courses" tab
         - error handling, and lots of it (how to handle failed document generation, other errors, etc...)
             - error handling for not finding any context when loading stone names in library?
             - ask chatgpt for what to do idk
@@ -58,6 +58,10 @@ TODO list:
     general:
         - ACCOUNT FOR MOBILE SCREEN SIZES!!
         - ADD SHAD-CN
+        - add support for multiple file upload (possibly)
+        - add other routes back in, eventually
+        - remove library difficulty, mentor, language, etc... from db course structure, backend, frontend course creation screen
+            - note: easy to get rid of in the frontend, but have to remove lots of stuff in backend w/ various function calls and stuff
         - include question prompt generation (e.g. make the answer choices very similar to what you think the user would think, etc...)
         - add default background if you scroll to far (like in main page if you scroll too far down)
         - eventually add footer back (note: requires light mode, discord link, donate link (or we could just not do that), everything in contact page, terms page, copyright(?), and possibly twitter link if we decide to do that)
@@ -66,8 +70,10 @@ TODO list:
         - ability to "star" / "favorite" a course
         - make footer smaller and look better
         - contact image on main sidebar?
+        - add about route back in (could be something about how I want to help students study, or I could just not add it back in)
         - significant ui rehaul *** --> kinnu, duolingo, saved instagram design reels etc..
             - copy openais font?
+        
         - change gpt 4o-mini to deepseek (deepseek once I test reliable function calling / parsing) or other model for cost
         - eventually look into custom api / llm specifically designed for education or review or whatever
         - *possibly* add a slider to each course based on how lenient the course creator wants the fuzzy string matcher to be (for misspelled words)
@@ -85,6 +91,7 @@ TODO list:
         - after user submits something and is waiting, display a loading bar or wheel or something letting the user know that it is generating
 
     game page:
+        - implement game "score" logic (if you get >80% #attemps:number of questions ratio) then you get more / less points or something, etc...)
         - investigate into what clouds and diamonds in game screen were used for so I can probably use them later
         - remove time from db then remove all references to "timer", "end time" or "starting time" in gameStore.js
         - add possibly a hint button as well (3 hints per question?)
@@ -171,6 +178,7 @@ TODO list:
             5) user should delete things hopefully
         - other idea: instead of giving whole textbook to gemini to figure out ideas, just have the user input a syllabus / toc of
          textbook so we can get the names off the bat, or have an option to specify yourself,
+            - search for GenerateLibraryRoomNames
         or have it make its own based on the input material (this would be better for unorganized courses w/ no 
         syllabus and it would be easy for users - could make specifying yourself the default and have this for paid content?)
         - optimize sectioning (e: citations should not be ignored as opposed to taking up lots of sections possibly)

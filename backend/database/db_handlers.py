@@ -1,8 +1,11 @@
 from database.models import db, User, ChatHistory, Challenge, Lesson, UserAction, Achievement, UserAchievement, Feedback,LibraryRoomState,LibraryCompletion
 from utils import decode_if_needed, extract_single_emoji
 from datetime import datetime
+from sqlalchemy.exc import SQLAlchemyError
 
 history_limit = 16
+MAX_LESSON_NAME_LENGTH = 200
+MAX_CHALLENGE_NAME_LENGTH = 200
 
 def add_user_message(user_id, message_content, challenge_id=None, lesson_id=None):
     message = ChatHistory(
@@ -86,10 +89,40 @@ def award_lesson_experience(user_id):
         db.session.commit()    
 
 def get_recent_messages(user_id, lesson_id=None, challenge_id=None, limit=history_limit):
-    query = ChatHistory.query.filter_by(user_id=user_id, lesson_id=lesson_id, challenge_id=challenge_id)
-    recent_messages = query.order_by(ChatHistory.id.desc()).limit(limit).all()
-    recent_messages = recent_messages[::-1]
-    return [{"role": msg.role, "content": msg.message, "type": msg.message_type} for msg in recent_messages]
+    # Validate input parameters
+    if not isinstance(user_id, int) or user_id <= 0:
+        return {"error": "Invalid user_id. It must be a positive integer.", "messages": []}, 400
+    if lesson_id is not None and (not isinstance(lesson_id, int) or lesson_id <= 0):
+        return {"error": "Invalid lesson_id. It must be a positive integer or None.", "messages": []}, 400
+    if challenge_id is not None and (not isinstance(challenge_id, int) or challenge_id <= 0):
+        return {"error": "Invalid challenge_id. It must be a positive integer or None.", "messages": []}, 400
+    if not isinstance(limit, int) or limit <= 0:
+        return {"error": "Invalid limit. It must be a positive integer.", "messages": []}, 400
+
+    try:
+        # Construct query dynamically based on provided parameters
+        query = ChatHistory.query.filter_by(user_id=user_id)
+        if lesson_id is not None:
+            query = query.filter_by(lesson_id=lesson_id)
+        if challenge_id is not None:
+            query = query.filter_by(challenge_id=challenge_id)
+
+        # Retrieve messages, handling ordering and limit
+        recent_messages = query.order_by(ChatHistory.id.desc()).limit(limit).all()
+
+        # Reverse order to maintain chronological order
+        messages = [
+            {"role": msg.role, "content": msg.message, "type": msg.message_type}
+            for msg in reversed(recent_messages)
+        ]
+
+        return {"messages": messages}, 200
+
+    except SQLAlchemyError as e:
+        return {"error": f"Database error: {str(e)}", "messages": []}, 500
+    except Exception as e:
+        return {"error": f"An unexpected error occurred: {str(e)}", "messages": []}, 500
+
 
 def get_content_messages(lesson_id, challenge_id, limit=history_limit):
     query = ChatHistory.query.filter_by(lesson_id=lesson_id, challenge_id=challenge_id)
@@ -98,14 +131,37 @@ def get_content_messages(lesson_id, challenge_id, limit=history_limit):
     return [{"role": msg.role, "content": msg.message, "type": msg.message_type} for msg in recent_messages]
 
 def get_api_messages(user_id, lesson_id=None, challenge_id=None, limit=history_limit):
-    query = ChatHistory.query.filter_by(user_id=user_id, lesson_id=lesson_id, challenge_id=challenge_id)
-    
-    valid_roles = ['system', 'assistant', 'user', 'function']
-    query = query.filter(ChatHistory.role.in_(valid_roles))
+    # Validate input parameters
+    if not isinstance(user_id, int) or user_id <= 0:
+        return {"error": "Invalid user_id. It must be a positive integer.", "messages": []}, 400
+    if lesson_id is not None and (not isinstance(lesson_id, int) or lesson_id <= 0):
+        return {"error": "Invalid lesson_id. It must be a positive integer or None.", "messages": []}, 400
+    if challenge_id is not None and (not isinstance(challenge_id, int) or challenge_id <= 0):
+        return {"error": "Invalid challenge_id. It must be a positive integer or None.", "messages": []}, 400
+    if not isinstance(limit, int) or limit <= 0:
+        return {"error": "Invalid limit. It must be a positive integer.", "messages": []}, 400
 
-    recent_messages = query.order_by(ChatHistory.id.desc()).limit(limit).all()
-    recent_messages = recent_messages[::-1]
-    return [{"role": msg.role, "content": msg.message} for msg in recent_messages]
+    try:
+        # Construct the base query based on provided parameters.
+        query = ChatHistory.query.filter_by(user_id=user_id, lesson_id=lesson_id, challenge_id=challenge_id)
+        valid_roles = ['system', 'assistant', 'user', 'function']
+        query = query.filter(ChatHistory.role.in_(valid_roles))
+
+        # Retrieve messages ordered by id descending and then reverse the list to maintain chronological order.
+        recent_messages = query.order_by(ChatHistory.id.desc()).limit(limit).all()
+        recent_messages = list(reversed(recent_messages))
+
+        messages = [{"role": msg.role, "content": msg.message} for msg in recent_messages]
+        return {"messages": messages}, 200
+
+    except SQLAlchemyError as e:
+        # Roll back the session if necessary and return an empty list with an error message.
+        return {"error": f"Database error: {str(e)}", "messages": []}, 500
+
+    except Exception as e:
+        # Catch-all for any other unexpected exceptions.
+        return {"error": f"An unexpected error occurred: {str(e)}", "messages": []}, 500
+
 
 def set_system_role(user_id, role):
     user = User.query.get(user_id)
@@ -255,19 +311,47 @@ def set_user_content(user_id, content_description):
         user.current_content = content_description
         db.session.commit()
 
-def add_challenge(user_id, challenge_name, user_started = True):
-    if not extract_single_emoji(challenge_name):
-        challenge_name = f"⛰️{challenge_name}"
-    challenge = Challenge(user_id=user_id, challenge_name=challenge_name, completion_date=None)
-    db.session.add(challenge)
-    db.session.commit()
-    add_content_message(user_id, challenge_name,challenge_id=challenge.id)
-    add_ai_message(user_id, f"Share your progress 📈, ask for a plan 📆, or some just guidance 🧭.\n\n I'm here to help you complete the challenge:\n{challenge_name}", "challenge", challenge.id)
-    if user_started:
-        set_user_content(user_id, f"started challenge {challenge_name}")
-    else:
-        set_user_content(user_id, f"was given (by you) challenge {challenge_name}")
-    return challenge.id
+def add_challenge(user_id, challenge_name, user_started=True):
+    # Validate challenge_name: must be a non-empty string and within length limits.
+    if not isinstance(challenge_name, str) or not challenge_name.strip():
+        return False, "Challenge name must be a non-empty string."
+    if len(challenge_name) > MAX_CHALLENGE_NAME_LENGTH:
+        return False, f"Challenge name too long. Maximum allowed length is {MAX_CHALLENGE_NAME_LENGTH} characters."
+
+    try:
+        # Prepend default emoji if none is found
+        if not extract_single_emoji(challenge_name):
+            challenge_name = f"⛰️{challenge_name}"
+        
+        # Create the new challenge
+        challenge = Challenge(user_id=user_id, challenge_name=challenge_name, completion_date=None)
+        db.session.add(challenge)
+        db.session.commit()
+
+        # Add associated content message and AI message
+        add_content_message(user_id, challenge_name, challenge_id=challenge.id)
+        add_ai_message(
+            user_id, 
+            f"Share your progress 📈, ask for a plan 📆, or some just guidance 🧭.\n\nI'm here to help you complete the challenge:\n{challenge_name}", 
+            "challenge", 
+            challenge.id
+        )
+
+        # Update user content accordingly
+        if user_started:
+            set_user_content(user_id, f"started challenge {challenge_name}")
+        else:
+            set_user_content(user_id, f"was given (by you) challenge {challenge_name}")
+
+        return True, challenge.id
+
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        return False, f"Database error: {str(e)}"
+    except Exception as e:
+        db.session.rollback()
+        return False, f"An unexpected error occurred: {str(e)}"
+
 
 def update_challenge(user_id, challenge_id):
     challenge = Challenge.query.filter_by(user_id=user_id, id=challenge_id).first()
@@ -280,22 +364,46 @@ def is_challenge_complete(challenge_id):
     return challenge.completion_date is not None if challenge else False
 
 
-def add_lesson(user_id, lesson_name, user_started = True):
-    existing_lesson = Lesson.query.filter_by(user_id=user_id, lesson_name=lesson_name).first()
-    if existing_lesson:
-        return False, existing_lesson.id
-    
-    if not extract_single_emoji(lesson_name):
-        lesson_name = f"🤔{lesson_name}"
-    lesson = Lesson(user_id=user_id, lesson_name=lesson_name, completion_date=None, system_role=None)
-    db.session.add(lesson)
-    db.session.commit()
-    add_content_message(user_id, lesson_name,lesson_id=lesson.id)
-    if user_started:
-        set_user_content(user_id, f"started lesson {lesson_name}")
-    else:
-        set_user_content(user_id, f"was given (by you) lesson {lesson_name}")
-    return True, lesson.id
+def add_lesson(user_id, lesson_name, user_started=True):
+    # Validate lesson_name: must be a non-empty string and within length limits.
+    if not isinstance(lesson_name, str) or not lesson_name.strip():
+        return False, "Lesson name must be a non-empty string."
+    if len(lesson_name) > MAX_LESSON_NAME_LENGTH:
+        return False, f"Lesson name too long. Maximum allowed length is {MAX_LESSON_NAME_LENGTH} characters."
+
+    try:
+        # Check for an existing lesson
+        existing_lesson = Lesson.query.filter_by(user_id=user_id, lesson_name=lesson_name).first()
+        if existing_lesson:
+            return False, existing_lesson.id
+
+        # Prepend a default emoji if none is found in the lesson name.
+        if not extract_single_emoji(lesson_name):
+            lesson_name = f"🤔{lesson_name}"
+
+        # Create the new lesson
+        lesson = Lesson(user_id=user_id, lesson_name=lesson_name, completion_date=None, system_role=None)
+        db.session.add(lesson)
+        db.session.commit()
+
+        # Add associated content message.
+        add_content_message(user_id, lesson_name, lesson_id=lesson.id)
+
+        # Update the user's current content.
+        if user_started:
+            set_user_content(user_id, f"started lesson {lesson_name}")
+        else:
+            set_user_content(user_id, f"was given (by you) lesson {lesson_name}")
+
+        return True, lesson.id
+
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        return False, f"Database error: {str(e)}"
+    except Exception as e:
+        db.session.rollback()
+        return False, f"An unexpected error occurred: {str(e)}"
+
 
 def update_lesson(user_id, lesson_id, completion_date=None, system_role=None):
     lesson = Lesson.query.filter_by(user_id=user_id, id=lesson_id).first()

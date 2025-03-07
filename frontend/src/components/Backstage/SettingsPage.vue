@@ -86,7 +86,6 @@ export default {
   },
   async mounted() {
     this.fetchProfile();
-    this.fetchCurrentMentor();
   },
   computed: {
     cloudTokens(){
@@ -139,10 +138,6 @@ export default {
       } catch (error) {
         popupStore.showPopup(`Error updating ${type} profile:`, error);
       }
-    },
-    async fetchCurrentMentor() {
-      const mentorStore = useMentorStore();
-      mentorStore.getCurrentMentorName();
     },
     changeMentor() {
       const mentorStore = useMentorStore();

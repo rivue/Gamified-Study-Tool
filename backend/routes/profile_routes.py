@@ -48,29 +48,29 @@ def init_profile_routes(app):
         set_user_tier(current_user.id, tierName)
         return jsonify(status="success")
     
-    @app.route("/api/mentor", methods=["GET"])
-    @login_required
-    def get_user_mentor():
-        print("test")
-        print(current_user.is_authenticated)
-        name = dbh.get_mentor_name(current_user.id) # TODO: PROBLEM
-        return jsonify(status="success", selectedMentorId=name)
+    # @app.route("/api/mentor", methods=["GET"])
+    # @login_required
+    # def get_user_mentor():
+    #     print("test")
+    #     print(current_user.is_authenticated)
+    #     name = dbh.get_mentor_name(current_user.id)
+    #     return jsonify(status="success", selectedMentorId=name)
 
-    @app.route("/api/mentor", methods=["POST"])
-    @login_required
-    def set_user_mentor():
-        data = request.json
-        name = data.get('mentorId')
-        print(name)
-        if not name:
-            return jsonify(status="error", message=""), 400
+    # @app.route("/api/mentor", methods=["POST"])
+    # @login_required
+    # def set_user_mentor():
+    #     data = request.json
+    #     name = data.get('mentorId')
+    #     print(name)
+    #     if not name:
+    #         return jsonify(status="error", message=""), 400
 
-        dbh.set_mentor_name(current_user.id, name)
-        update_system_role(current_user.id, dbh.get_system_role(current_user.id))
-        isInitial = len(dbh.get_api_messages(current_user.id))
-        if isInitial == 2:
-            initialize_messages(current_user.id)
-        return jsonify(status="success")
+    #     dbh.set_mentor_name(current_user.id, name)
+    #     update_system_role(current_user.id, dbh.get_system_role(current_user.id))
+    #     isInitial = len(dbh.get_api_messages(current_user.id))
+    #     if isInitial == 2:
+    #         initialize_messages(current_user.id)
+    #     return jsonify(status="success")
     
     @app.route('/api/user/stats', methods=['GET'])
     @login_required

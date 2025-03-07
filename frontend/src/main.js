@@ -11,7 +11,6 @@ import './assets/themes.css';
 import axios from 'axios';
 
     // basically main home page
-    // TODO eventually add back in - maybe like talk abt the struggle of school and / or my background or something
     // { path: '/about', component: defineAsyncComponent(() => import('./components/Footer/MainPage.vue')), meta: { title: Rivue.ai | Learn Anything!' } },
     // { path: '/', component: defineAsyncComponent(() => import('./components/Footer/MainPage.vue')), meta: { title: Rivue.ai | Learn Anything!' } },
 

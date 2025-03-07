@@ -120,29 +120,18 @@ def init_library_routes(app):
             return jsonify({"error": f"Error reading file: {str(e)}"}), 400
 
         # Start moderation task
-        # TODO vvv 
         content_for_moderation = topic
         if extra_context:
             content_for_moderation += extra_context
         moderation_future = executor.submit(moderate, content_for_moderation)
 
-        # Start library generation task (flask Gemini 1.5)
-        # TODO Maybe in the case where we are extracting it from a table of contents / syllabus?
-        # room_names_future = executor.submit(lgn.suggest_library_wing, user_id, topic, library_difficulty, language, language_difficulty, extra_context)
-
         # Wait for moderation result
-        # TODO vvv 
         violation, message = moderation_future.result()
         if violation:
             if user_id:
                 increment_violations(user_id)
             return jsonify({"error": f"Message breaks our usage policy. Please check our guidelines.\n{message}"}), 400
 
-        # Create the library
-        # TODO Maybe in the case where we are extracting it from a table of contents / syllabus?
-        # room_names = room_names_future.result()
-
-        # TODO (room_names is already from frontend)
         # Creates library database object
         library_response, status_code = lbh.create_library(user_id, topic, room_names, library_difficulty, language, language_difficulty, guide)
 
@@ -287,8 +276,6 @@ def init_library_routes(app):
         
         # If no content exists, fetch new content
         if not user_id:
-            ip = request.remote_addr # TODO ip stuff?
-            # if not check_generation_allowed(ip, 'room'):
             return jsonify(status="error", message="Must be signed in."), 403
             
         # print(f"userid: ${user_id}")

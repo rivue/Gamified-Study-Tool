@@ -301,7 +301,7 @@ export default {
             formData.append("languageDifficulty", "Normal"); // TODO delete later (from backend and library model)
             formData.append("libraryDifficulty", this.libraryDifficulty);
             formData.append("guide", "Azalea"); // TODO delete later (from backend and library model)
-            formData.append("selectedFile", this.selectedFile); // TODO textbook, could easily add support for > 1 input file later
+            formData.append("selectedFile", this.selectedFile);
             this.roomNames.forEach(room => formData.append("roomNames", room));
             //    formData.append("roomNames", JSON.stringify(this.roomNames));  // Convert array to string
 

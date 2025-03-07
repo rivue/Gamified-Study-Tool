@@ -85,15 +85,15 @@ def lesson_create(user_id, lesson_id, lesson_name = None):
         lesson_name = db.get_lesson_name(lesson_id)
         #if lesson name already exists, navigate to that lesson
     profile = db.get_profile(user_id)
-    ##### TODO: generate improved tutor #####
+
     if not db.get_tutor(user_id):
         tutor_create_message = mh.create_message(mh.system_message(user_id, roles.TutorCreate), profile)
-        # TODO: model=GPT4 for paid users
+
         response = generate_response(user_id, tutor_create_message, tokens=LESSON_TOKENS)
         db.set_tutor(user_id, response['choices'][0]['message']['content'])
 
     lesson_msgs = mh.prepare_session_messages(user_id, lesson_id)+mh.user_message("Lesson topic: "+lesson_name)
-    return generate_response(user_id, lesson_msgs, tokens=LESSON_TOKENS, model= GPT4), lesson_id # TODO: for paid model=GPT4
+    return generate_response(user_id, lesson_msgs, tokens=LESSON_TOKENS, model= GPT4), lesson_id # Will Gunter (me): might be for main user idk
 
 def lesson_guide(user_id, lesson_id):
     messages = mh.prepare_session_messages(user_id, lesson_id) 

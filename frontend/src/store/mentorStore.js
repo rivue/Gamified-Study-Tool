@@ -1,8 +1,6 @@
 // store/mentorStore.js
 import { defineStore } from 'pinia';
-import axios from 'axios';
 
-import { useMessageStore } from "@/store/messageStore";
 import { useAuthStore } from '@/store/authStore';
 import { usePopupStore } from "@/store/popupStore";
 
@@ -44,24 +42,6 @@ export const useMentorStore = defineStore('mentorStore', {
         isVisible: false,
     }),
     actions: {
-        async getCurrentMentorName() {
-            this.currentMentor = "Azalea"
-            const auth = useAuthStore();
-            console.log("mentorStore.js why is this being calleadfasdfd")
-            if (!auth.loggedIn){
-                return;
-            }
-            axios.get('/api/mentor')
-            .then(response => {
-                console.log(response);
-                console.log("mentorStore.js why is this being called 2")
-                this.currentMentor = response.data.selectedMentorId;
-            })
-            .catch(error => {
-                console.log("mentorStore.js why is this being called 3")
-                console.error('Error fetching selected mentor:', error)
-            });
-        },
         confirmSelection(name) {
             if (!this.isVisible) { return; }
             const auth = useAuthStore();
@@ -76,24 +56,6 @@ export const useMentorStore = defineStore('mentorStore', {
                 this.selectedMentorName = 'Azalea';
             }
             this.hide();
-            axios.post('/api/mentor', { mentorId: this.selectedMentorName })
-                .then(() => {
-                    this.currentMentor = this.selectedMentorName;
-                    const path = window.location.pathname;
-                    if (path === "/settings"){
-                        const popupStore = usePopupStore();
-                        popupStore.showPopup(`Mentor personality set to ${this.currentMentor}.<br/>This change will affect the main chat and any new lessons.`);
-                    }
-                    if (path == "/lessons"){
-                        const messageStore = useMessageStore();
-                        messageStore.fetchRecentMessages(path);
-                    }
-                })
-                .catch((error) => {                    
-                    const popupStore = usePopupStore();
-                    popupStore.showPopup(`Error updating mentor selection:${error}`);
-                    this.show();
-                  });
         },
         show() {
             this.isVisible = true;

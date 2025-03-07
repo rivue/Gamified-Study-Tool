@@ -12,7 +12,7 @@
         <div class="col-name">Name</div>
         <div class="col-status">Status</div>
         <div class="col-stats">Statistics</div>
-        <div class="col-date">Created at</div>
+        <!-- <div class="col-date">Created at</div> -->
         <div class="col-actions"></div>
       </div>
 
@@ -38,9 +38,9 @@
           <span class="stat">👥 {{ library.clicks || 0 }}</span>
           <span class="stat">❤️ {{ library.likes || 0 }}</span>
         </div>
-        <div class="col-date">
+        <!-- <div class="col-date">
           {{ new Date(library.created_at).toLocaleDateString() }}
-        </div>
+        </div> -->
         <div class="col-actions">
           <button class="action-btn">⋮</button>
         </div>

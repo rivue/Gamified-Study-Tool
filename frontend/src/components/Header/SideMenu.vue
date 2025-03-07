@@ -48,7 +48,6 @@
       :isSelected="isRouteActive('/about')"
       @click="openRoute('/about')"
     > 
-    TODO add about back in
       <template v-slot:icon>&#128065;</template>
     </SideMenuButton> -->
     <!-- <SideMenuButton

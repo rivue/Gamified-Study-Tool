@@ -50,7 +50,7 @@ app.config.update(
 
 db.init_app(app)
 migrate = Migrate(app, db)
-CORS(app, origins="*", supports_credentials=True) # TODO: replace w/ actual frontend URL and make sure it work
+CORS(app, origins="*", supports_credentials=True)
 
 # class LoggerWriter:
 #     def __init__(self, level):
@@ -68,6 +68,31 @@ CORS(app, origins="*", supports_credentials=True) # TODO: replace w/ actual fron
 
 # logging.basicConfig(filename='./debug123.log', level=logging.DEBUG)
 # logging.basicConfig(filename='./app.log', level=logging.DEBUG)
+
+# Global error handler for all unhandled exceptions
+@app.errorhandler(Exception)
+def handle_exception(e):
+    app.logger.error(f"Unhandled exception: {str(e)}")
+    return jsonify({
+        "error": "An internal server error occurred",
+        "message": str(e)
+    }), 500
+
+# 404 error handler for resource not found
+@app.errorhandler(404)
+def page_not_found(e):
+    return jsonify({
+        "error": "Resource not found",
+    }), 404
+
+# You can add more specific error handlers
+@app.errorhandler(403)
+def forbidden(e):
+    return jsonify({"error": "Forbidden", "message": "You don't have permission to access this resource"}), 403
+
+@app.errorhandler(400)
+def bad_request(e):
+    return jsonify({"error": "Bad request", "message": str(e)}), 400
 
 login_manager = LoginManager()
 login_manager.init_app(app)
