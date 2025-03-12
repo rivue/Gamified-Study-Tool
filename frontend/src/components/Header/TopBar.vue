@@ -36,19 +36,19 @@ export default {
                 : require("@/assets/images/rivueai_logo.png");
         },
         pageTitle() {
-            if (this.$route.path.includes("lesson/")) {
-                return "rivue.";
-            } else if (this.$route.path.includes("challenge/")) {
-                return "rivue.";
-            } else if (this.$route.path.includes("progress/")) {
-                return "rivue.";
-            } else if (this.$route.path.includes("achievements/")) {
-                return "rivue.";
-            } else if (this.$route.path.includes("settings/")) {
-                return "rivue.";
-            } else {
-                return "rivue.";
-            }
+            // if (this.$route.path.includes("lesson/")) {
+            //     return "rivue.ai";
+            // } else if (this.$route.path.includes("challenge/")) {
+            //     return "rivue.ai";
+            // } else if (this.$route.path.includes("progress/")) {
+            //     return "rivue.ai";
+            // } else if (this.$route.path.includes("achievements/")) {
+            //     return "rivue.ai";
+            // } else if (this.$route.path.includes("settings/")) {
+            //     return "rivue.ai";
+            // } else {
+                return "rivue.ai";
+            // }
         },
     },
     methods: {

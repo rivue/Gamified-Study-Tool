@@ -52,22 +52,22 @@ db.init_app(app)
 migrate = Migrate(app, db)
 CORS(app, origins="*", supports_credentials=True)
 
-# class LoggerWriter:
-#     def __init__(self, level):
-#         self.level = level
+class LoggerWriter:
+    def __init__(self, level):
+        self.level = level
 
-#     def write(self, message):
-#         if message != '\n':
-#             self.level(message)
+    def write(self, message):
+        if message != '\n':
+            self.level(message)
 
-#     def flush(self):
-#         pass
+    def flush(self):
+        pass
 
-# sys.stdout = LoggerWriter(logging.info)
-# sys.stderr = LoggerWriter(logging.error)
+sys.stdout = LoggerWriter(logging.info)
+sys.stderr = LoggerWriter(logging.error)
 
-# logging.basicConfig(filename='./debug123.log', level=logging.DEBUG)
-# logging.basicConfig(filename='./app.log', level=logging.DEBUG)
+logging.basicConfig(filename='./debug123.log', level=logging.DEBUG)
+logging.basicConfig(filename='./app.log', level=logging.DEBUG)
 
 # Global error handler for all unhandled exceptions
 @app.errorhandler(Exception)

@@ -195,7 +195,7 @@ def init_library_routes(app):
 
         user_id = current_user.id if not isinstance(current_user, AnonymousUserMixin) else None
         library = lbh.get_library(library_id, user_id)
-        
+        print("after get_library in lbh")
         if not library:
             return jsonify(status="error", message="Library not found"), 404
 
@@ -208,15 +208,19 @@ def init_library_routes(app):
         if response.json['has_default_image'] and library.get_json().get("clicks") % 4 == 0:
             executor.submit(generate_images_task, library_id)
         
+        print("before library.get_json")
         # Retrieve library data
         library_data = library.get_json()
+        print("after library.get_json")
 
         # Attempt to retrieve existing room contents
         room_data = None
         # print("library api")
         # print(library_topic)
+        # library_topic = "science thing"
         if library_topic:
             room_data = lbh.retrieve_library_room_contents(library_id, library_topic, user_id)
+            print("after retrieve")
             if not room_data:
                 if library_topic in library_data.get('room_names', []):
                     try:
