@@ -1,0 +1,149 @@
+Date : 2025-03-14 23:17:35
+Directory : /Users/willgunter/projects/Gamefied-Study-Tool/frontend
+Total : 94 files,  25746 codes, 614 comments, 1307 blanks, all 27667 lines
+
+Languages
++--------------------+------------+------------+------------+------------+------------+
+| language           | files      | code       | comment    | blank      | total      |
++--------------------+------------+------------+------------+------------+------------+
+| JSON               |          2 |     13,703 |          0 |          2 |     13,705 |
+| vue                |         61 |     10,699 |        456 |      1,149 |     12,304 |
+| JavaScript         |         21 |      1,025 |        109 |        102 |      1,236 |
+| CSS                |          2 |        197 |         48 |         42 |        287 |
+| HTML               |          1 |         47 |          1 |          4 |         52 |
+| XML                |          5 |         37 |          0 |          1 |         38 |
+| Markdown           |          1 |         19 |          0 |          6 |         25 |
+| JSON with Comments |          1 |         19 |          0 |          1 |         20 |
++--------------------+------------+------------+------------+------------+------------+
+
+Directories
++---------------------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                                                                      | files      | code       | comment    | blank      | total      |
++---------------------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                                                                         |         94 |     25,746 |        614 |      1,307 |     27,667 |
+| . (Files)                                                                                                                 |          8 |     13,772 |          1 |         15 |     13,788 |
+| public                                                                                                                    |          2 |         80 |          1 |          5 |         86 |
+| src                                                                                                                       |         84 |     11,894 |        612 |      1,287 |     13,793 |
+| src (Files)                                                                                                               |          3 |        322 |         62 |         42 |        426 |
+| src/assets                                                                                                                |          6 |        201 |         48 |         42 |        291 |
+| src/assets (Files)                                                                                                        |          2 |        197 |         48 |         42 |        287 |
+| src/assets/images                                                                                                         |          4 |          4 |          0 |          0 |          4 |
+| src/components                                                                                                            |         60 |     10,518 |        453 |      1,135 |     12,106 |
+| src/components/Auth                                                                                                       |          4 |        476 |          1 |         33 |        510 |
+| src/components/Backstage                                                                                                  |          6 |        864 |         47 |         99 |      1,010 |
+| src/components/Chat                                                                                                       |          7 |      1,632 |         15 |        155 |      1,802 |
+| src/components/Footer                                                                                                     |          9 |      1,784 |         57 |        191 |      2,032 |
+| src/components/Footer (Files)                                                                                             |          4 |      1,047 |         57 |        135 |      1,239 |
+| src/components/Footer/LandingPageComponents                                                                               |          5 |        737 |          0 |         56 |        793 |
+| src/components/Game                                                                                                       |         15 |      2,719 |        247 |        291 |      3,257 |
+| src/components/Game (Files)                                                                                               |          1 |        242 |          0 |         21 |        263 |
+| src/components/Game/Creation                                                                                              |          5 |      1,179 |         15 |        125 |      1,319 |
+| src/components/Game/NewGame                                                                                               |          9 |      1,298 |        232 |        145 |      1,675 |
+| src/components/Graphs                                                                                                     |          9 |      1,926 |         27 |        232 |      2,185 |
+| src/components/Header                                                                                                     |          3 |        318 |         56 |         38 |        412 |
+| src/components/Menus                                                                                                      |          5 |        333 |          1 |         48 |        382 |
+| src/components/Monetization                                                                                               |          2 |        466 |          2 |         48 |        516 |
+| src/scripts                                                                                                               |          1 |         36 |          0 |         10 |         46 |
+| src/store                                                                                                                 |         14 |        817 |         49 |         58 |        924 |
++---------------------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++---------------------------------------------------------------------------------------------------------------------------+--------------------+------------+------------+------------+------------+
+| filename                                                                                                                  | language           | code       | comment    | blank      | total      |
++---------------------------------------------------------------------------------------------------------------------------+--------------------+------------+------------+------------+------------+
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/README.md                                                         | Markdown           |         19 |          0 |          6 |         25 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/babel.config.js                                                   | JavaScript         |          3 |          0 |          1 |          4 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/jsconfig.json                                                     | JSON with Comments |         19 |          0 |          1 |         20 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/package-lock.json                                                 | JSON               |     13,642 |          0 |          1 |     13,643 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/package.json                                                      | JSON               |         61 |          0 |          1 |         62 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/postcss.config.js                                                 | JavaScript         |          6 |          0 |          1 |          7 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/public/index.html                                                 | HTML               |         47 |          1 |          4 |         52 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/public/sitemap.xml                                                | XML                |         33 |          0 |          1 |         34 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/App.vue                                                       | vue                |        181 |          3 |         14 |        198 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/assets/images/powered-by-openai-badge-filled-on-dark.svg      | XML                |          1 |          0 |          0 |          1 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/assets/images/powered-by-openai-badge-filled-on-light.svg     | XML                |          1 |          0 |          0 |          1 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/assets/images/powered-by-openai-badge-outlined-on-dark.svg    | XML                |          1 |          0 |          0 |          1 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/assets/images/powered-by-openai-badge-outlined-on-light.svg   | XML                |          1 |          0 |          0 |          1 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/assets/styles.css                                             | CSS                |        155 |          3 |         30 |        188 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/assets/themes.css                                             | CSS                |         42 |         45 |         12 |         99 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/components/Auth/AdminPage.vue                                 | vue                |         86 |          0 |          4 |         90 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/components/Auth/LoginForm.vue                                 | vue                |         68 |          0 |          4 |         72 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/components/Auth/LoginSignupPopup.vue                          | vue                |        237 |          1 |         20 |        258 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/components/Auth/SignupForm.vue                                | vue                |         85 |          0 |          5 |         90 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/components/Backstage/404.vue                                  | vue                |         71 |          0 |         11 |         82 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/components/Backstage/LoadingComponent.vue                     | vue                |         68 |          0 |         13 |         81 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/components/Backstage/MapPage.vue                              | vue                |         69 |          0 |         10 |         79 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/components/Backstage/MentorSelection.vue                      | vue                |        208 |          0 |         29 |        237 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/components/Backstage/ProgressPage.vue                         | vue                |        250 |          1 |         20 |        271 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/components/Backstage/SettingsPage.vue                         | vue                |        198 |         46 |         16 |        260 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/components/Chat/ActionMenu.vue                                | vue                |         51 |          1 |          5 |         57 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/components/Chat/ChatComponent.vue                             | vue                |         92 |          1 |         14 |        107 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/components/Chat/ChatConversation.vue                          | vue                |        293 |          1 |         35 |        329 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/components/Chat/CompleteButton.vue                            | vue                |        408 |          7 |         36 |        451 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/components/Chat/ContentButton.vue                             | vue                |        100 |          4 |          7 |        111 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/components/Chat/MessageInput.vue                              | vue                |        317 |          1 |         29 |        347 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/components/Chat/QuizComponent.vue                             | vue                |        371 |          0 |         29 |        400 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/components/Footer/BottomBar.vue                               | vue                |         88 |         52 |         11 |        151 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/components/Footer/ContactPage.vue                             | vue                |        146 |          1 |         14 |        161 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/components/Footer/HomePage.vue                                | vue                |        548 |          1 |         88 |        637 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/components/Footer/LandingPageComponents/CtaButton.vue         | vue                |         83 |          0 |         11 |         94 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/components/Footer/LandingPageComponents/FaqComponent.vue      | vue                |        175 |          0 |         13 |        188 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/components/Footer/LandingPageComponents/FeatureGrid.vue       | vue                |        266 |          0 |         10 |        276 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/components/Footer/LandingPageComponents/FeaturesComponent.vue | vue                |        129 |          0 |         15 |        144 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/components/Footer/LandingPageComponents/SharedContent.vue     | vue                |         84 |          0 |          7 |         91 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/components/Footer/TermsAndPoliciesPage.vue                    | vue                |        265 |          3 |         22 |        290 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/components/Game/Creation/CyclingContentButton.vue             | vue                |        136 |          2 |         12 |        150 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/components/Game/Creation/LibraryBrowser.vue                   | vue                |         84 |          0 |          5 |         89 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/components/Game/Creation/LibraryButton.vue                    | vue                |         80 |          0 |         12 |         92 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/components/Game/Creation/LibraryCarousel.vue                  | vue                |        363 |          7 |         40 |        410 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/components/Game/Creation/LibraryCreator.vue                   | vue                |        516 |          6 |         56 |        578 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/components/Game/LeaderBoard.vue                               | vue                |        242 |          0 |         21 |        263 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/components/Game/NewGame/FactoidComponent.vue                  | vue                |         79 |          1 |          8 |         88 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/components/Game/NewGame/GamePage.vue                          | vue                |         34 |          0 |          9 |         43 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/components/Game/NewGame/GameStart.vue                         | vue                |          0 |        199 |          1 |        200 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/components/Game/NewGame/GameToolbar.vue                       | vue                |        147 |         21 |         20 |        188 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/components/Game/NewGame/GameWindow.vue                        | vue                |         56 |          1 |         11 |         68 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/components/Game/NewGame/LibraryCompletion.vue                 | vue                |        429 |          9 |         37 |        475 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/components/Game/NewGame/LibraryQuestion.vue                   | vue                |        391 |          1 |         44 |        436 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/components/Game/NewGame/NextRoomsComponent.vue                | vue                |         77 |          0 |          5 |         82 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/components/Game/NewGame/RoomButton.vue                        | vue                |         85 |          0 |         10 |         95 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/components/Graphs/ExpProgressBar.vue                          | vue                |        135 |          0 |         14 |        149 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/components/Graphs/KnowledgeGraph.vue                          | vue                |        650 |          0 |         84 |        734 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/components/Graphs/LearningPath.vue                            | vue                |        465 |          9 |         71 |        545 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/components/Graphs/LearningPath1.vue                           | vue                |        103 |          7 |         11 |        121 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/components/Graphs/LearningPath2.vue                           | vue                |        181 |          9 |         17 |        207 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/components/Graphs/PieChart.vue                                | vue                |         64 |          1 |          5 |         70 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/components/Graphs/ProgressGraph.vue                           | vue                |         74 |          1 |          4 |         79 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/components/Graphs/StreakFire.vue                              | vue                |        202 |          0 |         18 |        220 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/components/Graphs/UserStats.vue                               | vue                |         52 |          0 |          8 |         60 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/components/Header/SideMenu.vue                                | vue                |        110 |         47 |         14 |        171 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/components/Header/SubHeader.vue                               | vue                |         80 |          1 |          8 |         89 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/components/Header/TopBar.vue                                  | vue                |        128 |          8 |         16 |        152 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/components/Menus/ActionMenuButton.vue                         | vue                |         46 |          0 |          6 |         52 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/components/Menus/InfoPopup.vue                                | vue                |        116 |          0 |         17 |        133 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/components/Menus/MenuButton.vue                               | vue                |         45 |          0 |          6 |         51 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/components/Menus/SideMenuButton.vue                           | vue                |         56 |          0 |          9 |         65 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/components/Menus/TierButton.vue                               | vue                |         70 |          1 |         10 |         81 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/components/Monetization/AdPopup.vue                           | vue                |        237 |          1 |         30 |        268 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/components/Monetization/PlanPage.vue                          | vue                |        229 |          1 |         18 |        248 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/eventBus.js                                                   | JavaScript         |         13 |          0 |          3 |         16 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/main.js                                                       | JavaScript         |        128 |         59 |         25 |        212 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/scripts/placeholderTyping.js                                  | JavaScript         |         36 |          0 |         10 |         46 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/store/adminStore.js                                           | JavaScript         |         27 |          1 |          2 |         30 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/store/adsStore.js                                             | JavaScript         |         20 |          1 |          2 |         23 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/store/authStore.js                                            | JavaScript         |         51 |          6 |          2 |         59 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/store/gameStore.js                                            | JavaScript         |        262 |         21 |         13 |        296 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/store/inputStore.js                                           | JavaScript         |         20 |          3 |          2 |         25 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/store/libGenStore.js                                          | JavaScript         |         85 |          1 |          2 |         88 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/store/loadingStore.js                                         | JavaScript         |          8 |          1 |          1 |         10 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/store/mentorStore.js                                          | JavaScript         |         64 |          2 |          4 |         70 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/store/menuStore.js                                            | JavaScript         |         85 |          1 |          7 |         93 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/store/messageStore.js                                         | JavaScript         |        113 |          4 |         15 |        132 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/store/popupStore.js                                           | JavaScript         |         25 |          3 |          1 |         29 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/store/scrollStore.js                                          | JavaScript         |          6 |          1 |          2 |          9 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/store/themeStore.js                                           | JavaScript         |         17 |          2 |          3 |         22 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/src/store/userStatsStore.js                                       | JavaScript         |         34 |          2 |          2 |         38 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/tailwind.config.js                                                | JavaScript         |          7 |          1 |          2 |         10 |
+| /Users/willgunter/projects/Gamefied-Study-Tool/frontend/vue.config.js                                                     | JavaScript         |         15 |          0 |          2 |         17 |
+| Total                                                                                                                     |                    |     25,746 |        614 |      1,307 |     27,667 |
++---------------------------------------------------------------------------------------------------------------------------+--------------------+------------+------------+------------+------------+

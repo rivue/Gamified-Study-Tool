@@ -49,10 +49,12 @@
 
                     <!-- Room Names Section -->
                     <div class="form-group room-names">
-                        <div class="libgen-title">Stepping Stone Names</div>
+                        <div class="libgen-title">
+                            Section Names
+                        </div>
                         <div class="room-input-container">
                             <div class="room-input-wrapper">
-                                <input type="text" v-model="newRoomName" placeholder="Enter stepping stone names"
+                                <input type="text" v-model="newRoomName" placeholder="Enter section names"
                                     :class="{ 'input-error': roomError || roomTypingError || roomSpaceError }"
                                     maxlength="40" :disabled="roomNames.length >= 30 || disableExtras"
                                     @keyup.enter="addRoom" />
@@ -71,9 +73,12 @@
                                 </div>
                             </div>
                             <div class="helper-text">
-                                🐙 Stepping stone = 1 lecture, textbook chapter, etc...
+                                🐙 Sections are how course content is divided up.
                             </div>
-                            <div class="helper-text" v-if="roomNames.length < 30">
+                            <div class="helper-text">
+                                🐙 We try to make the content of each section based on its name, so if a section is named "mitosis" the content of that section is baed on mitosis, etc...
+                            </div>
+                            <div class="helper-text">
                                 🐙 Don't worry about adding all rooms or files now - you can generate more later!
                             </div>
                         </div>

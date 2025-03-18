@@ -1,32 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
    <url>
-      <loc>https://rivue.ai/</loc>
+      <loc>https://rivue.ai</loc>
       <changefreq>monthly</changefreq>
       <priority>0.2</priority>
    </url>
    <url>
-      <loc>https://rivue.ai/login</loc>
+      <loc>https://rivue.ailogin</loc>
       <changefreq>monthly</changefreq>
       <priority>0.5</priority>
    </url>
    <url>
-      <loc>https://rivue.ai/terms</loc>
+      <loc>https://rivue.aiterms</loc>
       <changefreq>monthly</changefreq>
       <priority>0.5</priority>
    </url>
    <url>
-      <loc>https://rivue.ai/contact</loc>
+      <loc>https://rivue.aicontact</loc>
       <changefreq>monthly</changefreq>
       <priority>0.5</priority>
    </url>
    <url>
-      <loc>https://rivue.ai/plan</loc>
+      <loc>https://rivue.aiplan</loc>
       <changefreq>monthly</changefreq>
       <priority>0.5</priority>
    </url>
    <url>
-      <loc>https://rivue.ai/library</loc>
+      <loc>https://rivue.ailibrary</loc>
       <changefreq>monthly</changefreq>
       <priority>0.2</priority>
    </url>
