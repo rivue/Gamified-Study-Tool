@@ -4,8 +4,8 @@
     <div class="footer-top">
       <router-link to="/about" class="text-link">About</router-link>
       <span class="separator">·</span>
-      <router-link to="/contact" class="text-link">Contact</router-link>
-      <span class="separator">·</span>
+      <!-- <router-link to="/contact" class="text-link">Contact</router-link>
+      <span class="separator">·</span> -->
       <!-- <div class="text-link" @click="donateRedirect">Donate</div> -->
       <!-- <span class="separator">·</span> -->
       <!-- <button @click="toggleTheme" class="dark-mode-btn">

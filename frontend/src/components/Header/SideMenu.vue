@@ -56,7 +56,7 @@
       :isSelected="isRouteActive('/contact')"
       @click="openRoute('/contact')"
     >
-      <template v-slot:icon>&#9993;</template>
+      <!-- <template v-slot:icon>&#9993;</template> -->
     </SideMenuButton>
     
     <!-- <SideMenuButton
