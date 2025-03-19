@@ -29,21 +29,22 @@
                 </div>
             </div>
             <!-- Add this section before the OpenAI logo -->
-             <!-- COME BACK HERE VVV-->
-    <div class="social-links-container">
-        <h3>Connect With Us</h3>
-        <div class="social-links">
-            <a :href="socialLinks.twitter" target="_blank" rel="noopener noreferrer" class="social-link">
-                <img :src="require('@/assets/images/x-logo.svg')" alt="X (Twitter)" class="social-icon" />
-                <span>Follow us on X</span>
-            </a>
-            <a :href="socialLinks.discord" target="_blank" rel="noopener noreferrer" class="social-link">
-                <img :src="require('@/assets/images/discord-logo.svg')" alt="Discord" class="social-icon" />
-                <span>Join our Discord</span>
-            </a>
-        </div>
-    </div>
-    <!-- COME BACK HERE ^^^-->
+            <!-- COME BACK HERE TO CHANGE IMAGE SIZEVVV-->
+            <div class="social-links-container">
+                <h3>Connect With Us</h3>
+                <div class="social-links">
+                    <a href="https://x.com/Rivueai" target="_blank" rel="noopener noreferrer" class="social-link">
+                        <img :src="require('@/assets/images/x-logo-white.png')" alt="X (Twitter)" class="social-icon" />
+                        <span>Follow us on X</span>
+                    </a>
+                    <a href="https://discord.gg/7h7DpTDc" target="_blank" rel="noopener noreferrer" class="social-link">
+                        <img :src="require('@/assets/images/discord-mark-white.png')" alt="Discord"
+                            class="social-icon" />
+                        <span>Join our Discord</span>
+                    </a>
+                </div>
+            </div>
+            <!-- COME BACK HERE ^^^-->
             <img :src="openaiPath" alt="Powered by OpenAI" class="openai" />
             <div class="faq-container">
                 <FaqComponent />
@@ -75,7 +76,7 @@ export default {
         return {
             items: ["Have Fun", "Discover", "Level Up"],
             content: [
-                ["Your personal learning journey.", "<b>You</b> decide what to learn. Choose any topic you can describe in a few words. Or let our tutor suggest based on your goals and interests."], 
+                ["Your personal learning journey.", "<b>You</b> decide what to learn. Choose any topic you can describe in a few words. Or let our tutor suggest based on your goals and interests."],
                 ["Learn anything, challenge yourself.", "Embark on a personalized learning adventure with interactive lessons and fun quizzes."],
                 ["Stats, graphs, streaks...", "Seeing progress gives us the rewarding feeling hard work deserves. Track your gains with graphs and stats."]
             ],
@@ -586,67 +587,129 @@ body {
 
 
 .dropdown-menus {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  margin-bottom: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 2rem;
 }
 
 .dropdown {
-  position: relative;
+    position: relative;
 }
 
 .dropdown-button {
-  width: 100%;
-  padding: 1rem;
-  font-size: 1.2rem;
-  font-weight: 600;
-  text-align: left;
-  background-color: var(--background-color);
-  color: var(--text-color);
-  border: 1px solid var(--element-color-1);
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s ease;
+    width: 100%;
+    padding: 1rem;
+    font-size: 1.2rem;
+    font-weight: 600;
+    text-align: left;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    border: 1px solid var(--element-color-1);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
 
 .dropdown-button:hover,
 .dropdown-button.active {
-  background-color: var(--element-color-1);
-  color: var(--background-color);
+    background-color: var(--element-color-1);
+    color: var(--background-color);
 }
 
 .dropdown-arrow {
-  float: right;
-  transition: transform 0.3s ease;
+    float: right;
+    transition: transform 0.3s ease;
 }
 
 .dropdown-button.active .dropdown-arrow {
-  transform: rotate(180deg);
+    transform: rotate(180deg);
 }
 
 .dropdown-content {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  width: 100%;
-  padding: 1rem;
-  background-color: var(--background-color);
-  border: 1px solid var(--element-color-1);
-  border-top: none;
-  border-radius: 0 0 8px 8px;
-  z-index: 1;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    padding: 1rem;
+    background-color: var(--background-color);
+    border: 1px solid var(--element-color-1);
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    z-index: 1;
 }
 
 .dropdown-content h3 {
-  font-size: 1.1rem;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
 }
 
 .dropdown-content p {
-  font-size: 1rem;
-  color: var(--text-color);
-  opacity: 0.9;
+    font-size: 1rem;
+    color: var(--text-color);
+    opacity: 0.9;
+}
+
+.social-links-container {
+    margin: 2rem auto;
+    padding: 1.5rem;
+    text-align: center;
+    width: 100%;
+    max-width: 800px;
+}
+
+.social-links-container h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    color: var(--text-color);
+}
+
+.social-links {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+
+.social-link {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: var(--text-color);
+    padding: 0.75rem 1.25rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    border: 1px solid var(--element-color-1);
+}
+
+.social-link:hover {
+    background-color: var(--element-color-1);
+    color: var(--background-color);
+    transform: translateY(-2px);
+}
+
+.social-icon {
+    width: 24px;
+    height: 24px;
+    margin-right: 0.75rem;
+}
+
+.social-link span {
+    font-weight: 500;
+}
+
+/* Responsive adjustments */
+@media only screen and (max-width: 600px) {
+    .social-links {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .social-link {
+        width: 100%;
+        justify-content: center;
+    }
 }
 </style>

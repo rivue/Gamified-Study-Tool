@@ -47,7 +47,7 @@ TODO list:
 
     MVP CLEANUP LIST:
         - ascendence --> rivue (everywhere on the site and in the file system)
-            - pretty much done, just need to create email for product and modify email_templates
+            - pretty much done, and modify email_templates
         - go through TODOs (again once emails are taken care of)
         - figure out prod building and gcp and possibly nginx / rabbit / zeromq or whatever
         - change CORS(origins="*") to the actual frontend url in app.py
@@ -235,7 +235,7 @@ COMPLETED:
     ✅ add ability to create rooms / "lectures" once you create a library, and mention that in the "add rooms" page (ex: "*lectures can be added within the library*")
     ✅ fix the issue where anywhere on a card exits the lesson as opposed to just the red x
     ✅ maybe do something that caps length of vector embedding response, like chops off anything after 1k tokens / characters or something (limited response to 10 questions)
-
+    
     rag stuff:
     1) give whole textbook to gpt to "split up" ✅
     2) store embeddings in pinecone (every paragraph) ✅
@@ -260,6 +260,7 @@ COMPLETED:
         which covers cases where you have to fetch from api
     ✅ weird redirect for when user is logged in and try to navigate to a library which doesn't exist or no permissions (102 in main.js) ex: /lessons/234234
             fix w/ a loading state or something, prob pretty easy
+    ✅ create email
 
 RESOURCES:
     - node components: https://vueflow.dev/
