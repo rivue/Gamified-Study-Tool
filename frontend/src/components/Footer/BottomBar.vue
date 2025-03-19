@@ -2,13 +2,13 @@
 <template>
   <div class="app-footer">
     <div class="footer-top">
-      <!-- <router-link to="/about" class="text-link">About</router-link>
+      <router-link to="/about" class="text-link">About</router-link>
       <span class="separator">·</span>
       <router-link to="/contact" class="text-link">Contact</router-link>
       <span class="separator">·</span>
-      <div class="text-link" @click="donateRedirect">Donate</div>
-      <span class="separator">·</span>
-      <button @click="toggleTheme" class="dark-mode-btn">
+      <!-- <div class="text-link" @click="donateRedirect">Donate</div> -->
+      <!-- <span class="separator">·</span> -->
+      <!-- <button @click="toggleTheme" class="dark-mode-btn">
         <img
           :src="themeIcon"
           :alt="themeIconAlt"
@@ -17,10 +17,9 @@
           height="16"
         />
       </button> -->
-      <!-- TODO twitter link vvv -->
-      <!-- <span class="separator">·</span>
+      <!-- <span class="separator">·</span> -->
       <a
-        href="https://twitter.com/AscendanceCloud"
+        href="https://x.com/Rivueai"
         target="_blank"
         rel="noopener noreferrer"
       >
@@ -31,10 +30,10 @@
           width="12"
           height="12"
         />
-      </a> -->
-      <!-- <span class="separator">·</span> -->
-      <!-- <a
-        href="https://discord.gg/SSGygda5DX"
+      </a>
+      <span class="separator">·</span>
+      <a
+        href="https://discord.gg/7h7DpTDc"
         target="_blank"
         rel="noopener noreferrer"
       >
@@ -45,14 +44,14 @@
           width="16"
           height="16"
         />
-      </a> -->
-    <!-- </div> -->
-    <!-- <div class="footer-bottom"> -->
-      <!-- <div class="footer-top"> -->
-        <!-- <router-link to="/terms" class="text-link">Terms and Policies</router-link> -->
-      <!-- <span class="separator">·</span> -->
-      <!-- <p>© 2025 Rivue.ai</p></div> -->
-      <!-- <div><p class="sincere-msg">Made with ❤️ for knowing and doing.</p></div> -->
+      </a>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-top">
+        <router-link to="/terms" class="text-link">Terms and Policies</router-link>
+      <span class="separator">·</span>
+      <p>© 2025 Rivue.ai</p></div>
+      <div><p class="sincere-msg">Made with ❤️ for thinking and doing.</p></div>
     </div>
   </div>
 </template>

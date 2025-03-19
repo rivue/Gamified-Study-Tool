@@ -4,6 +4,7 @@ Tool that allows users to input things like lecture recordings, lecture slides, 
 IDEAS:
 
     ideas for grand plan / future:
+        - create a community discord server (configure the current one)
         - create cheap vr cardboard cutouts of headsets where you can put your phone --> give to high schools possibly for free once you partner with them
             - have to think specifically of who / what to target for MVP, etc... so as little time as possibly gets wasted building something that either 1) is outside of my domain of expertise or 2) other people might build (repeat of unclear jupyterhub research)
             - not sure where to go from there, lots of places though
@@ -54,10 +55,22 @@ TODO list:
         - error handling, and lots of it (how to handle failed document generation, other errors, etc...)
             - error handling for not finding any context when loading stone names in library?
             - ask chatgpt for what to do idk
+        - (NEAR FUTURE) - put x / discord links in main page, probably along with something like "join us" or "hear our updates" or something
+        - add OTHER PAGES
     
+
+    OTHER PAGES:
+        - contact page 
+        - terms and policies page
+        - somewhere to link to x / discord (might be on an existing page, idk) (see mvp cleanup list)
+        - about page
+        (currently all 4 were in BottomBar.vue)
+
     general:
+
         - ACCOUNT FOR MOBILE SCREEN SIZES!!
         - ADD SHAD-CN
+        - add light / dark mode switcher to settings (it already exists)
         - add support for multiple file upload (possibly)
         - add other routes back in, eventually
         - remove library difficulty, mentor, language, etc... from db course structure, backend, frontend course creation screen

@@ -1,9 +1,9 @@
 # email_templates.py
 
 Registration = {
-    "from": "Rivue ",#TODO email <miko@ascendance.cloud>",
+    "from": "Rivue <contact@rivue.ai>",
     "subject": "Welcome to Rivue",
-    "bcc":"",#TODO email ,"miko@ascendance.cloud",
+    "bcc":"contact@rivue.ai",
     "html": """,
     <html>
         <head>
@@ -65,6 +65,7 @@ Registration = {
                 <div class="footer">
                     <p>
                         Stay connected:<br>
+                        <a href="https://x.com/Rivueai">Twitter/X</a> | <a href="https://discord.gg/7h7DpTDc">Discord</a>
                     </p>
                 </div>
             </div>
@@ -85,5 +86,3 @@ If you have any questions or need assistance, our mentorship team is here for yo
 Embrace your journey,
 The Rivue.ai Team"""
 }
-
-# TODO add beneath "stay connected" <a href="https://twitter.com/AscendanceCloud">Twitter/X</a> | <a href="https://discord.gg/HWaYnvTp34">Discord</a>

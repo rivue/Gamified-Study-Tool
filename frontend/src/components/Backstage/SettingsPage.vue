@@ -11,6 +11,15 @@
       </div>
     </div>
 
+    <div class="profile-section">
+      <h2 class="section-title">Color Theme</h2>
+      <div class="half-n-half">
+        <p v-if="currentTheme" class="profile-info">Note: Dark Mode is recommended</p>
+        <p class="profile-info"> {{ currentTheme ? 'Dark Mode' : 'Light Mode'}} </p>
+        <MenuButton label="Change Theme" @click="changeTheme" />
+      </div>
+    </div>
+
     <!-- <div class="profile-section">
       <h2 class="section-title">Subscription Tier</h2>
       <div class="half-n-half">
@@ -67,6 +76,7 @@ import MenuButton from "@/components/Menus/MenuButton.vue";
 import { useMentorStore } from "@/store/mentorStore";
 import { useAuthStore } from "@/store/authStore";
 import { usePopupStore } from "@/store/popupStore";
+import { useThemeStore } from "@/store/themeStore";
 
 export default {
   name: "SettingsPage",
@@ -105,6 +115,10 @@ export default {
       };
       return tierNameMap[tierCode] || "Unknown Tier";
     },
+    currentTheme() {
+        const themeStore = useThemeStore();
+        return themeStore.darkMode;
+    }
   },
 
   methods: {
@@ -114,8 +128,12 @@ export default {
         if (response.data.status === "success") {
           this.profile = response.data.profile;
           this.$nextTick(() => {
-            this.autoGrow({ target: this.$refs.userTextarea });
-            this.autoGrow({ target: this.$refs.tutorTextarea });
+            if (this.$refs.userTextarea) {
+              this.autoGrow({ target: this.$refs.userTextarea });
+            }
+            if (this.$refs.tutorTextarea) {
+              this.autoGrow({ target: this.$refs.tutorTextarea });
+            }
           });
         } else {
           console.error("Failed to fetch profile");
@@ -139,10 +157,7 @@ export default {
         popupStore.showPopup(`Error updating ${type} profile:`, error);
       }
     },
-    changeMentor() {
-      const mentorStore = useMentorStore();
-      mentorStore.show();
-    },
+
     async logout() {
       const popupStore = usePopupStore();
       try {
@@ -158,28 +173,33 @@ export default {
         popupStore.showPopup("Error logging out:", error);
       }
     },
-    async resetConversation() {
-      if (
-        !confirm(
-          "Are you sure you want to reset your whole account? This will delete all history and you can start anew."
-        )
-      ) {
-        return;
-      }
-      try {
-        let response = await axios.get("/api/reset");
-        if (response.data.status === "success") {
-          this.$router.push("/?awake");
-        } else {
-          console.error("Failed to reset conversation.");
-        }
-      } catch (error) {
-        console.error("Error resetting conversation:", error);
-      }
+    changeTheme() {
+        const themeStore = useThemeStore();
+        console.log(themeStore.darkMode)
+        themeStore.toggleDarkMode();
     },
-    redirectPlan() {
-      this.$router.push("/plan");
-    },
+    // async resetConversation() {
+    //   if (
+    //     !confirm(
+    //       "Are you sure you want to reset your whole account? This will delete all history and you can start anew."
+    //     )
+    //   ) {
+    //     return;
+    //   }
+    //   try {
+    //     let response = await axios.get("/api/reset");
+    //     if (response.data.status === "success") {
+    //       this.$router.push("/?awake");
+    //     } else {
+    //       console.error("Failed to reset conversation.");
+    //     }
+    //   } catch (error) {
+    //     console.error("Error resetting conversation:", error);
+    //   }
+    // },
+    // redirectPlan() {
+    //   this.$router.push("/plan");
+    // },
     autoGrow(event) {
       const textarea = event.target;
       textarea.style.height = "auto";
