@@ -79,7 +79,7 @@ import axios from 'axios';
         // Simple routes
         { path: '/library', component: defineAsyncComponent(() => import('./components/Game/Creation/LibraryCreator.vue')), meta: { title: 'Rivue.ai | Create Library' } },
         // { path: '/progress', component: defineAsyncComponent(() => import('./components/Backstage/ProgressPage.vue')), meta: { title: 'Rivue.ai | Progress' } },
-        // { path: '/contact', component: defineAsyncComponent(() => import('./components/Footer/ContactPage.vue')), meta: { title: 'Rivue.ai | Contact Us' } },
+        { path: '/contact', component: defineAsyncComponent(() => import('./components/Footer/ContactPage.vue')), meta: { title: 'Rivue.ai | Contact Us' } },
         { path: '/settings', component: defineAsyncComponent(() => import('./components/Backstage/SettingsPage.vue')), meta: { title: 'Rivue.ai | Settings' } },
         // { path: '/terms', component: defineAsyncComponent(() => import('./components/Footer/TermsAndPoliciesPage.vue')), meta: { title: 'Rivue.ai | Terms and Policies' } },
         // { path: '/plan', component: defineAsyncComponent(() => import('./components/Monetization/PlanPage.vue')), meta: { title: 'Rivue.ai | Premium Plans' } },
@@ -91,7 +91,7 @@ import axios from 'axios';
         { path: '/lessons/:pathMatch(.*)*', redirect: '/' },
         { path: '/library/:pathMatch(.*)*', redirect: '/library' },
         // { path: '/progress/:pathMatch(.*)*', redirect: '/progress' },
-        // { path: '/contact/:pathMatch(.*)*', redirect: '/contact' },
+        { path: '/contact/:pathMatch(.*)*', redirect: '/contact' },
         { path: '/settings/:pathMatch(.*)*', redirect: '/settings' },
         // { path: '/terms/:pathMatch(.*)*', redirect: '/terms' },
         // { path: '/plan/:pathMatch(.*)*', redirect: '/plan' },

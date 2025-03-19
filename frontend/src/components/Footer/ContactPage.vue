@@ -4,7 +4,7 @@
     <div class="page-main-section">
       <div class="contact-overlay">
         <div class="popup-content">
-          <h1>Submit feedback</h1>
+          <h1>Contact / Submit feedback</h1>
           <form v-if="loggedIn" @submit.prevent="handleSubmit">
             <textarea
               id="message"
@@ -19,7 +19,7 @@
           <div v-else>Please <a href="/login">log in</a> to submit feedback and bugs.</div>
           <br />
           <div>
-            To reach us, join the Discord <a href="https://discord.gg/SSGygda5DX" target="_blank">community</a> or email <!-- TODO email here <b>miko@ascendance.cloud</b>-->.
+            To reach us, join our Discord <a href="https://discord.gg/7h7DpTDc" target="_blank">community</a> or email us at <a href="mailto:contact@rivue.ai?subject=Rivue.ai%20Feedback&body=Hello,%20I%20have%20some%20feedback..."><b>contact@rivue.ai</b></a>
           </div>
         </div>
       </div>

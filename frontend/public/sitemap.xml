@@ -6,27 +6,27 @@
       <priority>0.2</priority>
    </url>
    <url>
-      <loc>https://rivue.ailogin</loc>
+      <loc>https://rivue.ai/login</loc>
       <changefreq>monthly</changefreq>
       <priority>0.5</priority>
    </url>
    <url>
-      <loc>https://rivue.aiterms</loc>
+      <loc>https://rivue.ai/terms</loc>
       <changefreq>monthly</changefreq>
       <priority>0.5</priority>
    </url>
    <url>
-      <loc>https://rivue.aicontact</loc>
+      <loc>https://rivue.ai/contact</loc>
       <changefreq>monthly</changefreq>
       <priority>0.5</priority>
    </url>
    <url>
-      <loc>https://rivue.aiplan</loc>
+      <loc>https://rivue.ai/plan</loc>
       <changefreq>monthly</changefreq>
       <priority>0.5</priority>
    </url>
    <url>
-      <loc>https://rivue.ailibrary</loc>
+      <loc>https://rivue.ai/library</loc>
       <changefreq>monthly</changefreq>
       <priority>0.2</priority>
    </url>

@@ -11,7 +11,7 @@
     </SideMenuButton>
 
     <SideMenuButton
-      label="My Library"
+      label="My Library "
       :isSelected="isRouteActive('/library')"
       @click="openRoute('/library')"
     >
@@ -50,13 +50,15 @@
     > 
       <template v-slot:icon>&#128065;</template>
     </SideMenuButton> -->
-    <!-- <SideMenuButton
+
+    <SideMenuButton
       label="Contact"
       :isSelected="isRouteActive('/contact')"
       @click="openRoute('/contact')"
     >
       <template v-slot:icon>&#9993;</template>
-    </SideMenuButton> -->
+    </SideMenuButton>
+    
     <!-- <SideMenuButton
       label="Terms & Policies"
       :isSelected="isRouteActive('/terms')"
