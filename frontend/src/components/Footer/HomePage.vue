@@ -28,6 +28,22 @@
                     </div>
                 </div>
             </div>
+            <!-- Add this section before the OpenAI logo -->
+             <!-- COME BACK HERE VVV-->
+    <div class="social-links-container">
+        <h3>Connect With Us</h3>
+        <div class="social-links">
+            <a :href="socialLinks.twitter" target="_blank" rel="noopener noreferrer" class="social-link">
+                <img :src="require('@/assets/images/x-logo.svg')" alt="X (Twitter)" class="social-icon" />
+                <span>Follow us on X</span>
+            </a>
+            <a :href="socialLinks.discord" target="_blank" rel="noopener noreferrer" class="social-link">
+                <img :src="require('@/assets/images/discord-logo.svg')" alt="Discord" class="social-icon" />
+                <span>Join our Discord</span>
+            </a>
+        </div>
+    </div>
+    <!-- COME BACK HERE ^^^-->
             <img :src="openaiPath" alt="Powered by OpenAI" class="openai" />
             <div class="faq-container">
                 <FaqComponent />

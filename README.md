@@ -57,14 +57,14 @@ TODO list:
             - ask chatgpt for what to do idk
         - (NEAR FUTURE) - put x / discord links in main page, probably along with something like "join us" or "hear our updates" or something
         - add OTHER PAGES
+        - continue with adding X / Discord link to main page (LibraryCreator.vue)
     
 
     OTHER PAGES:
-        - contact page 
         - terms and policies page
-        - somewhere to link to x / discord (might be on an existing page, idk) (see mvp cleanup list)
+        - somewhere to link to X / discord (might be on an existing page, idk) (see mvp cleanup list)
         - about page
-        (currently all 4 were in BottomBar.vue)
+        (currently all 4 were in BottomBar.vue) --> BASICALLY MAKE BottomBar.vue SMALLER)
 
     general:
 
