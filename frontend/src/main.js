@@ -200,7 +200,6 @@ router.afterEach(() => {
     loading.finish()
 })
 
-// axios.defaults.baseURL = 'https://obscure-memory-64wr7jgrgrvhr7g4-5000.app.github.dev';
 axios.defaults.baseURL = 'http://localhost:5000';
 axios.defaults.withCredentials = true;
 

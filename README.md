@@ -19,9 +19,6 @@ IDEAS:
             - investigate into late-chunking or late-interaction for vector embedding
             - also add multimodal and >1 file input for library / course creation
 
-    ideas for name:
-        - name something stone related for the actual lessons (bc you are SOLIDIFYING your knowledge (hahahahahah ok im done))
-        - rivue (ReInvent VirtUal Education --> go public w/ the acronym when I start the cardboard thing)
 
     ideas for map themes (possibly):
         - name something stone related (bc you are SOLIDIFYING your knowledge (hahahahahah ok im done))
@@ -261,6 +258,10 @@ COMPLETED:
     ✅ weird redirect for when user is logged in and try to navigate to a library which doesn't exist or no permissions (102 in main.js) ex: /lessons/234234
             fix w/ a loading state or something, prob pretty easy
     ✅ create email
+
+    ✅ ideas for name:
+        - name something stone related for the actual lessons (bc you are SOLIDIFYING your knowledge (hahahahahah ok im done))
+        - rivue (ReInvent VirtUal Education --> go public w/ the acronym when I start the cardboard thing)
 
 RESOURCES:
     - node components: https://vueflow.dev/
