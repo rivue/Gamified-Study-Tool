@@ -57,7 +57,7 @@ def init_pinecone():
     try:
         pc = PineconeGRPC(api_key=os.getenv("PINECONE_API_KEY"))
 
-        index_name = "testing-index"
+        index_name = "beta-index"
         
         try:
             # Try to get the existing index directly
