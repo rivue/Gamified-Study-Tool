@@ -28,6 +28,7 @@ Flask-Migrate==4.0.7
 Flask-Session==0.8.0
 Flask-SQLAlchemy==3.1.1
 frozenlist==1.4.1
+google-generativeai==0.8.3
 greenlet==3.0.3
 gunicorn==22.0.0
 h11==0.14.0

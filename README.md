@@ -65,6 +65,7 @@ TODO list:
 
     general:
 
+        - reduce bundle (currently @ 261 KiB, want to be ideally below 244)
         - ACCOUNT FOR MOBILE SCREEN SIZES!!
         - ADD SHAD-CN
         - add light / dark mode switcher to settings (it already exists)

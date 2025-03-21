@@ -14,7 +14,6 @@ import sys
 
 from database.models import db, User
 from database.upgrade_db import run_upgrades
-
 load_dotenv()
 app = Flask(__name__, static_folder='../frontend/dist')
 app.secret_key = os.getenv('FLASK_SECRET_KEY')
