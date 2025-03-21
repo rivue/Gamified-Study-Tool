@@ -1,4 +1,4 @@
-from pinecone.grpc import PineconeGRPC, GRPCClientConfig
+from pinecone.grpc import PineconeGRPC
 from pinecone import ServerlessSpec
 import time
 import concurrent.futures

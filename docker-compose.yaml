@@ -1,11 +1,29 @@
+version: '3.8'
+
 services:
-  index1:
-    image: ghcr.io/pinecone-io/pinecone-index:latest
-    environment:
-      PORT: 5080
-      INDEX_TYPE: serverless
-      DIMENSION: 1536 
-      METRIC: cosine
+  app:
+    build: .
     ports:
-      - "5081:5081"
-    platform: linux/amd64
+      - "5000:5000"
+    environment:
+      - GOOGLE_API_KEY=your-google-api-key
+      - PINECONE_API_KEY=your-pinecone-api-key
+      - FLASK_ENV=production
+      - RUN_SEEDING=False
+    depends_on:
+      - db
+
+  db:
+    image: mysql:latest
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootpassword
+      - MYSQL_DATABASE=mydb
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=password
+    ports:
+      - "3306:3306"
+    volumes:
+      - db-data:/var/lib/mysql
+
+volumes:
+  db-data:

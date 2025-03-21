@@ -64,7 +64,9 @@ TODO list:
         (currently all 4 were in BottomBar.vue) --> BASICALLY MAKE BottomBar.vue SMALLER)
 
     general:
-
+    
+        - migrate from pinecone-client to pinecone (not really a migration, just a typo I think, shouldn't take too long)
+        - possibly fix weird ssl module warning thing when I run the backend
         - reduce bundle (currently @ 261 KiB, want to be ideally below 244)
         - ACCOUNT FOR MOBILE SCREEN SIZES!!
         - ADD SHAD-CN

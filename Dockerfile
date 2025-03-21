@@ -11,6 +11,14 @@ RUN apt-get update && apt-get install -y \
     python3-dev \
     && rm -rf /var/lib/apt/lists/*
 
+# Install system dependencies for PyMuPDF
+RUN apt-get update && apt-get install -y \
+    libmupdf-dev \
+    libfreetype6-dev \
+    libjpeg-dev \
+    zlib1g-dev \
+    && rm -rf /var/lib/apt/lists/*
+
 # Install Node.js and npm for building the frontend
 RUN apt-get update && apt-get install -y nodejs npm
 
@@ -23,6 +31,8 @@ COPY backend/ ./backend/
 COPY requirements.txt ./
 
 # Install Python dependencies
+# Explicitly uninstall pinecone-client to avoid conflicts
+RUN pip3 uninstall -y pinecone-client || true
 RUN pip3 install --no-cache-dir -r requirements.txt
 RUN pip3 install gunicorn
 
@@ -30,12 +40,12 @@ RUN pip3 install gunicorn
 RUN mkdir -p ./frontend/dist
 COPY frontend/dist/ ./frontend/dist/
 
-# Expose the port your app will run on
-EXPOSE 5000
-
-# Set environment variables (optional, adjust as needed)
+# Set environment variables
 ENV FLASK_ENV=production
 ENV RUN_SEEDING=False
+
+# Expose the port your app will run on
+EXPOSE 5000
 
 # Run database migrations and start the app with gunicorn
 CMD ["sh", "-c", "flask --app backend/app db upgrade && gunicorn --chdir backend -b 0.0.0.0:5000 -w 4 app:app --timeout 300 --log-level info"]
