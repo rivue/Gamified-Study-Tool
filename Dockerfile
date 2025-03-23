@@ -4,23 +4,15 @@ FROM python:3.11-slim
 # Set working directory
 WORKDIR /app
 
-# Install build dependencies (gcc and others) for compiling C extensions
+# Install necessary dependencies
 RUN apt-get update && apt-get install -y \
-    build-essential \
-    gcc \
-    python3-dev \
-    && rm -rf /var/lib/apt/lists/*
-
-# Install system dependencies for PyMuPDF
-RUN apt-get update && apt-get install -y \
-    libmupdf-dev \
-    libfreetype6-dev \
-    libjpeg-dev \
-    zlib1g-dev \
-    && rm -rf /var/lib/apt/lists/*
-
-# Install Node.js and npm for building the frontend
-RUN apt-get update && apt-get install -y nodejs npm
+    build-essential gcc python3-dev \
+    libmupdf-dev libfreetype6-dev libjpeg-dev zlib1g-dev \
+    nodejs npm \
+    default-mysql-client \
+    locales \
+    && rm -rf /var/lib/apt/lists/* \
+    && locale-gen en_US.UTF-8
 
 # Copy frontend files and build the Vue.js app
 COPY frontend/ ./frontend/
@@ -31,21 +23,28 @@ COPY backend/ ./backend/
 COPY requirements.txt ./
 
 # Install Python dependencies
-# Explicitly uninstall pinecone-client to avoid conflicts
+# Explicitly uninstall pinecone-client to avoid conflicts (pinecone-client is out of date, install pinecone instead)
 RUN pip3 uninstall -y pinecone-client || true
 RUN pip3 install --no-cache-dir -r requirements.txt
 RUN pip3 install gunicorn
 
 # Copy the built frontend files to a location the backend can serve
 RUN mkdir -p ./frontend/dist
-COPY frontend/dist/ ./frontend/dist/
+# COPY frontend/dist/ ./frontend/dist/
 
 # Set environment variables
 ENV FLASK_ENV=production
 ENV RUN_SEEDING=False
 
+# for UTF-8 encoding ('latin-1' codec can't encode character xyz, ordinal not in range(128), or 'ascii codec' or similar errors)
+ENV LANG=C.UTF-8 \
+    LC_ALL=C.UTF-8 \
+    PYTHONUTF8=1
+
 # Expose the port your app will run on
 EXPOSE 5000
 
 # Run database migrations and start the app with gunicorn
-CMD ["sh", "-c", "flask --app backend/app db upgrade && gunicorn --chdir backend -b 0.0.0.0:5000 -w 4 app:app --timeout 300 --log-level info"]
+# CMD ["sh", "-c", "flask --app backend/app db upgrade && gunicorn --chdir backend -b 0.0.0.0:5000 -w 1 app:app --timeout 300 --log-level debug"]
+CMD ["sh", "-c", "ls"]
+

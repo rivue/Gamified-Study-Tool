@@ -64,7 +64,7 @@ TODO list:
         (currently all 4 were in BottomBar.vue) --> BASICALLY MAKE BottomBar.vue SMALLER)
 
     general:
-    
+
         - migrate from pinecone-client to pinecone (not really a migration, just a typo I think, shouldn't take too long)
         - possibly fix weird ssl module warning thing when I run the backend
         - reduce bundle (currently @ 261 KiB, want to be ideally below 244)
@@ -78,7 +78,6 @@ TODO list:
         - include question prompt generation (e.g. make the answer choices very similar to what you think the user would think, etc...)
         - add default background if you scroll to far (like in main page if you scroll too far down)
         - eventually add footer back (note: requires light mode, discord link, donate link (or we could just not do that), everything in contact page, terms page, copyright(?), and possibly twitter link if we decide to do that)
-        - implement "feedback" tab (note: requires email oath, and email domain and possibly twitter and stuff as well)
         - change theme / color / name
         - ability to "star" / "favorite" a course
         - make footer smaller and look better
@@ -265,6 +264,7 @@ COMPLETED:
     ✅ ideas for name:
         - name something stone related for the actual lessons (bc you are SOLIDIFYING your knowledge (hahahahahah ok im done))
         - rivue (ReInvent VirtUal Education --> go public w/ the acronym when I start the cardboard thing)
+    ✅ implement "feedback" tab (note: requires email oath, and email domain and possibly twitter and stuff as well)
 
 RESOURCES:
     - node components: https://vueflow.dev/

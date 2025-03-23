@@ -35,7 +35,7 @@ def init_auth_routes(app):
             print("User ID in session:", session.get('_user_id'))
             print("Session:", dict(session))
             print(f"SECRET_KEY at login      : {app.config['SECRET_KEY']}")
-            # print(f"FLASK_SECRET_KEY at login: {app.config['FLASK_SECRET_KEY']}")
+            # print(f"FLAKS_SECRET_KEY at login: {app.config['FLASK_SECRET_KEY']}")
 
             return jsonify({'status': 'success'})
         else:

@@ -81,7 +81,7 @@ def init_library_routes(app):
             extra_context = clean(extra_context)
             if len(extra_context) > 200:
                 return jsonify({"error": "Extra context is too long. Maximum 200 characters allowed."}), 400
-
+        print("test output library_routes")
         # Check for existing library
         if not extra_context:
             existing_library = lbh.get_library_id(topic, library_difficulty, language, language_difficulty, guide)
