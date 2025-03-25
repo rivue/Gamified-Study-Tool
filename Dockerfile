@@ -32,8 +32,14 @@ RUN pip3 install gunicorn
 RUN mkdir -p ./frontend/dist
 # COPY frontend/dist/ ./frontend/dist/
 
+COPY entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
+
 # Set environment variables
 ENV FLASK_ENV=production
+ENV FLASK_APP=backend/app.py
+ENV PYTHONIOENCODING=UTF-8
+ENV SQLALCHEMY_DATABASE_URI=sqlite:///app.db
 ENV RUN_SEEDING=False
 
 # for UTF-8 encoding ('latin-1' codec can't encode character xyz, ordinal not in range(128), or 'ascii codec' or similar errors)
@@ -44,7 +50,8 @@ ENV LANG=C.UTF-8 \
 # Expose the port your app will run on
 EXPOSE 5000
 
+# CMD ["sh", "-c", "cd backend && ls"]
 # Run database migrations and start the app with gunicorn
-# CMD ["sh", "-c", "flask --app backend/app db upgrade && gunicorn --chdir backend -b 0.0.0.0:5000 -w 1 app:app --timeout 300 --log-level debug"]
-CMD ["sh", "-c", "ls"]
-
+# CMD ["sh", "-c", "cd backend/migrations/versions && ls && flask db upgrade"]
+CMD ["sh", "-c", "gunicorn --chdir backend -b 0.0.0.0:5000 -w 1 app:app --timeout 300 --log-level debug"]
+# ENTRYPOINT ["/app/entrypoint.sh"]

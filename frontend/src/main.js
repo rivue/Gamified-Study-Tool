@@ -200,7 +200,9 @@ router.afterEach(() => {
     loading.finish()
 })
 
-axios.defaults.baseURL = 'http://localhost:5000';
+// axios.defaults.baseURL = 'http://localhost:5000';
+axios.defaults.baseURL = 'https://rivue.ai';
+
 axios.defaults.withCredentials = true;
 
 const pinia = createPinia()
