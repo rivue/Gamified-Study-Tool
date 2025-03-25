@@ -1,7 +1,7 @@
 import fitz
 
 from vector_processing.file_processing import clean_text, split_into_sentences, create_sections
-from vector_processing.embedding_service import insert_sections_to_pinecone_parallel, init_pinecone
+from vector_processing.embedding_service import insert_sections_to_pinecone_parallel
 
 def process_document(selected_files, library_id=None):
     # Validate file type and size here if needed (e.g., check if it's a PDF and not too large)

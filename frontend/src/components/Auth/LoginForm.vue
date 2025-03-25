@@ -35,7 +35,7 @@ export default {
     return {
       email: "",
       password: "",
-      buttonText: "Log inddddd",
+      buttonText: "Log in",
     };
   },
   methods: {
