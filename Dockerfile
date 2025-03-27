@@ -7,6 +7,7 @@ WORKDIR /app
 # Install necessary dependencies
 RUN apt-get update && apt-get install -y \
     build-essential gcc python3-dev \
+    libpq-dev \
     libmupdf-dev libfreetype6-dev libjpeg-dev zlib1g-dev \
     nodejs npm \
     default-mysql-client \
