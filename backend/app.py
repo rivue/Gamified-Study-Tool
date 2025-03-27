@@ -127,7 +127,7 @@ def load_user(user_id):
     # return User.query.get(int(user_id))
     # return session.get(User, int(user_id.id))
 
-print(f' database uri: {app.config['SQLALCHEMY_DATABASE_URI']}')
+print(f" database uri: {app.config['SQLALCHEMY_DATABASE_URI']}")
 
 # Routes
 from routes.auth_routes import init_auth_routes
