@@ -19,7 +19,6 @@ IDEAS:
             - investigate into late-chunking or late-interaction for vector embedding
             - also add multimodal and >1 file input for library / course creation
 
-
     ideas for map themes (possibly):
         - name something stone related (bc you are SOLIDIFYING your knowledge (hahahahahah ok im done))
         - could have the background be a pond / stream or something
