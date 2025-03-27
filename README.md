@@ -265,6 +265,7 @@ COMPLETED:
         - rivue (ReInvent VirtUal Education --> go public w/ the acronym when I start the cardboard thing)
     ✅ implement "feedback" tab (note: requires email oath, and email domain and possibly twitter and stuff as well)
     ✅ change CORS(origins="*") to the actual frontend url in app.py
+    ✅ add auto deploy for github ci/cd
 
 
 RESOURCES:
