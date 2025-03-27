@@ -1,8 +1,8 @@
-"""empty message
+"""initial migration
 
-Revision ID: b181e191204f
+Revision ID: f6e9c2d42fbd
 Revises: 
-Create Date: 2023-11-09 19:51:10.364463
+Create Date: 2025-03-27 00:40:49.307705
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'b181e191204f'
+revision = 'f6e9c2d42fbd'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -25,15 +25,27 @@ def upgrade():
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('name')
     )
+    op.create_table('ip_tracking',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('hashed_ip', sa.String(length=64), nullable=False),
+    sa.Column('library_generated', sa.Boolean(), nullable=False),
+    sa.Column('library_generated_time', sa.DateTime(), nullable=True),
+    sa.Column('room_generated', sa.Boolean(), nullable=False),
+    sa.Column('room_generated_time', sa.DateTime(), nullable=True),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('hashed_ip')
+    )
     op.create_table('user',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('username', sa.String(length=50), nullable=False),
-    sa.Column('password', sa.String(length=200), nullable=False),
+    sa.Column('password', sa.String(length=200), nullable=True),
     sa.Column('email', sa.String(length=100), nullable=False),
+    sa.Column('mentor_name', sa.String(length=100), nullable=True),
     sa.Column('system_role', sa.String(length=100), nullable=True),
     sa.Column('profile', sa.Text(), nullable=True),
     sa.Column('ai_tutor_profile', sa.Text(), nullable=True),
     sa.Column('current_content', sa.String(length=500), nullable=True),
+    sa.Column('experience_points', sa.Integer(), nullable=True),
     sa.Column('tier', sa.String(length=50), nullable=True),
     sa.Column('daily_request_count', sa.Integer(), nullable=True),
     sa.Column('last_request_time', sa.DateTime(), nullable=True),
@@ -50,15 +62,34 @@ def upgrade():
     sa.Column('user_id', sa.Integer(), nullable=False),
     sa.Column('challenge_name', sa.String(length=100), nullable=False),
     sa.Column('completion_date', sa.DateTime(), nullable=True),
+    sa.Column('shared', sa.Boolean(), nullable=True),
     sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('lesson',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=False),
-    sa.Column('lesson_name', sa.String(length=100), nullable=False),
+    sa.Column('lesson_name', sa.String(length=200), nullable=False),
     sa.Column('completion_date', sa.DateTime(), nullable=True),
     sa.Column('system_role', sa.String(length=100), nullable=True),
+    sa.Column('shared', sa.Boolean(), nullable=True),
+    sa.Column('public', sa.Boolean(), nullable=True),
+    sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_table('library',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('user_id', sa.Integer(), nullable=True),
+    sa.Column('library_topic', sa.String(length=200), nullable=False),
+    sa.Column('difficulty', sa.String(length=50), nullable=False),
+    sa.Column('guide', sa.String(length=50), nullable=False),
+    sa.Column('language', sa.String(length=50), nullable=False),
+    sa.Column('language_difficulty', sa.String(length=50), nullable=False),
+    sa.Column('context', sa.String(length=200), nullable=True),
+    sa.Column('clicks', sa.Integer(), nullable=True),
+    sa.Column('likes', sa.Integer(), nullable=True),
+    sa.Column('room_names', sa.JSON(), nullable=False),
+    sa.Column('image_url', sa.String(length=200), nullable=False),
     sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
@@ -80,6 +111,7 @@ def upgrade():
     sa.Column('timestamp', sa.DateTime(), nullable=True),
     sa.Column('challenge_id', sa.Integer(), nullable=True),
     sa.Column('lesson_id', sa.Integer(), nullable=True),
+    sa.Column('message_type', sa.String(length=50), nullable=True),
     sa.ForeignKeyConstraint(['challenge_id'], ['challenge.id'], ),
     sa.ForeignKeyConstraint(['lesson_id'], ['lesson.id'], ),
     sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
@@ -100,6 +132,39 @@ def upgrade():
     sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
+    op.create_table('library_completion',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('user_id', sa.Integer(), nullable=True),
+    sa.Column('library_id', sa.Integer(), nullable=False),
+    sa.Column('completion_date', sa.DateTime(), nullable=False),
+    sa.Column('score', sa.Integer(), nullable=False),
+    sa.Column('time', sa.Integer(), nullable=False),
+    sa.Column('completed_rooms', sa.Text(), nullable=True),
+    sa.Column('is_complete', sa.Boolean(), nullable=True),
+    sa.ForeignKeyConstraint(['library_id'], ['library.id'], ),
+    sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_table('library_factoid',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('library_id', sa.Integer(), nullable=False),
+    sa.Column('room_name', sa.String(length=200), nullable=False),
+    sa.Column('lesson_name', sa.String(length=200), nullable=False),
+    sa.Column('factoid_content', sa.Text(), nullable=False),
+    sa.ForeignKeyConstraint(['library_id'], ['library.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_table('library_room_state',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('user_id', sa.Integer(), nullable=False),
+    sa.Column('library_id', sa.Integer(), nullable=False),
+    sa.Column('room_name', sa.String(length=200), nullable=False),
+    sa.Column('num_lessons', sa.Integer(), nullable=False),
+    sa.Column('lesson_state', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['library_id'], ['library.id'], ),
+    sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
     op.create_table('user_action',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=False),
@@ -109,17 +174,41 @@ def upgrade():
     sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
+    op.create_table('library_question',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('factoid_id', sa.Integer(), nullable=False),
+    sa.Column('question_text', sa.Text(), nullable=False),
+    sa.Column('correct_choice', sa.JSON(), nullable=False),
+    sa.Column('question_type', sa.String(length=50), nullable=False),
+    sa.ForeignKeyConstraint(['factoid_id'], ['library_factoid.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_table('library_question_choice',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('question_id', sa.Integer(), nullable=False),
+    sa.Column('choice_text', sa.String(length=400), nullable=False),
+    sa.Column('is_correct', sa.Boolean(), nullable=True),
+    sa.ForeignKeyConstraint(['question_id'], ['library_question.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
     # ### end Alembic commands ###
 
 
 def downgrade():
     # ### commands auto generated by Alembic - please adjust! ###
+    op.drop_table('library_question_choice')
+    op.drop_table('library_question')
     op.drop_table('user_action')
+    op.drop_table('library_room_state')
+    op.drop_table('library_factoid')
+    op.drop_table('library_completion')
     op.drop_table('feedback')
     op.drop_table('chat_history')
     op.drop_table('user_achievement')
+    op.drop_table('library')
     op.drop_table('lesson')
     op.drop_table('challenge')
     op.drop_table('user')
+    op.drop_table('ip_tracking')
     op.drop_table('achievement')
     # ### end Alembic commands ###

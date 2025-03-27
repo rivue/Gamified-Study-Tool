@@ -17,24 +17,43 @@ from database.upgrade_db import run_upgrades
 load_dotenv()
 app = Flask(__name__, static_folder='../frontend/dist')
 app.secret_key = os.getenv('FLASK_SECRET_KEY')
+app.config['FLASK_ENV'] = os.getenv('FLASK_ENV', 'development')
 openai.api_key = os.getenv("OPENAI_API_KEY")
 resend.api_key = os.getenv('RESEND_API_KEY')
 
 print(f"app level secret key: {app.secret_key}")
-# host = os.environ.get('AZURE_MYSQL_HOST')
-# name = os.environ.get('AZURE_MYSQL_NAME')
-# password = os.environ.get('AZURE_MYSQL_PASSWORD')
-# user = os.environ.get('AZURE_MYSQL_USER')
-# if host and name and password and user:
-#     uri = f'mysql+pymysql://{user}:{password}@{host}/{name}'
-# else:
-#     uri = os.environ.get('SQLALCHEMY_DATABASE_URI', 'mysql+pymysql://root:password@localhost/rivue')
+
+host = os.getenv('HOST')
+port = os.getenv('PORT')
+database = os.getenv('DATABASE')
+user = os.getenv('USER')
+password = os.getenv('PASSWORD')
+
+host_local = os.getenv('HOST_LOCAL')
+port_local = os.getenv('PORT_LOCAL')
+database_local = os.getenv('DATABASE_LOCAL')
+user_local = os.getenv('USER_LOCAL')
+password_local = os.getenv('PASSWORD_LOCAL')
+
+print(f"flask_env: {app.config['FLASK_ENV']}")
+if host and port and database and user and password and app.config["FLASK_ENV"] == "production": # PUT BACK IN FOR PRODUCTION and app.config['FLASK_ENV'] == 'production':
+    uri = SUPABASE_DATABASE_URI=f'postgresql+psycopg2://{user}:{password}@{host}:{port}/{database}'
+elif host_local and port_local and database_local and user_local and password_local: # uses a different string because macbook is ipv4
+    uri = SUPABASE_DATABASE_URI=f'postgresql+psycopg2://{user_local}:{password_local}@{host_local}:{port_local}/{database_local}'
+else:
+    uri = 'sqlite:///app.db'
 
 # os.makedirs("instance", exist_ok=True)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = uri
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['REMEMBER_COOKIE_DURATION'] = timedelta(days=7)
 app.config['FLASK_SECRET_KEY'] = os.getenv('FLASK_SECRET_KEY')
+app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
+    "pool_size": 5,          # how many persistent connections
+    "max_overflow": 10,      # extra connections on demand
+    "pool_timeout": 30,      # how long to wait for a connection
+    "pool_recycle": 1800     # recycle connections every 30 mins
+}
 
 app.config.update(
     # SESSION_COOKIE_SECURE=True,  # for HTTPS only
@@ -49,7 +68,11 @@ app.config.update(
 
 db.init_app(app)
 migrate = Migrate(app, db)
-CORS(app, origins="https://www.rivue.ai", supports_credentials=True)
+if os.getenv('FLASK_ENV') == 'production':
+    origins = "https://www.rivue.ai"
+else:
+    origins = "*"
+CORS(app, origins=origins, supports_credentials=True)
 
 # class LoggerWriter:
 #     def __init__(self, level):

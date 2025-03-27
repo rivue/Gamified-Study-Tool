@@ -39,7 +39,6 @@ RUN chmod +x /app/entrypoint.sh
 ENV FLASK_ENV=production
 ENV FLASK_APP=backend/app.py
 ENV PYTHONIOENCODING=UTF-8
-ENV SQLALCHEMY_DATABASE_URI=sqlite:///app.db
 ENV RUN_SEEDING=False
 
 # for UTF-8 encoding ('latin-1' codec can't encode character xyz, ordinal not in range(128), or 'ascii codec' or similar errors)

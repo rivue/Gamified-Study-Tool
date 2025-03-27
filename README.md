@@ -47,7 +47,6 @@ TODO list:
             - pretty much done, and modify email_templates
         - go through TODOs (again once emails are taken care of)
         - figure out prod building and gcp and possibly nginx / rabbit / zeromq or whatever
-        - change CORS(origins="*") to the actual frontend url in app.py
       
         - error handling, and lots of it (how to handle failed document generation, other errors, etc...)
             - error handling for not finding any context when loading stone names in library?
@@ -265,6 +264,8 @@ COMPLETED:
         - name something stone related for the actual lessons (bc you are SOLIDIFYING your knowledge (hahahahahah ok im done))
         - rivue (ReInvent VirtUal Education --> go public w/ the acronym when I start the cardboard thing)
     ✅ implement "feedback" tab (note: requires email oath, and email domain and possibly twitter and stuff as well)
+    ✅ change CORS(origins="*") to the actual frontend url in app.py
+
 
 RESOURCES:
     - node components: https://vueflow.dev/
