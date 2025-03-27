@@ -24,7 +24,7 @@ resend.api_key = os.getenv('RESEND_API_KEY')
 print(f"app level secret key: {app.secret_key}")
 
 host = os.getenv('HOST')
-port = os.getenv('PORT')
+port = os.getenv('SUPABASE_PORT')
 database = os.getenv('DATABASE')
 user = os.getenv('USER')
 password = os.getenv('PASSWORD')

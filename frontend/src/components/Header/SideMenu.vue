@@ -43,13 +43,13 @@
     >
       <template v-slot:icon>&#128200;</template>
     </SideMenuButton> -->
-    <!-- <SideMenuButton
+    <SideMenuButton
       label="About"
       :isSelected="isRouteActive('/about')"
       @click="openRoute('/about')"
     > 
-      <template v-slot:icon>&#128065;</template>
-    </SideMenuButton> -->
+      <template v-slot:icon>📢</template>
+    </SideMenuButton>
 
     <SideMenuButton
       label="Contact"
