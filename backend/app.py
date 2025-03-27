@@ -37,9 +37,9 @@ password_local = os.getenv('PASSWORD_LOCAL')
 
 print(f"flask_env: {app.config['FLASK_ENV']}")
 if host and port and database and user and password and app.config["FLASK_ENV"] == "production": # PUT BACK IN FOR PRODUCTION and app.config['FLASK_ENV'] == 'production':
-    uri = SUPABASE_DATABASE_URI=f'postgresql+psycopg2://{user}:{password}@{host}:{port}/{database}'
+    uri = f'postgresql+psycopg2://{user}:{password}@{host}:{port}/{database}'
 elif host_local and port_local and database_local and user_local and password_local: # uses a different string because macbook is ipv4
-    uri = SUPABASE_DATABASE_URI=f'postgresql+psycopg2://{user_local}:{password_local}@{host_local}:{port_local}/{database_local}'
+    uri = f'postgresql+psycopg2://{user_local}:{password_local}@{host_local}:{port_local}/{database_local}'
 else:
     uri = 'sqlite:///app.db'
 
@@ -127,7 +127,7 @@ def load_user(user_id):
     # return User.query.get(int(user_id))
     # return session.get(User, int(user_id.id))
 
-print(app.config['SQLALCHEMY_DATABASE_URI'])
+print(f' database uri: {app.config['SQLALCHEMY_DATABASE_URI']}')
 
 # Routes
 from routes.auth_routes import init_auth_routes
