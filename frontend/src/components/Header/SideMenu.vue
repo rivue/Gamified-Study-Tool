@@ -48,7 +48,7 @@
       :isSelected="isRouteActive('/about')"
       @click="openRoute('/about')"
     > 
-      <template v-slot:icon>📢</template>
+      <template v-slot:icon>📢</template>asd,fkjhas[dkfa'lskdfn099]
     </SideMenuButton>
 
     <SideMenuButton
