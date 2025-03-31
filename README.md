@@ -37,7 +37,7 @@ IDEAS:
         - could be some sort of water rocks in a ocean
         - could be rocks in an island (or actual islands)
         - could be something in a crop field
-        - possibly take inspiration from btd5 / btd6 / odessey
+        - possibly take inspiration from btd5 or btd6 / odessey
 TODO list:
 
     MVP CLEANUP LIST:
