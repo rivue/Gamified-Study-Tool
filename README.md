@@ -82,7 +82,7 @@ TODO list:
         - significant ui rehaul *** --> kinnu, duolingo, saved instagram design reels etc..
             - copy openais font?
         
-        - change gpt 4o-mini to deepseek (deepseek once I test reliable function calling / parsing) or other model for cost
+        - change gpt 4o-mini to deepseek (deepseek once I test reliable function calling or parsing) or other model for cost
         - eventually look into custom api / llm specifically designed for education or review or whatever
         - *possibly* add a slider to each course based on how lenient the course creator wants the fuzzy string matcher to be (for misspelled words)
         - improve completion screen a bit
