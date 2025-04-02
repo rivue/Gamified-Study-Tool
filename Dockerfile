@@ -53,5 +53,5 @@ EXPOSE 5000
 # CMD ["sh", "-c", "cd backend && ls"]
 # Run database migrations and start the app with gunicorn
 # CMD ["sh", "-c", "cd backend/migrations/versions && ls && flask db upgrade"]
-CMD ["sh", "-c", "gunicorn --chdir backend -b 0.0.0.0:5000 -w 4 --threads 2 app:app --timeout 300 --log-level debug"]
+CMD ["sh", "-c", "gunicorn --chdir backend -b 0.0.0.0:5000 -w 3 app:app --timeout 300 --log-level debug"]
 # ENTRYPOINT ["/app/entrypoint.sh"]
