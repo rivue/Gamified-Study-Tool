@@ -61,13 +61,12 @@ TODO list:
         (currently all 4 were in BottomBar.vue) --> BASICALLY MAKE BottomBar.vue SMALLER)
 
     general:
- 
+        - add a slot for an image in each question for reference or description or something - like maybe an image of a bridge or trigonometry or something
         - migrate from pinecone-client to pinecone (not really a migration, just a typo I think, shouldn't take too long)
         - possibly fix weird ssl module warning thing when I run the backend
         - reduce bundle (currently @ 261 KiB, want to be ideally below 244)
         - ACCOUNT FOR MOBILE SCREEN SIZES!!
         - ADD SHAD-CN
-        - add light / dark mode switcher to settings (it already exists)
         - add support for multiple file upload (possibly)
         - add other routes back in, eventually
         - remove library difficulty, mentor, language, etc... from db course structure, backend, frontend course creation screen
@@ -264,6 +263,7 @@ COMPLETED:
     ✅ implement "feedback" tab (note: requires email oath, and email domain and possibly twitter and stuff as well)
     ✅ change CORS(origins="*") to the actual frontend url in app.py
     ✅ add auto deploy for github ci/cd
+    ✅ add light / dark mode switcher to settings (it already exists)
 
 
 RESOURCES:

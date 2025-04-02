@@ -55,6 +55,8 @@ ordered-set==4.1.0
 packaging==24.0
 pinecone[grpc]==6.0.0
 protobuf==5.29.4
+psycopg2==2.9.10
+psycopg2-binary==2.9.10
 pyasn1==0.6.0
 pyasn1_modules==0.4.0
 pycparser==2.22
