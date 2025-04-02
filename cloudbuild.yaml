@@ -25,6 +25,7 @@ steps:
       - '--platform=managed'
       - '--quiet'
       - '--allow-unauthenticated'
-
+options:
+  logging: CLOUD_LOGGING_ONLY
 images:
   - 'us-central1-docker.pkg.dev/rivue-app/cloud-run-source-deploy/gamified-study-tool/rivue-app:$COMMIT_SHA'
