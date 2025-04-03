@@ -41,6 +41,7 @@ ENV FLASK_ENV=production
 ENV FLASK_APP=backend/app.py
 ENV PYTHONIOENCODING=UTF-8
 ENV RUN_SEEDING=False
+ENV VITE_API_BASE_URL=https://rivue.ai
 
 # for UTF-8 encoding ('latin-1' codec can't encode character xyz, ordinal not in range(128), or 'ascii codec' or similar errors)
 ENV LANG=C.UTF-8 \
@@ -53,5 +54,5 @@ EXPOSE 5000
 # CMD ["sh", "-c", "cd backend && ls"]
 # Run database migrations and start the app with gunicorn
 # CMD ["sh", "-c", "cd backend/migrations/versions && ls && flask db upgrade"]
-CMD ["sh", "-c", "gunicorn --chdir backend -b 0.0.0.0:5000 -w 3 app:app --timeout 300 --log-level debug"]
+CMD ["sh", "-c", "gunicorn --chdir backend -b 0.0.0.0:5000 -w 2 app:app --timeout 300 --log-level debug"]
 # ENTRYPOINT ["/app/entrypoint.sh"]

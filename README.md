@@ -38,20 +38,11 @@ IDEAS:
         - could be rocks in an island (or actual islands)
         - could be something in a crop field
         - possibly take inspiration from btd5 or btd6 / odessey
+
 TODO list:
 
     MVP CLEANUP LIST:
-        - ascendence --> rivue (everywhere on the site and in the file system)
-            - pretty much done, and modify email_templates
-        - go through TODOs (again once emails are taken care of)
-        - figure out prod building and gcp and possibly nginx / rabbit / zeromq or whatever
-      
-        - error handling, and lots of it (how to handle failed document generation, other errors, etc...)
-            - error handling for not finding any context when loading stone names in library?
-            - ask chatgpt for what to do idk
-        - (NEAR FUTURE) - put x / discord links in main page, probably along with something like "join us" or "hear our updates" or something
         - add OTHER PAGES
-        - continue with adding X / Discord link to main page (LibraryCreator.vue)
     
 
     OTHER PAGES:
@@ -61,6 +52,7 @@ TODO list:
         (currently all 4 were in BottomBar.vue) --> BASICALLY MAKE BottomBar.vue SMALLER)
 
     general:
+        - add ability to add multiple room names from Add New Stepping Stone part
         - add a slot for an image in each question for reference or description or something - like maybe an image of a bridge or trigonometry or something
         - migrate from pinecone-client to pinecone (not really a migration, just a typo I think, shouldn't take too long)
         - possibly fix weird ssl module warning thing when I run the backend
@@ -264,6 +256,14 @@ COMPLETED:
     ✅ change CORS(origins="*") to the actual frontend url in app.py
     ✅ add auto deploy for github ci/cd
     ✅ add light / dark mode switcher to settings (it already exists)
+    ✅ ascendence --> rivue (everywhere on the site and in the file system)
+            - pretty much done, and modify email_templates
+    ✅ go through TODOs (again once emails are taken care of)
+    ✅ figure out prod building and gcp and possibly nginx / rabbit / zeromq or whatever  
+    ✅ error handling, and lots of it (how to handle failed document generation, other errors, etc...)
+    ✅ error handling for not finding any context when loading stone names in library?
+    ✅ put x / discord links in main page, probably along with something like "join us" or "hear our updates" or something
+    ✅ continue with adding X / Discord link to main page (LibraryCreator.vue)
 
 
 RESOURCES:

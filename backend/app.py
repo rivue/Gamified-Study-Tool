@@ -38,8 +38,12 @@ password_local = os.getenv('PASSWORD_LOCAL')
 print(f"flask_env: {app.config['FLASK_ENV']}")
 if host and port and database and user and password and app.config["FLASK_ENV"] == "production": # PUT BACK IN FOR PRODUCTION and app.config['FLASK_ENV'] == 'production':
     uri = f'postgresql+psycopg2://{user}:{password}@{host}:{port}/{database}'
-elif host_local and port_local and database_local and user_local and password_local: # uses a different string because macbook is ipv4
-    uri = f'postgresql+psycopg2://{user_local}:{password_local}@{host_local}:{port_local}/{database_local}'
+# elif host_local and port_local and database_local and user_local and password_local: # uses a different string because macbook is ipv4
+#     uri = f'postgresql+psycopg2://{user_local}:{password_local}@{host_local}:{port_local}/{database_local}'
+elif app.config["FLASK_ENV"] == "production":
+    # throw an error because uri is not defined
+    print("Database URI not defined")
+    raise Exception("Database URI not defined")
 else:
     uri = 'sqlite:///app.db'
 

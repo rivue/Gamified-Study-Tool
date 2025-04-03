@@ -57,7 +57,10 @@ def init_pinecone():
     try:
         pc = PineconeGRPC(api_key=os.getenv("PINECONE_API_KEY"))
 
-        index_name = "beta-testing"
+        if os.getenv("FLASK_ENV") == "production":
+            index_name = "beta-testing"
+        else:
+            index_name = "text-sections"
         
         try:
             # Try to get the existing index directly

@@ -243,100 +243,95 @@ def init_library_routes(app):
 
         return jsonify(status="success", data=library_data, room_data=room_data)
         
-    @app.route("/api/library/room", methods=["POST"])
+    @app.route('/api/library/room', methods=['POST'])
     def generate_room():
         user_id = current_user.id if not isinstance(current_user, AnonymousUserMixin) else None
-        subtopic = request.form.get("roomName")
+        subtopics = request.form.getlist("roomNames")  # Get list of subtopics
         library_id = request.form.get("libraryId")
 
-        if not subtopic:
-            return jsonify(status="error", message="No subtopic provided"), 400
+        # Validate inputs
+        if not subtopics:
+            return jsonify(status="error", message="No subtopics provided"), 400
         if not library_id:
             return jsonify(status="error", message="No library ID provided"), 400
 
         try:
+
             # Check if "file" is in request.files
-            if "file" not in request.files:
-                return jsonify({"error": "No file provided (not in request.files)"}), 400
+            selected_file = None
+            if "file" in request.files:
+                file = request.files["file"]
+                if file.filename == "":
+                    return jsonify(status="error", message="No file selected"), 400
+                selected_file = file.read()
 
-            # Get the file
-            file = request.files["file"]
-
-            # Check if the file is empty
-            if file.filename == "":
-                return jsonify({"error": "No file selected"}), 400
-
-            # Read the file
-            selected_file = file.read()
-
-        except Exception as e:
-            return jsonify({"error": f"Error reading file: {str(e)}"}), 400
-        
-        # Attempt to retrieve existing room contents
-        existing_content = lbh.retrieve_library_room_contents(library_id, subtopic, user_id) # .replace("-", " "))
-
-        if existing_content:
-            return jsonify(status="success", data=existing_content)
-        
-        # If no content exists, fetch new content
-        if not user_id:
-            return jsonify(status="error", message="Must be signed in."), 403
+            # If no user is logged in, return an error
+            if not user_id:
+                return jsonify(status="error", message="Must be signed in."), 403
             
-        # print(f"userid: ${user_id}")
-        # if user_id:
-        #     within_limit, message = is_within_limit(current_user)
-        #     if not within_limit:
-        #         return jsonify({"error": message}), 429
-        # elif not lbh.is_center_room(library_id, subtopic):
-        #     return jsonify(status="error", message="Please login to continue."), 400
-
+        except Exception as e:
+            return jsonify(status="error", message=f"Failed to process request: {str(e)}"), 500
+    
         try:
             library_response = get_library(library_id)
             if not library_response or library_response.status_code == "error":
                 return jsonify(status="error", message="Can only generate library rooms for valid libraries"), 400
 
-            library_data = library_response.get_json()
-            room_list = library_data.get('data', {}).get('room_names', [])
-
-            # print(f"room_names: {room_list}")
-
-            # if not subtopic in room_list:
-                # return jsonify(status="error", message="Can only generate library rooms for valid libraries"), 400
-
+            # Process each subtopic
+            results = []
+            rag_context = None
             if selected_file:
                 process_document(selected_file, library_id)
-                rag_context = query_and_respond_pinecone(subtopic, library_id)
-                generated_content = lgn.generate_libroom_content(user_id, subtopic, library_id, rag_context)
-                # print("selected_file")
-            else:
-                generated_content = lgn.generate_libroom_content(user_id, subtopic, library_id, rag_context=None) # need generate_room_content(user_id, topic, library_difficulty, language, language_difficulty, extra_context, guide, rag_context): 
-            
-            
-            if not generated_content:
-                # print("generated_content lbr")
-                return jsonify(status="error", message="Failed to generate room content"), 500
-            
-            print(f"room_contents library_routes 328: {generated_content}")
 
-            # print("lbg_save_contents")
-            # print(f"generated_content: {generated_content}")
-            
-            # response, status_code = lbh.add_room_name_to_library(library_id, subtopic)
-            
-            # if not response or status_code != 200:
-            #     return jsonify(status="error", message="Failed to save room content"), 500
-            
-            lbh.save_library_room_contents(library_id, subtopic, generated_content, user_id)
-            # print("save_libroom_contents")
-            existing_content = lbh.retrieve_library_room_contents(library_id, subtopic, user_id)
-            # print("existing_content")
-            return jsonify(status="success", data=existing_content)
-            # if not user_id:
-            #     mark_generation_done(ip, 'room')
-            # return jsonify(status="success", data=existing_content)
+            futures_dict = {}
+            for subtopic in subtopics:
+                # Check for existing content
+                existing_content = lbh.retrieve_library_room_contents(library_id, subtopic, user_id)
+                if existing_content:
+                    results.append({"subtopic": subtopic, "status": "success", "data": existing_content})
+                    continue
+
+                # Generate new content for this subtopic
+                try:
+
+                    print("before rag_context")
+                    rag_context = query_and_respond_pinecone(subtopic, library_id)
+                    print(f"rag context: {rag_context}")
+                    future = executor.submit(lgn.generate_libroom_content, user_id, subtopic, library_id, rag_context)
+                    futures_dict[future] = subtopic
+                     
+                except Exception as e:
+                    results.append({"subtopic": subtopic, "status": "error", "message": f"Failed to generate content: {str(e)}"})
+
+            completed_subtopics = {}
+            for future in concurrent.futures.as_completed(futures_dict):
+                print("before subtopic")
+                subtopic = futures_dict[future]
+                print("after subtopic")
+                try: 
+                    subtopic_contents = future.result()
+
+                    # Save the generated content
+                    print(f" library_id: {library_id} subtopic: {subtopic} subtopic_contents: {subtopic_contents} user_id: {user_id}")
+                    lbh.save_library_room_contents(library_id, subtopic, subtopic_contents, user_id)
+                    results.append({"subtopic": subtopic, "status": "success", "data": subtopic_contents})
+                    completed_subtopics[subtopic] = True
+
+                except Exception as e:
+                    print(f"Error generating content for subtopic {subtopic}: {str(e)}")
+                    completed_subtopics[subtopic] = False
+
+                        
+            # Check if all subtopics failed
+            if all(result["status"] == "error" for result in results):
+                return jsonify(status="error", message="Failed to process any subtopics", errors=results), 500
+
+            # Return results for all subtopics
+            return jsonify(status="success", results=results)
+
         except Exception as e:
-            return jsonify(status="error", message=f"Failed to generate content {e}"), 500
-    
+            return jsonify(status="error", message=f"Failed to process request: {str(e)}"), 500
+        
     @app.route('/api/library/available-generated-rooms', methods=['POST'])
     def get_available_generated_rooms():
         try:
