@@ -41,7 +41,6 @@ ENV FLASK_ENV=production
 ENV FLASK_APP=backend/app.py
 ENV PYTHONIOENCODING=UTF-8
 ENV RUN_SEEDING=False
-ENV VITE_API_BASE_URL=https://rivue.ai
 
 # for UTF-8 encoding ('latin-1' codec can't encode character xyz, ordinal not in range(128), or 'ascii codec' or similar errors)
 ENV LANG=C.UTF-8 \

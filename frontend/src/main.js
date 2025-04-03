@@ -205,7 +205,8 @@ router.afterEach(() => {
     loading.finish()
 })
 
-axios.defaults.baseURL = import.meta.VITE_API_BASE_URL || 'http://localhost:5000';
+// axios.defaults.baseURL = import.meta.VITE_API_BASE_URL || 'http://localhost:5000';
+axios.defaults.baseURL = 'https://rivue.ai';
 
 axios.defaults.withCredentials = true;
 
