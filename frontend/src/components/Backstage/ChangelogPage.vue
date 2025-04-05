@@ -21,6 +21,12 @@ export default {
         return {
             changelog: [
                 {
+                    date: "April 5, 2025",
+                    items: [
+                        "Fixed mobile viewing on Course selection page and Learning Path page"
+                    ],
+                },
+                {
                     date: "April 2, 2025",
                     items: [
                         "Added ability to add multiple new rooms with \"Add New Stepping Stones\" button"

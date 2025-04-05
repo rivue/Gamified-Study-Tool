@@ -31,7 +31,7 @@
                     <span class="stat">👥 {{ library.clicks || 0 }}</span>
                     <span class="stat">❤️ {{ library.likes || 0 }}</span>
                 </div>
-                <!-- TODO: maybe add the date the library was created? -->
+                <!-- TODO: maybe add the date the library was -->
                 <div class="col-actions">
                     <button class="action-btn">⋮</button>
                 </div>
@@ -147,7 +147,7 @@ export default {
 <style scoped>
 .library-list {
     margin-top: 100px;
-    padding: 24px;
+    padding: 16px;
     background: var(--background-color-1);
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
@@ -158,7 +158,7 @@ export default {
 }
 
 .list-header h1 {
-    font-size: 28px;
+    font-size: 24px;
     font-weight: 700;
     margin-bottom: 8px;
     color: var(--text-color);
@@ -166,7 +166,7 @@ export default {
 
 .subtitle {
     color: var(--text-color-secondary);
-    font-size: 16px;
+    font-size: 15px;
 }
 
 .list-table {
@@ -177,25 +177,46 @@ export default {
     margin-bottom: 16px;
 }
 
-.table-header {
+.table-header, .library-item {
     display: grid;
-    grid-template-columns: 80px 2fr 1fr 1fr 1fr 48px;
-    padding: 14px 16px;
+    /* Define columns here - ADJUST THESE values as needed for your design */
+    grid-template-columns:
+      minmax(60px, 80px) /* col-thumbnail: min 60px, max 80px */
+      minmax(100px, 2fr)  /* col-name: min 100px, flexible */
+      minmax(80px, 1fr)  /* col-status: min 80px, flexible */
+      minmax(120px, 1fr) /* col-stats: min 100px, flexible */
+      minmax(48px, 48px); /* col-actions: fixed 48px */
+    align-items: center;
+    /*padding: 14px 16px; /* Keep padding */
+    gap: 16px; /* Add gap for spacing between grid cells */
+
+    /* --- Key Additions for Horizontal Scrolling --- */
+    padding-bottom: 10px;
+}
+
+
+.library-item {
+    display: flex;
+    flex-wrap: wrap; /* Allow items to wrap to the next line */
+    align-items: center; /* Align items nicely vertically */
+    gap: 12px 16px; /* Row gap, Column gap */
+    padding: 16px;
+    border: 1px solid var(--border-color); /* Add border to each item */
+    border-radius: 8px; /* Rounded corners for card look */
+    margin-bottom: 16px; /* Space between cards */
+    background-color: var(--background-color-1); /* Ensure items have background */
+    cursor: pointer;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.table-header {
+    /* padding: 14px 16px;
     background-color: var(--background-color-2);
     border-bottom: 1px solid var(--border-color);
     color: var(--text-color-secondary);
     font-size: 14px;
-    font-weight: 600;
-}
-
-.library-item {
-    display: grid;
-    grid-template-columns: 80px 2fr 1fr 1fr 1fr 48px;
-    padding: 16px;
-    align-items: center;
-    border-bottom: 1px solid var(--border-color);
-    cursor: pointer;
-    transition: all 0.2s ease;
+    font-weight: 600; */
+    display: none;
 }
 
 .library-item:last-child {
@@ -204,8 +225,7 @@ export default {
 
 .library-item:hover {
     background-color: var(--element-color-1);
-    transform: translateY(-2px);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .thumbnail {
@@ -223,6 +243,19 @@ export default {
     font-weight: 600;
     color: var(--text-color);
     margin: 0;
+     /* Allow name text itself to wrap if extremely long */
+     white-space: normal;
+     word-break: break-word; /* Break long words if needed */
+}
+
+.col-thumbnail {
+    flex-grow: 1; /* Allow name to take available space on its line */
+    min-width: 150px; /* Prevent it from getting too small before wrapping stats */
+}
+
+.col-status {
+    flex-shrink: 0; /* Prevent status badge from shrinking */
+    margin-right: auto; /* Push stats/actions further away when wrapped (optional) */
 }
 
 .status-badge {
@@ -234,24 +267,49 @@ export default {
     font-size: 13px;
     font-weight: 600;
     letter-spacing: 0.3px;
+    white-space: nowrap; /* Keep badge text itself on one line */
 }
 
 .col-stats {
     display: flex;
-    gap: 16px;
+    flex-wrap: wrap; /* Allow stats themselves to wrap if needed */
+    gap: 12px; /* Gap between individual stats */
+    align-items: center;
+     /* Ensure stats can appear on new line */
+    flex-basis: 100%; /* Default to taking full width when wrapped below name/status */
+    justify-content: flex-start; /* Align stats to the start */
+}
+
+@media (min-width: 400px) { /* Example breakpoint where stats might fit better beside status */
+    .col-stats {
+       flex-basis: auto; /* Allow stats to sit beside status */
+       justify-content: flex-end;
+    }
+     .col-status {
+         margin-right: 0;
+     }
 }
 
 .stat {
     font-size: 14px;
     color: var(--text-color-secondary);
-    display: flex;
+    display: inline-flex;
     align-items: center;
+    gap: 4px;
     font-weight: 500;
+    white-space: nowrap; /* Prevent text within a stat from wrapping */
+    flex-shrink: 0;
 }
 
 .col-date {
     font-size: 14px;
     color: var(--text-color-secondary);
+}
+
+.col-actions {
+    flex-shrink: 0;
+    margin-left: auto; /* Push action button to the end */
+    align-self: center; /* Vertically align button */
 }
 
 .action-btn {
@@ -273,6 +331,85 @@ export default {
     background-color: var(--background-color-3);
     color: var(--text-color);
 }
+
+@media (min-width: 768px) {
+    .list-table {
+        /* Re-add border styling to the table container */
+        border-radius: 8px;
+        overflow: hidden;
+        border: 1px solid var(--border-color);
+    }
+
+    /* Show the header and style it as a grid */
+    .table-header {
+        display: grid; /* Use grid layout */
+        grid-template-columns: 80px minmax(150px, 2fr) 1fr 1fr 48px; /* Define columns */
+        padding: 14px 16px;
+        background-color: var(--background-color-2);
+        border-bottom: 1px solid var(--border-color);
+        color: var(--text-color-secondary);
+        font-size: 14px;
+        font-weight: 600;
+        gap: 16px; /* Add gap */
+         /* Ensure header text doesn't wrap undesirably */
+        white-space: nowrap;
+    }
+     .table-header > div {
+         overflow: hidden;
+         text-overflow: ellipsis;
+     }
+
+
+    .library-item {
+        display: grid; /* Switch back to grid */
+        grid-template-columns: 80px minmax(150px, 2fr) 1fr 1fr 48px; /* Same columns as header */
+        flex-wrap: nowrap; /* Disable wrapping for grid */
+        border: none;      /* Remove individual item border */
+        border-radius: 0; /* Remove individual item radius */
+        margin-bottom: 0; /* Remove margin between items */
+        border-bottom: 1px solid var(--border-color); /* Use bottom border */
+        gap: 16px; /* Add gap */
+         /* Ensure grid text content truncates if needed */
+        white-space: nowrap;
+    }
+
+     .library-item > div {
+         overflow: hidden;
+         text-overflow: ellipsis;
+         /* Allow normal whitespace wrapping WITHIN cells if specifically desired */
+         /* white-space: normal; */
+     }
+
+     .library-item:last-child {
+         border-bottom: none;
+     }
+
+    .col-name {
+         /* Re-apply specific styling for grid if needed */
+         min-width: 0; /* Allow shrinking in grid */
+    }
+
+    .col-name h3 {
+         /* Re-apply truncation for grid */
+         white-space: nowrap;
+         overflow: hidden;
+         text-overflow: ellipsis;
+    }
+
+
+     .col-status {
+          margin-right: 0; /* Reset margin override */
+     }
+
+    .col-stats {
+        display: flex;
+        flex-wrap: nowrap; /* Prevent stats wrapping on desktop */
+        gap: 16px;
+        flex-basis: auto; /* Reset flex-basis */
+        justify-content: flex-start; /* Reset justify */
+    }
+}
+
 
 .pagination {
     padding: 16px;

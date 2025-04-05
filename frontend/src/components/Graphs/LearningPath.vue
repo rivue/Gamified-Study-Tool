@@ -263,8 +263,6 @@ const selectedRoom = ref(null)
 
 const library_id = props.libraryId;
 
-const router = useRouter();
-
 // File input handling
 const fileInput = ref(null)
 
@@ -467,35 +465,65 @@ onUnmounted(() => {
     }
 });
 
+
+// Add these variables
+const startY = ref(0)
+const hasMoved = ref(false)
+const tapThreshold = 10 // pixels to consider as a tap vs drag
+const router = useRouter();
+
 const startDragging = (e) => {
     isDragging.value = true
-    const pageX = e.type.includes('mouse') ? e.pageX : e.touches[0].pageX
-    startX.value = pageX - scrollContainer.value.offsetLeft
+    hasMoved.value = false
+    
+    if (e.type.includes('touch')) {
+        startX.value = e.touches[0].pageX - scrollContainer.value.offsetLeft
+        startY.value = e.touches[0].pageY
+    } else {
+        startX.value = e.pageX - scrollContainer.value.offsetLeft
+        e.preventDefault() // Only prevent default for mouse events
+    }
+    
     scrollLeft.value = scrollContainer.value.scrollLeft
-    e.preventDefault()
 }
 
 const drag = (e) => {
     if (!isDragging.value) return
-    const pageX = e.type.includes('mouse') ? e.pageX : e.touches[0].pageX
-    const x = pageX - scrollContainer.value.offsetLeft
-    const walk = (x - startX.value) * 2
-    scrollContainer.value.scrollLeft = scrollLeft.value - walk
+    
+    let x, y
+    if (e.type.includes('touch')) {
+        x = e.touches[0].pageX - scrollContainer.value.offsetLeft
+        y = e.touches[0].pageY
+    } else {
+        x = e.pageX - scrollContainer.value.offsetLeft
+        e.preventDefault()
+    }
+    
+    // Calculate distance moved
+    const diffX = Math.abs(x - startX.value)
+    const diffY = Math.abs(y - startY.value)
+    
+    // Only consider it a drag if moved more than threshold
+    if (diffX > tapThreshold || diffY > tapThreshold) {
+        hasMoved.value = true
+        const walk = (x - startX.value) * 2
+        scrollContainer.value.scrollLeft = scrollLeft.value - walk
+    }
 }
 
 const stopDragging = () => {
     isDragging.value = false
 }
 
+const handleNodeClick = (roomName) => {
+    if (!hasMoved.value) {
+        selectedRoom.value = selectedRoom.value === roomName ? null : roomName
+    }
+}
+
 const getNodeOffset = (index) => {
     const amplitude = 80
     return Math.sin(index * 0.7) * amplitude
-}
-
-const handleNodeClick = (roomName) => {
-    if (!isDragging.value) {
-        selectedRoom.value = selectedRoom.value === roomName ? null : roomName
-    }
 }
 
 const startLesson = (roomName) => {
