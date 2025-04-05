@@ -76,7 +76,7 @@
                                 🐙 Sections are how course content is divided up.
                             </div>
                             <div class="helper-text">
-                                🐙 We try to make the content of each section based on its name, so if a section is named "mitosis" the content of that section is baed on mitosis, etc...
+                                🐙 We try to make the content of each section based on its name, so if a section is named "mitosis" the content of that section is based on mitosis, etc...
                             </div>
                             <div class="helper-text">
                                 🐙 Don't worry about adding all rooms or files now - you can generate more later!

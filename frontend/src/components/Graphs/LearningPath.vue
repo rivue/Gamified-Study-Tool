@@ -122,7 +122,7 @@
                                 class="flex items-center gap-2 mb-2">
                                 <input v-model="newNodeNames[index]" type="text" class="w-full p-2 border rounded-lg"
                                     style="background-color: var(--background-color-1t); color: var(--light-text); border-color: var(--color-primary-dark);"
-                                    placeholder="Enter node name" maxlength="40" />
+                                    placeholder="Enter Stepping Stone name" maxlength="40" />
                                 <button v-if="newNodeNames.length > 1" @click="removeNodeName(index)"
                                     class="text-red-400 hover:text-red-300">
                                     <XCircleIcon class="w-6 h-6" />
@@ -202,7 +202,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import {
     StarIcon,
     BookOpenIcon,
@@ -351,6 +351,7 @@ const addNewNodes = async () => {
   if (hasError) return
 
   isAddingNode.value = true
+  const currentAbortController = new AbortController();
 
   try {
     // Add each node
@@ -369,15 +370,17 @@ const addNewNodes = async () => {
     }
       
     const response = await axios.post('/api/library/room', formData, {
+        signal: currentAbortController.signal,
         headers: {
           'Content-Type': 'multipart/form-data'
         }
     })
+
+    if (currentAbortController.signal.aborted) return; // Don't proceed if aborted
       
     if (response.data && response.data.status === "success") {
         for (const name of trimmedNames) {
             localRoomNames.value.push(name)
-            emit('nodeAdded', name)
         }
     }
 
@@ -385,7 +388,8 @@ const addNewNodes = async () => {
     newNodeNames.value = [''] // Reset to one empty field
     removeFile()
     showAddNodeModal.value = false
-    window.location.reload()
+    window.location.reload(); // TODO for showing new nodes / stepping stones, but theres 
+    // probably a better way to do this
   } catch (error) {
     console.error('Error adding nodes:', error)
     nodeNameErrors.value[0] = error.message || 'Failed to add nodes. Please try again.'
@@ -437,19 +441,29 @@ const isDragging = ref(false)
 const startX = ref(0)
 const scrollLeft = ref(0)
 
+let scrollTimeoutId = null;
+
 // Scroll to center on first load
 onMounted(() => {
     // If there are nodes and the container exists, scroll to position
     // some nodes may not be visible at first depending on the starting position
     if (nodes.value.length > 0 && scrollContainer.value) {
         // Calculate an appropriate starting position based on available width
-        setTimeout(() => {
+        scrollTimeoutId = setTimeout(() => {
             // This gives time for the layout to render before scrolling
             if (scrollContainer.value) {
                 const startPosition = Math.max(0, 200); // A small offset to show the first node
                 scrollContainer.value.scrollLeft = startPosition;
             }
+            scrollTimeoutId = null; // Clear the timeout ID
         }, 100);
+    }
+});
+
+onUnmounted(() => {
+    if (scrollTimeoutId) {
+        clearTimeout(scrollTimeoutId); // Clear the timeout if it hasn't run yet
+        console.log("LearningPath unmounting, cleared initial scroll timeout.");
     }
 });
 
@@ -487,7 +501,6 @@ const handleNodeClick = (roomName) => {
 const startLesson = (roomName) => {
     console.log(`Starting lesson for ${roomName}`)
     router.push(`/lessons/${library_id}/${roomName}`)
-    emit('nodeSelected', roomName)
 }
 
 const scroll = (direction) => {
@@ -507,7 +520,6 @@ const handleScroll = () => {
     // Implement if needed
 }
 
-const emit = defineEmits(['nodeSelected', 'nodeAdded'])
 </script>
 
 <style scoped>

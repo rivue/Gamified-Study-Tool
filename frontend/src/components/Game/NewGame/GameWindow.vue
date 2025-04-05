@@ -7,12 +7,14 @@
 </template>
 
 <script>
-import { onMounted, ref } from 'vue';
+import { onMounted, onUnmounted, ref } from 'vue';
 // import GameStart from './GameStart.vue';
 import FactoidComponent from "./FactoidComponent.vue";
 import LibraryQuestion from "./LibraryQuestion.vue";
 import { useRoute } from 'vue-router';
 import { useGameStore } from "@/store/gameStore";
+import { usePopupStore } from "@/store/popupStore";
+import axios from 'axios';
 
 export default {
     name: 'GameWindow',
@@ -27,28 +29,40 @@ export default {
         // const router = useRouter();
         const gameStore = useGameStore();
         const loading = ref(true);
+        const abortController = new AbortController();
 
         onMounted(async () => {
             const libraryId = route.params.id;
             const roomName = route.params.roomName;
             try {
                 
-                await gameStore.fetchLibraryDetails(libraryId, roomName);
+                await gameStore.fetchLibraryDetails(libraryId, roomName, abortController.signal);
+                // Check if the library data is valid
+                if (!abortController.signal.aborted && !gameStore.libraryError) {
+                    gameStore.startGame();
+                 } else if (gameStore.libraryError) {
+                    // Optional: handle error even if aborted, or just let finally handle loading
+                 }
 
             } catch (error) {
-                console.error("Error fetching library details:", error);
-                // router.push(`/lessons/${libraryId}`);
+                if (!axios.isCancel(error)) {
+                    console.error("Error fetching library details:", error);
+                }
+                
+                const popupStore = usePopupStore();
+                popupStore.showPopup(error.message || "Game Window Failed. Please try again.");
 
             } finally {
-                loading.value = false;
+                if (!abortController.signal.aborted) {
+                    loading.value = false;
+                }
             }
+        });
 
-            if (gameStore.libraryError) {
-                // If there was an error, navigate away
-                // router.push(`/lessons/${libraryId}`);
-            } else {
-                gameStore.startGame();
-            }
+        // Add onUnmounted hook
+        onUnmounted(() => {
+            console.log("GameWindow unmounting, aborting fetch.");
+            abortController.abort(); // Abort the request
         });
 
         return { loading };

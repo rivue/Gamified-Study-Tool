@@ -19,7 +19,7 @@ def process_document(selected_files, library_id=None):
             print("Detected Scanned PDF - performing OCR...")
             for page in doc:
                 try:
-                    pix = page.get_pixmap(dpi=100)
+                    pix = page.get_pixmap(dpi=100) 
                     img_bytes = pix.tobytes("png")
                     # Assuming you have an OCR client (e.g., Google Vision); wrap its call in try/except.
                     image = vision.Image(content=img_bytes)

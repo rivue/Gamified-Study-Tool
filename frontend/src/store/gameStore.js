@@ -110,6 +110,7 @@ export const useGameStore = defineStore("gameStore", {
         },
         async fetchLibraryDetails(libraryId, roomNameThing) {
             
+            this.libraryError = false;
             this.setId(libraryId);
             
             try {
@@ -161,8 +162,13 @@ export const useGameStore = defineStore("gameStore", {
 
                 }
             } catch (error) {
-                this.libraryError = true;
-                console.error("Error fetching library details:", error);
+                if (axios.isCancel(error)) {
+                    this.libraryError = true;
+                    console.error("Request canceled:", error.message);
+                } else {
+                    this.libraryError = true;
+                    console.error("Error fetching library details:", error);
+                }
             }
         },
         async loadRoom(room_name) {

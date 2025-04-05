@@ -18,7 +18,7 @@
 
 <script>
 import { useRoute } from "vue-router";
-import { onMounted, ref } from 'vue';
+import { onMounted, onUnmounted, ref } from 'vue';
 import { usePopupStore } from "@/store/popupStore";
 import LearningPath from "../Graphs/LearningPath.vue";
 import axios from 'axios';
@@ -37,11 +37,14 @@ export default {
         const libraryId = route.params.id;
         const library = ref(null);
         const loading = ref(true);
+        const abortController = new AbortController();
 
         // Fetch library data
         const fetchLibraryData = async () => {
             try {
-                const response = await axios.get(`/api/library/${libraryId}`);
+                const response = await axios.get(`/api/library/${libraryId}`, {
+                    signal: abortController.signal // Pass the signal to axios
+                });
                 console.log("response: ", response);
                 if (response.data && response.data.data && response.data.room_data) {
 
@@ -55,19 +58,27 @@ export default {
                     
                     console.log(library.value.data.room_names)
                 } else {
-                    // throw new Error("Invalid response data");
+                    throw new Error("Invalid response data");
                 }
             } catch (error) {
                 // Handle the error
                 const popupStore = usePopupStore();
                 popupStore.showPopup(error.message || "Learning map failed. Please try again.");
             } finally {
-                loading.value = false;
+                if (!abortController.signal.aborted) {
+                    // Only set loading to false if the request was not aborted
+                    loading.value = false;
+                }
             }
         };
 
         // Fetch data on component mount
         onMounted(fetchLibraryData);
+
+        onUnmounted(() => {
+            // Abort the fetch request if the component is unmounted
+            abortController.abort();
+        });
 
         return { library, loading };
     },

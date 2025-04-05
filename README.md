@@ -52,6 +52,9 @@ TODO list:
         (currently all 4 were in BottomBar.vue) --> BASICALLY MAKE BottomBar.vue SMALLER)
 
     general:
+        - improve prompt / answer generation
+        - fix propfind error thing
+        - add google auth and / or PASSWORD RESET
         - add ability to add multiple room names from Add New Stepping Stone part
         - add a slot for an image in each question for reference or description or something - like maybe an image of a bridge or trigonometry or something
         - migrate from pinecone-client to pinecone (not really a migration, just a typo I think, shouldn't take too long)
