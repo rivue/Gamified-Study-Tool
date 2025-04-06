@@ -1,4 +1,8 @@
 <template>
+    <div class="inspirational-quote">
+        The stars in the universe are not just for us to see, but to remind us we can shine just as brightly. Let's continue your story.
+    </div>
+
   <form @submit.prevent="handleSubmit">
     <label for="email">Email:</label>
     <input
@@ -64,9 +68,18 @@ export default {
   },
 };
 </script>
-  
-  <style>
+<style>
 .button-container {
-  text-align: center;
+    text-align: center;
+}
+.inspirational-quote {
+    text-align: center;
+    font-style: italic;
+    margin-bottom: 20px;
+    color: #555;
+}
+
+.button-container {
+    text-align: center;
 }
 </style>

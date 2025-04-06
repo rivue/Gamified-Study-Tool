@@ -1,4 +1,6 @@
 <template>
+    "Stars can't shine without darkness. Your brilliant journey begins here."
+
   <form @submit.prevent="handleSubmit">
     <label for="new-email">Email:</label>
     <input
