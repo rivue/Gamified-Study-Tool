@@ -23,7 +23,7 @@ export default {
                 {
                     date: "April 5, 2025",
                     items: [
-                        "Fixed mobile viewing on Course selection page and Learning Path page"
+                        "Fixed mobile viewing on Course Selection page and Learning Path page"
                     ],
                 },
                 {
@@ -36,7 +36,7 @@ export default {
 
                     date: "March 26, 2025",
                     items: [
-                        "Switched to a new database system (Supabase)",
+                        "Added a database",
                         "Added this changelog"
                     ],
                 },

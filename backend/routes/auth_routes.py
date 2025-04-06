@@ -49,11 +49,10 @@ def init_auth_routes(app):
 
     @app.route('/api/check-auth', methods=['GET'])
     def check_auth():
-        if current_user.is_authenticated:
+        if current_user.is_authenticated and current_user.is_confirmed:
             return jsonify({'loggedIn': True, 'userTier': get_user_tier(current_user.id), 'requestCount': get_daily_request_count(current_user.id), 'userId': current_user.id})
         else:
             return jsonify({'loggedIn': False, 'userTier': None})
-        
 
     @app.route('/api/test-cookie', methods=['GET'])
     def test_cookie():
@@ -104,11 +103,16 @@ def init_auth_routes(app):
             db.session.add(new_user)
             db.session.commit()
             new_user.confirmation_token = generate_confirmation_token(new_user.id)
+            
             new_user.confirm_sent_at = datetime.utcnow()
             db.session.commit()
             
-            confirmation_link = url_for('confirm_email', token=new_user.confirmation_token, _external=True)
-            # send_registration_email(email, Registration, confirmation_link)
+            if os.getenv('FLASK_ENV') == 'production':
+                frontend_url = "https://rivue.ai"
+            else:
+                frontend_url = "http://localhost:8080"
+            confirmation_link = f"{frontend_url}/verify/{new_user.confirmation_token}"
+            send_registration_email(email, Registration, confirmation_link)
             return jsonify({'status': 'success'})
         except IntegrityError as e:
             if isinstance(e.orig, pymysql_err.IntegrityError) and 'Duplicate entry' in str(e.orig):
@@ -116,24 +120,70 @@ def init_auth_routes(app):
             else:
                 return jsonify({'status': 'error', 'message': 'An unexpected error occurred. Please try again later.'}), 500
 
-    @app.route('/api/confirm/<token>')
-    def confirm_email(token):
-        user = User.query.filter_by(confirmation_token=token).first()
-        if user and confirm(user.id, token):
-            login_user(user)
-            initialize_messages(user.id)
-            return redirect('/?awake')
-        else:
-            if user is not None and not user.confirmed:
-                user.confirmation_token = generate_confirmation_token(user.id)
-                user.confirm_sent_at = datetime.utcnow()
-                db.session.commit()
+    @app.route('/api/confirm', methods=['POST'])
+    def confirm_email():
+        print("hello")
+        try:
+            data = request.get_json(silent=True) or {}
+            # Use the URL token or fall back to body token
+            token = data.get('token')
+
+            if not token:
+                return jsonify({'status': 'error', 'message': 'No token provided'}), 400
+            print(f"token_to_use: {token}")
+
+            user = User.query.filter_by(confirmation_token=token).first()
+            print(f"user: {user}, confirmed: {user.confirmed}")
+
+            if user and confirm(user.id, token):
+                print("confirm successfull")
+                login_user(user)
+                initialize_messages(user.id)
                 
-                # Send a new confirmation email
-                confirmation_link = url_for('confirm_email', token=user.confirmation_token, _external=True)
-                send_registration_email(user.email, Registration, confirmation_link)
-                return redirect('/about?message=expired_registration_token')
-            return redirect('/about?message=invalid_registration_token')
+                return jsonify({'status': 'success', 'message': 'Email confirmed successfully!'})
+            else:
+                print("/api/confirm here")
+                if user is not None and not user.confirmed:
+                    print(f"user: {user}, confirmed: {user.confirmed}")
+                    user.confirmation_token = generate_confirmation_token(user.id)
+                    user.confirm_sent_at = datetime.utcnow()
+                    db.session.commit()
+                    
+                    if os.getenv('FLASK_ENV') == 'production':
+                        frontend_url = "https://rivue.ai"
+                    else:
+                        frontend_url = "http://localhost:8080"
+                    confirmation_link = f"{frontend_url}/verify/{token}"
+                    send_registration_email(user.email, Registration, confirmation_link)
+                    return jsonify({'status': 'error', 'message': 'expired_registration_token'}), 500
+                return jsonify({'status': 'error', 'message': 'invalid_registration_token'}), 500
+        except Exception as e:
+            return jsonify({'status': 'error', 'message': 'something failed'}), 500
+        
+    @app.route('/api/resend-verification', methods=['POST'])
+    def resend_verification():
+        data = request.get_json()
+        token = data.get('token')
+        
+        # Find user by the expired token
+        user = User.query.filter_by(confirmation_token=token).first()
+        
+        if user:
+            # Generate new token
+            user.confirmation_token = generate_confirmation_token(user.id)
+            user.confirm_sent_at = datetime.utcnow()
+            db.session.commit()
+            
+            # Send a new email
+            if os.getenv('FLASK_ENV') == 'production':
+                frontend_url = "https://rivue.ai"
+            else:
+                frontend_url = "http://localhost:8080"
+                confirmation_link = f"{frontend_url}/verify/{token}"
+            send_registration_email(user.email, Registration, confirmation_link)
+            return jsonify({'status': 'success', 'message': 'Verification email sent!'})
+        else:
+            return jsonify({'status': 'error', 'message': 'User not found'})
     
     # @app.route('/api/auth/google/callback', methods=['POST'])
     # def google_auth_callback():
