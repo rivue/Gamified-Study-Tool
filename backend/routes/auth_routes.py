@@ -49,7 +49,7 @@ def init_auth_routes(app):
 
     @app.route('/api/check-auth', methods=['GET'])
     def check_auth():
-        if current_user.is_authenticated and current_user.confirmed:
+        if current_user.is_authenticated: # TODO add back later and current_user.is_confirmed:
             return jsonify({'loggedIn': True, 'userTier': get_user_tier(current_user.id), 'requestCount': get_daily_request_count(current_user.id), 'userId': current_user.id})
         else:
             return jsonify({'loggedIn': False, 'userTier': None})

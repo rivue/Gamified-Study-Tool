@@ -1,8 +1,7 @@
 <!-- TODO: fix weird vue warn messages that come up when someone types -->
 <template>
     <div class="inspirational-quote">
-        The stars in the universe are not just for us to see, but to remind us we can shine just as brightly. Let's
-        continue your story.
+        Even the best magicians lose their wands sometimes. Let’s conjure up a little magic to get you back on stage!
     </div>
     <form @submit.prevent="handleSubmit">
         <div class="form-field">

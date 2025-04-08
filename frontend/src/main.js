@@ -87,7 +87,7 @@ import axios from 'axios';
         { path: '/login', component: defineAsyncComponent(() => import('./components/Auth/LoginSignupPopup.vue')), meta: { title: 'Rivue.ai | Login/Signup' } },
         // { path: '/admin', component: defineAsyncComponent(() => import('./components/Auth/AdminPage.vue')), meta: { title: 'Rivue.ai | Admin' } },
         { path: '/verify/:token', component: defineAsyncComponent(() => import('./components/Auth/VerifyEmail.vue')), meta: { title: 'Rivue.ai | Verify Email' }},
-        { path: '/password-reset/:token', component: defineAsyncComponent(() => import('./components/Auth/VerifyEmail.vue')), meta: { title: 'Rivue.ai | Password Reset' }},
+        // { path: '/password-reset/:token', component: defineAsyncComponent(() => import('./components/Auth/VerifyEmail.vue')), meta: { title: 'Rivue.ai | Password Reset' }},
         
         // Redirects
         // { path: '/lessons', redirect: '/' },
@@ -137,12 +137,10 @@ router.beforeEach(async (to, from, next) => {
         '/terms',
         '/contact',
         '/plan',
+        '/verify/:token',
     ];
-
-    const requiresAuth =
-        !publicPaths.includes(to.path) &&
-        !to.path.startsWith('/lesson/') &&
-        !to.path.startsWith('/library') && !to.path.startsWith('/lessons');
+    console.log(to.path)
+    const requiresAuth = !publicPaths.includes(to.path) && !to.path.startsWith('/verify/');
 
     if (to.meta.requiresCreator && to.params.id) {
         // Only proceed with this check if the user is logged in
