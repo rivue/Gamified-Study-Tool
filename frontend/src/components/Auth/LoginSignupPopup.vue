@@ -4,29 +4,29 @@
         <div v-if="loggingIn" id="loadingCloud" class="cloud-animation">☁️</div>
         <div v-else class="popup-content">
             <transition name="fade" mode="out-in">
-                <LoginForm v-if="activeForm == 'login'" @loginSuccess="handleLoginSuccess" key="loginForm" />
-                <SignupForm v-else-if="activeForm == 'signup'" @signupSuccess="handleSignupSuccess" key="signupForm" />
-                <PasswordResetForm v-else-if="activeForm == 'passwordReset'" @resetSuccess="handleResetSuccess" key="passwordResetForm" />
-            </transition>
-            <transition name="fade" mode="out-in">
+                <div :key="activeForm">
+                    <LoginForm v-if="activeForm === 'login'" @loginSuccess="handleLoginSuccess" />
+                    <SignupForm v-else-if="activeForm === 'signup'" @signupSuccess="handleSignupSuccess" />
+                    <PasswordResetForm v-else-if="activeForm === 'passwordReset'" @resetSuccess="handleResetSuccess" />
 
-                <div v-if="activeForm === 'signup'">
-                    <button class="toggle-btn" @click="toggleForms('login')">
-                        Already have an account? <span class="underline-text">Log in</span>
-                    </button>
+                    <!-- Buttons under each form -->
+                    <div v-if="activeForm === 'signup'">
+                        <button class="toggle-btn" @click="toggleForms('login')">
+                            Already have an account? <span class="underline-text">Log in</span>
+                        </button>
+                    </div>
+
+                    <div v-else-if="activeForm === 'login'">
+                        <button class="forgot-password" @click="toggleForms('passwordReset')">
+                            Forgot your password? <span class="underline-text">Reset Here</span>
+                        </button>
+                        <button class="toggle-btn" @click="toggleForms('signup')">
+                            Don't have an account? <span class="underline-text">Sign up</span>
+                        </button>
+                    </div>
                 </div>
-
-                <div v-else-if="activeForm === 'login'">
-                    
-                    <button class="forgot-password" @click="toggleForms('passwordReset')">
-                        Forgot your password? <span class="underline-text">Reset Here</span>
-                    </button>
-                    <button class="toggle-btn" @click="toggleForms('signup')">
-                        Don't have an account? <span class="underline-text">Sign up</span>
-                    </button>
-                </div>
-
             </transition>
+
             <div ref="googleButton"></div>
         </div>
     </div>
@@ -71,13 +71,7 @@ export default {
     },
     methods: {
         toggleForms(form) {
-            if (form == "login") {
-                this.activeForm = "login";
-            } else if (form == "signup") {
-                this.activeForm = "signup";
-            } else if (form == "passwordReset") {
-                this.activeForm = "passwordReset";
-            }
+            this.activeForm = form;
         },
         handleLoginSuccess() {
             const authStore = useAuthStore();
@@ -146,6 +140,24 @@ export default {
 </script>
 
 <style scoped>
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-bottom: 16px;
+  max-width: 250px;
+  /* width: 100%; */
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.form-field label {
+  margin-bottom: 6px;
+  font-size: 0.9em;
+  color: var(--text-color);
+}
+
 .popup-overlay {
     position: fixed;
     top: 0;
@@ -157,30 +169,25 @@ export default {
     justify-content: center;
     align-items: center;
     z-index: 95;
+    padding: 25px;
 }
 
 .popup-content {
-    background-color: var(--background-color-1t);
-    display: flex;
-    justify-content: center;
-    flex-direction: column;
-    align-items: center;
-    padding: 10px;
-    border-radius: 8px;
+  background-color: var(--background-color-1t);
+  display: flex;
+  justify-content: center;  /* Horizontal center */
+  align-items: center;      /* Vertical center */
+  flex-direction: column;
+  padding: 10px;
+  border-radius: 8px;
+  max-width: 400px;
+  width: 100%;
+  min-height: 300px;
 }
+
 
 .popup-content label {
     margin-bottom: 8px;
-}
-
-.popup-content :deep(input[type="text"]),
-.popup-content :deep(input[type="password"]) {
-    background-color: #00000000;
-    padding: 10px;
-    border: 1px solid var(--text-color);
-    border-radius: 4px;
-    width: 100%;
-    box-sizing: border-box;
 }
 
 .popup-content :deep(input[type="submit"]) {

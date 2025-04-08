@@ -4,26 +4,30 @@
     </div>
 
   <form @submit.prevent="handleSubmit">
-    <label for="email">Email:</label>
-    <input
-      type="text"
-      id="email"
-      name="email"
-      v-model="email"
-      autocomplete="email"
-      required
-    />
-    <br />
-    <label for="password">Password:</label>
-    <input
-      type="password"
-      id="password"
-      name="password"
-      v-model="password"
-      autocomplete="current-password"
-      required
-    />
-    <br />
+    <div class="form-field">
+
+        <label for="email">Email:</label>
+        <input
+        type="text"
+        id="email"
+        name="email"
+        v-model="email"
+        autocomplete="email"
+        required
+        />
+    </div>
+    <div class="form-field">
+
+        <label for="password">Password:</label>
+        <input
+        type="password"
+        id="password"
+        name="password"
+        v-model="password"
+        autocomplete="current-password"
+        required
+        />
+    </div>
     <div class="button-container">
       <input type="submit" id="submit" :value="buttonText" />
     </div>
@@ -69,6 +73,13 @@ export default {
 };
 </script>
 <style>
+form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
 .button-container {
     text-align: center;
 }
@@ -81,5 +92,31 @@ export default {
 
 .button-container {
     text-align: center;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Change from flex-start to center */
+  max-width: 300px;
+  width: 100%;
+  margin-bottom: 16px; /* Re-add this for spacing between fields */
+  margin-left: auto; /* Keep these for horizontal centering */
+  margin-right: auto;
+}
+
+.form-field label {
+  font-size: 0.9em;
+  color: var(--text-color);
+}
+
+.form-field input[type="text"],
+.form-field input[type="password"] {
+  background-color: #00000000;
+  padding: 10px;
+  border: 1px solid var(--text-color);
+  border-radius: 4px;
+  width: 100%;
+  box-sizing: border-box;
 }
 </style>

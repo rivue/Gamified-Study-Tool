@@ -1,63 +1,106 @@
 <template>
+    <div class="inspirational-quote">
+        The stars in the universe are not just for us to see, but to remind us we can shine just as brightly. Let's
+        continue your story.
+    </div>
     <form @submit.prevent="handleSubmit">
-      <label for="email">Email:</label>
-      <input
-        type="text"
-        id="email"
-        name="email"
-        v-model="email"
-        autocomplete="email"
-        required
-      />
-      <br />
-      <div class="button-container">
-        <input type="submit" id="submit" :value="buttonText" />
-      </div>
+        <div class="form-field">
+
+            <label for="email">Email:</label>
+            <input type="text" id="email" name="email" v-model="email" autocomplete="email" required />
+        </div>
+        <br />
+        <div class="button-container">
+            <input type="submit" id="submit" :value="buttonText" />
+        </div>
     </form>
-  </template>
-    
-    <script>
+</template>
+
+<script>
 
 //     import axios from 'axios';
 //   import { usePopupStore } from "@/store/popupStore";
-  
-  export default {
+
+export default {
     data() {
-      return {
-        email: "",
-        password: "",
-        buttonText: "Send Reset Link",
-      };
+        return {
+            email: "",
+            password: "",
+            buttonText: "Send Reset Link",
+        };
     },
     methods: {
-    //   handleSubmit() {
-    //     this.buttonText = "Loading...";
-    //     const formData = new FormData();
-    //     formData.append("email", this.email);
-    //     formData.append("password", this.password);
-  
-    //     axios.post("api/login", formData)
-    //       .then(response => {
-    //         const data = response.data;
-    //         if (data.status === "success") {
-    //           this.$emit("loginSuccess");
-    //         } else {
-    //           throw new Error("Login failed. Please try again.");
-    //         }
-    //       })
-    //       .catch(error => {
-    //         console.error("Error during login:", error);
-    //         const popupStore = usePopupStore();
-    //         popupStore.showPopup(error.message || "Login failed. Please try again.");
-    //         this.buttonText = "Log in";
-    //       });
-    //   },
+        //   handleSubmit() {
+        //     this.buttonText = "Loading...";
+        //     const formData = new FormData();
+        //     formData.append("email", this.email);
+        //     formData.append("password", this.password);
+
+        //     axios.post("api/login", formData)
+        //       .then(response => {
+        //         const data = response.data;
+        //         if (data.status === "success") {
+        //           this.$emit("loginSuccess");
+        //         } else {
+        //           throw new Error("Login failed. Please try again.");
+        //         }
+        //       })
+        //       .catch(error => {
+        //         console.error("Error during login:", error);
+        //         const popupStore = usePopupStore();
+        //         popupStore.showPopup(error.message || "Login failed. Please try again.");
+        //         this.buttonText = "Log in";
+        //       });
+        //   },
     },
-  };
-  </script>
-    
-    <style>
-  .button-container {
+};
+</script>
+
+<style>
+.button-container {
     text-align: center;
-  }
-  </style>
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.inspirational-quote {
+    text-align: center;
+    font-style: italic;
+    margin-bottom: 20px;
+    color: #555;
+}
+
+.form-field {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* Change from flex-start to center */
+    max-width: 300px;
+    width: 100%;
+    margin-bottom: 16px;
+    /* Re-add this for spacing between fields */
+    margin-left: auto;
+    /* Keep these for horizontal centering */
+    margin-right: auto;
+}
+
+.form-field label {
+    font-size: 0.9em;
+    color: var(--text-color);
+}
+
+.form-field input[type="text"],
+.form-field input[type="password"] {
+    background-color: #00000000;
+    padding: 10px;
+    border: 1px solid var(--text-color);
+    border-radius: 4px;
+    width: 100%;
+    box-sizing: border-box;
+}
+</style>
