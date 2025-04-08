@@ -55,6 +55,7 @@
             if (data.status === 'success') {
                 // Set cookie or update store to reflect logged in state if needed
                 // This depends on how your authentication is implemented
+                console.log("hi")
                 setTimeout(() => {
                 this.$router.push('/');
                 }, 3000);

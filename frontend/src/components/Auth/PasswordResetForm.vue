@@ -1,3 +1,4 @@
+<!-- TODO: fix weird vue warn messages that come up when someone types -->
 <template>
     <div class="inspirational-quote">
         The stars in the universe are not just for us to see, but to remind us we can shine just as brightly. Let's
@@ -10,6 +11,12 @@
             <input type="text" id="email" name="email" v-model="email" autocomplete="email" required />
         </div>
         <br />
+        <div v-if="error" class="error-message">
+            There was an error sending the reset link
+        </div>
+        <div v-if="success" class="success-message">
+            A reset link has been sent to your email
+        </div>
         <div class="button-container">
             <input type="submit" id="submit" :value="buttonText" />
         </div>
@@ -18,40 +25,48 @@
 
 <script>
 
-//     import axios from 'axios';
-//   import { usePopupStore } from "@/store/popupStore";
+    import axios from 'axios';
+  import { usePopupStore } from "@/store/popupStore";
 
 export default {
     data() {
         return {
             email: "",
-            password: "",
+            error: false,
+            success: false,
             buttonText: "Send Reset Link",
         };
     },
     methods: {
-        //   handleSubmit() {
-        //     this.buttonText = "Loading...";
-        //     const formData = new FormData();
-        //     formData.append("email", this.email);
-        //     formData.append("password", this.password);
+          handleSubmit() {
+            this.buttonText = "Loading...";
 
-        //     axios.post("api/login", formData)
-        //       .then(response => {
-        //         const data = response.data;
-        //         if (data.status === "success") {
-        //           this.$emit("loginSuccess");
-        //         } else {
-        //           throw new Error("Login failed. Please try again.");
-        //         }
-        //       })
-        //       .catch(error => {
-        //         console.error("Error during login:", error);
-        //         const popupStore = usePopupStore();
-        //         popupStore.showPopup(error.message || "Login failed. Please try again.");
-        //         this.buttonText = "Log in";
-        //       });
-        //   },
+            axios.post("api/send-reset-link", {
+
+                method: 'POST',
+                headers: {
+                'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ email: this.email })
+            })
+              .then(response => {
+                const data = response.data;
+                console.log("response: ", data);
+                if (data.status === "success") {
+                  this.success = true;
+                  this.buttonText = "Reset Link Sent";
+                } else {
+                    this.error = true;
+                    this.buttonText = "Send Reset Link";
+                }
+              })
+              .catch(error => {
+                console.error("Error during login:", error);
+                const popupStore = usePopupStore();
+                popupStore.showPopup(error.message || "Login failed. Please try again.");
+                this.buttonText = "Log in";
+              });
+          },
     },
 };
 </script>
