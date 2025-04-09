@@ -48,7 +48,8 @@ else:
     uri = 'sqlite:///app.db'
 
 # os.makedirs("instance", exist_ok=True)
-app.config['SQLALCHEMY_DATABASE_URI'] = uri
+# app.config['SQLALCHEMY_DATABASE_URI'] = uri
+# app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI') # TODO comment back in
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['REMEMBER_COOKIE_DURATION'] = timedelta(days=7)
 app.config['FLASK_SECRET_KEY'] = os.getenv('FLASK_SECRET_KEY')
