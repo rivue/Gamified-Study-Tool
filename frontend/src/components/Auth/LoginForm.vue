@@ -63,7 +63,6 @@ export default {
           }
         })
         .catch(error => {
-          console.error("Error during login:", error);
           const popupStore = usePopupStore();
           popupStore.showPopup(error.message || "Login failed. Please try again.");
           this.buttonText = "Log in";

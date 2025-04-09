@@ -40,6 +40,9 @@ export default {
                 .then((response) => {
                     if (response.status === 200) {
                         this.buttonText = "Reset Link Sent";
+                        setTimeout(() => {
+                            this.buttonText = "Send Reset Link";
+                        }, 3000);
                     } 
                 })
                 .catch(() => {

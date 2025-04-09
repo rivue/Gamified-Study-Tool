@@ -102,8 +102,8 @@ def init_auth_routes(app):
             new_user = User(email=email, password=hashed_password, username=email)
             db.session.add(new_user)
             db.session.commit()
+
             new_user.confirmation_token = generate_confirmation_token(new_user.id)
-            
             new_user.confirm_sent_at = datetime.utcnow()
             db.session.commit()
             
@@ -140,10 +140,12 @@ def init_auth_routes(app):
                 initialize_messages(user.id)
                 
                 return jsonify({'status': 'success', 'message': 'Email confirmed successfully!'})
+            
             else:
-                print("/api/confirm here")
+                
                 if user and not user.confirmed:
                     print(f"user: {user}, confirmed: {user.confirmed}")
+
                     user.confirmation_token = generate_confirmation_token(user.id)
                     user.confirm_sent_at = datetime.utcnow()
                     db.session.commit()
@@ -167,13 +169,17 @@ def init_auth_routes(app):
         user = User.query.filter_by(email=email).first() # TODO add username and change this to username instead of email
         
         if user and user.confirmed:
+            
             # Generate reset token and send email
-            reset_token = generate_confirmation_token(user.id)
+            user.password_reset_token = generate_confirmation_token(user.id)
+            user.password_reset_sent_at = datetime.utcnow()
+            db.session.commit()
+
             if os.getenv('FLASK_ENV') == 'production':
                 frontend_url = "https://rivue.ai"
             else:
                 frontend_url = "http://localhost:8080"
-                reset_link = f"{frontend_url}/reset-password/{reset_token}"
+                reset_link = f"{frontend_url}/reset-password/{user.password_reset_token}"
             send_email(email, PasswordReset, reset_link)
             
             return jsonify({'message': 'Reset link sent!'})
@@ -185,13 +191,14 @@ def init_auth_routes(app):
         data = request.get_json()
         token = data.get('token')
         new_password = data.get('new_password')
-        
-        user = User.query.filter_by(confirmation_token=token).first()
+        user = User.query.filter_by(password_reset_token=token).first()
         
         if user:
             user.password = generate_password_hash(new_password)
-            user.confirmation_token = None
+            user.password_reset_token = None
+            user.password_reset_sent_at = None
             db.session.commit()
+
             return jsonify({'status': 'success', 'message': 'Password reset successfully!'})
         else:
             return jsonify({'status': 'error', 'message': 'Invalid token'})

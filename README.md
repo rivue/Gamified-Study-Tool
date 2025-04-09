@@ -51,6 +51,8 @@ TODO list:
         (currently all 4 were in BottomBar.vue) --> (BASICALLY MAKE BottomBar.vue SMALLER)
 
     general:
+        - should email / pwd reset tokens be visible via the url or should they be more secret?
+        - how long do email confirmation tokens last / how long do password reset tokens last / what do I do when they're done?
         - implement some sort of const file with routes (ex: PASSWORD_RESET_URL = "...", etc...)
         - improve prompt / answer generation
         - fix propfind error thing

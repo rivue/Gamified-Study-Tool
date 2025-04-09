@@ -39,6 +39,9 @@ class User(db.Model, UserMixin):
     confirmation_token = db.Column(db.String(100), nullable=True)
     confirm_sent_at = db.Column(db.DateTime, nullable=True)
 
+    password_reset_token = db.Column(db.String(100), nullable=True)
+    password_reset_sent_at = db.Column(db.DateTime, nullable=True)
+
     def as_dict(self):
         active_lessons = [lesson.lesson_name for lesson in sorted(
             [l for l in self.lessons if not l.completion_date], 

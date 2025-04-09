@@ -21,6 +21,12 @@ export default {
         return {
             changelog: [
                 {
+                    date: "April 9, 2025",
+                    items: [
+                        "Added password reset ability",
+                    ],
+                },
+                {
                     date: "April 5, 2025",
                     items: [
                         "Fixed mobile viewing on Course Selection page and Learning Path page"
