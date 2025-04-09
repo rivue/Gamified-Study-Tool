@@ -1,6 +1,6 @@
 <template>
     <div class="changelog-container">
-        <h1 class="changelog-title">📢 Changelog</h1>
+        <h1 class="changelog-title">Changelog</h1>
         <p class="changelog-subtitle">See what's new, improved, or fixed in Rivue!</p>
 
         <div class="changelog-entry" v-for="(entry, index) in changelog" :key="index">

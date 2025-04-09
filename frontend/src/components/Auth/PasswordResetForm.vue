@@ -1,120 +1,197 @@
-<!-- TODO: fix weird vue warn messages that come up when someone types -->
+<!-- LoginSignupPopup.vue -->
 <template>
-    <div class="inspirational-quote">
-        Even the best magicians lose their wands sometimes. Let’s conjure up a little magic to get you back on stage!
-    </div>
-    <form @submit.prevent="handleSubmit">
-        <div class="form-field">
+    <div v-if="!loggedIn" class="popup-overlay">
+        <div v-if="loggingIn" id="loadingCloud" class="cloud-animation">☁️</div>
+        <div v-else class="popup-content">
+            <transition name="fade" mode="out-in">
+                <div :key="activeForm">
+                    <!-- <LoginForm v-if="activeForm === 'login'" @loginSuccess="handleLoginSuccess" />
+                    <SignupForm v-else-if="activeForm === 'signup'" @signupSuccess="handleSignupSuccess" />
+                    <SendPasswordResetForm v-else-if="activeForm === 'passwordReset'" @resetSuccess="handleResetSuccess" /> -->
 
-            <label for="email">Email:</label>
-            <input type="text" id="email" name="email" v-model="email" autocomplete="email" required />
+                    <!-- Buttons under each form -->
+                    <div v-if="activeForm === 'signup'">
+                        <button class="toggle-btn" @click="toggleForms('login')">
+                            Already have an account? <span class="underline-text">Log in</span>
+                        </button>
+                    </div>
+
+                    <div v-else-if="activeForm === 'login'">
+                        <button class="forgot-password" @click="toggleForms('passwordReset')">
+                            Forgot your password? <span class="underline-text">Reset Here</span>
+                        </button>
+                        <button class="toggle-btn" @click="toggleForms('signup')">
+                            Don't have an account? <span class="underline-text">Sign up</span>
+                        </button>
+                    </div>
+                </div>
+            </transition>
+
+            <div ref="googleButton"></div>
         </div>
-        <br />
-        <div v-if="error" class="error-message">
-            There was an error sending the reset link
-        </div>
-        <div v-if="success" class="success-message">
-            A reset link has been sent to your email
-        </div>
-        <div class="button-container">
-            <input type="submit" id="submit" :value="buttonText" />
-        </div>
-    </form>
+    </div>
 </template>
 
 <script>
 
-    import axios from 'axios';
-  import { usePopupStore } from "@/store/popupStore";
+import { useAuthStore } from "@/store/authStore";
 
 export default {
+    components: {
+    },
     data() {
         return {
-            email: "",
-            error: false,
-            success: false,
-            buttonText: "Send Reset Link",
+            activeForm: "login",
+            loggingIn: false,
         };
     },
+    mounted() {
+    },
+    computed: {
+        loggedIn() {
+            const authStore = useAuthStore();
+            return authStore.loggedIn;
+        },
+    },
     methods: {
-          handleSubmit() {
-            this.buttonText = "Loading...";
-
-            axios.post("api/send-reset-link", {
-
-                method: 'POST',
-                headers: {
-                'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ email: this.email })
-            })
-              .then(response => {
-                const data = response.data;
-                console.log("response: ", data);
-                if (data.status === "success") {
-                  this.success = true;
-                  this.buttonText = "Reset Link Sent";
-                } else {
-                    this.error = true;
-                    this.buttonText = "Send Reset Link";
-                }
-              })
-              .catch(error => {
-                console.error("Error during login:", error);
-                const popupStore = usePopupStore();
-                popupStore.showPopup(error.message || "Login failed. Please try again.");
-                this.buttonText = "Log in";
-              });
-          },
+        
     },
 };
 </script>
 
-<style>
-.button-container {
-    text-align: center;
-}
-
-form {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-}
-
-.inspirational-quote {
-    text-align: center;
-    font-style: italic;
-    margin-bottom: 20px;
-    color: #555;
-}
+<style scoped>
 
 .form-field {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    /* Change from flex-start to center */
-    max-width: 300px;
-    width: 100%;
-    margin-bottom: 16px;
-    /* Re-add this for spacing between fields */
-    margin-left: auto;
-    /* Keep these for horizontal centering */
-    margin-right: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-bottom: 16px;
+  max-width: 250px;
+  /* width: 100%; */
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .form-field label {
-    font-size: 0.9em;
-    color: var(--text-color);
+  margin-bottom: 6px;
+  font-size: 0.9em;
+  color: var(--text-color);
 }
 
-.form-field input[type="text"],
-.form-field input[type="password"] {
-    background-color: #00000000;
-    padding: 10px;
-    border: 1px solid var(--text-color);
-    border-radius: 4px;
+.popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
     width: 100%;
-    box-sizing: border-box;
+    height: 100%;
+    background-color: var(--background-haze);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 95;
+    padding: 25px;
+}
+
+.popup-content {
+  background-color: var(--background-color-1t);
+  display: flex;
+  justify-content: center;  /* Horizontal center */
+  align-items: center;      /* Vertical center */
+  flex-direction: column;
+  padding: 10px;
+  border-radius: 8px;
+  max-width: 400px;
+  width: 100%;
+  min-height: 300px;
+}
+
+
+.popup-content label {
+    margin-bottom: 8px;
+}
+
+.popup-content :deep(input[type="submit"]) {
+    margin-top: 8px;
+    padding: 10px 15px;
+    background-color: var(--element-color-1);
+    color: var(--text-color);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.popup-content :deep(input[type="submit"]):hover {
+    background-color: var(--element-color-2);
+    text-shadow: 0 0 5px #bb86fc, 0 0 10px #bb86fc, 0 0 15px #bb86fc;
+}
+
+.popup-content button {
+    margin-top: 8px;
+    padding: 10px 15px;
+    color: var(--text-color);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.popup-content button:hover,
+.popup-content button:active {
+    text-shadow: 0 0 5px #bb86fc, 0 0 10px #bb86fc, 0 0 15px #bb86fc;
+}
+
+.underline-text {
+    font-weight: 700;
+    text-decoration: underline;
+}
+
+.popup-content button:hover .underline-text,
+.popup-content button:active .underline-text {
+    text-decoration: none;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.5s;
+}
+
+.fade-enter,
+.fade-leave-to {
+    opacity: 0;
+}
+
+@keyframes cloudMove {
+    0% {
+        opacity: 0;
+        transform: translateX(-25vw) translateY(-2vh);
+    }
+
+    25% {
+        transform: translateX(-12.5vw) translateY(2vh);
+    }
+
+    50% {
+        opacity: 1;
+        transform: translateX(0vw) translateY(-2vh);
+    }
+
+    75% {
+        transform: translateX(12.5vw) translateY(2vh);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translateX(25vw) translateY(-2vh);
+    }
+}
+
+.cloud-animation {
+    font-size: 3em;
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    animation: cloudMove 3s linear infinite;
 }
 </style>

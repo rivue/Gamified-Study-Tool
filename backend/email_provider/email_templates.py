@@ -53,7 +53,7 @@ Registration = {
                     <p>
                         Please confirm your email address to start ascending to new heights:
                     </p>
-                    <a href="{{ confirmation_link }}" class="button">Confirm Email</a>
+                    <a href="{{ link }}" class="button">Confirm Email</a>
                     <p>
                         If you have any questions or need assistance, our mentorship team is here for you every step of the way.
                     </p>
@@ -140,7 +140,7 @@ PasswordReset = {
                     <p>
                         We received a request to reset your password. If you made this request, please click the button below to reset your password:
                     </p>
-                    <a href="{{ reset_link }}" class="button">Reset Password</a>
+                    <a href="{{ link }}" class="button">Reset Password</a>
                     <p>
                         If you did not request a password reset, please ignore this email or contact our support team if you have concerns.
                     </p>

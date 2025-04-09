@@ -7,7 +7,7 @@
                 <div :key="activeForm">
                     <LoginForm v-if="activeForm === 'login'" @loginSuccess="handleLoginSuccess" />
                     <SignupForm v-else-if="activeForm === 'signup'" @signupSuccess="handleSignupSuccess" />
-                    <PasswordResetForm v-else-if="activeForm === 'passwordReset'" @resetSuccess="handleResetSuccess" />
+                    <SendPasswordResetEmail v-else-if="activeForm === 'passwordReset'" @resetSuccess="handleResetSuccess" />
 
                     <!-- Buttons under each form -->
                     <div v-if="activeForm === 'signup'">
@@ -37,7 +37,7 @@ import axios from "axios";
 
 import LoginForm from "./LoginForm.vue";
 import SignupForm from "./SignupForm.vue";
-import PasswordResetForm from "./PasswordResetForm.vue";
+import SendPasswordResetEmail from "./SendPasswordResetEmail.vue";
 import { usePopupStore } from "@/store/popupStore";
 import { useAuthStore } from "@/store/authStore";
 
@@ -45,7 +45,7 @@ export default {
     components: {
         LoginForm,
         SignupForm,
-        PasswordResetForm,
+        SendPasswordResetEmail,
     },
     data() {
         return {

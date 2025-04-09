@@ -43,15 +43,15 @@ TODO list:
 
     MVP CLEANUP LIST:
         - add OTHER PAGES
-    
 
     OTHER PAGES:
         - terms and policies page
         - somewhere to link to X / discord (might be on an existing page, idk) (see mvp cleanup list)
         - about page
-        (currently all 4 were in BottomBar.vue) --> BASICALLY MAKE BottomBar.vue SMALLER)
+        (currently all 4 were in BottomBar.vue) --> (BASICALLY MAKE BottomBar.vue SMALLER)
 
     general:
+        - implement some sort of const file with routes (ex: PASSWORD_RESET_URL = "...", etc...)
         - improve prompt / answer generation
         - fix propfind error thing
         - add google auth and / or PASSWORD RESET

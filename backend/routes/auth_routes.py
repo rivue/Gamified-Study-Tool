@@ -113,16 +113,15 @@ def init_auth_routes(app):
                 frontend_url = "http://localhost:8080"
             confirmation_link = f"{frontend_url}/verify/{new_user.confirmation_token}"
             send_email(email, Registration, confirmation_link)
-            return jsonify({'status': 'success'})
+            return jsonify({})
         except IntegrityError as e:
             if isinstance(e.orig, pymysql_err.IntegrityError) and 'Duplicate entry' in str(e.orig):
-                return jsonify({'status': 'error', 'message': 'An account with this email already exists.'}), 400
+                return jsonify({'message': 'An account with this email already exists.'}), 400
             else:
-                return jsonify({'status': 'error', 'message': 'An unexpected error occurred. Please try again later.'}), 500
+                return jsonify({'message': 'An unexpected error occurred. Please try again later.'}), 500
 
     @app.route('/api/confirm', methods=['POST'])
     def confirm_email():
-        print("hello")
         try:
             data = request.get_json(silent=True) or {}
             # Use the URL token or fall back to body token
@@ -143,7 +142,7 @@ def init_auth_routes(app):
                 return jsonify({'status': 'success', 'message': 'Email confirmed successfully!'})
             else:
                 print("/api/confirm here")
-                if user is not None and not user.confirmed:
+                if user and not user.confirmed:
                     print(f"user: {user}, confirmed: {user.confirmed}")
                     user.confirmation_token = generate_confirmation_token(user.id)
                     user.confirm_sent_at = datetime.utcnow()
@@ -160,39 +159,14 @@ def init_auth_routes(app):
         except Exception as e:
             return jsonify({'status': 'error', 'message': 'something failed'}), 500
         
-    @app.route('/api/resend-verification', methods=['POST'])
-    def resend_verification():
-        data = request.get_json()
-        token = data.get('token')
-        
-        # Find user by the expired token
-        user = User.query.filter_by(confirmation_token=token).first()
-        
-        if user:
-            # Generate new token
-            user.confirmation_token = generate_confirmation_token(user.id)
-            user.confirm_sent_at = datetime.utcnow()
-            db.session.commit()
-            
-            # Send a new email
-            if os.getenv('FLASK_ENV') == 'production':
-                frontend_url = "https://rivue.ai"
-            else:
-                frontend_url = "http://localhost:8080"
-                confirmation_link = f"{frontend_url}/verify/{token}"
-            send_email(user.email, Registration, confirmation_link)
-            return jsonify({'status': 'success', 'message': 'Verification email sent!'})
-        else:
-            return jsonify({'status': 'error', 'message': 'User not found'})
-        
     @app.route('/api/send-reset-link', methods=['POST'])
     def send_reset_link():
         data = request.get_json()
         email = data.get('email')
         
-        user = User.query.filter_by(username=email).first() # TODO add username and change this to username instead of email
+        user = User.query.filter_by(email=email).first() # TODO add username and change this to username instead of email
         
-        if user:
+        if user and user.confirmed:
             # Generate reset token and send email
             reset_token = generate_confirmation_token(user.id)
             if os.getenv('FLASK_ENV') == 'production':
@@ -202,9 +176,9 @@ def init_auth_routes(app):
                 reset_link = f"{frontend_url}/reset-password/{reset_token}"
             send_email(email, PasswordReset, reset_link)
             
-            return jsonify({'status': 'success', 'message': 'Reset link sent!'})
+            return jsonify({'message': 'Reset link sent!'})
         else:
-            return jsonify({'status': 'error', 'message': 'User not found'})
+            return jsonify({'message': 'User not found'}), 400
         
     @app.route('/api/reset-password', methods=['POST'])
     def reset_password():

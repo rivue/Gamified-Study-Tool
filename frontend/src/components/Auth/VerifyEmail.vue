@@ -13,19 +13,19 @@
             <h1>Verification Link Expired</h1>
             <p>The verification link has expired. Please click the button below to resend an email.</p>
             <p>Please click the button below to resend an email.</p>
-            <button @click="resendVerification" class="button">Resend verification email</button>
+            <button @click="verifyEmail" class="button">Resend verification email</button>
         </div>
         <div v-else-if="status === 'invalid_registration_token'" class="error">
             <h1>Verification Link Invalid</h1>
             <p>The verification link is invalid. </p>
             <p>Please click the button below to resend an email.</p>
-            <button @click="resendVerification" class="button">Resend verification email</button>
+            <button @click="verifyEmail" class="button">Resend verification email</button>
         </div>
         <div v-else class="error">
             <h1>Verification Failed</h1>
             <p>We couldn't verify your email. The link may be invalid or expired. </p>
             <p>Please click the button below to resend an email.</p>
-            <button @click="resendVerification" class="button">Resend verification email</button>
+            <button @click="verifyEmail" class="button">Resend verification email</button>
         </div>
     </div>
 </template>
@@ -63,26 +63,6 @@ export default {
                     this.loading = false;
                 });
 
-        },
-        async resendVerification() {
-            this.loading = true;
-
-            axios
-                .post('/api/resend-verification', { token: this.token })
-                .then((response) => {
-                    if (response.status === 200) {
-                        this.status = 'resent';
-                    } else if (response.message) {
-                        this.status = 'error';
-                    }
-                })
-                .catch(() => {
-                    this.status = 'error';
-                })
-                .finally(() =>
-                    this.loading = false
-                );
-
         }
     }
 };
@@ -90,20 +70,20 @@ export default {
 
 <style scoped>
 .verification-container {
-  max-width: 600px;
-  /* Change from margin: 50px auto; to these settings */
-  margin: 0 auto;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  /* Keep the rest of your styles */
-  padding: 30px;
-  background-color: #0e0c14;
-  color: #f0f8ff;
-  border-radius: 8px;
-  text-align: center;
-  border: 1px solid #4a148c;
+    max-width: 600px;
+    /* Change from margin: 50px auto; to these settings */
+    margin: 0 auto;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    /* Keep the rest of your styles */
+    padding: 30px;
+    background-color: #0e0c14;
+    color: #f0f8ff;
+    border-radius: 8px;
+    text-align: center;
+    border: 1px solid #4a148c;
 }
 
 h1 {

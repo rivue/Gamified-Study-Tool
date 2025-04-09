@@ -72,9 +72,9 @@ export default {
       formData.append("new-password", this.password);
 
       axios.post("/api/signup", formData)
-        .then(response => {
+        .then((response) => {
           const data = response.data;
-          if (data.status === "success") {
+          if (data.status === 200) {
             this.$emit("signupSuccess");
           } else {
             throw new Error(data.message || "Signup failed. Please try again.");

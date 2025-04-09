@@ -7,7 +7,6 @@
       :isSelected="isRouteActive('/login')"
       @click="openRoute('/login')"
     >
-      <template v-slot:icon>&#128274;</template>
     </SideMenuButton>
 
     <SideMenuButton
@@ -17,7 +16,7 @@
     >
       <!-- <template v-slot:icon>🏛</template> -->
     </SideMenuButton>
-
+<!-- TODO look at these more -->
     <!-- <SideMenuButton
       v-if="loggedIn"
       label="Lessons"
@@ -48,7 +47,6 @@
       :isSelected="isRouteActive('/about')"
       @click="openRoute('/about')"
     > 
-      <template v-slot:icon>📢</template>
     </SideMenuButton>
 
     <SideMenuButton
