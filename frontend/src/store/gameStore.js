@@ -81,7 +81,7 @@ export const useGameStore = defineStore("gameStore", {
                 this.multiplier += 1;
                 this.currentQuestion += 1;
                 if (this.currentQuestion === this.factoids.length) { // && this.finalTest) {
-                    console.log("mark of success")
+                    console.debug("mark of success")
                     this.questionVisible = false;
                     this.factoidVisible = null;
                     this.endGame();
@@ -117,7 +117,7 @@ export const useGameStore = defineStore("gameStore", {
                 const response = await axios.get(`/api/library/${libraryId}`, {params: {library_topic: roomNameThing}});
 
                 // do loadName first in case factoid doesn't exist
-                console.log("response: ", response);
+                console.debug("response: ", response);
                 if (response.data.status === "success") {
                     if (response.data.data === null && response.data.room_data === null) {
                         // if for some reason roomNameThing is null
@@ -125,10 +125,10 @@ export const useGameStore = defineStore("gameStore", {
                         console.error("Failed to fetch library details", response);
                         return;
                     }
-                    console.log(response.data.room_data)
+                    console.debug(response.data.room_data)
                     const data = response.data.data;
                     this.userStateData = response.data.room_data;
-                    console.log(this.userStateData);
+                    console.debug(this.userStateData);
                     this.score = data.score || 0;
                     this.bestTime = data.best_time || 0;
                     this.completion = data.completion || 0;
@@ -141,7 +141,7 @@ export const useGameStore = defineStore("gameStore", {
                     this.languageDifficulty = data.language_difficulty || "Normal";
                     // this.libraryTopic = data.library_topic || null;
                     this.libraryTopic = roomNameThing;
-                    // console.log("roomNameThing: ", roomNameThing);
+                    // console.debug("roomNameThing: ", roomNameThing);
                     this.likes = data.likes || 0;
                     this.userId = data.user_id || null;
                     this.tutorial = data.tutorial || false;
@@ -187,7 +187,7 @@ export const useGameStore = defineStore("gameStore", {
                 //     subtopic: room_name
                 // });
 
-                console.log("roomname: ", room_name, "library topic: " , this.libraryTopic)
+                console.debug("roomname: ", room_name, "library topic: " , this.libraryTopic)
                 if (response.data.status === "success") {
                     this.roomStates[room_name].state = 2;
                     this.roomStates[room_name].factoids = response.data.data.factoids;
@@ -202,7 +202,7 @@ export const useGameStore = defineStore("gameStore", {
                 }
             } catch (error) {
                 if (error.response && error.response.status === 403) {
-                    console.log(error.response);
+                    console.debug(error.response);
                     const popupStore = usePopupStore();
                     popupStore.showPopup("You have reached the limit.</br>Please login to continue.");
                     return false;

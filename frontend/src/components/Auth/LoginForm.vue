@@ -59,7 +59,7 @@ export default {
           if (data.status === "success") {
             this.$emit("loginSuccess");
           } else {
-            throw new Error("Login failed. Please try again.");
+            // throw new Error("Login failed. Please try again.");
           }
         })
         .catch(error => {

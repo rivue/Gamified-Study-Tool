@@ -363,7 +363,7 @@ const addNewNodes = async () => {
 
     // Add file if present (same file for all nodes)
     if (selectedFile.value) {
-        console.log(selectedFile.value)
+        console.debug(selectedFile.value)
         formData.append('file', selectedFile.value)
     }
       
@@ -461,7 +461,7 @@ onMounted(() => {
 onUnmounted(() => {
     if (scrollTimeoutId) {
         clearTimeout(scrollTimeoutId); // Clear the timeout if it hasn't run yet
-        console.log("LearningPath unmounting, cleared initial scroll timeout.");
+        console.debug("LearningPath unmounting, cleared initial scroll timeout.");
     }
 });
 
@@ -527,7 +527,7 @@ const getNodeOffset = (index) => {
 }
 
 const startLesson = (roomName) => {
-    console.log(`Starting lesson for ${roomName}`)
+    console.debug(`Starting lesson for ${roomName}`)
     router.push(`/lessons/${library_id}/${roomName}`)
 }
 

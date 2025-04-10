@@ -129,7 +129,7 @@ export default {
     watch: {
         loggedIn(newValue) {
             if (!newValue) {
-                console.log("login from app");
+                console.debug("login from app");
                 this.$router.push("/login");
             }
             if (newValue && this.shouldShowChat) {

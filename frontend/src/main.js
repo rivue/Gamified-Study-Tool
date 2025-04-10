@@ -117,7 +117,7 @@ router.beforeEach(async (to, from, next) => {
 
     const loading = useLoadingStore()
     if (!from.matched.length) loading.start()
-    console.log("idk")
+    console.debug("idk")
     // const gameStore = useGameStore();
 
     // if (from.path.startsWith('/library/')) {
@@ -169,7 +169,7 @@ router.beforeEach(async (to, from, next) => {
             }
         } else {
             // If not logged in and the route requires creator access, redirect to login
-            console.log("Requires creator access, redirecting to login");
+            console.debu("Requires creator access, redirecting to login");
             return next({
                 path: '/login',
                 query: { redirect: to.fullPath },

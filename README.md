@@ -51,6 +51,10 @@ TODO list:
         (currently all 4 were in BottomBar.vue) --> (BASICALLY MAKE BottomBar.vue SMALLER)
 
     general:
+        - make it so you have to be confirmed to access pages
+        - remove lesson ids, lesson names, password reset tokens and confirmation tokens from urls and communicate them somewhere else
+            - make it like duolingo where doing the actual lesson is /learn or something
+        - add page after you finish, but make it have confetti or an animation or something
         - should email / pwd reset tokens be visible via the url or should they be more secret?
         - how long do email confirmation tokens last / how long do password reset tokens last / what do I do when they're done?
         - implement some sort of const file with routes (ex: PASSWORD_RESET_URL = "...", etc...)

@@ -45,7 +45,7 @@ export default {
                 const response = await axios.get(`/api/library/${libraryId}`, {
                     signal: abortController.signal // Pass the signal to axios
                 });
-                console.log("response: ", response);
+                console.debug("response: ", response);
                 if (response.data && response.data.data && response.data.room_data) {
 
                     library.value = {
@@ -56,7 +56,7 @@ export default {
                         },
                     };
                     
-                    console.log(library.value.data.room_names)
+                    console.debug(library.value.data.room_names)
                 } else {
                     throw new Error("Invalid response data");
                 }

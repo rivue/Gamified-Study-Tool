@@ -18,13 +18,7 @@
       <div class="nav-row">
         <button class="nav-button" @click="navigateBack">🔙Back</button>
         <div class="separator">|</div>
-        <!-- <button
-          class="nav-button"
-          @click="navigateExplore"
-          :disabled="exploreLoading"
-        >
-          {{ exploreLoading ? "⏳Loading" : "🔍Explore" }}
-        </button> -->
+        
         <div class="separator">|</div>
         <button class="nav-button" @click="navigateMap">🗺️Map</button>
       </div>
@@ -127,26 +121,9 @@ export default {
     navigateBack() {
       this.$router.push("/lessons");
     },
-    // navigateExplore() {
-    //   this.exploreLoading = true;
-    //   const messageStore = useMessageStore();
-    //   const url = `/api/explore?name=${messageStore.subheading}`;
-    //   axios
-    //     .get(url)
-    //     .then((response) => {
-    //       if (response.data && response.data.suggestions) {
-    //         this.suggestions = response.data.suggestions;
-    //       } else {
-    //         this.exploreLoading = false; // console.log("No suggestions received");
-    //       }
-    //     })
-    //     .catch((error) => {
-    //       console.error("Error fetching suggestions: ", error);
-    //       this.exploreLoading = false;
-    //     });
-    // },
+    
     async startSuggestion(suggestion) {
-      // console.log("Selected suggestion: " + suggestion);
+        
       const messageStore = useMessageStore();
 
       try {
@@ -154,8 +131,7 @@ export default {
           "Start lesson: " + suggestion,
           "/lessons"
         );
-        // console.log("Response: ", response);
-
+        
         if (!response || response === "not sent") {
           console.error("No response or message not sent");
           return;
