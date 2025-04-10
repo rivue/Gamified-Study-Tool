@@ -11,7 +11,7 @@ import './assets/themes.css';
 import axios from 'axios';
 
     // basically main home page
-    // { path: '/about', component: defineAsyncComponent(() => import('./components/Footer/MainPage.vue')), meta: { title: Rivue.ai | Learn Anything!' } },
+    // { path: '/changelog', component: defineAsyncComponent(() => import('./components/Footer/MainPage.vue')), meta: { title: Rivue.ai | Learn Anything!' } },
     // { path: '/', component: defineAsyncComponent(() => import('./components/Footer/MainPage.vue')), meta: { title: Rivue.ai | Learn Anything!' } },
 
     // { 
@@ -77,7 +77,7 @@ import axios from 'axios';
         },
         
         // Simple routes
-        { path: '/about', component: defineAsyncComponent(() => import('./components/Backstage/ChangelogPage.vue')), meta: { title: 'Rivue.ai | Learn Anything!' } },
+        { path: '/changelog', component: defineAsyncComponent(() => import('./components/Backstage/ChangelogPage.vue')), meta: { title: 'Rivue.ai | Learn Anything!' } },
         { path: '/library', component: defineAsyncComponent(() => import('./components/Game/Creation/LibraryCreator.vue')), meta: { title: 'Rivue.ai | Create Library' } },
         // { path: '/progress', component: defineAsyncComponent(() => import('./components/Backstage/ProgressPage.vue')), meta: { title: 'Rivue.ai | Progress' } },
         { path: '/contact', component: defineAsyncComponent(() => import('./components/Footer/ContactPage.vue')), meta: { title: 'Rivue.ai | Contact Us' } },
@@ -92,7 +92,7 @@ import axios from 'axios';
         // Redirects
         // { path: '/lessons', redirect: '/' },
         { path: '/lessons/:pathMatch(.*)*', redirect: '/' },
-        { path: '/about/:pathMatch(.*)*', redirect: '/' },
+        { path: '/changelog/:pathMatch(.*)*', redirect: '/' },
         { path: '/library/:pathMatch(.*)*', redirect: '/library' },
         // { path: '/progress/:pathMatch(.*)*', redirect: '/progress' },
         { path: '/contact/:pathMatch(.*)*', redirect: '/contact' },
@@ -132,7 +132,7 @@ router.beforeEach(async (to, from, next) => {
 
     const publicPaths = [
         '/',
-        '/about',
+        '/changelog',
         '/login',
         '/terms',
         '/contact',

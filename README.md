@@ -39,22 +39,23 @@ TODO list:
 
     OTHER PAGES:
         - terms and policies page
+        - about page (?)
         - somewhere to link to X / discord (might be on an existing page, idk) (see mvp cleanup list)
-        - about page
         (currently all 4 were in BottomBar.vue) --> (BASICALLY MAKE BottomBar.vue SMALLER)
 
     general:
-        - make it so you have to be confirmed to access pages
+        - improve ui with courses
+        - add ability to change color of image of courses
         - remove lesson ids, lesson names, password reset tokens and confirmation tokens from urls and communicate them somewhere else
             - make it like duolingo where doing the actual lesson is /learn or something
-        - add page after you finish, but make it have confetti or an animation or something
+        - add page after you finish a game session, but make it have confetti or an animation or something
         - should email / pwd reset tokens be visible via the url or should they be more secret?
         - how long do email confirmation tokens last / how long do password reset tokens last / what do I do when they're done?
         - implement some sort of const file with routes (ex: PASSWORD_RESET_URL = "...", etc...)
         - improve prompt / answer generation
         - fix propfind error thing
         - add google auth and / or PASSWORD RESET
-        - add ability to add multiple room names from Add New Stepping Stone part
+        
         - add a slot for an image in each question for reference or description or something - like maybe an image of a bridge or trigonometry or something
         - migrate from pinecone-client to pinecone (not really a migration, just a typo I think, shouldn't take too long)
         - possibly fix weird ssl module warning thing when I run the backend
@@ -86,7 +87,7 @@ TODO list:
         - only fetch most 30 recent factoids, or summary of factoids or something when doing room generation
         - one word short answer (make gpt come up with variations so people aren't pissed off w/ super close answers, ex:
         NCSU, ncsu, NC State, North Carolina State University, etc... or maybe use basic nlp to check?)
-        - all the other routes and stuff (contact / submit feedback, terms & policies, buying subscription, settings)
+        - all the other routes and stuff (terms & policies, buying subscription)
 
     create course (library) page:
         - add support for links / pdfs / other things and get rid of things like difficulty, tutor, etc... then actually start generating stuff to study
@@ -101,8 +102,6 @@ TODO list:
         - instead of multiple choice, have it where users can drag / drop for an answer slot:
             (deepseek recomendations):
             - Add haptic feedback on drop (vibration for correct/wrong).
-            - Use gravity physics (e.g., answers "fall" into the slot with a bounce).
-            - Animated rewards: Slot glows/explodes with confetti on correct answers.
         - once I add a second type of "game", make it "shuffle" the questions once it gets the
             8 or so least seen so that the questions seem random and they aren't just the same multiple choice every time
         - make the underscores ___ visible in the questions
@@ -266,6 +265,8 @@ COMPLETED:
     ✅ error handling for not finding any context when loading stone names in library?
     ✅ put x / discord links in main page, probably along with something like "join us" or "hear our updates" or something
     ✅ continue with adding X / Discord link to main page (LibraryCreator.vue)
+    ✅ make it so you have to be confirmed to access pages
+    ✅ add ability to add multiple room names from Add New Stepping Stone part
 
 
 RESOURCES:

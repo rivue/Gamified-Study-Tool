@@ -37,7 +37,7 @@
                         <img :src="require('@/assets/images/x-logo-white.png')" alt="X (Twitter)" class="social-icon" />
                         <span>Follow us on X</span>
                     </a>
-                    <a href="https://discord.gg/7h7DpTDc" target="_blank" rel="noopener noreferrer" class="social-link">
+                    <a href="https://discord.gg/33yAcp2qDf" target="_blank" rel="noopener noreferrer" class="social-link">
                         <img :src="require('@/assets/images/discord-mark-white.png')" alt="Discord"
                             class="social-icon" />
                         <span>Join our Discord</span>

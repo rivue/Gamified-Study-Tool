@@ -20,7 +20,7 @@
         <!-- </div> -->
         <div class="footer-bottom">
             <div class="footer-top">
-                <router-link to="/about" class="text-link">About</router-link>
+                <router-link to="/changelog" class="text-link">Changelog</router-link>
                 <span class="separator">·</span>
                 <router-link to="/terms" class="text-link">Terms and Policies</router-link>
                 <span class="separator">·</span>
