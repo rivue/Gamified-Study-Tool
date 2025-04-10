@@ -8,16 +8,9 @@ IDEAS:
         - create cheap vr cardboard cutouts of headsets where you can put your phone --> give to high schools possibly for free once you partner with them
             - have to think specifically of who / what to target for MVP, etc... so as little time as possibly gets wasted building something that either 1) is outside of my domain of expertise or 2) other people might build (repeat of unclear jupyterhub research)
             - not sure where to go from there, lots of places though
-        - see google doc for more plans
-        - say you came up with and built the knowledge graph algorithm on your resume
+        - see google doc for more plansyour resume
             - Built a custom text extraction pipeline using Optical Character Recognition to extract text from pdf textbooks with 97% accuracy
                 (add image to text ocr thing on resume)
-        - ADD RAG STUFF TO RESUME (INCLUDING GOOGLE VISION STUFF)
-            - add gRPC stuff abt pinecone stuff
-            - more advanced processing for Masters / PhD level topics (ask chatgpt, but mainly re-ranking, structured search, 
-                and advanced reasonding-based prompt engineering to capture cross-section dependencies) 
-            - investigate into late-chunking or late-interaction for vector embedding
-            - also add multimodal and >1 file input for library / course creation
 
     ideas for map themes (possibly):
         - name something stone related (bc you are SOLIDIFYING your knowledge (hahahahahah ok im done))

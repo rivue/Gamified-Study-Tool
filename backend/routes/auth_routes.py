@@ -26,20 +26,26 @@ def init_auth_routes(app):
         print(user)
         print(os.getenv('SECRET_KEY'))
         print(os.getenv('FLASK_SECRET_KEY'))
+        print(f"user confirmed:")
+        print(f"{user.confirmed}")
+
+        
         if user and check_password_hash(user.password, password):
             # print(login_user(user, remember=True))
             # print(current_user.is_authenticated)
+            if not user.confirmed:
+                return jsonify({'status': 'fail', 'message': 'Email not authenticated'}), 400
             login_result = login_user(user, remember=True)
             print("Login result:", login_result)
             print("User authenticated:", current_user.is_authenticated)
             print("User ID in session:", session.get('_user_id'))
             print("Session:", dict(session))
             print(f"SECRET_KEY at login      : {app.config['SECRET_KEY']}")
-            # print(f"FLAKS_SECRET_KEY at login: {app.config['FLASK_SECRET_KEY']}")
+            # print(f"FLASK_SECRET_KEY at login: {app.config['FLASK_SECRET_KEY']}")
 
             return jsonify({'status': 'success'})
         else:
-            return jsonify({'status': 'fail'})
+            return jsonify({'status': 'fail', 'message': 'Error logging in'}), 400
 
     @app.route("/api/logout", methods=["GET"])
     @login_required
@@ -52,7 +58,7 @@ def init_auth_routes(app):
         if current_user.is_authenticated and current_user.confirmed:
             return jsonify({'loggedIn': True, 'userTier': get_user_tier(current_user.id), 'requestCount': get_daily_request_count(current_user.id), 'userId': current_user.id})
         else:
-            return jsonify({'loggedIn': False, 'userTier': None})
+            return jsonify({'loggedIn': False, 'userTier': None}), 400
 
     @app.route('/api/test-cookie', methods=['GET'])
     def test_cookie():
@@ -97,6 +103,10 @@ def init_auth_routes(app):
     def signup():
         try:
             email = request.form['new-email']
+            user = User.query.filter_by(email=email).first()
+            if user:
+                return jsonify({'message': 'An account with this email already exists.'}), 400
+
             password = request.form['new-password']
             hashed_password = generate_password_hash(password)
             new_user = User(email=email, password=hashed_password, username=email)
@@ -115,10 +125,7 @@ def init_auth_routes(app):
             send_email(email, Registration, confirmation_link)
             return jsonify({})
         except IntegrityError as e:
-            if isinstance(e.orig, pymysql_err.IntegrityError) and 'Duplicate entry' in str(e.orig):
-                return jsonify({'message': 'An account with this email already exists.'}), 400
-            else:
-                return jsonify({'message': 'An unexpected error occurred. Please try again later.'}), 500
+            return jsonify({'message': 'An unexpected error occurred. Please try again later.'}), 500
 
     @app.route('/api/confirm', methods=['POST'])
     def confirm_email():

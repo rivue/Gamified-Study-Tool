@@ -33,7 +33,6 @@
 </template>
 
 <script>
-import axios from "axios";
 
 import LoginForm from "./LoginForm.vue";
 import SignupForm from "./SignupForm.vue";
@@ -87,54 +86,54 @@ export default {
             );
             this.$router.push("/");
         },
-        loadGoogleIdentityServices() {
-            if (window.google && window.google.accounts) {
-                this.initializeGoogleSignIn();
-            } else {
-                const script = document.createElement("script");
-                script.src = "https://accounts.google.com/gsi/client";
-                script.onload = this.initializeGoogleSignIn;
-                script.async = true;
-                script.defer = true;
-                document.head.appendChild(script);
-            }
-        },
+        // loadGoogleIdentityServices() {
+        //     if (window.google && window.google.accounts) {
+        //         this.initializeGoogleSignIn();
+        //     } else {
+        //         const script = document.createElement("script");
+        //         script.src = "https://accounts.google.com/gsi/client";
+        //         script.onload = this.initializeGoogleSignIn;
+        //         script.async = true;
+        //         script.defer = true;
+        //         document.head.appendChild(script);
+        //     }
+        // },
 
-        initializeGoogleSignIn() {
-            window.google.accounts.id.initialize({
-                client_id:
-                    "529262341360-9sq10od3qkro19jaavhgachkpviugfv3.apps.googleusercontent.com",
-                callback: this.handleCredentialResponse,
-            });
-            window.google.accounts.id.renderButton(this.$refs.googleButton, {
-                theme: "outline",
-                size: "large",
-            });
-        },
+        // initializeGoogleSignIn() {
+        //     window.google.accounts.id.initialize({
+        //         client_id:
+        //             "529262341360-9sq10od3qkro19jaavhgachkpviugfv3.apps.googleusercontent.com",
+        //         callback: this.handleCredentialResponse,
+        //     });
+        //     window.google.accounts.id.renderButton(this.$refs.googleButton, {
+        //         theme: "outline",
+        //         size: "large",
+        //     });
+        // },
 
-        handleCredentialResponse(response) {
-            this.loggingIn = true;
-            this.sendTokenToBackend(response.credential);
-        },
-        sendTokenToBackend(id_token) {
-            axios
-                .post("/api/auth/google/callback", { id_token })
-                .then((response) => {
-                    const authStore = useAuthStore();
-                    authStore.login();
-                    if (response.data.message === "new_user") {
-                        this.$router.push("/?awake");
-                    } else {
-                        this.$router.push("/");
-                    }
-                })
-                .catch((error) => {
-                    console.error("Error authenticating", error);
-                })
-                .finally(() => {
-                    this.loggingIn = false;
-                });
-        },
+        // handleCredentialResponse(response) {
+        //     this.loggingIn = true;
+        //     this.sendTokenToBackend(response.credential);
+        // },
+        // sendTokenToBackend(id_token) {
+        //     axios
+        //         .post("/api/auth/google/callback", { id_token })
+        //         .then((response) => {
+        //             const authStore = useAuthStore();
+        //             authStore.login();
+        //             if (response.data.message === "new_user") {
+        //                 this.$router.push("/?awake");
+        //             } else {
+        //                 this.$router.push("/");
+        //             }
+        //         })
+        //         .catch((error) => {
+        //             console.error("Error authenticating", error);
+        //         })
+        //         .finally(() => {
+        //             this.loggingIn = false;
+        //         });
+        // },
     },
 };
 </script>

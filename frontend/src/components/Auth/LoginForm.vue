@@ -55,17 +55,16 @@ export default {
 
       axios.post("api/login", formData)
         .then(response => {
-          const data = response.data;
-          if (data.status === "success") {
+          if (response.status === 200) {
             this.$emit("loginSuccess");
-          } else {
-            // throw new Error("Login failed. Please try again.");
           }
         })
         .catch(error => {
-          const popupStore = usePopupStore();
-          popupStore.showPopup(error.message || "Login failed. Please try again.");
-          this.buttonText = "Log in";
+            console.log(error.response);
+            console.log(error.response?.data);
+            const popupStore = usePopupStore();
+            popupStore.showPopup(error.response?.data?.message || "Login failed, please try again");
+            this.buttonText = "Log in";
         });
     },
   },

@@ -66,24 +66,32 @@ export default {
         this.buttonText = "Sign up";
         return;
       }
+      console.log("hi")
 
+      if (this.password.length <  8) {
+        const popupStore = usePopupStore();
+        popupStore.showPopup("Passwords must be longer than 8 characters!");
+        this.buttonText = "Sign up";
+        return;
+      }
+      console.log("second")
       const formData = new FormData();
       formData.append("new-email", this.email);
       formData.append("new-password", this.password);
 
+    //   console.log("Form data:", formData);
+
       axios.post("/api/signup", formData)
         .then((response) => {
-          const data = response.data;
-          if (data.status === 200) {
+          if (response.status === 200) {
             this.$emit("signupSuccess");
-          } else {
-            throw new Error(data.message || "Signup failed. Please try again.");
+            this.buttonText = "Sign up";
           }
         })
         .catch(error => {
-          console.error('Error during signup:', error);
+        //   console.debug('Error during signup:', error);
           const popupStore = usePopupStore();
-          popupStore.showPopup(error.message || "Signup failed. Please try again.");
+          popupStore.showPopup(error.response?.data?.message || "Signup failed. Please try again.");
           this.buttonText = "Sign up";
         });
     },

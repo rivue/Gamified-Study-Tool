@@ -34,7 +34,7 @@ export const useAuthStore = defineStore('auth', {
           this.logout();
         }
       } catch (error) {
-        console.error('Error checking auth status:', error);
+        // console.error('Error checking auth status:', error);
         this.logout();
       }
       // console.log("Auth:" + this.loggedIn);
