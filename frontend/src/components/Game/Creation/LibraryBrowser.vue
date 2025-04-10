@@ -30,8 +30,6 @@ export default {
         return {
             isLoading: true,
             myLibraries: [],
-            mostLikedLibraries: [],
-            newestLibraries: [],
         };
     },
     mounted() {

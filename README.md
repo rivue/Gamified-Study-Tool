@@ -44,6 +44,9 @@ TODO list:
         (currently all 4 were in BottomBar.vue) --> (BASICALLY MAKE BottomBar.vue SMALLER)
 
     general:
+        - look into adding a resizable area somewhere in your site (like how turbo learn has it) but like people can't change it
+        - add ability to delete library (have to enter its name exactly)
+        - add check for duplicate room name for the time being - maybe allow it later down the line?
         - when you mouse over the popup for the lesson that has the # of lessons / x button, it should not cause the button to hover
         - improve ui with libraries / courses in library creation screen
         - add ability to change color of image of courses
@@ -62,14 +65,13 @@ TODO list:
         - possibly fix weird ssl module warning thing when I run the backend
         - reduce bundle (currently @ 261 KiB, want to be ideally below 244)
         - ACCOUNT FOR MOBILE SCREEN SIZES!!
-        - ADD SHAD-CN
         - add support for multiple file upload (possibly)
         - add other routes back in, eventually
         - remove library difficulty, mentor, language, etc... from db course structure, backend, frontend course creation screen
             - note: easy to get rid of in the frontend, but have to remove lots of stuff in backend w/ various function calls and stuff
-        - include question prompt generation (e.g. make the answer choices very similar to what you think the user would think, etc...)
+        - include question prompt generation (e.g. make the answer choices very similar to what you think the user would think so the questions are a little more challenging, etc...)
         - add default background if you scroll to far (like in main page if you scroll too far down)
-        - eventually add footer back (note: requires light mode, discord link, donate link (or we could just not do that), everything in contact page, terms page, copyright(?), and possibly twitter link if we decide to do that)
+        - eventually add footer back (note: requires light mode, discord link, everything in contact page, terms page, copyright(?), and possibly twitter link if we decide to do that)
         - change theme / color / name
         - ability to "star" / "favorite" a course
         - make footer smaller and look better
@@ -267,6 +269,8 @@ COMPLETED:
     ✅ continue with adding X / Discord link to main page (LibraryCreator.vue)
     ✅ make it so you have to be confirmed to access pages
     ✅ add ability to add multiple room names from Add New Stepping Stone part
+    ✅ ADD SHAD-CN
+
 
 
 RESOURCES:

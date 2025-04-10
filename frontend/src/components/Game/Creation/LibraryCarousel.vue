@@ -7,34 +7,25 @@
 
         <!-- Conditional rendering based on library count -->
         <div v-if="totalItems > 0" class="list-table">
+            <div class="search-bar">
+            <Input class="max-w-sm" placeholder="Search courses..." />
+        </div>
             <div class="table-header">
-                <div class="col-thumbnail">Preview</div>
                 <div class="col-name">Name</div>
                 <div class="col-status">Status</div>
                 <div class="col-stats">Statistics</div>
                 <!-- <div class="col-date">Created at</div> -->
-                <div class="col-actions"></div>
             </div>
 
             <div v-for="library in paginatedLibraries" :key="library.id" class="library-item"
                 @click="goToLibrary(library.id)">
-                <div class="col-thumbnail">
-                    <div class="thumbnail" :style="{ backgroundImage: `url(${library.image_url})` }"></div>
-                </div>
                 <div class="col-name">
                     <h3>{{ library.library_topic }}</h3>
                 </div>
                 <div class="col-status">
-                    <span class="status-badge">Active</span>
+                    <span class="dots" @click.stop>...</span>
                 </div>
-                <div class="col-stats">
-                    <span class="stat">👥 {{ library.clicks || 0 }}</span>
-                    <span class="stat">❤️ {{ library.likes || 0 }}</span>
-                </div>
-                <!-- TODO: maybe add the date the library was -->
-                <div class="col-actions">
-                    <button class="action-btn">⋮</button>
-                </div>
+                
             </div>
         </div>
 
@@ -68,6 +59,8 @@
 </template>
 
 <script>
+import { Input } from "@/components/ui/input";
+
 export default {
     name: "LibraryList",
     props: {
@@ -181,7 +174,6 @@ export default {
     display: grid;
     /* Define columns here - ADJUST THESE values as needed for your design */
     grid-template-columns:
-      minmax(60px, 80px) /* col-thumbnail: min 60px, max 80px */
       minmax(100px, 2fr)  /* col-name: min 100px, flexible */
       minmax(80px, 1fr)  /* col-status: min 80px, flexible */
       minmax(120px, 1fr) /* col-stats: min 100px, flexible */
@@ -228,16 +220,6 @@ export default {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.thumbnail {
-    width: 56px;
-    height: 56px;
-    border-radius: 8px;
-    background-size: cover;
-    background-position: center;
-    background-color: var(--element-color-1);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
 .col-name h3 {
     font-size: 16px;
     font-weight: 600;
@@ -248,26 +230,28 @@ export default {
      word-break: break-word; /* Break long words if needed */
 }
 
-.col-thumbnail {
-    flex-grow: 1; /* Allow name to take available space on its line */
-    min-width: 150px; /* Prevent it from getting too small before wrapping stats */
-}
-
 .col-status {
-    flex-shrink: 0; /* Prevent status badge from shrinking */
-    margin-right: auto; /* Push stats/actions further away when wrapped (optional) */
+    background: none;
+    border: none;
+    cursor: pointer;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background-color 0.2s ease;
 }
 
-.status-badge {
-    display: inline-block;
-    padding: 4px 10px;
-    border-radius: 16px;
-    background-color: var(--success-color-bg);
-    color: var(--success-color);
-    font-size: 13px;
-    font-weight: 600;
-    letter-spacing: 0.3px;
-    white-space: nowrap; /* Keep badge text itself on one line */
+.col-status:hover {
+    background-color: var(--background-color-2);
+}
+
+.dots {
+    font-size: 20px;
+    font-weight: bold;
+    line-height: 0;
+    color: var(--text-color-secondary);
 }
 
 .col-stats {
@@ -304,32 +288,6 @@ export default {
 .col-date {
     font-size: 14px;
     color: var(--text-color-secondary);
-}
-
-.col-actions {
-    flex-shrink: 0;
-    margin-left: auto; /* Push action button to the end */
-    align-self: center; /* Vertically align button */
-}
-
-.action-btn {
-    width: 32px;
-    height: 32px;
-    border: none;
-    background: transparent;
-    color: var(--text-color-secondary);
-    cursor: pointer;
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 16px;
-    transition: all 0.2s ease;
-}
-
-.action-btn:hover {
-    background-color: var(--background-color-3);
-    color: var(--text-color);
 }
 
 @media (min-width: 768px) {

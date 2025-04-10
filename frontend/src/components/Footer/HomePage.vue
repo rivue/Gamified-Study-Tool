@@ -429,7 +429,18 @@ body {
 }
 
 /* media */
+@media only screen and (max-width: 740px) {
+    .value-content {
+        height: 7em;
+        padding-right: 20%;
+    }
 
+
+    .value-text {
+        font-size: 0.7em;
+    }
+
+}
 @media only screen and (max-width: 600px) {
     .landing-title {
         font-size: 3em;
@@ -449,7 +460,7 @@ body {
     }
 
     .value-text {
-        font-size: 0.8em;
+        font-size: 0.7em;
     }
 
     .openai {
