@@ -1,6 +1,6 @@
 <template>
     <div class="changelog-container">
-        <h1 class="changelog-title">📢 Changelog</h1>
+        <h1 class="changelog-title">Changelog</h1>
         <p class="changelog-subtitle">See what's new, improved, or fixed in Rivue!</p>
 
         <div class="changelog-entry" v-for="(entry, index) in changelog" :key="index">
@@ -21,9 +21,15 @@ export default {
         return {
             changelog: [
                 {
+                    date: "April 9, 2025",
+                    items: [
+                        "Added password reset ability",
+                    ],
+                },
+                {
                     date: "April 5, 2025",
                     items: [
-                        "Fixed mobile viewing on Course selection page and Learning Path page"
+                        "Fixed mobile viewing on Course Selection page and Learning Path page"
                     ],
                 },
                 {
@@ -36,7 +42,7 @@ export default {
 
                     date: "March 26, 2025",
                     items: [
-                        "Switched to a new database system (Supabase)",
+                        "Added a database",
                         "Added this changelog"
                     ],
                 },

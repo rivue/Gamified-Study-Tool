@@ -86,6 +86,8 @@ import axios from 'axios';
         // { path: '/plan', component: defineAsyncComponent(() => import('./components/Monetization/PlanPage.vue')), meta: { title: 'Rivue.ai | Premium Plans' } },
         { path: '/login', component: defineAsyncComponent(() => import('./components/Auth/LoginSignupPopup.vue')), meta: { title: 'Rivue.ai | Login/Signup' } },
         // { path: '/admin', component: defineAsyncComponent(() => import('./components/Auth/AdminPage.vue')), meta: { title: 'Rivue.ai | Admin' } },
+        { path: '/verify/:token', component: defineAsyncComponent(() => import('./components/Auth/VerifyEmail.vue')), meta: { title: 'Rivue.ai | Verify Email' }},
+        { path: '/reset-password/:token', component: defineAsyncComponent(() => import('./components/Auth/PasswordResetForm.vue')), props: true, meta: { title: 'Rivue.ai | Password Reset' }},
         
         // Redirects
         // { path: '/lessons', redirect: '/' },
@@ -101,7 +103,7 @@ import axios from 'axios';
         // { path: '/admin/:pathMatch(.*)*', redirect: '/admin' },
         
         // Catch-all route - must be last!
-        { path: '/:pathMatch(.*)*', component: defineAsyncComponent(() => import('./components/Backstage/404.vue')), meta: { title: 'Rivue.ai' } },
+        // { path: '/:pathMatch(.*)*', component: defineAsyncComponent(() => import('./components/Backstage/404.vue')), meta: { title: 'Rivue.ai' } },
 
     ];
 
@@ -136,11 +138,8 @@ router.beforeEach(async (to, from, next) => {
         '/contact',
         '/plan',
     ];
-
-    const requiresAuth =
-        !publicPaths.includes(to.path) &&
-        !to.path.startsWith('/lesson/') &&
-        !to.path.startsWith('/library') && !to.path.startsWith('/lessons');
+    console.log(to.path)
+    const requiresAuth = !publicPaths.includes(to.path) && !to.path.startsWith('/verify/') && !to.path.startsWith('/reset-password/');
 
     if (to.meta.requiresCreator && to.params.id) {
         // Only proceed with this check if the user is logged in

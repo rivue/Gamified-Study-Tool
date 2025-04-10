@@ -3,7 +3,7 @@ from itsdangerous import URLSafeSerializer as Serializer
 from flask import current_app
 import hashlib
 # import stripe
-import os
+# import os
 
 from database.models import db, User, IPTracking
 
@@ -111,6 +111,8 @@ def generate_confirmation_token(user_id):
     return s.dumps({'confirm': str(user_id)})
 
 def confirm(user_id, token):
+    print(f"user_id: {user_id}")
+    print(f"token: {token}")
     user = User.query.get(user_id)
     s = Serializer(current_app.config['SECRET_KEY'])
     try:

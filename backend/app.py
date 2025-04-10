@@ -19,7 +19,7 @@ app = Flask(__name__, static_folder='../frontend/dist')
 app.secret_key = os.getenv('FLASK_SECRET_KEY')
 app.config['FLASK_ENV'] = os.getenv('FLASK_ENV', 'development')
 openai.api_key = os.getenv("OPENAI_API_KEY")
-resend.api_key = os.getenv('RESEND_API_KEY')
+resend.api_key = os.getenv("RESEND_API_KEY")
 
 print(f"app level secret key: {app.secret_key}")
 
@@ -35,20 +35,22 @@ database_local = os.getenv('DATABASE_LOCAL')
 user_local = os.getenv('USER_LOCAL')
 password_local = os.getenv('PASSWORD_LOCAL')
 
+
 print(f"flask_env: {app.config['FLASK_ENV']}")
-if host and port and database and user and password and app.config["FLASK_ENV"] == "production": # PUT BACK IN FOR PRODUCTION and app.config['FLASK_ENV'] == 'production':
+if host and port and database and user and password and app.config["FLASK_ENV"] == "production":
     uri = f'postgresql+psycopg2://{user}:{password}@{host}:{port}/{database}'
-# elif host_local and port_local and database_local and user_local and password_local: # uses a different string because macbook is ipv4
-#     uri = f'postgresql+psycopg2://{user_local}:{password_local}@{host_local}:{port_local}/{database_local}'
+    
 elif app.config["FLASK_ENV"] == "production":
     # throw an error because uri is not defined
     print("Database URI not defined")
     raise Exception("Database URI not defined")
+
 else:
     uri = 'sqlite:///app.db'
 
 # os.makedirs("instance", exist_ok=True)
 app.config['SQLALCHEMY_DATABASE_URI'] = uri
+print(f"SQLALCHEMY_DATABASE_URI: {app.config['SQLALCHEMY_DATABASE_URI']}")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['REMEMBER_COOKIE_DURATION'] = timedelta(days=7)
 app.config['FLASK_SECRET_KEY'] = os.getenv('FLASK_SECRET_KEY')
@@ -77,23 +79,6 @@ if os.getenv('FLASK_ENV') == 'production':
 else:
     origins = "*"
 CORS(app, origins=origins, supports_credentials=True)
-
-# class LoggerWriter:
-#     def __init__(self, level):
-#         self.level = level
-
-#     def write(self, message):
-#         if message != '\n':
-#             self.level(message)
-
-#     def flush(self):
-#         pass
-
-# sys.stdout = LoggerWriter(logging.info)
-# sys.stderr = LoggerWriter(logging.error)
-
-# logging.basicConfig(filename='./debug123.log', level=logging.DEBUG)
-# logging.basicConfig(filename='./app.log', level=logging.DEBUG)
 
 # Global error handler for all unhandled exceptions
 @app.errorhandler(Exception)
