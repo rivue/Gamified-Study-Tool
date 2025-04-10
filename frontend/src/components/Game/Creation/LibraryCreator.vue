@@ -228,7 +228,6 @@ export default {
                 }
                 this.roomNames.push(trimmedName);
                 this.buttonDisabled.noRooms = false;
-                console.log("asd;lfkjasdf")
                 this.newRoomName = "";
             }
         },
@@ -261,7 +260,6 @@ export default {
             }
             this.topicSpaceError = this.topic[0] === " " || this.topic[this.topic.length - 1] === " ";
             if (this.topicSpaceError) {
-                console.log("topic space error");
                 return;
             }
 
@@ -282,7 +280,6 @@ export default {
             }
             this.roomSpaceError = this.roomNames.some(roomName => roomName[0] === " " || roomName[roomName.length - 1] === " ");
             if (this.roomSpaceError) {
-                console.log("room space error");
                 return;
             }
 
@@ -308,9 +305,6 @@ export default {
             formData.append("guide", "Azalea"); // TODO delete later (from backend and library model)
             formData.append("selectedFile", this.selectedFile);
             this.roomNames.forEach(room => formData.append("roomNames", room));
-            //    formData.append("roomNames", JSON.stringify(this.roomNames));  // Convert array to string
-
-            console.log(formData.get("selectedFile"));
 
             axios
                 .post("/api/library/generate", formData, {

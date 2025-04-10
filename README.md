@@ -44,7 +44,8 @@ TODO list:
         (currently all 4 were in BottomBar.vue) --> (BASICALLY MAKE BottomBar.vue SMALLER)
 
     general:
-        - improve ui with courses
+        - when you mouse over the popup for the lesson that has the # of lessons / x button, it should not cause the button to hover
+        - improve ui with libraries / courses in library creation screen
         - add ability to change color of image of courses
         - remove lesson ids, lesson names, password reset tokens and confirmation tokens from urls and communicate them somewhere else
             - make it like duolingo where doing the actual lesson is /learn or something
@@ -105,25 +106,24 @@ TODO list:
         - once I add a second type of "game", make it "shuffle" the questions once it gets the
             8 or so least seen so that the questions seem random and they aren't just the same multiple choice every time
         - make the underscores ___ visible in the questions
+
         - "games":
             - compare and contrast two items / scenarios (list of items / cards and sort them into categories)
-            - analogies: newton is to physics as darwin is to ___ <-- would be super similar to already existing ones
+            - ***analogies (would be easy to implement): newton is to physics as darwin is to ___ <-- would be super similar to already existing ones
             - ranking tasks: users rank tasks on order of importance, size, or chronology
             - timeline creation - drag and drop events <-- maybe would be good after we get a couple others down
             - category sorting (sort these into mammals, birds, and reptiles) - could be for easier questions
                 like sort the statements into whether they are true / false, etc...
             - true / false <-- rlly good
-            - sentence completion <-- kind of similar to one word answer? maybe you type it in the sentence or something?
-                maybe it can be more drag / drop later?
             - matching pairs possibly, not sure how that would work with longer questions
             - could vary option amount (2-7 options)
-            - users could have to select multiple options (select 1-5 out of 5-8, etc...)
+            - users could have to select multiple options (select 1-5 out of 6-8, etc...)
             
             - multiple options in a row: like with duolingo where you are given 10 or so options and you pick 4 or 5 and they have to be 
                 in a specific order. this might be somewhat tricky to implement cus I have to implement drag-and-drop at the same time, so I might have to 
                 think of a couple others in the mean time
             - play duolingo / kinnu for inspiration
-            - correct the statement / choose the correct portion of a paragrah / two students have different opinions make them choose the correct one
+            - (easy**) correct the statement / choose the correct portion of a paragrah / two students have different opinions make them choose the correct one
             - time attack mode option - questions might be a little easier possibly or not
             - image based questions - not sure how that would work how how we would ensure accuracy
             - drag-and-drop labels (label the x axis, y axis, identify what the mean is, etc...)
