@@ -35,6 +35,7 @@ database_local = os.getenv('DATABASE_LOCAL')
 user_local = os.getenv('USER_LOCAL')
 password_local = os.getenv('PASSWORD_LOCAL')
 
+
 print(f"flask_env: {app.config['FLASK_ENV']}")
 if host and port and database and user and password and app.config["FLASK_ENV"] == "production":
     uri = f'postgresql+psycopg2://{user}:{password}@{host}:{port}/{database}'
@@ -48,8 +49,8 @@ else:
     uri = 'sqlite:///app.db'
 
 # os.makedirs("instance", exist_ok=True)
-# app.config['SQLALCHEMY_DATABASE_URI'] = uri
-# app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI') # TODO comment back in
+app.config['SQLALCHEMY_DATABASE_URI'] = uri
+print(f"SQLALCHEMY_DATABASE_URI: {app.config['SQLALCHEMY_DATABASE_URI']}")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['REMEMBER_COOKIE_DURATION'] = timedelta(days=7)
 app.config['FLASK_SECRET_KEY'] = os.getenv('FLASK_SECRET_KEY')
