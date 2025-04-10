@@ -138,7 +138,7 @@ router.beforeEach(async (to, from, next) => {
         '/contact',
         '/plan',
     ];
-    console.log(to.path)
+    console.debug(to.path)
     const requiresAuth = !publicPaths.includes(to.path) && !to.path.startsWith('/verify/') && !to.path.startsWith('/reset-password/');
 
     if (to.meta.requiresCreator && to.params.id) {
@@ -170,7 +170,8 @@ router.beforeEach(async (to, from, next) => {
         } else {
             // If not logged in and the route requires creator access, redirect to login
             console.debu("Requires creator access, redirecting to login");
-            return next({
+            return next(
+                {
                 path: '/login',
                 query: { redirect: to.fullPath },
             });

@@ -21,7 +21,7 @@ export default {
         return {
             changelog: [
                 {
-                    date: "April 9, 2025",
+                    date: "April 10, 2025",
                     items: [
                         "Added password reset ability",
                     ],
