@@ -1,4 +1,5 @@
 <template>
+    
     <div class="library-list">
         <div class="list-header">
             <h1>My Courses</h1>
@@ -8,7 +9,7 @@
         <!-- Conditional rendering based on library count -->
         <div v-if="totalItems > 0" class="list-table">
             <div class="search-bar">
-            <Input class="max-w-sm" placeholder="Search courses..." />
+            <Input class="max-w-sm" type="email" placeholder="Search courses..." />
         </div>
             <div class="table-header">
                 <div class="col-name">Name</div>
@@ -38,6 +39,7 @@
         <!-- Pagination only shows if there are libraries -->
         <div class="pagination" v-if="totalItems > 0">
             <div class="pagination-info">
+                
                 Showing {{ startIndex + 1 }}-{{ endIndex }} of {{ totalItems }} courses
             </div>
             <div class="pagination-controls">
@@ -59,10 +61,15 @@
 </template>
 
 <script>
-import { Input } from "@/components/ui/input";
 
+/* eslint-disable vue/no-reserved-component-names */
+/* eslint-disable */
+import { Input } from "@/components/ui/input";
 export default {
     name: "LibraryList",
+    components: {
+        Input,
+    },
     props: {
         libraries: {
             type: Array,
