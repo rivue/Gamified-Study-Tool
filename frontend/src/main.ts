@@ -2,7 +2,7 @@
 import { createApp, defineAsyncComponent } from 'vue';
 import { createPinia } from 'pinia'
 import App from './App.vue';
-import { createRouter, createWebHistory } from 'vue-router';
+import { createRouter, createWebHistory, NavigationGuardNext, RouteLocationNormalized } from 'vue-router';
 import { useAuthStore } from "@/store/authStore";
 import { useLoadingStore } from "@/store/loadingStore";
 // import { useGameStore } from "@/store/gameStore";
@@ -46,7 +46,7 @@ import axios from 'axios';
             path: '/lessons/:id/:roomName',
             component: defineAsyncComponent(() => import('./components/Game/NewGame/GamePage.vue')),
             meta: { title: 'Rivue.ai | Explore Library', hideHeaderFooter: true },
-            beforeEnter: async (to, from, next) => {
+            beforeEnter: async (to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext) => {
                 try {
                     const response = await axios.get(`/api/library/${to.params.id}`);
                     if (response.data?.status === "success") {
@@ -65,7 +65,7 @@ import axios from 'axios';
             path: '/lessons/:id',
             component: defineAsyncComponent(() => import('./components/Backstage/MapPage.vue')), 
             meta: { title: 'Rivue.ai | Explore Library', requiresCreator: true },
-            beforeEnter: async (to, from, next) => {
+            beforeEnter: async (to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext) => {
                 try {
                     const response = await axios.get(`/api/library/${to.params.id}`);
                     response.data?.status === "success" ? next() : next('/library');
@@ -169,7 +169,7 @@ router.beforeEach(async (to, from, next) => {
             }
         } else {
             // If not logged in and the route requires creator access, redirect to login
-            console.debu("Requires creator access, redirecting to login");
+            console.debug("Requires creator access, redirecting to login");
             return next(
                 {
                 path: '/login',
@@ -197,7 +197,7 @@ router.beforeEach(async (to, from, next) => {
         next();
     }
 
-    document.title = to.meta.title || 'Rivue.ai | Learn Anything!';
+    document.title = (to.meta.title as string) || 'Rivue.ai | Learn Anything!';
 });
 
 router.afterEach(() => {

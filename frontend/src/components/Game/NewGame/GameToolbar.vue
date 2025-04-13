@@ -43,7 +43,7 @@
 <script>
 import axios from "axios";
 import { useGameStore } from "@/store/gameStore";
-import { useAuthStore } from "@/store/authStore";
+import { useAuthStore } from "@/store/authStore.Ts";
 import { ref, watch } from "vue";
 
 export default {

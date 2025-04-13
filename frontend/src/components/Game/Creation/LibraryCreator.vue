@@ -105,9 +105,9 @@ import {
     stopTypingEffect,
 } from "@/scripts/placeholderTyping.js";
 
-import { useLibGenStore } from "@/store/libGenStore.js";
-import { usePopupStore } from "@/store/popupStore.js";
-import { useAuthStore } from "@/store/authStore.js";
+import { useLibGenStore } from "@/store/libGenStore";
+import { usePopupStore } from "@/store/popupStore";
+import { useAuthStore } from "@/store/authStore";
 import CtaButton from "../../Footer/LandingPageComponents/CtaButton.vue";
 import LibraryBrowser from "./LibraryBrowser.vue"; 3
 

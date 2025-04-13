@@ -33,7 +33,7 @@ import InfoPopup from "./components/Menus/InfoPopup.vue";
 import AdPopup from "./components/Monetization/AdPopup.vue";
 import MentorSelection from "./components/Backstage/MentorSelection.vue";
 import HomePage from './components/Footer/HomePage.vue';
-import { useAuthStore } from "@/store/authStore";
+import { useAuthStore } from "@/store/authStore.Ts";
 import { useMenuStore } from "@/store/menuStore";
 import { useThemeStore } from "@/store/themeStore";
 import { useMessageStore } from "@/store/messageStore";

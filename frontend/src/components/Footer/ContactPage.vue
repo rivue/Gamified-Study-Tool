@@ -29,7 +29,7 @@
 
 <script>
 import axios from "axios";
-import { useAuthStore } from "@/store/authStore";
+import { useAuthStore } from "@/store/authStore.Ts";
 import { usePopupStore } from "@/store/popupStore";
 
 export default {

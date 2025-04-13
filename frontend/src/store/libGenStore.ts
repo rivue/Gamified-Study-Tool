@@ -61,7 +61,7 @@ export const useLibGenStore = defineStore('libGenStore', {
     ]
   }),
   getters: {
-    filteredLanguages: (state) => (searchTerm) => {
+    filteredLanguages: (state) => (searchTerm: string) => {
       if (!searchTerm) {
         return state.languages;
       }
@@ -69,7 +69,7 @@ export const useLibGenStore = defineStore('libGenStore', {
         lang.toLowerCase().includes(searchTerm.toLowerCase())
       );
     },
-    filteredTopics: (state) => (searchTerm) => {
+    filteredTopics: (state) => (searchTerm: string) => {
       if (!searchTerm) {
         return state.topics;
       }

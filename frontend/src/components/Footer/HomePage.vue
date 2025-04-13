@@ -56,7 +56,7 @@
 <script>
 import { usePopupStore } from "@/store/popupStore";
 import { useThemeStore } from "@/store/themeStore";
-import { useAuthStore } from "@/store/authStore";
+import { useAuthStore } from "@/store/authStore.Ts";
 import CtaButton from "./LandingPageComponents/CtaButton.vue";
 import FaqComponent from "./LandingPageComponents/FaqComponent.vue";
 // import FeatureGrid from "./LandingPageComponents/FeatureGrid.vue";

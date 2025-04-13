@@ -76,7 +76,7 @@
 <script>
 import axios from "axios";
 import { usePopupStore } from "@/store/popupStore";
-import { useAuthStore } from "@/store/authStore";
+import { useAuthStore } from "@/store/authStore.Ts";
 import { useMessageStore } from "@/store/messageStore";
 import { useInputStore } from "@/store/inputStore";
 import ContentButton from "../Chat/ContentButton.vue";

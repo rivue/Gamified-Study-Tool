@@ -1,4 +1,4 @@
-export function startTypingEffect(elem, topics) {
+export function startTypingEffect(elem: HTMLInputElement, topics: string[]) {
     let currentIndex = 0;
     let isDeleting = false;
     let text = '';
@@ -9,11 +9,10 @@ export function startTypingEffect(elem, topics) {
         let currentTopic = topics[currentIndex];
         const fullText = currentTopic;
 
-        if (isDeleting) {
-            text = fullText.substring(0, text.length - 1);
-        } else {
-            text = fullText.substring(0, text.length + 1);
-        }
+
+        text = isDeleting
+            ? fullText.substring(0, text.length - 1)
+            : fullText.substring(0, text.length + 1);
 
         elem.placeholder = text;
 

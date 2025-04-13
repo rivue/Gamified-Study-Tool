@@ -17,7 +17,7 @@
 
 <script>
 import axios from "axios";
-import { useAuthStore } from "@/store/authStore";
+import { useAuthStore } from "@/store/authStore.Ts";
 import LoadingComponent from "@/components/Backstage/LoadingComponent.vue";
 import LibraryCarousel from "./LibraryCarousel.vue";
 export default {

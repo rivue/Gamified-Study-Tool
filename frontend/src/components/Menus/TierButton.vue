@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import { useAuthStore } from "@/store/authStore";
+import { useAuthStore } from "@/store/authStore.Ts";
 
 export default {
   name: "TierButton",

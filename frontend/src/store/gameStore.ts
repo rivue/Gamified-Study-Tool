@@ -1,4 +1,5 @@
-// src/store/gameStore.js
+// tate
+// rc/store/gameStore.js
 import { defineStore } from "pinia";
 import axios from "axios";
 import { useAuthStore } from "@/store/authStore";
@@ -8,16 +9,16 @@ import { useUserStatsStore } from "@/store/userStatsStore";
 export const useGameStore = defineStore("gameStore", {
     state: () => ({
         userStateData: null,
-        libraryId: null,
-        roomStates: {},
-        currentRoom: null,
+        libraryId: null as string | null,
+        roomStates: {} as Record<string, { state: number; factoids: any[] }>,
+        currentRoom: null as string | null,
         nextRooms: [],
-        factoids: [],
+        factoids: [] as any[],
         currentQuestion: 0,
         answeredQuestions: [],
-        incorrectQuestionAnswers: [],
+        incorrectQuestionAnswers: [] as any[],
         questionVisible: false,
-        factoidVisible: null,
+        factoidVisible: null  as number | null,
         finalTest: false,
         score: 0,
         multiplier: 5,
@@ -32,7 +33,7 @@ export const useGameStore = defineStore("gameStore", {
         imageUrl: null,
         language: null,
         languageDifficulty: null,
-        libraryTopic: null,
+        libraryTopic: null as string | null,
         likes: 0,
         timer: null,
         timeSpent: 0,
@@ -43,7 +44,7 @@ export const useGameStore = defineStore("gameStore", {
         libraryError: false,
     }),
     actions: {
-        setId(libraryId) {
+        setId(libraryId: string) {
             this.resetGameState();
             this.libraryId = libraryId;
         },
@@ -53,7 +54,9 @@ export const useGameStore = defineStore("gameStore", {
                 return;
             }
             this.showStart = false;
-            this.openRoom(this.libraryTopic);
+            if (this.libraryTopic !== null) {
+                this.openRoom(this.libraryTopic);
+            }
         },
         hideGameInfo() {
             this.showStart = false;
@@ -75,7 +78,7 @@ export const useGameStore = defineStore("gameStore", {
                 this.questionVisible = true;
             }
         },
-        answerAttempt(correct) {
+        answerAttempt(correct: boolean) {
             if (correct) {
                 this.score += this.multiplier;
                 this.multiplier += 1;
@@ -108,7 +111,7 @@ export const useGameStore = defineStore("gameStore", {
             }
             return true;
         },
-        async fetchLibraryDetails(libraryId, roomNameThing) {
+        async fetchLibraryDetails(libraryId: string, roomNameThing: string) {
             
             this.libraryError = false;
             this.setId(libraryId);
@@ -143,7 +146,6 @@ export const useGameStore = defineStore("gameStore", {
                     this.libraryTopic = roomNameThing;
                     // console.debug("roomNameThing: ", roomNameThing);
                     this.likes = data.likes || 0;
-                    this.userId = data.user_id || null;
                     this.tutorial = data.tutorial || false;
                     this.roomStates = {};
                     this.roomStates[this.libraryTopic] = {
@@ -171,14 +173,14 @@ export const useGameStore = defineStore("gameStore", {
                 }
             }
         },
-        async loadRoom(room_name) {
+        async loadRoom(room_name: string) {
             try {
                 if (this.roomStates[room_name].state !== 1) {
                     console.error(`Trying to load ${room_name} in state ${this.roomStates[room_name].state}.`);
                     return;
                 }
                 const formdata = new FormData();
-                formdata.append("libraryId", this.libraryId);
+                formdata.append("libraryId", this.libraryId || "");
                 formdata.append("subtopic", room_name);
                 const response = await axios.post("/api/library/room", formdata);
                 
@@ -201,17 +203,20 @@ export const useGameStore = defineStore("gameStore", {
                     }
                 }
             } catch (error) {
-                if (error.response && error.response.status === 403) {
+                if (axios.isAxiosError(error) && error.response?.status === 403) {
                     console.debug(error.response);
                     const popupStore = usePopupStore();
                     popupStore.showPopup("You have reached the limit.</br>Please login to continue.");
                     return false;
+                } else if (error instanceof Error) {
+                    console.error("Error unlocking room:", error.message);
+                } else {
+                    console.error("Unknown Error unlocking room:", error);
                 }
-                console.error("Error unlocking room:", error);
             }
             return true;
         },
-        openRoom(room_name) {
+        openRoom(room_name: string) {
             if (this.roomStates[room_name].state < 2) {
                 console.error(`Opening unloaded room ${room_name}`);
                 return;
@@ -226,7 +231,7 @@ export const useGameStore = defineStore("gameStore", {
             this.roomStates[room_name].state = 3;
             if (room_name === "Final Test Room") {
                 this.finalTest = true;
-                this.factoids = this.factoids.map(factoid => {
+                this.factoids = this.factoids.map((factoid: any) => {
                     return {
                         ...factoid,
                         text: "No cheating lol"

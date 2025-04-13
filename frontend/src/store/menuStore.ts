@@ -5,8 +5,8 @@ export const useMenuStore = defineStore('menu', {
     state: () => ({
         sideMenuOpen: false,
         actionsMenuOpen: false,
-        sideMenuClickListener: null,
-        actionMenuClickListener: null,
+        sideMenuClickListener: null as ((event: MouseEvent) => void) | null,
+        actionMenuClickListener: null as ((event: MouseEvent) => void) | null,
     }),
     actions: {
         toggleSideMenu() {
@@ -51,9 +51,9 @@ export const useMenuStore = defineStore('menu', {
 
         setupClickAwayListenerActionMenu() {
             setTimeout(() => {
-                const clickAwayListener = (event) => {
+                const clickAwayListener = (event: MouseEvent) => {
                     const menuElement = document.querySelector('.action-menu');
-                    if (!menuElement.contains(event.target)) {
+                    if (menuElement && !menuElement.contains(event.target as Node)) {
                         this.hideActionMenu();
                     }
                 };
@@ -64,9 +64,9 @@ export const useMenuStore = defineStore('menu', {
 
         setupClickAwayListenerSideMenu() {
             setTimeout(() => {
-                const clickAwayListener = (event) => {
+                const clickAwayListener = (event: MouseEvent) => {
                     const sideMenuElement = document.querySelector('.side-menu');
-                    if (!sideMenuElement.contains(event.target)) {
+                    if (sideMenuElement && !sideMenuElement.contains(event.target as Node)) {
                         this.hideSideMenu();
                     }
                 };

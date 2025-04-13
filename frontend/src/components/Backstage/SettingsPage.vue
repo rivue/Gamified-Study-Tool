@@ -74,7 +74,7 @@ import axios from "axios";
 import MenuButton from "@/components/Menus/MenuButton.vue";
 // import TierButton from "@/components/Menus/TierButton.vue";
 import { useMentorStore } from "@/store/mentorStore";
-import { useAuthStore } from "@/store/authStore";
+import { useAuthStore } from "@/store/authStore.Ts";
 import { usePopupStore } from "@/store/popupStore";
 import { useThemeStore } from "@/store/themeStore";
 

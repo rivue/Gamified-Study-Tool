@@ -32,15 +32,12 @@
   </transition>
 </template>
 
-<script>
+<script setup lang="ts">
 import { useAdsStore } from "@/store/adsStore";
 import { ref, computed, onMounted, onUnmounted } from "vue";
 
-export default {
-  name: "AdPopup",
-  setup() {
     const ads = useAdsStore();
-    const messages = ref([
+    const messages = ref<string[]>([
       '<a href="/plan" target="_blank">Paid plans</a> use the most accurate and powerful AI models available.',
       'Complete at least one lesson daily to keep a streak!',
       "Generating lessons and quizzes takes about 2-3× longer than regular replies. Thank you for your patience.",
@@ -54,16 +51,16 @@ export default {
     messages.value.sort(() => Math.random() - 0.5);
     messages.value.splice(1, 0, specialMessage);
 
-    let messageIndex = ref(0);
+    let messageIndex = ref<number>(0);
     const randomMessage = computed(() => messages.value[messageIndex.value]);
 
     const changeMessage = () => {
       messageIndex.value = (messageIndex.value + 1) % messages.value.length;
     };
 
-    let messageInterval;
+    let messageInterval: ReturnType<typeof setInterval>;
 
-    const handleKeyPress = (event) => {
+    const handleKeyPress = (event: KeyboardEvent) => {
       if (event.key === "Enter" && !ads.isLoading) {
         handleResponseClick();
       }
@@ -83,13 +80,6 @@ export default {
       window.removeEventListener("keydown", handleKeyPress);
     });
 
-    return {
-      ads,
-      randomMessage,
-      handleResponseClick,
-    };
-  },
-};
 </script>
 
 <style>

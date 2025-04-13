@@ -38,7 +38,7 @@ import LoginForm from "./LoginForm.vue";
 import SignupForm from "./SignupForm.vue";
 import SendPasswordResetEmail from "./SendPasswordResetEmail.vue";
 import { usePopupStore } from "@/store/popupStore";
-import { useAuthStore } from "@/store/authStore";
+import { useAuthStore } from "@/store/authStore.Ts";
 
 export default {
     components: {

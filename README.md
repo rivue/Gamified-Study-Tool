@@ -44,6 +44,7 @@ TODO list:
         (currently all 4 were in BottomBar.vue) --> (BASICALLY MAKE BottomBar.vue SMALLER)
 
     general:
+        - fix Aryan's problem with viewing it on his phone
         - look into adding a resizable area somewhere in your site (like how turbo learn has it) but like people can't change it
         - add ability to delete library (have to enter its name exactly)
         - add check for duplicate room name for the time being - maybe allow it later down the line?

@@ -11,41 +11,32 @@
   </transition>
 </template>
 
-<script>
+<script setup lang="ts">
 import { useMessageStore } from "@/store/messageStore";
 import { useAuthStore } from "@/store/authStore";
+import { useRoute, useRouter } from "vue-router";
+import { computed } from "vue";
 
-export default {
-  computed: {
-    messageStore() {
-      return useMessageStore();
-    },
-    authStore() {
-      return useAuthStore();
-    },
-    discovery(){
-      return this.authStore.cloudTokens;
-    },
-    subheading() {
-      return this.messageStore.subheading;
-    },
-    progressBarWidth() {
-      return `${this.messageStore.progress * 100}%`;
-    },
-    show() {
-      return (
-        this.subheading &&
-        this.subheading.trim() !== "" &&
-        this.$route.path.startsWith("/lesson")
-      );
-    },
-  },
-  methods: {
-    navToPlans(){
-      this.$router.push("/plan")
-    }
-  }
-};
+const messageStore = useMessageStore();
+const authStore = useAuthStore();
+const route = useRoute();
+const router = useRouter();
+
+const discovery = computed(() => authStore.cloudTokens);
+const subheading = computed(() => messageStore.subheading);
+const progressBarWidth = computed(() => `${messageStore.progress * 100}%`);
+
+const show = computed(() => {
+  return (
+    subheading.value &&
+    subheading.value.trim() !== "" &&
+    route.path.startsWith("/lesson")
+  );
+});
+
+function navToPlans() {
+  router.push("/plan");
+}
 </script>
 
 <style scoped>
