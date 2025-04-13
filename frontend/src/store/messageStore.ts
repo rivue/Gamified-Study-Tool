@@ -7,6 +7,7 @@ import { usePopupStore } from "@/store/popupStore";
 import { useAdsStore } from "@/store/adsStore";
 import { useAuthStore } from "@/store/authStore";
 
+
 export const useMessageStore = defineStore('messageStore', {
     state: () => ({
         messages: [],
@@ -27,9 +28,10 @@ export const useMessageStore = defineStore('messageStore', {
                 }
             }
         },
-        async fetchRecentMessages(currentPath) {
+        async fetchRecentMessages(currentPath: string) {
+            const params: { lesson_id?: string; challenge_id?: string } = {};
+
             let apiEndpoint = "/api/chat";
-            const params = {};
 
             const isLesson = currentPath.includes("/lesson/");
             const isChallenge = currentPath.includes("/challenge/");
@@ -114,13 +116,17 @@ export const useMessageStore = defineStore('messageStore', {
             } catch (error) {
                 const popupStore = usePopupStore();
                 let errorMessage = "Error sending message: ";
-                if (error.response) {
+            
+                if (axios.isAxiosError(error) && error.response) {
                     errorMessage += error.response.data?.error || `Server responded with status code ${error.response.status}`;
-                } else if (error.request) {
+                } else if (axios.isAxiosError(error) && error.request) {
                     errorMessage += "No response received from server. Please check your network connection.";
-                } else {
+                } else if (error instanceof Error) {
                     errorMessage += error.message;
+                } else {
+                    errorMessage += "An unknown error occurred.";
                 }
+            
                 popupStore.showPopup(errorMessage);
             } finally {
                 adStore.loaded();

@@ -9,7 +9,7 @@ export const usePopupStore = defineStore('popup', {
   }),
   // actions
   actions: {
-    showPopup(message) {
+    showPopup(message: string) {
       this.isVisible = true
       this.message = message
     },

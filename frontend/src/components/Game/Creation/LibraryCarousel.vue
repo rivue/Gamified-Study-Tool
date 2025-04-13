@@ -51,6 +51,7 @@
                         :class="{ 'active': currentPage === page }" @click="goToPage(page)">
                         {{ page }}
                     </button>
+
                 </div>
                 <button class="pagination-btn" :disabled="currentPage === totalPages" @click="nextPage">
                     Next <span class="pagination-icon">→</span>
