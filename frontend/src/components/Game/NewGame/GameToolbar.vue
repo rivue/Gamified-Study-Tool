@@ -65,9 +65,7 @@ watch(() => gameStore.score, (newVal, oldVal) => {
 });
 
 const progressBarWidth = computed(() => {
-  const progress = gameStore.currentQuestion / gameStore.factoids.length;
-  const width = Math.min(initialProgress + (100 - initialProgress) * Math.pow(progress, 0.1), 100);
-  return `${width}%`;
+    return `${Math.min(initialProgress + (100 - initialProgress) * (gameStore.currentQuestion / gameStore.factoids.length)^0.1)}%`;
 });
 
 const score = computed(() => {

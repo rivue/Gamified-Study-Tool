@@ -12,7 +12,7 @@
 import { useRouter } from "vue-router";
 
 const props = defineProps<{
-    library: { id: number };
+    library: { id: number, library_topic: string, image_url: string };
 }>();
 
 const router = useRouter()

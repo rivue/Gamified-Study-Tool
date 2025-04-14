@@ -15,9 +15,11 @@ import LibraryCompletion from './LibraryCompletion.vue';
 import GameToolbar from './GameToolbar.vue';
 import { onBeforeRouteLeave } from "vue-router";
 
+const gameStore = useGameStore();
+
 onBeforeRouteLeave((to, from, next) => {
     console.log("successfully unmounted");
-    useGameStore.resetGameState();
+    gameStore.resetGameState();
     next();
 });
 
