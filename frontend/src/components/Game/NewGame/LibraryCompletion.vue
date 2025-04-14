@@ -92,185 +92,147 @@
     </div>
   </transition>
 </template>
-
-<script>
+<script setup lang="ts">
+import { ref, computed, watch } from "vue";
+import { useRouter, useRoute } from "vue-router";
 import axios from "axios";
 import { usePopupStore } from "@/store/popupStore";
-import { useAuthStore } from "@/store/authStore.Ts";
+import { useAuthStore } from "@/store/authStore";
 import { useMessageStore } from "@/store/messageStore";
 import { useGameStore } from "@/store/gameStore";
 import CyclingContentButton from "../Creation/CyclingContentButton.vue";
-// import UserStats from "../../Graphs/UserStats.vue";
 import CtaButton from "../../Footer/LandingPageComponents/CtaButton.vue";
 import LeaderBoard from "../LeaderBoard.vue";
 
-export default {
-  data() {
-    return {
-      page: 0,
-      rating: 0,
-      feedback: "",
-      showFeedback: false,
-      isSubmitted: false,
-      suggestions: [],
-      exploreLoading: false,
-      loading: false,
-      showLeaderBoard: false,
-    };
-  },
-  components: {
-    CyclingContentButton,
-    // UserStats,
-    CtaButton,
-    LeaderBoard,
-  },
-  computed: {
-    gameStore() {
-      return useGameStore();
-    },
-    messageStore() {
-      return useMessageStore();
-    },
-    completionVisible() {
-      return this.gameStore.completed;
-    },
-    isValid() {
-      return this.rating > 0 || this.feedback.trim().length > 0;
-    },
-    loggedIn() {
-      const authStore = useAuthStore();
-      return authStore.loggedIn;
-    },
-    firstPage() {
-      return this.page === 0;
-    },
-    formattedTime() {
-      return this.gameStore.formattedTime();
-    },
-  },
-  methods: {
-    toggleLeaderBoard() {
-      this.showLeaderBoard = true;
-    },
-    nextPage() {
-        this.$router.push(`/lessons/${this.gameStore.libraryId}`);
-        this.page = 1;
-    },
-    navigateLibrary() {
-      this.$router.push("/library");
-    },
-    navigateBack() {
-      this.gameStore.fetchLibraryDetails(this.gameStore.libraryId, this.gameStore.libraryTopic);
-    },
-    // async navigateExplore() {
-    //   this.exploreLoading = true;
-    //   const url = `/api/explore?name=${this.gameStore.roomNames[12]}`;
-    //   axios
-    //     .get(url)
-    //     .then((response) => {
-    //       if (response.data && response.data.suggestions) {
-    //         this.suggestions = response.data.suggestions;
-    //       } else {
-    //         console.error("No suggestions...");
-    //       }
-    //     })
-    //     .catch((error) => {
-    //       console.error("Error fetching suggestions: ", error);
-    //     })
-    //     .finally(() => {
-    //       this.exploreLoading = false;
-    //     });
-    // },
-    async startSuggestion(suggestion) {
-      if (this.loading) return;
+const router = useRouter();
+const route = useRoute();
+const gameStore = useGameStore();
+const messageStore = useMessageStore();
+const authStore = useAuthStore();
 
-      this.loading = true;
+const page = ref(0);
+const rating = ref(0);
+const feedback = ref("");
+const showFeedback = ref(false);
+const isSubmitted = ref(false);
+const suggestions = ref<string[]>([]);
+const exploreLoading = ref(false);
+const loading = ref(false);
+const showLeaderBoard = ref(false);
 
-      try {
-        // Making the POST request to the library generate route
-        const libraryResponse = await axios.post("/api/library/generate", {
-          topic: suggestion,
-        });
-        const libraryId = libraryResponse.data.library_data.id;
+const completionVisible = computed(() => gameStore.completed);
+const isValid = computed(() => rating.value > 0 || feedback.value.trim().length > 0);
+const loggedIn = computed(() => authStore.loggedIn);
+const firstPage = computed(() => page.value === 0);
+const formattedTime = computed(() => gameStore.formattedTime());
 
-        // Set the room names in the store
-        this.loading = false;
-        this.$router.push(`/lessons/${libraryId}`);
-      } catch (error) {
-        this.loading = false;
-      }
-    },
-    navigateMap() {
-      this.$router.push("/knowledge?node=" + this.gameStore.roomNames[12]);
-    },
-    toggleFeedback() {
-      this.showFeedback = !this.showFeedback;
-    },
-    setRating(n) {
-      this.rating = n;
-    },
-    submitFeedback() {
-      const sanitizeInput = (input) => {
-        const div = document.createElement("div");
-        div.textContent = input + this.shareLink;
-        return div.innerHTML;
-      };
-      const sanitizedMessage = sanitizeInput(this.feedback);
+function toggleLeaderBoard() {
+  showLeaderBoard.value = true;
+}
 
-      const payload = new FormData();
-      payload.append("message", sanitizedMessage);
-      payload.append("rating", this.rating);
-      const routeParts = this.$route.path.split("/");
-      if (routeParts.length >= 2) {
-        payload.append(
-          routeParts[routeParts.length - 2],
-          routeParts[routeParts.length - 1]
+function nextPage() {
+  router.push(`/lessons/${gameStore.libraryId}`);
+  page.value = 1;
+}
+
+function navigateLibrary() {
+  router.push("/library");
+}
+
+function navigateBack() {
+  gameStore.fetchLibraryDetails(gameStore.libraryId, gameStore.libraryTopic);
+}
+
+async function startSuggestion(suggestion: string) {
+  if (loading.value) return;
+  loading.value = true;
+
+  try {
+    const libraryResponse = await axios.post("/api/library/generate", {
+      topic: suggestion,
+    });
+    const libraryId = libraryResponse.data.library_data.id;
+    loading.value = false;
+    router.push(`/lessons/${libraryId}`);
+  } catch (error) {
+    loading.value = false;
+  }
+}
+
+function navigateMap() {
+  router.push("/knowledge?node=" + gameStore.roomNames[12]);
+}
+
+function toggleFeedback() {
+  showFeedback.value = !showFeedback.value;
+}
+
+function setRating(n: number) {
+  rating.value = n;
+}
+
+function submitFeedback() {
+  const sanitizeInput = (input: string) => {
+    const div = document.createElement("div");
+    div.textContent = input;
+    return div.innerHTML;
+  };
+
+  const sanitizedMessage = sanitizeInput(feedback.value);
+  const payload = new FormData();
+  payload.append("message", sanitizedMessage);
+  payload.append("rating", rating.value.toString());
+
+  const routeParts = route.path.split("/");
+  if (routeParts.length >= 2) {
+    payload.append(
+      routeParts[routeParts.length - 2],
+      routeParts[routeParts.length - 1]
+    );
+  }
+
+  axios
+    .post("/api/feedback", payload)
+    .then((response) => {
+      const popupStore = usePopupStore();
+      if (
+        response.data &&
+        response.data.message &&
+        response.data.feedback_id
+      ) {
+        popupStore.showPopup(
+          `${response.data.message} Your feedback ID is ${response.data.feedback_id}.`
         );
+      } else {
+        popupStore.showPopup("Feedback submitted.");
       }
-      axios
-        .post("/api/feedback", payload)
-        .then((response) => {
-          const popupStore = usePopupStore();
-          if (
-            response.data &&
-            response.data.message &&
-            response.data.feedback_id
-          ) {
-            const successMessage = `${response.data.message} Your feedback ID is ${response.data.feedback_id}.`;
-            popupStore.showPopup(successMessage);
-          } else {
-            popupStore.showPopup("Feedback submitted.");
-          }
-          this.isSubmitted = true;
-          this.message = "";
-        })
-        .catch((error) => {
-          const popupStore = usePopupStore();
-          let message = "An error occurred while submitting feedback.";
-          if (
-            error.response &&
-            error.response.data &&
-            error.response.data.error
-          ) {
-            message = error.response.data.error;
-          }
-          popupStore.showPopup(message);
-        });
-    },
-  },
-  resetFeedbackForm() {
-    this.rating = 0;
-    this.feedback = "";
-    this.showFeedback = false;
-  },
-  watch: {
-    completionVisible(newValue) {
-      if (newValue) {
-    //     this.navigateExplore();
+      isSubmitted.value = true;
+    })
+    .catch((error) => {
+      const popupStore = usePopupStore();
+      let message = "An error occurred while submitting feedback.";
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.error
+      ) {
+        message = error.response.data.error;
       }
-    },
-  },
-};
+      popupStore.showPopup(message);
+    });
+}
+
+function resetFeedbackForm() {
+  rating.value = 0;
+  feedback.value = "";
+  showFeedback.value = false;
+}
+
+watch(completionVisible, (newValue) => {
+  if (newValue) {
+    // this.navigateExplore();
+  }
+});
 </script>
 
 <style scoped>

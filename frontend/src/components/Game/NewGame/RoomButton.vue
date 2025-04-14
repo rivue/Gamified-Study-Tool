@@ -9,36 +9,36 @@
   </button>
 </template>
 
-<script>
-export default {
-  name: "RoomButton",
-  props: {
-    label: {
-      type: String,
-      required: true,
-    },
-    isSelected: {
-      type: Boolean,
-      default: false,
-    },
-    position: {
-      type: Number,
-      required: true,
-    },
-    isLoading: {
-      type: Boolean,
-      default: false,
-    },
-  },
-  computed: {
-    text() {
-      if (this.position === 0) return '↑ ' + this.label;
-      return this.position % 2 === 0 
-        ? '→ ' + this.label 
-        : '← ' + this.label;
-    },
-  },
-};
+<script setup lang="ts">
+
+import { computed } from 'vue';
+
+// Define props with TypeScript types
+const props = defineProps<{
+  label: string;
+  isSelected?: boolean;
+  position: number;
+  isLoading?: boolean;
+}>();
+
+// Define default values for optional props
+withDefaults(defineProps<{
+  label: string;
+  isSelected?: boolean;
+  position: number;
+  isLoading?: boolean;
+}>(), {
+  isSelected: false,
+  isLoading: false,
+});
+
+// Define the computed property with a return type
+const text = computed<string>(() => {
+  if (props.position === 0) return '↑ ' + props.label;
+  return props.position % 2 === 0 
+    ? '→ ' + props.label 
+    : '← ' + props.label;
+});
 </script>
 
 <style scoped>

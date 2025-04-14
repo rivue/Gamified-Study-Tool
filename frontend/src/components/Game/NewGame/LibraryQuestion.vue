@@ -46,144 +46,137 @@
     </transition>
 </template>
 
-<script>
+<script setup lang="ts">
+import { ref, computed } from "vue";
+import { useRouter, useRoute } from "vue-router";
 import { useGameStore } from "@/store/gameStore";
-import stringSimilarity from 'string-similarity';
+import stringSimilarity from "string-similarity";
 
-export default {
-    name: "LibraryQuestion",
-    data() {
-        return {
-            answerState: {
-                correct: null,
-                wrong: null,
-            },
-            isDisabled: false,
-            userAnswer: "",
-            isShaking: false
-        };
-    },
-    methods: {
-        shuffleArray(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-        },
-        submitOneWordAnswer() {
-            if (this.isDisabled || !this.userAnswer.trim()) return;
-            
-            const processedAnswer = this.userAnswer.trim().toLowerCase();
-            const store = useGameStore();
-            const correctAnswer = store.factoids[store.currentQuestion].questions[0].correct_choice.toLowerCase();
-            
-            // Using string-similarity (Levenshtein Distance) to compare answers - threshold of 0.50 (50% similar)
-            const similarity = stringSimilarity.compareTwoStrings(processedAnswer, correctAnswer);
-            const isCorrect = similarity > 0.70;
-            
-            this.submitAnswer(this.userAnswer, isCorrect);
-        },
-        submitAnswer(choice, isOneWordAnswer = false) {
-            const store = useGameStore();
-            const correct = store.factoids[store.currentQuestion].questions[0].correct_choice;
-            const isCorrect = isOneWordAnswer ? choice : correct === choice;
+const router = useRouter();
+const route = useRoute();
+const store = useGameStore();
 
-            if (isCorrect) {
-                this.answerState.correct = choice;
-                this.answerState.wrong = null;
-            } else {
-                this.answerState.wrong = choice;
-                this.answerState.correct = null;
-                this.isDisabled = true;
-                this.isShaking = true;
-                
-                setTimeout(() => {
-                    this.isShaking = false;
-                    this.isDisabled = false;
-                    if (isOneWordAnswer) {
-                        this.userAnswer = "";
-                    }
-                    this.answerState.wrong = null;
-                }, 1000);
-            }
+const answerState = ref<{ correct: string | null; wrong: string | null }>({
+  correct: null,
+  wrong: null,
+});
+const isDisabled = ref(false);
+const isShaking = ref(false);
+const userAnswer = ref("");
 
-            setTimeout(() => {
-                if (store.answerAttempt(isCorrect)) {
-                    this.resetState();
-                } else {
-                    this.$router.push("/login");
-                }
-            }, 300);
-        },
-        resetState() {
-            this.answerState.wrong = null;
-            this.answerState.correct = null;
-            this.userAnswer = "";
-            this.isShaking = false;
-        },
-        flipQuestion() {
-            const store = useGameStore();
-            store.toggleFactoid();
-            this.resetState();
-        },
-        closeQuestion() {
-            this.$router.push(`/lessons/${this.$route.params.id}`);
-        },
-        format(content) {
-            let regex;
-            regex = /\*\*([^*]*?)\*\*/g;
-            content = content.replace(regex, "<strong>$1</strong>");
-            regex = /_([^_]*?)_|\*([^*]*?)\*/g;
-            content = content.replace(regex, "<em>$1$2</em>");
-            return content;
-        },
-    },
-    computed: {
-        question() {
-            const store = useGameStore();
-            if (store.currentQuestion === null) return null;
-            const currentFactoid = store.factoids[store.currentQuestion];
+function shuffleArray<T>(array: T[]): void {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+}
 
-            if (
-                !currentFactoid ||
-                !Array.isArray(currentFactoid.questions) ||
-                currentFactoid.questions.length === 0
-            ) {
-                console.error("No questions available or invalid questions format");
-                return null;
-            }
-            const currentQuestion = currentFactoid.questions[0];
-            if (
-                !currentQuestion ||
-                !currentQuestion.question_text ||
-                !currentQuestion.correct_choice ||
-                !currentQuestion.question_type ||
-                !Array.isArray(currentQuestion.wrong_choices)
-            ) {
-                console.log("this is good I think - replace with actual completion message and exit out of room")
-                console.error("Question structure is incomplete or invalid");
-                return null;
-            }
+function submitOneWordAnswer() {
+  if (isDisabled.value || !userAnswer.value.trim()) return;
 
-            const choices = [
-                currentQuestion.correct_choice,
-                ...currentQuestion.wrong_choices,
-            ];
-            this.shuffleArray(choices);
+  const processedAnswer = userAnswer.value.trim().toLowerCase();
+  const correctAnswer = store.factoids[store.currentQuestion].questions[0].correct_choice.toLowerCase();
+  const similarity = stringSimilarity.compareTwoStrings(processedAnswer, correctAnswer);
+  const isCorrect = similarity > 0.7;
 
-            return {
-                text: this.format(currentQuestion.question_text),
-                choices: choices.map((choice) => this.format(choice)),
-                type: currentQuestion.question_type,
-            };
-        },
-        questionVisible() {
-            const store = useGameStore();
-            return store.questionVisible;
-        },
-    },
-};
+  submitAnswer(userAnswer.value, isCorrect);
+}
+
+function submitAnswer(choice: string, isOneWordAnswer = false) {
+  const correct = store.factoids[store.currentQuestion].questions[0].correct_choice;
+  const isCorrect = isOneWordAnswer ? true : correct === choice;
+
+  if (isCorrect) {
+    answerState.value.correct = choice;
+    answerState.value.wrong = null;
+  } else {
+    answerState.value.wrong = choice;
+    answerState.value.correct = null;
+    isDisabled.value = true;
+    isShaking.value = true;
+
+    setTimeout(() => {
+      isShaking.value = false;
+      isDisabled.value = false;
+      if (isOneWordAnswer) {
+        userAnswer.value = "";
+      }
+      answerState.value.wrong = null;
+    }, 1000);
+  }
+
+  setTimeout(() => {
+    if (store.answerAttempt(isCorrect)) {
+      resetState();
+    } else {
+      router.push("/login");
+    }
+  }, 300);
+}
+
+function resetState() {
+  answerState.value.correct = null;
+  answerState.value.wrong = null;
+  userAnswer.value = "";
+  isShaking.value = false;
+}
+
+function flipQuestion() {
+  store.toggleFactoid();
+  resetState();
+}
+
+function closeQuestion() {
+  router.push(`/lessons/${route.params.id}`);
+}
+
+function format(content: string): string {
+  return content
+    .replace(/\*\*([^*]*?)\*\*/g, "<strong>$1</strong>")
+    .replace(/_([^_]*?)_|\*([^*]*?)\*/g, "<em>$1$2</em>");
+}
+
+const question = computed(() => {
+  if (store.currentQuestion === null) return null;
+
+  const currentFactoid = store.factoids[store.currentQuestion];
+  if (
+    !currentFactoid ||
+    !Array.isArray(currentFactoid.questions) ||
+    currentFactoid.questions.length === 0
+  ) {
+    console.error("Invalid question structure.");
+    return null;
+  }
+
+  const currentQuestion = currentFactoid.questions[0];
+  if (
+    !currentQuestion ||
+    !currentQuestion.question_text ||
+    !currentQuestion.correct_choice ||
+    !currentQuestion.question_type ||
+    !Array.isArray(currentQuestion.wrong_choices)
+  ) {
+    console.error("Missing question fields.");
+    return null;
+  }
+
+  const choices = [
+    currentQuestion.correct_choice,
+    ...currentQuestion.wrong_choices,
+  ];
+  shuffleArray(choices);
+
+  return {
+    text: format(currentQuestion.question_text),
+    choices: choices.map(format),
+    type: currentQuestion.question_type,
+  };
+});
+
+const questionVisible = computed(() => store.questionVisible);
 </script>
+
 
 <style scoped>
 .completion-message {

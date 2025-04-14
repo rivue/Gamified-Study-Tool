@@ -46,68 +46,74 @@
   </div>
 </template>
 
-
-
-<script>
+<script setup lang="ts">
 import { useGameStore } from "@/store/gameStore";
-import { ref, watch } from "vue";
+import { ref, watch, onMounted } from "vue";
+import { useRoute } from "vue-router";
+import { defineProps } from "vue";
 
-export default {
-  name: "ExpProgressBar",
-  props: {
-    newExp: {
-      type: Number,
-      required: true,
-    },
-  },
-  setup(props) {
-    const gameStore = useGameStore();
-    const oldExp = ref(0);
-    const gainedExp = ref(0);
-    const oldLvl = ref(0);
-    const newLvl = ref(Math.floor(props.newExp / 200) + 1);
-    const displayLevel = ref(oldLvl.value);
-    const levelUp = ref(false);
-    const circumference = 2 * Math.PI * 45;
-    const offset = ref(circumference);
+// Props
+const { newExp } = defineProps<{
+  newExp: number;
+}>();
 
-    const updateExp = () => {
-      if (window.location.pathname.includes("/library")) {
-        gainedExp.value = gameStore.score;
-      } else if (window.location.pathname.includes("/lesson")) {
-        gainedExp.value = 100;
-      }
-      oldExp.value = props.newExp - gainedExp.value;
-      oldLvl.value = Math.floor(oldExp.value / 200) + 1;
-      displayLevel.value = oldLvl.value;
-      animateProgress();
-    };
+const route = useRoute();
+const gameStore = useGameStore();
 
-    const animateProgress = () => {
-      const diff = props.newExp - oldExp.value;
-      const diffLevel = newLvl.value - oldLvl.value;
-      levelUp.value = diffLevel > 0;
-      let progress = 0;
-      const step = () => {
-        progress += diff / 100;
-        const currentExp = oldExp.value + progress;
-        const currentLevel = Math.floor(currentExp / 200) + 1;
-        displayLevel.value = currentLevel;
-        const progressPercentage = (currentExp % 200) / 200;
-        offset.value = circumference * (1 - progressPercentage);
-        if (progress < diff) {
-          requestAnimationFrame(step);
-        } 
-      };
-      requestAnimationFrame(step);
-    };
+const oldExp = ref(0);
+const gainedExp = ref(0);
+const oldLvl = ref(0);
+const newLvl = ref(Math.floor(newExp / 200) + 1);
+const displayLevel = ref(oldLvl.value);
+const levelUp = ref(false);
 
-    watch(() => props.newExp, updateExp, { immediate: true });
+const circumference = 2 * Math.PI * 45;
+const offset = ref(circumference);
 
-    return { displayLevel, offset, circumference, levelUp };
-  },
+// Update EXP depending on route
+const updateExp = () => {
+  if (route.path.includes("/library")) {
+    gainedExp.value = gameStore.score;
+  } else if (route.path.includes("/lesson")) {
+    gainedExp.value = 100;
+  }
+
+  oldExp.value = newExp - gainedExp.value;
+  oldLvl.value = Math.floor(oldExp.value / 200) + 1;
+  displayLevel.value = oldLvl.value;
+
+  animateProgress();
 };
+
+// Animate EXP circle
+const animateProgress = () => {
+  const diff = newExp - oldExp.value;
+  const diffLevel = newLvl.value - oldLvl.value;
+  levelUp.value = diffLevel > 0;
+
+  let progress = 0;
+
+  const step = () => {
+    progress += diff / 100;
+    const currentExp = oldExp.value + progress;
+    const currentLevel = Math.floor(currentExp / 200) + 1;
+    displayLevel.value = currentLevel;
+
+    const progressPercentage = (currentExp % 200) / 200;
+    offset.value = circumference * (1 - progressPercentage);
+
+    if (progress < diff) {
+      requestAnimationFrame(step);
+    }
+  };
+
+  requestAnimationFrame(step);
+};
+
+// Watch newExp
+watch(() => newExp, updateExp, { immediate: true });
 </script>
+
 
 <style scoped>
 .exp-progress{
