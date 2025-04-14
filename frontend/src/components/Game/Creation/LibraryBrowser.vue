@@ -6,7 +6,7 @@
         </div>
 
         <template v-else>
-            <LibraryCarousel v-if="loggedIn & browsingLibraries" title="My Courses" :libraries="myLibraries" />
+            <LibraryCarousel v-if="loggedIn && browsingLibraries" title="My Courses" :libraries="myLibraries" />
         </template>
     </div>
 </template>
@@ -15,10 +15,11 @@
 import { ref, computed, onMounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import axios from "axios";
-import { authStore } from "@/store/authStore";
+import { useAuthStore } from "@/store/authStore";
 import LoadingComponent from "@/components/Backstage/LoadingComponent.vue";
 import LibraryCarousel from "./LibraryCarousel.vue";
 
+const authStore = useAuthStore();
 const router = useRouter();
 const route = useRoute();
 const isLoading = ref(true);
@@ -32,6 +33,7 @@ function fetchLibraries() {
     axios
         .get("/api/libraries")
         .then((response) => {
+            console.log(response.data.mine);
             if (authStore.loggedIn) {
                 myLibraries.value = response.data.mine;
             }
@@ -47,6 +49,7 @@ function fetchLibraries() {
 const loggedIn = computed(() => authStore.loggedIn);
 
 const browsingLibraries = computed(() => route.path === "/library");
+
 </script>
 
 <style scoped>

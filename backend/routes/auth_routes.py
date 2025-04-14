@@ -23,12 +23,13 @@ def init_auth_routes(app):
         email = request.form['email']
         password = request.form['password']
         user = User.query.filter_by(email=email).first()
+        if not user:
+            return jsonify({'status': 'fail', 'message': 'Email or User not found'}), 400
         print(user)
         print(os.getenv('SECRET_KEY'))
         print(os.getenv('FLASK_SECRET_KEY'))
         print(f"user confirmed:")
         print(f"{user.confirmed}")
-
         
         if user and check_password_hash(user.password, password):
             # print(login_user(user, remember=True))
@@ -45,7 +46,7 @@ def init_auth_routes(app):
 
             return jsonify({'status': 'success'})
         else:
-            return jsonify({'status': 'fail', 'message': 'Error logging in'}), 400
+            return jsonify({'status': 'fail', 'message': 'Incorrect Password'}), 400
 
     @app.route("/api/logout", methods=["GET"])
     @login_required

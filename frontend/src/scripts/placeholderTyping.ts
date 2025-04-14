@@ -1,4 +1,4 @@
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, onUnmounted } from 'vue';
 
 export function useTypingEffect(elem: HTMLInputElement, topics: string[]) {
     const currentIndex = ref(0);

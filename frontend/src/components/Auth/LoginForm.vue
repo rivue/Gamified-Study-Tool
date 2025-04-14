@@ -58,8 +58,6 @@ const handleSubmit = () => {
             }
         })
         .catch(error => {
-            console.log(error.response);
-            console.log(error.response?.data);
             const popupStore = usePopupStore();
             popupStore.showPopup(error.response?.data?.message || "Login failed, please try again");
             buttonText.value = "Log in";

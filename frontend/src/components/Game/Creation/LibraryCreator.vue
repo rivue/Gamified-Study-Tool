@@ -76,7 +76,8 @@
                                 🐙 Sections are how course content is divided up.
                             </div>
                             <div class="helper-text">
-                                🐙 We try to make the content of each section based on its name, so if a section is named "mitosis" the content of that section is based on mitosis, etc...
+                                🐙 We try to make the content of each section based on its name, so if a section is
+                                named "mitosis" the content of that section is based on mitosis, etc...
                             </div>
                             <div class="helper-text">
                                 🐙 Don't worry about adding all rooms or files now - you can generate more later!
@@ -103,8 +104,7 @@ import { useRoute, useRouter } from 'vue-router';
 import axios from "axios";
 import { storeToRefs } from "pinia";
 import {
-    startTypingEffect,
-    stopTypingEffect,
+    useTypingEffect,
 } from "@/scripts/placeholderTyping";
 
 import { useLibGenStore } from "@/store/libGenStore";
@@ -119,8 +119,11 @@ const libGenStore = useLibGenStore();
 const authStore = useAuthStore();
 const popupStore = usePopupStore();
 
-const { languages, topics } = storeToRefs(libGenStore);
+const { topics } = storeToRefs(libGenStore);
 
+
+
+const typingEffectStop = ref(() => { });
 const topic = ref("");
 const topicError = ref(false);
 const topicTypingError = ref(false);
@@ -141,9 +144,9 @@ const buttonDisabled = ref({
 const selectedFile = ref<File | null>(null);
 const newRoomName = ref("");
 const roomNames = ref<string[]>([]);
-const typingInterval = ref<number | null>(null);
 const topicInput = ref<HTMLInputElement | null>(null);
 const fileInput = ref<HTMLInputElement | null>(null);
+
 
 // Computed properties
 const computedTopics = computed(() => {
@@ -334,26 +337,24 @@ const handleSubmit = () => {
 onMounted(() => {
     libraryDifficulty.value = "Normal";
     if (computedTopics.value.length > 0 && topicInput.value) {
-        typingInterval.value = startTypingEffect(
-            topicInput.value,
-            computedTopics.value
-        );
+        const { start, stop } = useTypingEffect(topicInput.value, computedTopics.value);
+        typingEffectStop.value = stop; // Store the stop function
+        start();
     } else {
         //console.log("never started");
     }
 });
 
 onUnmounted(() => {
-    if (typingInterval.value) {
-        stopTypingEffect(typingInterval.value);
-    }
+    typingEffectStop.value();
 });
 </script>
 
 <style scoped>
 .library-gen-page {
     display: flex;
-    justify-content: flex-start;  /* Align content at the top */
+    justify-content: flex-start;
+    /* Align content at the top */
     display: flex;
     flex-direction: column;
     width: 100%;

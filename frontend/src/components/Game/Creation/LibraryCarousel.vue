@@ -67,7 +67,7 @@ import { Input } from "@/components/ui/input";
 
 // Props
 const props = defineProps<{
-  libraries: Array<{ id: number; library_topic: string }>;
+  libraries: Array<{ clicks: number; context: any; difficulty: string; guide: string; id: number; image_url: string, language: string; language_difficulty: string; likes: number; library_topic: string }>;
 }>();
 
 // State
