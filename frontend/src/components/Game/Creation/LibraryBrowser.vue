@@ -4,64 +4,49 @@
             <span>Loading Your Libraries</span>
             <LoadingComponent />
         </div>
-      
+
         <template v-else>
-            <LibraryCarousel 
-                v-if="loggedIn & browsingLibraries"
-                title="My Courses" 
-                :libraries="myLibraries"
-            />
+            <LibraryCarousel v-if="loggedIn & browsingLibraries" title="My Courses" :libraries="myLibraries" />
         </template>
     </div>
 </template>
 
-<script>
+<script setup lang="ts">
+import { ref, computed, onMounted } from "vue";
+import { useRouter, useRoute } from "vue-router";
 import axios from "axios";
-import { useAuthStore } from "@/store/authStore.Ts";
+import { authStore } from "@/store/authStore";
 import LoadingComponent from "@/components/Backstage/LoadingComponent.vue";
 import LibraryCarousel from "./LibraryCarousel.vue";
-export default {
-    name: "LibraryBrowser",
-    components: {
-        LoadingComponent,
-        LibraryCarousel,
-    },
-    data() {
-        return {
-            isLoading: true,
-            myLibraries: [],
-        };
-    },
-    mounted() {
-        this.fetchLibraries();
-    },
-    methods: {
-        fetchLibraries() {
-            axios
-                .get("/api/libraries")
-                .then((response) => {
-                    if (this.loggedIn) {
-                        this.myLibraries = response.data.mine;
-                    }
-                })
-                .catch((error) => {
-                    console.error("Failed to fetch libraries", error);
-                })
-                .finally(() => {
-                    this.isLoading = false;
-                });
-        },
-    },
-    computed: {
-        loggedIn() {
-            const authStore = useAuthStore();
-            return authStore.loggedIn;
-        },
-        browsingLibraries() {
-            return this.$route.path === "/library";
-        }
-    }
-};
+
+const router = useRouter();
+const route = useRoute();
+const isLoading = ref(true);
+const myLibraries = ref([]);
+
+onMounted(() => {
+    fetchLibraries();
+});
+
+function fetchLibraries() {
+    axios
+        .get("/api/libraries")
+        .then((response) => {
+            if (authStore.loggedIn) {
+                myLibraries.value = response.data.mine;
+            }
+        })
+        .catch((error) => {
+            console.error("Failed to fetch libraries", error);
+        })
+        .finally(() => {
+            isLoading.value = false;
+        });
+}
+
+const loggedIn = computed(() => authStore.loggedIn);
+
+const browsingLibraries = computed(() => route.path === "/library");
 </script>
 
 <style scoped>

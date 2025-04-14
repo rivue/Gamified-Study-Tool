@@ -60,90 +60,79 @@
         </div>
     </div>
 </template>
-
-<script>
-
-/* eslint-disable vue/no-reserved-component-names */
-/* eslint-disable */
+<script setup lang="ts">
+import { ref, computed } from "vue";
+import { useRouter } from "vue-router";
 import { Input } from "@/components/ui/input";
-export default {
-    name: "LibraryList",
-    components: {
-        Input,
-    },
-    props: {
-        libraries: {
-            type: Array,
-            required: true,
-            default: () => []
-        }
-    },
-    data() {
-        return {
-            currentPage: 1,
-            itemsPerPage: 5
-        };
-    },
-    computed: {
-        totalItems() {
-            return this.libraries.length;
-        },
-        totalPages() {
-            return Math.ceil(this.totalItems / this.itemsPerPage);
-        },
-        startIndex() {
-            return (this.currentPage - 1) * this.itemsPerPage;
-        },
-        endIndex() {
-            return Math.min(this.startIndex + this.itemsPerPage, this.totalItems);
-        },
-        paginatedLibraries() {
-            return this.libraries.slice(this.startIndex, this.endIndex);
-        },
-        displayedPages() {
-            const range = [];
-            const maxVisiblePages = 5;
 
-            if (this.totalPages <= maxVisiblePages) {
-                for (let i = 1; i <= this.totalPages; i++) {
-                    range.push(i);
-                }
-            } else {
-                let start = Math.max(1, this.currentPage - 2);
-                let end = Math.min(this.totalPages, start + maxVisiblePages - 1);
+// Props
+const props = defineProps<{
+  libraries: Array<{ id: number; library_topic: string }>;
+}>();
 
-                if (end - start + 1 < maxVisiblePages) {
-                    start = Math.max(1, end - maxVisiblePages + 1);
-                }
+// State
+const currentPage = ref(1);
+const itemsPerPage = 5;
+const router = useRouter();
 
-                for (let i = start; i <= end; i++) {
-                    range.push(i);
-                }
-            }
+// Computed values
+const totalItems = computed(() => props.libraries.length);
+const totalPages = computed(() => Math.ceil(totalItems.value / itemsPerPage));
+const startIndex = computed(() => (currentPage.value - 1) * itemsPerPage);
+const endIndex = computed(() =>
+  Math.min(startIndex.value + itemsPerPage, totalItems.value)
+);
 
-            return range;
-        }
-    },
-    methods: {
-        goToLibrary(id) {
-            this.$router.push(`/lessons/${id}`);
-        },
-        prevPage() {
-            if (this.currentPage > 1) {
-                this.currentPage--;
-            }
-        },
-        nextPage() {
-            if (this.currentPage < this.totalPages) {
-                this.currentPage++;
-            }
-        },
-        goToPage(page) {
-            this.currentPage = page;
-        }
+const paginatedLibraries = computed(() =>
+  props.libraries.slice(startIndex.value, endIndex.value)
+);
+
+const displayedPages = computed(() => {
+  const range: number[] = [];
+  const maxVisiblePages = 5;
+
+  if (totalPages.value <= maxVisiblePages) {
+    for (let i = 1; i <= totalPages.value; i++) {
+      range.push(i);
     }
-};
+  } else {
+    let start = Math.max(1, currentPage.value - 2);
+    let end = Math.min(totalPages.value, start + maxVisiblePages - 1);
+
+    if (end - start + 1 < maxVisiblePages) {
+      start = Math.max(1, end - maxVisiblePages + 1);
+    }
+
+    for (let i = start; i <= end; i++) {
+      range.push(i);
+    }
+  }
+
+  return range;
+});
+
+// Methods
+function goToLibrary(id: number) {
+  router.push(`/lessons/${id}`);
+}
+
+function prevPage() {
+  if (currentPage.value > 1) {
+    currentPage.value--;
+  }
+}
+
+function nextPage() {
+  if (currentPage.value < totalPages.value) {
+    currentPage.value++;
+  }
+}
+
+function goToPage(page: number) {
+  currentPage.value = page;
+}
 </script>
+
 
 <style scoped>
 .library-list {

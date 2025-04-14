@@ -97,13 +97,13 @@
     </div>
 </template>
 
-<script>
+<script setup lang="ts">
 import axios from "axios";
 import { mapState } from "pinia";
 import {
     startTypingEffect,
     stopTypingEffect,
-} from "@/scripts/placeholderTyping.js";
+} from "@/scripts/placeholderTyping";
 
 import { useLibGenStore } from "@/store/libGenStore";
 import { usePopupStore } from "@/store/popupStore";
@@ -111,9 +111,7 @@ import { useAuthStore } from "@/store/authStore";
 import CtaButton from "../../Footer/LandingPageComponents/CtaButton.vue";
 import LibraryBrowser from "./LibraryBrowser.vue"; 3
 
-export default {
-    name: "LibraryCreator",
-    components: { CtaButton, LibraryBrowser },
+    components: { CtaButton, LibraryBrowser }
     data() {
         return {
             topic: "",

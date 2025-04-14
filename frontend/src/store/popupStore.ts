@@ -1,4 +1,4 @@
-// store/popupStore.js
+// store/popupStore.ts
 import { defineStore } from 'pinia'
 
 export const usePopupStore = defineStore('popupStore', {

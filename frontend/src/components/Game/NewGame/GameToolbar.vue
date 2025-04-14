@@ -40,80 +40,68 @@
 </template>
 
 
-<script>
+<script setup lang="ts">
+import { ref, computed, watch } from "vue";
+import { useRouter } from "vue-router";
 import axios from "axios";
 import { useGameStore } from "@/store/gameStore";
-import { useAuthStore } from "@/store/authStore.Ts";
-import { ref, watch } from "vue";
+import { useAuthStore } from "@/store/authStore";
 
-export default {
-  name: "GameToolbar",
-  data() {
-    return {
-      isLiked: false,
-    };
-  },
-  setup() {
-    const gameStore = useGameStore();
-    const authStore = useAuthStore();
-    const isScoreAnimating = ref(false);
-    const initialProgress = Math.floor(Math.random() * (17 - 8 + 1)) + 8;
+const router = useRouter();
+const gameStore = useGameStore();
+const authStore = useAuthStore();
 
-    watch(
-      () => gameStore.score,
-      (newVal, oldVal) => {
-        if (newVal !== oldVal) {
-          isScoreAnimating.value = true;
-          setTimeout(() => {
-            isScoreAnimating.value = false;
-          }, 300);
-        }
-      }
-    );
+const isLiked = ref(false);
+const isScoreAnimating = ref(false);
+const initialProgress = Math.floor(Math.random() * (17 - 8 + 1)) + 8;
 
-    return {
-      initialProgress,
-      gameStore,
-      authStore,
-      isScoreAnimating,
-    };
-  },
-  computed: {
-    progressBarWidth() {
-    // return `${Math.min( initialProgress + ( (this.gameStore.currentQuestion - ( initialProgress / 100 )) / this.gameStore.factoids.length ) * 100, 100)}%`;
-        return `${Math.min(this.initialProgress + (100 - this.initialProgress) * (this.gameStore.currentQuestion / this.gameStore.factoids.length)^0.1)}%`;
+watch(() => gameStore.score, (newVal, oldVal) => {
+  if (newVal !== oldVal) {
+    isScoreAnimating.value = true;
+    setTimeout(() => {
+      isScoreAnimating.value = false;
+    }, 300);
+  }
+});
 
-  },
-    score() {
-      return this.gameStore.score + " (+" + this.gameStore.multiplier + ")";
-    },
-    discovery() {
-      return this.authStore.cloudTokens;
-    },
-    likeText() {
-      return this.isLiked ? "Liked 👍" : "Like 👍";
-    },
-    visible(){
-      return !this.gameStore.completed;
-    }
-  },
-  methods: {
-    likeLib() {
-      axios
-        .post("/api/library/like", { libraryId: this.gameStore.libraryId })
-        .then(() => {
-          this.isLiked = true;
-        })
-        .catch((error) => {
-          console.error("Error liking the library:", error);
-        });
-    },
-    navToPlans() {
-      this.$router.push("/plan");
-    },
-  },
-};
+const progressBarWidth = computed(() => {
+  const progress = gameStore.currentQuestion / gameStore.factoids.length;
+  const width = Math.min(initialProgress + (100 - initialProgress) * Math.pow(progress, 0.1), 100);
+  return `${width}%`;
+});
+
+const score = computed(() => {
+  return `${gameStore.score} (+${gameStore.multiplier})`;
+});
+
+const discovery = computed(() => {
+  return authStore.cloudTokens;
+});
+
+const likeText = computed(() => {
+  return isLiked.value ? "Liked 👍" : "Like 👍";
+});
+
+const visible = computed(() => {
+  return !gameStore.completed;
+});
+
+function likeLib() {
+  axios
+    .post("/api/library/like", { libraryId: gameStore.libraryId })
+    .then(() => {
+      isLiked.value = true;
+    })
+    .catch((error) => {
+      console.error("Error liking the library:", error);
+    });
+}
+
+function navToPlans() {
+  router.push("/plan");
+}
 </script>
+
 
 
 <style scoped>

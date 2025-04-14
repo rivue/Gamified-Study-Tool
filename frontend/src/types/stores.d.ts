@@ -5,8 +5,6 @@ declare module "pinia" {
     }
 }
 
-
-
 import { useAuthStore } from "@/store/authStore";
 declare module "pinia" {
     export interface PiniaCustomStores {
@@ -14,15 +12,12 @@ declare module "pinia" {
     }
 }
 
-
 import { useMessageStore } from "@/store/messageStore";
 declare module "pinia" {
   export interface PiniaCustomStores {
     messageStore: ReturnType<typeof useMessageStore>;
   }
 }
-
-
 
 import { usePopupStore } from "@/store/popupStore";
 declare module "pinia" {

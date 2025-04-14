@@ -27,117 +27,55 @@
       </Carousel>
     </div>
   </template>
-   <script>
-  import { Brain, Book, Trophy, BarChart, Target, Users, MessageSquare, Rocket, Clock, Shield } from 'lucide-vue-next'
-  import Carousel from 'primevue/carousel'
-
-   export default {
-    name: 'FeatureGrid',
-    components: { Brain, Book, Trophy, BarChart, Target, Users, MessageSquare, Rocket, Clock, Shield, Carousel },
-    data() {
-      return {
-        features: [
-                       {
-           "icon": "Brain",
-           "title": "The app helped me focus on my weak areas and improve my understanding.",
-           "description": "~Harvard 25'"
-         },
-         {
-           "icon": "Book",
-           "title": "I love the interactive lessons. They make learning so much more fun!",
-           "description": "~Stanford 27'"
-         },
-         {
-           "icon": "Trophy",
-           "title": "The achievement system kept me motivated throughout my study sessions.",
-           "description": "~NCSU 26'"
-         },
-         {
-           "icon": "BarChart",
-           "title": "I can clearly track my progress and see where I need to improve.",
-           "description": "~UC Berkeley 28'"
-         },
-         {
-           "icon": "Target",
-           "title": "The app freed up so much of my time so I could focus on my final exams.",
-           "description": "~Princeton 24'"
-         },
-         {
-           "icon": "Users",
-           "title": "I improved my GRE score by 15 points with the help of this app.",
-           "description": "~MIT 29'"
-         },
-         {
-           "icon": "MessageSquare",
-           "title": "The AI tutor is a game changer. I get answers and explanations instantly.",
-           "description": "~University of Chicago 27'"
-         },
-         {
-           "icon": "Rocket",
-           "title": "The quick start guides made it so easy to jump right into my studies.",
-           "description": "~Columbia 25'"
-         },
-         {
-           "icon": "Clock",
-           "title": "Being able to learn at my own pace has been a life-saver during midterms.",
-           "description": "~Yale 26'"
-         },
-         {
-           "icon": "Shield",
-           "title": "The knowledge validation quizzes helped solidify what I learned.",
-           "description": "~Duke 28'"
-         },
-         {
-           "icon": "Brain",
-           "title": "The personalized learning paths really helped me master difficult concepts.",
-           "description": "~UCLA 27'"
-         },
-         {
-           "icon": "Trophy",
-           "title": "Earning rewards as I progress has been a great motivator to keep studying.",
-           "description": "~MIT 30'"
-         }
-       ],
-       responsiveOptions: [
-        {
-          breakpoint: '1024px',
-          numVisible: 2,
-          numScroll: 1
-        },
-        {
-          breakpoint: '768px',
-          numVisible: 1,
-          numScroll: 1
-        }
-      ],
-        currentSlide: 0,
-        autoplayInterval: null,
-        animationState: {}
-      }
-    },
-    
-    computed: {
-      slides() {
-        const slides = []
-        const itemsPerSlide = 3
-        for (let i = 0; i < this.features.length; i += itemsPerSlide) {
-          slides.push(this.features.slice(i, i + itemsPerSlide))
-        }
-        return slides
-      },
-      totalSlides() {
-        return this.slides.length
-      }
-    },
-    mounted() {
-      this.initializeAnimationStates()
-    },
-    beforeUnmount() {
-      this.stopAutoplay()
-    },
-    
-  }
+  
+  <script setup lang="ts">
+  import { ref, onMounted, onBeforeUnmount, computed } from 'vue';
+  import { 
+    Brain, Book, Trophy, BarChart, Target, Users, 
+    MessageSquare, Rocket, Clock, Shield 
+  } from 'lucide-vue-next';
+  import Carousel from 'primevue/carousel';
+  
+  const features = ref([
+    { icon: Brain, title: "The app helped me focus on my weak areas and improve my understanding.", description: "~Harvard 25'" },
+    { icon: Book, title: "I love the interactive lessons. They make learning so much more fun!", description: "~Stanford 27'" },
+    { icon: Trophy, title: "The achievement system kept me motivated throughout my study sessions.", description: "~NCSU 26'" },
+    { icon: BarChart, title: "I can clearly track my progress and see where I need to improve.", description: "~UC Berkeley 28'" },
+    { icon: Target, title: "The app freed up so much of my time so I could focus on my final exams.", description: "~Princeton 24'" },
+    { icon: Users, title: "I improved my GRE score by 15 points with the help of this app.", description: "~MIT 29'" },
+    { icon: MessageSquare, title: "The AI tutor is a game changer. I get answers and explanations instantly.", description: "~University of Chicago 27'" },
+    { icon: Rocket, title: "The quick start guides made it so easy to jump right into my studies.", description: "~Columbia 25'" },
+    { icon: Clock, title: "Being able to learn at my own pace has been a life-saver during midterms.", description: "~Yale 26'" },
+    { icon: Shield, title: "The knowledge validation quizzes helped solidify what I learned.", description: "~Duke 28'" },
+    { icon: Brain, title: "The personalized learning paths really helped me master difficult concepts.", description: "~UCLA 27'" },
+    { icon: Trophy, title: "Earning rewards as I progress has been a great motivator to keep studying.", description: "~MIT 30'" },
+  ]);
+  
+  const responsiveOptions = ref([
+    { breakpoint: '1024px', numVisible: 2, numScroll: 1 },
+    { breakpoint: '768px', numVisible: 1, numScroll: 1 }
+  ]);
+  
+  const slides = computed(() => {
+    const s = [];
+    const perSlide = 3;
+    for (let i = 0; i < features.value.length; i += perSlide) {
+      s.push(features.value.slice(i, i + perSlide));
+    }
+    return s;
+  });
+  
+  const totalSlides = computed(() => slides.value.length);
+  
+  onMounted(() => {
+    // Placeholder for animation state setup if needed
+  });
+  
+  onBeforeUnmount(() => {
+    // Cleanup logic if needed
+  });
   </script>
+  
    <style scoped>
   .feature-grid {
    width: 100%;
