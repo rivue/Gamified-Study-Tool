@@ -1,6 +1,6 @@
 <!-- App.vue -->
 <template>
-    <div v-if="useLoadingStore.isLoading">
+    <div v-if="isLoading">
         <LoadingComponent/>
     </div>
     <div class="app-container" :class="themeClass">
@@ -24,7 +24,9 @@
     </div>
 </template>
 
-<script>
+<script setup lang="ts">
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 import TopBar from "./components/Header/TopBar.vue";
 import SideMenu from "./components/Header/SideMenu.vue";
 import BottomBar from "./components/Footer/BottomBar.vue";
@@ -33,7 +35,7 @@ import InfoPopup from "./components/Menus/InfoPopup.vue";
 import AdPopup from "./components/Monetization/AdPopup.vue";
 import MentorSelection from "./components/Backstage/MentorSelection.vue";
 import HomePage from './components/Footer/HomePage.vue';
-import { useAuthStore } from "@/store/authStore.Ts";
+import { useAuthStore } from "@/store/authStore";
 import { useMenuStore } from "@/store/menuStore";
 import { useThemeStore } from "@/store/themeStore";
 import { useMessageStore } from "@/store/messageStore";
@@ -42,132 +44,103 @@ import { useMentorStore } from "@/store/mentorStore";
 import { useLoadingStore } from "@/store/loadingStore";
 import LoadingComponent from "./components/Backstage/LoadingComponent.vue";
 
-export default {
-    name: "App",
-    data() {
-        return {
-            lastVisible: new Date(),
-        };
-    },
-    components: {
-        TopBar,
-        SideMenu,
-        BottomBar,
-        SubHeader,
-        InfoPopup,
-        AdPopup,
-        MentorSelection,
-        HomePage,
-        LoadingComponent
-    },
-    mounted() {
-        this.handleVisibilityChange = () => {
-            if (document.visibilityState === "visible") {
-                const now = new Date();
-                const timeDifference = (now - this.lastVisible) / 1000 / 60;
-                if (timeDifference >= 20) {
-                    // 20 minutes afk to reload
-                    window.location.reload();
-                }
-            } else {
-                this.lastVisible = new Date();
-            }
-        };
-        
-        document.addEventListener("visibilitychange", this.handleVisibilityChange);
+const router = useRouter();
+const route = useRoute();
+const lastVisible = ref(new Date());
+const loadingStore = useLoadingStore();
+const isLoading = computed(() => loadingStore.isLoading);
 
-        const authStore = useAuthStore();
-        authStore.checkAuth();
+// Computed properties
+const hideHeaderFooter = computed(() => route.meta.hideHeaderFooter);
 
-        const router = this.$router;
-        if (window.location.search === "?awake") {
-            router.push("/");
-        }
+const messageStore = useMessageStore();
+const forceUpdateKey = computed(() => messageStore.progress);
 
-    },
-    unmounted() {
-        document.removeEventListener(
-            "visibilitychange",
-            this.handleVisibilityChange
-        );
-    },
-    computed: {
-        hideHeaderFooter() {
-            return this.$route.meta.hideHeaderFooter;
-        },
-        forceUpdateKey() {
-            const messageStore = useMessageStore();
-            return messageStore.progress;
-        },
-        themeClass() {
-            const themeStore = useThemeStore();
-            return themeStore.darkMode ? "light-theme" : "";
-        },
-        loggedIn() {
-            const authStore = useAuthStore();
-            return authStore.loggedIn;
-        },
-        shouldShowChat() {
-            const path = this.$route.path;
-            return (
-                path === "/lessons" ||
-                path.includes("/lesson/") ||
-                path.includes("/challenge/")
-            );
-        },
-        shouldShowRouterView() {
-            return this.$route.path !== "/";
-        },
-        subheaderExists() {
-            const messageStore = useMessageStore();
-            return !(messageStore.subheading === "");
-        },
-        useLoadingStore() {
-            return useLoadingStore();
-        },
-    },
-    watch: {
-        loggedIn(newValue) {
-            if (!newValue) {
-                console.debug("login from app");
-                this.$router.push("/login");
-            }
-            if (newValue && this.shouldShowChat) {
-                // console.log("login fetch");
+const themeStore = useThemeStore();
+const themeClass = computed(() => themeStore.darkMode ? "light-theme" : "");
 
-                const messageStore = useMessageStore();
-                messageStore.fetchRecentMessages(this.$route.path);
-            }
-        },
-        "$route.path": function () {
-            // console.log(this.$route.path);
-            if (this.shouldShowChat) {
-                const messageStore = useMessageStore();
-                messageStore.fetchRecentMessages(this.$route.path);
-            } else {
-                window.scrollTo(0, 0);
-            }
+const authStore = useAuthStore();
+const loggedIn = computed(() => authStore.loggedIn);
 
-            const menuStore = useMenuStore();
-            menuStore.hideActionMenu();
-            const mentorStore = useMentorStore();
-            mentorStore.hide();
-            if (window.innerWidth < 1750) {
-                menuStore.hideSideMenu();
-            }
+const shouldShowChat = computed(() => {
+    const path = route.path;
+    return (
+        path === "/lessons" ||
+        path.includes("/lesson/") ||
+        path.includes("/challenge/")
+    );
+});
 
-        },
-    },
-    methods: {
-        onScroll(event) {
-            const scrollStore = useScrollStore();
-            scrollStore.scrollTop = event.target.scrollTop;
-        },
-        refreshApp() {
-            window.location.reload();
-        },
-    },
+const shouldShowRouterView = computed(() => route.path !== "/");
+
+const subheaderExists = computed(() => !(messageStore.subheading === ""));
+
+// Methods
+const onScroll = (event: Event) => {
+    const scrollStore = useScrollStore();
+    const target = event.target as Element;
+    scrollStore.scrollTop = target.scrollTop;
 };
+
+const refreshApp = () => {
+    window.location.reload();
+};
+
+const handleVisibilityChange = () => {
+    if (document.visibilityState === "visible") {
+        const now = new Date();
+        const timeDifference = (now.getTime() - lastVisible.value.getTime()) / 1000 / 60;
+        if (timeDifference >= 20) {
+            // 20 minutes afk to reload
+            window.location.reload();
+        }
+    } else {
+        lastVisible.value = new Date();
+    }
+};
+
+onMounted(() => {
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    authStore.checkAuth();
+
+    if (window.location.search === "?awake") {
+        router.push("/");
+    }
+});
+
+onUnmounted(() => {
+    document.removeEventListener("visibilitychange", handleVisibilityChange);
+});
+
+// Watchers
+watch(loggedIn, (newValue) => {
+    if (!newValue) {
+        console.debug("login from app");
+        router.push("/login");
+    }
+    if (newValue && shouldShowChat.value) {
+        // console.log("login fetch");
+        messageStore.fetchRecentMessages(route.path);
+    }
+});
+
+watch(() => route.path, () => {
+    // console.log(route.path);
+    if (shouldShowChat.value) {
+        messageStore.fetchRecentMessages(route.path);
+    } else {
+        window.scrollTo(0, 0);
+    }
+
+    const menuStore = useMenuStore();
+    menuStore.hideActionMenu();
+    const mentorStore = useMentorStore();
+    mentorStore.hide();
+    if (window.innerWidth < 1750) {
+        menuStore.hideSideMenu();
+    }
+});
 </script>
 
 <style scoped>

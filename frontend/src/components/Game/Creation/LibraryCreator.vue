@@ -98,8 +98,10 @@
 </template>
 
 <script setup lang="ts">
+import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import axios from "axios";
-import { mapState } from "pinia";
+import { storeToRefs } from "pinia";
 import {
     startTypingEffect,
     stopTypingEffect,
@@ -109,241 +111,246 @@ import { useLibGenStore } from "@/store/libGenStore";
 import { usePopupStore } from "@/store/popupStore";
 import { useAuthStore } from "@/store/authStore";
 import CtaButton from "../../Footer/LandingPageComponents/CtaButton.vue";
-import LibraryBrowser from "./LibraryBrowser.vue"; 3
+import LibraryBrowser from "./LibraryBrowser.vue";
 
-    components: { CtaButton, LibraryBrowser }
-    data() {
-        return {
-            topic: "",
-            topicError: false,
-            topicTypingError: false,
-            topicSpaceError: false,
-            roomError: false,
-            roomTypingError: false,
-            roomSpaceError: false,
-            safeTopics: [
-                "Innovative breakdance moves",
-                "How to identify misinformation",
-                "Origins of the Olympic games",
-            ],
-            libraryDifficulty: "",
-            buttonDisabled: {
-                noRooms: true,
-                isSubmitting: false,
-            },
-            selectedFile: null,
-            newRoomName: "",
-            roomNames: [],
-        };
-    },
-    mounted() {
-        this.libraryDifficulty = "Normal";
-        if (this.computedTopics.length > 0 && this.$refs.topicInput) {
-            this.typingInterval = startTypingEffect(
-                this.$refs.topicInput,
-                this.computedTopics
-            );
-        } else {
-            //console.log("never started");
-        }
-    },
-    unmounted() {
-        if (this.typingInterval) {
-            stopTypingEffect(this.typingInterval);
-        }
-    },
-    computed: {
-        computedTopics() {
-            return this.topics.length > 0 ? this.topics : this.safeTopics;
-        },
-        ...mapState(useLibGenStore, {
-            languages: (state) => state.languages,
-            topics: (state) => state.topics,
-        }),
-        libgenRoute() {
-            return this.$route.path === "/library";
-        },
-        submitButtonText() {
+const route = useRoute();
+const router = useRouter();
+const libGenStore = useLibGenStore();
+const authStore = useAuthStore();
+const popupStore = usePopupStore();
 
-            if (this.buttonDisabled.isSubmitting) {
-                return "Loading (~45s)";
-            }
-            else if (this.buttonDisabled.noRooms) {
-                return "Add at least one room to get started!";
-            }
-            else {
-                return "Explore!";
-            }
-            // return this.isSubmitting ? this.isSubmitting.isEmpty ? "hi there" : "Loading (~45s)" : "Explore!";
-        },
-        disableExtras() {
-            const authStore = useAuthStore();
-            return !authStore.loggedIn;
-        },
-    },
-    methods: {
-        handlePaste(event) {
-            const pastedText = event.clipboardData.getData("text");
-            if (pastedText.length > 80) {
-                const popupStore = usePopupStore();
-                popupStore.showPopup(
-                    "Briefly describe the topic you wish to learn about in up to 80 characters.</br>Add other info into the <b>Extra</b> field."
-                );
-            }
-        },
-        selectInputText(event) {
-            event.target.select();
-        },
+const { languages, topics } = storeToRefs(libGenStore);
 
-        handleFileUpload(event) {
-            const file = event.target.files[0];
-            if (file) {
-                if (file.size > 15 * 1024 * 1024) { // 15MB limit
-                    const popupStore = usePopupStore();
-                    popupStore.showPopup("File size must be less than 15MB");
-                    this.$refs.fileInput.value = '';
-                    return;
-                }
-                this.selectedFile = file;
-            }
-        },
+const topic = ref("");
+const topicError = ref(false);
+const topicTypingError = ref(false);
+const topicSpaceError = ref(false);
+const roomError = ref(false);
+const roomTypingError = ref(false);
+const roomSpaceError = ref(false);
+const safeTopics = ref([
+    "Innovative breakdance moves",
+    "How to identify misinformation",
+    "Origins of the Olympic games",
+]);
+const libraryDifficulty = ref("Normal");
+const buttonDisabled = ref({
+    noRooms: true,
+    isSubmitting: false,
+});
+const selectedFile = ref<File | null>(null);
+const newRoomName = ref("");
+const roomNames = ref<string[]>([]);
+const typingInterval = ref<number | null>(null);
+const topicInput = ref<HTMLInputElement | null>(null);
+const fileInput = ref<HTMLInputElement | null>(null);
 
-        removeFile() {
-            this.selectedFile = null;
-            this.$refs.fileInput.value = '';
-        },
-        addRoom() {
-            const trimmedName = this.newRoomName.trim();
-            if (trimmedName && this.roomNames.length < 30) {
-                this.roomError = false;
-                this.roomTypingError = !/^[a-zA-Z ]+$/.test(trimmedName);
-                if (this.roomTypingError) {
-                    return;
-                }
-                this.roomSpaceError = trimmedName[0] === " " || trimmedName[trimmedName.length - 1] === " ";
-                if (this.roomSpaceError) {
-                    return;
-                }
-                this.roomNames.push(trimmedName);
-                this.buttonDisabled.noRooms = false;
-                this.newRoomName = "";
-            }
-        },
-        removeRoom(index) {
-            this.roomNames.splice(index, 1);
-            if (this.roomNames.length === 0) {
-                this.buttonDisabled.noRooms = true; // disables submit button until roomNames is not empty (must have room names to submit)
-            }
-        },
-        handleSubmit() {
-            const authStore = useAuthStore();
-            if (!authStore.loggedIn) {
+// Computed properties
+const computedTopics = computed(() => {
+    return topics.value.length > 0 ? topics.value : safeTopics.value;
+});
 
-                // must login to submit
-                const popupStore = usePopupStore();
-                popupStore.showPopup(
-                    "Please login to continue."
-                );
-                return;
-            }
+const libgenRoute = computed(() => {
+    return route.path === "/library";
+});
 
-            if (this.topic.trim() === "") {
-                this.topicError = true;
-                return;
-            }
-            this.topicError = false;
-            this.topicTypingError = !/^[a-zA-Z ]+$/.test(this.topic);
-            if (this.topicTypingError) {
-                return;
-            }
-            this.topicSpaceError = this.topic[0] === " " || this.topic[this.topic.length - 1] === " ";
-            if (this.topicSpaceError) {
-                return;
-            }
+const submitButtonText = computed(() => {
+    if (buttonDisabled.value.isSubmitting) {
+        return "Loading (~45s)";
+    }
+    else if (buttonDisabled.value.noRooms) {
+        return "Add at least one room to get started!";
+    }
+    else {
+        return "Explore!";
+    }
+    // return isSubmitting ? isSubmitting.isEmpty ? "hi there" : "Loading (~45s)" : "Explore!";
+});
 
-            if (this.roomNames.length === 0) {
-                this.roomError = true;
-                return;
-            }
-            for (let roomName of this.roomNames) {
-                if (roomName.trim() === "") {
-                    this.roomError = true;
-                    return;
-                }
-            }
-            this.roomError = false;
-            this.roomTypingError = this.roomNames.some(roomName => !/^[a-zA-Z ]+$/.test(roomName));
-            if (this.roomTypingError) {
-                return;
-            }
-            this.roomSpaceError = this.roomNames.some(roomName => roomName[0] === " " || roomName[roomName.length - 1] === " ");
-            if (this.roomSpaceError) {
-                return;
-            }
+const disableExtras = computed(() => {
+    return !authStore.loggedIn;
+});
 
-            const urlPattern =
-                /^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)$/;
-            if (urlPattern.test(this.topic)) {
-                const popupStore = usePopupStore();
-                popupStore.showPopup(
-                    "We do not currently support links.</br>Try entering the topic of the website instead.</br>Note: This app can teach you about anything, but will not do your homework!"
-                );
-                return;
-            }
-
-            this.buttonDisabled.isSubmitting = true;
-
-            const formData = new FormData();
-
-            formData.append("topic", this.topic);
-            formData.append("language", "English");
-            formData.append("extraContext", ""); // TODO delete later (from backend and library model)
-            formData.append("languageDifficulty", "Normal"); // TODO delete later (from backend and library model)
-            formData.append("libraryDifficulty", this.libraryDifficulty);
-            formData.append("guide", "Azalea"); // TODO delete later (from backend and library model)
-            formData.append("selectedFile", this.selectedFile);
-            this.roomNames.forEach(room => formData.append("roomNames", room));
-
-            axios
-                .post("/api/library/generate", formData, {
-                    headers: {
-                        "Content-Type": "multipart/form-data",
-                    },
-                })
-                .then((response) => {
-
-                    const libraryId = response.data.library_data.id;
-                    this.$router.push(`/lessons/${libraryId}`);
-                })
-                .catch((error) => {
-                    console.error("Error:", error);
-                    if (error.response && error.response.status === 403) {
-                        const popupStore = usePopupStore();
-                        popupStore.showPopup(
-                            "You have reached the limit.</br>Please login to continue."
-                        );
-                        this.$router.push("/login");
-                    }
-                    if (
-                        error.response &&
-                        error.response.status === 400 &&
-                        error.response.data &&
-                        error.response.data.error
-                    ) {
-                        const popupStore = usePopupStore();
-                        popupStore.showPopup(error.response.data.error);
-                    }
-                })
-                .finally(() => {
-                    this.buttonDisabled.isSubmitting = false;
-                });
-        },
-    },
+// Methods
+const handlePaste = (event: ClipboardEvent) => {
+    if (!event.clipboardData) return;
+    const pastedText = event.clipboardData.getData("text");
+    if (pastedText.length > 80) {
+        popupStore.showPopup(
+            "Briefly describe the topic you wish to learn about in up to 80 characters.</br>Add other info into the <b>Extra</b> field."
+        );
+    }
 };
+
+const selectInputText = (event: FocusEvent) => {
+    if (event.target instanceof HTMLInputElement) {
+        event.target.select();
+    }
+};
+
+const handleFileUpload = (event: Event) => {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+        const file = input.files[0];
+        if (file.size > 15 * 1024 * 1024) { // 15MB limit
+            popupStore.showPopup("File size must be less than 15MB");
+            if (fileInput.value) fileInput.value.value = '';
+            return;
+        }
+        selectedFile.value = file;
+    }
+};
+
+const removeFile = () => {
+    selectedFile.value = null;
+    if (fileInput.value) fileInput.value.value = '';
+};
+
+const addRoom = () => {
+    const trimmedName = newRoomName.value.trim();
+    if (trimmedName && roomNames.value.length < 30) {
+        roomError.value = false;
+        roomTypingError.value = !/^[a-zA-Z ]+$/.test(trimmedName);
+        if (roomTypingError.value) {
+            return;
+        }
+        roomSpaceError.value = trimmedName[0] === " " || trimmedName[trimmedName.length - 1] === " ";
+        if (roomSpaceError.value) {
+            return;
+        }
+        roomNames.value.push(trimmedName);
+        buttonDisabled.value.noRooms = false;
+        newRoomName.value = "";
+    }
+};
+
+const removeRoom = (index: number) => {
+    roomNames.value.splice(index, 1);
+    if (roomNames.value.length === 0) {
+        buttonDisabled.value.noRooms = true; // disables submit button until roomNames is not empty (must have room names to submit)
+    }
+};
+
+const handleSubmit = () => {
+    if (!authStore.loggedIn) {
+        // must login to submit
+        popupStore.showPopup(
+            "Please login to continue."
+        );
+        return;
+    }
+
+    if (topic.value.trim() === "") {
+        topicError.value = true;
+        return;
+    }
+    topicError.value = false;
+    topicTypingError.value = !/^[a-zA-Z ]+$/.test(topic.value);
+    if (topicTypingError.value) {
+        return;
+    }
+    topicSpaceError.value = topic.value[0] === " " || topic.value[topic.value.length - 1] === " ";
+    if (topicSpaceError.value) {
+        return;
+    }
+
+    if (roomNames.value.length === 0) {
+        roomError.value = true;
+        return;
+    }
+    for (let roomName of roomNames.value) {
+        if (roomName.trim() === "") {
+            roomError.value = true;
+            return;
+        }
+    }
+    roomError.value = false;
+    roomTypingError.value = roomNames.value.some(roomName => !/^[a-zA-Z ]+$/.test(roomName));
+    if (roomTypingError.value) {
+        return;
+    }
+    roomSpaceError.value = roomNames.value.some(roomName => roomName[0] === " " || roomName[roomName.length - 1] === " ");
+    if (roomSpaceError.value) {
+        return;
+    }
+
+    const urlPattern =
+        /^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)$/;
+    if (urlPattern.test(topic.value)) {
+        popupStore.showPopup(
+            "We do not currently support links.</br>Try entering the topic of the website instead.</br>Note: This app can teach you about anything, but will not do your homework!"
+        );
+        return;
+    }
+
+    buttonDisabled.value.isSubmitting = true;
+
+    const formData = new FormData();
+
+    formData.append("topic", topic.value);
+    formData.append("language", "English");
+    formData.append("extraContext", ""); // TODO delete later (from backend and library model)
+    formData.append("languageDifficulty", "Normal"); // TODO delete later (from backend and library model)
+    formData.append("libraryDifficulty", libraryDifficulty.value);
+    formData.append("guide", "Azalea"); // TODO delete later (from backend and library model)
+    if (selectedFile.value) {
+        formData.append("selectedFile", selectedFile.value);
+    }
+    roomNames.value.forEach(room => formData.append("roomNames", room));
+
+    axios
+        .post("/api/library/generate", formData, {
+            headers: {
+                "Content-Type": "multipart/form-data",
+            },
+        })
+        .then((response) => {
+            const libraryId = response.data.library_data.id;
+            router.push(`/lessons/${libraryId}`);
+        })
+        .catch((error) => {
+            console.error("Error:", error);
+            if (error.response && error.response.status === 403) {
+                popupStore.showPopup(
+                    "You have reached the limit.</br>Please login to continue."
+                );
+                router.push("/login");
+            }
+            if (
+                error.response &&
+                error.response.status === 400 &&
+                error.response.data &&
+                error.response.data.error
+            ) {
+                popupStore.showPopup(error.response.data.error);
+            }
+        })
+        .finally(() => {
+            buttonDisabled.value.isSubmitting = false;
+        });
+};
+
+// Lifecycle hooks
+onMounted(() => {
+    libraryDifficulty.value = "Normal";
+    if (computedTopics.value.length > 0 && topicInput.value) {
+        typingInterval.value = startTypingEffect(
+            topicInput.value,
+            computedTopics.value
+        );
+    } else {
+        //console.log("never started");
+    }
+});
+
+onUnmounted(() => {
+    if (typingInterval.value) {
+        stopTypingEffect(typingInterval.value);
+    }
+});
 </script>
 
 <style scoped>
-
 .library-gen-page {
     display: flex;
     justify-content: flex-start;  /* Align content at the top */

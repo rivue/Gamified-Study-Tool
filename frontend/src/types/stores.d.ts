@@ -14,14 +14,21 @@ declare module "pinia" {
 
 import { useMessageStore } from "@/store/messageStore";
 declare module "pinia" {
-  export interface PiniaCustomStores {
-    messageStore: ReturnType<typeof useMessageStore>;
-  }
+    export interface PiniaCustomStores {
+        messageStore: ReturnType<typeof useMessageStore>;
+    }
 }
 
 import { usePopupStore } from "@/store/popupStore";
 declare module "pinia" {
-  export interface PiniaCustomStores {
-    popupStore: ReturnType<typeof usePopupStore>;
-  }
+    export interface PiniaCustomStores {
+        popupStore: ReturnType<typeof usePopupStore>;
+    }
+}
+
+import { usePopupStore } from "@/store/menuStore";
+declare module "pinia" {
+    export interface PiniaCustomStores {
+        menuStore: ReturnType<typeof useMenuStore>;
+    }
 }

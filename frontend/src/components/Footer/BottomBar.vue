@@ -1,78 +1,58 @@
-<!-- BottomBar.vue -->
 <template>
     <div class="app-footer">
-        <!-- <div class="footer-top"> -->
-        <!-- <span class="separator">·</span> -->
-        <!-- <router-link to="/contact" class="text-link">Contact</router-link>
-        <span class="separator">·</span> -->
-        <!-- <div class="text-link" @click="donateRedirect">Donate</div> -->
-        <!-- <span class="separator">·</span> -->
-        <!-- <button @click="toggleTheme" class="dark-mode-btn">
-            <img
-            :src="themeIcon"
-            :alt="themeIconAlt"
-            class="link-icon"
-            width="16"
-            height="16"
-            />
-        </button> -->
-        <!-- <span class="separator">·</span> -->
-        <!-- </div> -->
-        <div class="footer-bottom">
-            <div class="footer-top">
-                <router-link to="/changelog" class="text-link">Changelog</router-link>
-                <span class="separator">·</span>
-                <router-link to="/terms" class="text-link">Terms and Policies</router-link>
-                <span class="separator">·</span>
-                <p>© 2025 Rivue.ai</p>
-            </div>
-            <div>
-                <p class="sincere-msg">Made with ❤️ for thinking and doing.</p>
-            </div>
+      <div class="footer-bottom">
+        <div class="footer-top">
+          <router-link to="/changelog" class="text-link">Changelog</router-link>
+          <span class="separator">·</span>
+          <router-link to="/terms" class="text-link">Terms and Policies</router-link>
+          <span class="separator">·</span>
+          <p>© 2025 Rivue.ai</p>
         </div>
+        <div>
+          <p class="sincere-msg">Made with ❤️ for thinking and doing.</p>
+        </div>
+      </div>
     </div>
-</template>
-
-<script>
-import { useThemeStore } from "@/store/themeStore";
-
-export default {
-    name: "BottomBar",
-    computed: {
-        themeIcon() {
-            return this.darkMode
-                ? require("@/assets/images/darkmode.png")
-                : require("@/assets/images/lightmode.png");
-        },
-        xIcon() {
-            return this.darkMode
-                ? require("@/assets/images/x-logo-black.png")
-                : require("@/assets/images/x-logo-white.png");
-        },
-        discordIcon() {
-            return this.darkMode
-                ? require("@/assets/images/discord-mark-black.png")
-                : require("@/assets/images/discord-mark-white.png");
-        },
-        themeIconAlt() {
-            return this.darkMode ? "Light Mode" : "Dark Mode";
-        },
-        darkMode() {
-            const themeStore = useThemeStore();
-            return themeStore.darkMode;
-        },
-    },
-    methods: {
-        toggleTheme() {
-            const themeStore = useThemeStore();
-            themeStore.toggleDarkMode();
-        },
-        donateRedirect() {
-            window.open("https://donate.stripe.com/fZe8Ao9hl63qe9GeUX", '_blank');
-        }
-    },
-};
-</script>
+  </template>
+  
+  <script setup lang="ts">
+  import { computed } from 'vue';
+  import { useThemeStore } from '@/store/themeStore';
+  
+  const themeStore = useThemeStore();
+  
+  const darkMode = computed(() => themeStore.darkMode);
+  
+  const themeIcon = computed(() =>
+    darkMode.value
+      ? require('@/assets/images/darkmode.png')
+      : require('@/assets/images/lightmode.png')
+  );
+  
+  const xIcon = computed(() =>
+    darkMode.value
+      ? require('@/assets/images/x-logo-black.png')
+      : require('@/assets/images/x-logo-white.png')
+  );
+  
+  const discordIcon = computed(() =>
+    darkMode.value
+      ? require('@/assets/images/discord-mark-black.png')
+      : require('@/assets/images/discord-mark-white.png')
+  );
+  
+  const themeIconAlt = computed(() =>
+    darkMode.value ? 'Light Mode' : 'Dark Mode'
+  );
+  
+  function toggleTheme() {
+    themeStore.toggleDarkMode();
+  }
+  
+  function donateRedirect() {
+    window.open('https://donate.stripe.com/fZe8Ao9hl63qe9GeUX', '_blank');
+  }
+  </script>
 
 <style scoped>
 .app-footer {

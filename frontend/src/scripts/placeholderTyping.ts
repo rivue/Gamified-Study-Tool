@@ -1,44 +1,58 @@
-export function startTypingEffect(elem: HTMLInputElement, topics: string[]) {
-    let currentIndex = 0;
-    let isDeleting = false;
-    let text = '';
-    let typingSpeed = 75;
-    let timer = null;
+import { ref, onMounted, onUnmounted } from 'vue';
+
+export function useTypingEffect(elem: HTMLInputElement, topics: string[]) {
+    const currentIndex = ref(0);
+    const isDeleting = ref(false);
+    const text = ref('');
+    const typingSpeed = ref(75);
+    let timer: number | null = null;
 
     function type() {
-        let currentTopic = topics[currentIndex];
+        const currentTopic = topics[currentIndex.value];
         const fullText = currentTopic;
 
+        text.value = isDeleting.value
+            ? fullText.substring(0, text.value.length - 1)
+            : fullText.substring(0, text.value.length + 1);
 
-        text = isDeleting
-            ? fullText.substring(0, text.length - 1)
-            : fullText.substring(0, text.length + 1);
+        elem.placeholder = text.value;
 
-        elem.placeholder = text;
+        let typeSpeed = typingSpeed.value;
 
-        let typeSpeed = typingSpeed;
-
-        if (isDeleting) {
+        if (isDeleting.value) {
             typeSpeed /= 4;
         }
 
-        if (!isDeleting && text === fullText) {
+        if (!isDeleting.value && text.value === fullText) {
             typeSpeed = 1500;
-            isDeleting = true;
-        } else if (isDeleting && text === '') {
-            isDeleting = false;
+            isDeleting.value = true;
+        } else if (isDeleting.value && text.value === '') {
+            isDeleting.value = false;
             typeSpeed = 500;
-            currentIndex = (currentIndex + (Math.floor(Math.random() * topics.length))) % topics.length;
+            currentIndex.value = (currentIndex.value + (Math.floor(Math.random() * topics.length))) % topics.length;
         }
 
-        clearTimeout(timer);
-        timer = setTimeout(type, typeSpeed);
+        clearTimeout(timer as number);
+        timer = setTimeout(type, typeSpeed) as unknown as number;
     }
 
-    type();
-    return () => clearTimeout(timer);
-}
+    const start = () => {
+        type();
+    };
 
-export function stopTypingEffect(stopFunction) {
-    stopFunction();
+    const stop = () => {
+        if (timer) {
+            clearTimeout(timer);
+            timer = null;
+        }
+    };
+
+    onUnmounted(() => {
+        stop();
+    });
+
+    return {
+        start,
+        stop
+    };
 }

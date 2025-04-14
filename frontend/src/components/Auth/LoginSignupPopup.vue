@@ -32,114 +32,111 @@
     </div>
 </template>
 
-<script>
-
+<script setup lang="ts">
+import { ref, computed, onMounted } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 import LoginForm from "./LoginForm.vue";
 import SignupForm from "./SignupForm.vue";
 import SendPasswordResetEmail from "./SendPasswordResetEmail.vue";
 import { usePopupStore } from "@/store/popupStore";
-import { useAuthStore } from "@/store/authStore.Ts";
+import { useAuthStore } from "@/store/authStore";
 
-export default {
-    components: {
-        LoginForm,
-        SignupForm,
-        SendPasswordResetEmail,
-    },
-    data() {
-        return {
-            activeForm: "login",
-            loggingIn: false,
-        };
-    },
-    mounted() {
-        // this.loadGoogleIdentityServices();
-        if (this.loggedIn) {
-            const popupStore = usePopupStore();
-            popupStore.showPopup(
-                "You are already signed in. Visit settings to log out."
-            );
-            this.$router.push("/");
-        }
-    },
-    computed: {
-        loggedIn() {
-            const authStore = useAuthStore();
-            return authStore.loggedIn;
-        },
-    },
-    methods: {
-        toggleForms(form) {
-            this.activeForm = form;
-        },
-        handleLoginSuccess() {
-            const authStore = useAuthStore();
-            authStore.login();
-            const redirectPath = this.$route.query.redirect || "/";
-            this.$router.push(redirectPath);
-        },
+const router = useRouter();
+const route = useRoute();
+const googleButton = ref<HTMLDivElement | null>(null);
+const activeForm = ref('login');
+const loggingIn = ref(false);
+const authStore = useAuthStore();
 
-        handleSignupSuccess() {
-            const popupStore = usePopupStore();
-            popupStore.showPopup(
-                "Registration email sent!\n Please click the link in the email to start your ascent."
-            );
-            this.$router.push("/");
-        },
-        // loadGoogleIdentityServices() {
-        //     if (window.google && window.google.accounts) {
-        //         this.initializeGoogleSignIn();
-        //     } else {
-        //         const script = document.createElement("script");
-        //         script.src = "https://accounts.google.com/gsi/client";
-        //         script.onload = this.initializeGoogleSignIn;
-        //         script.async = true;
-        //         script.defer = true;
-        //         document.head.appendChild(script);
-        //     }
-        // },
+const loggedIn = computed(() => {
+    return authStore.loggedIn;
+});
 
-        // initializeGoogleSignIn() {
-        //     window.google.accounts.id.initialize({
-        //         client_id:
-        //             "529262341360-9sq10od3qkro19jaavhgachkpviugfv3.apps.googleusercontent.com",
-        //         callback: this.handleCredentialResponse,
-        //     });
-        //     window.google.accounts.id.renderButton(this.$refs.googleButton, {
-        //         theme: "outline",
-        //         size: "large",
-        //     });
-        // },
+onMounted(() => {
+    // this.loadGoogleIdentityServices();
+    if (loggedIn.value) {
+        const popupStore = usePopupStore();
+        popupStore.showPopup(
+            "You are already signed in. Visit settings to log out."
+        );
+        router.push("/");
+    }
+});
 
-        // handleCredentialResponse(response) {
-        //     this.loggingIn = true;
-        //     this.sendTokenToBackend(response.credential);
-        // },
-        // sendTokenToBackend(id_token) {
-        //     axios
-        //         .post("/api/auth/google/callback", { id_token })
-        //         .then((response) => {
-        //             const authStore = useAuthStore();
-        //             authStore.login();
-        //             if (response.data.message === "new_user") {
-        //                 this.$router.push("/?awake");
-        //             } else {
-        //                 this.$router.push("/");
-        //             }
-        //         })
-        //         .catch((error) => {
-        //             console.error("Error authenticating", error);
-        //         })
-        //         .finally(() => {
-        //             this.loggingIn = false;
-        //         });
-        // },
-    },
+const toggleForms = (form: string) => {
+    activeForm.value = form;
 };
+
+const handleLoginSuccess = () => {
+    authStore.login();
+    const redirectPath = route.query.redirect?.toString() || "/";
+    router.push(redirectPath);
+};
+
+const handleSignupSuccess = () => {
+    const popupStore = usePopupStore();
+    popupStore.showPopup(
+        "Registration email sent!\n Please click the link in the email to start your ascent."
+    );
+    router.push("/");
+};
+
+const handleResetSuccess = () => {
+    // This function was not implemented in the original code
+    // Added here to satisfy the template usage
+};
+
+// loadGoogleIdentityServices() {
+//     if (window.google && window.google.accounts) {
+//         this.initializeGoogleSignIn();
+//     } else {
+//         const script = document.createElement("script");
+//         script.src = "https://accounts.google.com/gsi/client";
+//         script.onload = this.initializeGoogleSignIn;
+//         script.async = true;
+//         script.defer = true;
+//         document.head.appendChild(script);
+//     }
+// },
+
+// initializeGoogleSignIn() {
+//     window.google.accounts.id.initialize({
+//         client_id:
+//             "529262341360-9sq10od3qkro19jaavhgachkpviugfv3.apps.googleusercontent.com",
+//         callback: this.handleCredentialResponse,
+//     });
+//     window.google.accounts.id.renderButton(this.$refs.googleButton, {
+//         theme: "outline",
+//         size: "large",
+//     });
+// },
+
+// handleCredentialResponse(response) {
+//     this.loggingIn = true;
+//     this.sendTokenToBackend(response.credential);
+// },
+// sendTokenToBackend(id_token) {
+//     axios
+//         .post("/api/auth/google/callback", { id_token })
+//         .then((response) => {
+//             const authStore = useAuthStore();
+//             authStore.login();
+//             if (response.data.message === "new_user") {
+//                 this.$router.push("/?awake");
+//             } else {
+//                 this.$router.push("/");
+//             }
+//         })
+//         .catch((error) => {
+//             console.error("Error authenticating", error);
+//         })
+//         .finally(() => {
+//             this.loggingIn = false;
+//         });
+// },
 </script>
 
 <style scoped>
-
 .form-field {
   display: flex;
   flex-direction: column;

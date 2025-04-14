@@ -5,7 +5,6 @@
 
   <form @submit.prevent="handleSubmit">
     <div class="form-field">
-        
         <label for="new-email">Email:</label>
         <input
         type="text"
@@ -17,7 +16,6 @@
         />
     </div>
     <div class="form-field">
-
         <label for="new-password">Password:</label>
         <input
         type="password"
@@ -45,57 +43,51 @@
   </form>
 </template>
   
-  <script>
+<script setup lang="ts">
+import { ref } from 'vue';
 import axios from 'axios';
 import { usePopupStore } from "@/store/popupStore";
-export default {
-  data() {
-    return {
-      email: "",
-      password: "",
-      confirmPassword: "",
-      buttonText: "Sign up",
-    };
-  },
-  methods: {
-    handleSubmit() {
-      this.buttonText = "Loading...";
-      if (this.password !== this.confirmPassword) {
-        const popupStore = usePopupStore();
-        popupStore.showPopup("Passwords do not match!");
-        this.buttonText = "Sign up";
-        return;
+
+const emit = defineEmits<{
+  (e: 'signupSuccess'): void
+}>();
+
+const email = ref("");
+const password = ref("");
+const confirmPassword = ref("");
+const buttonText = ref("Sign up");
+
+const handleSubmit = () => {
+  buttonText.value = "Loading...";
+  const popupStore = usePopupStore();
+  
+  if (password.value !== confirmPassword.value) {
+    popupStore.showPopup("Passwords do not match!");
+    buttonText.value = "Sign up";
+    return;
+  }
+
+  if (password.value.length < 8) {
+    popupStore.showPopup("Passwords must be longer than 8 characters!");
+    buttonText.value = "Sign up";
+    return;
+  }
+  
+  const formData = new FormData();
+  formData.append("new-email", email.value);
+  formData.append("new-password", password.value);
+
+  axios.post("/api/signup", formData)
+    .then((response) => {
+      if (response.status === 200) {
+        emit("signupSuccess");
+        buttonText.value = "Sign up";
       }
-      console.log("hi")
-
-      if (this.password.length <  8) {
-        const popupStore = usePopupStore();
-        popupStore.showPopup("Passwords must be longer than 8 characters!");
-        this.buttonText = "Sign up";
-        return;
-      }
-      console.log("second")
-      const formData = new FormData();
-      formData.append("new-email", this.email);
-      formData.append("new-password", this.password);
-
-    //   console.log("Form data:", formData);
-
-      axios.post("/api/signup", formData)
-        .then((response) => {
-          if (response.status === 200) {
-            this.$emit("signupSuccess");
-            this.buttonText = "Sign up";
-          }
-        })
-        .catch(error => {
-        //   console.debug('Error during signup:', error);
-          const popupStore = usePopupStore();
-          popupStore.showPopup(error.response?.data?.message || "Signup failed. Please try again.");
-          this.buttonText = "Sign up";
-        });
-    },
-  },
+    })
+    .catch(error => {
+      popupStore.showPopup(error.response?.data?.message || "Signup failed. Please try again.");
+      buttonText.value = "Sign up";
+    });
 };
 </script>
   
@@ -124,18 +116,18 @@ form {
 .form-field {
   display: flex;
   flex-direction: column;
-  align-items: center; /* Change from flex-start to center */
+  align-items: center;
   max-width: 300px;
   width: 100%;
-  margin-bottom: 16px; /* Re-add this for spacing between fields */
-  margin-left: auto; /* Keep these for horizontal centering */
+  margin-bottom: 16px;
+  margin-left: auto;
   margin-right: auto;
 }
 
 .form-field label {
   font-size: 0.9em;
   color: var(--text-color);
-  align-self: flex-start; /* This keeps labels aligned to the left */
+  align-self: flex-start;
 }
 
 .form-field input[type="text"],

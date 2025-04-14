@@ -30,42 +30,37 @@
     </div>
 </template>
 
-<script>
+<script setup lang="ts">
 import axios from 'axios';
+import { ref, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
 
-export default {
-    data() {
-        return {
-            loading: true,
-            status: '',
-            token: ''
-        };
-    },
-    created() {
-        this.token = this.$route.params.token;
-        this.verifyEmail();
-    },
-    methods: {
-        async verifyEmail() {
+const route = useRoute();
+const loading = ref(true);
+const status = ref('');
+const token = ref('');
 
-            axios.post('/api/confirm', { token: this.token })
-                .then((response) => {
-                    if (response.status === 200) {
-                        this.status = 'success';
-                    } else if (response.message) {
-                        this.status = response.message;
-                    }
-                })
-                .catch(() => {
-                    this.status = 'error';
-                })
-                .finally(() => {
-                    this.loading = false;
-                });
+onMounted(() => {
+    token.value = route.params.token as string;
+    verifyEmail();
+});
 
-        }
-    }
-};
+async function verifyEmail() {
+    axios.post('/api/confirm', { token: token.value })
+        .then((response) => {
+            if (response.status === 200) {
+                status.value = 'success';
+            } else if (response.data && response.data.message) {
+                status.value = response.data.message;
+            }
+        })
+        .catch(() => {
+            status.value = 'error';
+        })
+        .finally(() => {
+            loading.value = false;
+        });
+}
 </script>
 
 <style scoped>

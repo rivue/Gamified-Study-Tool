@@ -3,7 +3,7 @@
 import { defineStore } from "pinia";
 import axios from "axios";
 import { useAuthStore } from "@/store/authStore";
-import { usePopupStore } from "@/store/popupStore.js";
+import { usePopupStore } from "@/store/popupStore";
 import { useUserStatsStore } from "@/store/userStatsStore";
 
 export const useGameStore = defineStore("gameStore", {
