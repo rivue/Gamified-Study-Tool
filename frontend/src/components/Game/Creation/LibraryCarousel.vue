@@ -5,8 +5,12 @@
 
             <h1>My Courses</h1>
         </div>
-        <Input class="max-w mb-4" type="text" v-model="searchQuery" @input="filterLibraries"
-            @keydown="handleSearchKeydown" placeholder="Search courses..." />
+        <Input class="max-w mb-4 text-lg border-[var(--element-color-1)] text-[var(--light-highlight)]" 
+            type="text" 
+            v-model="searchQuery" 
+            @input="filterLibraries"
+            @keydown="handleSearchKeydown" 
+            placeholder="Search courses..." />
 
         <!-- Conditional rendering based on library count -->
         <div v-if="libraries.length > 0" class="list-table">
@@ -15,18 +19,19 @@
                 <TableBody>
                     <template v-if="paginatedLibraries.length">
                         <TableRow v-for="library in paginatedLibraries" :key="library.id"
-                            class="cursor-pointer hover:bg-[var(--element-color-1)]" @click="goToLibrary(library.id)">
-                            <TableCell class="font-medium">{{ library.library_topic }}</TableCell>
-                            <TableCell class="text-right">
+                            class="cursor-pointer text-[var(--light-highlight)] hover:text-white hover:bg-[var(--element-color-1)] border-[1px] border-solid" 
+                            @click="goToLibrary(library.id)">
+                            <TableCell class="text-xl text-center p-4">{{ library.library_topic }}</TableCell>
+                            <!-- <TableCell class="text-right">
                                 <button class="rounded-full p-2 hover:bg-muted" @click.stop>
-                                    <span class="dots">...</span>
+                                    <span class="text-xl">...</span>
                                 </button>
-                            </TableCell>
+                            </TableCell> -->
                         </TableRow>
                     </template>
                     <TableRow v-else>
-                        <TableCell colspan="5" class="h-24 text-center">
-                            No results.
+                        <TableCell colspan="5" class="h-24 text-center text-xl">
+                            No results
                         </TableCell>
                     </TableRow>
                 </TableBody>
@@ -42,7 +47,6 @@
         <!-- Pagination only shows if there are libraries -->
         <div class="pagination" v-if="totalItems > 0">
             <div class="pagination-info">
-
                 Showing {{ startIndex + 1 }}-{{ endIndex }} of {{ totalItems }} courses
             </div>
             <div class="pagination-controls">
@@ -180,7 +184,6 @@ function goToPage(page: number) {
     padding: 16px;
     background: var(--background-color-1);
     border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 .list-header {
@@ -248,7 +251,7 @@ function goToPage(page: number) {
     background-color: var(--background-color-1);
     /* Ensure items have background */
     cursor: pointer;
-    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+    transition: background-color 0.2s ease;
 }
 
 .table-header {
@@ -296,12 +299,6 @@ function goToPage(page: number) {
 
 .col-status:hover {
     background-color: var(--background-color-2);
-}
-
-.dots {
-    font-size: 10px;
-    line-height: 0;
-    color: var(--text-color-secondary);
 }
 
 .col-stats {
@@ -455,7 +452,7 @@ function goToPage(page: number) {
 }
 
 .pagination-info {
-    color: var(--text-color-secondary);
+    color: var(--background-color-1);
     font-size: 14px;
     font-weight: 500;
 }
@@ -552,7 +549,7 @@ function goToPage(page: number) {
     --text-color-secondary: #6c757d;
     --border-color: #dee2e6;
     --success-color: #198754;
-    --success-color-bg: rgba(25, 135, 84, 0.1);
+    --success-color-bg: rgba(42, 87, 66, 0.1);
     --primary-color: #4361ee;
     --primary-hover: #3d55d5;
 }

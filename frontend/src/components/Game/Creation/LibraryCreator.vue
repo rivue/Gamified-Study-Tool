@@ -33,7 +33,8 @@
                         <!-- File Upload Section -->
                         <div class="form-group file-upload">
                             <div class="libgen-title">Upload File</div>
-                            <div class="file-input-container">
+                            <div class="file-input-container text-[var(--light-highlight)]
+">
                                 <input type="file" id="fileInput" ref="fileInput" @change="handleFileUpload"
                                     :disabled="disableExtras" accept=".pdf" />
                                 <div v-if="selectedFile" class="selected-file">
@@ -80,7 +81,7 @@
                                 named "mitosis" the content of that section is based on mitosis, etc...
                             </div>
                             <div class="helper-text">
-                                🐙 Don't worry about adding all rooms or files now - you can generate more later!
+                                🐙 Don't worry about adding all rooms or files now - you can add and generate more later!
                             </div>
                         </div>
                     </div>

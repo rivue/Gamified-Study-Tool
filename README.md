@@ -44,6 +44,8 @@ TODO list:
         (currently all 4 were in BottomBar.vue) --> (BASICALLY MAKE BottomBar.vue SMALLER)
 
     general:
+        - add ability to see uploaded files in library and maybe even file preview
+        - add ability to add friends to a course + leaderboard as well
         - make a constants file for discord links, twitter / x links, any backend urls, etc...
         - add tips for making a new stepping stone (i.e. make sure it aligns with what you put, etc... )
         - for short answer, 1) make it one word (for now) and most importantly 2) make sure the exact word is in the other side of the card
@@ -59,7 +61,6 @@ TODO list:
         - add page after you finish a game session, but make it have confetti or an animation or something
         - should email / pwd reset tokens be visible via the url or should they be more secret?
         - how long do email confirmation tokens last / how long do password reset tokens last / what do I do when they're done?
-        - implement some sort of const file with routes (ex: PASSWORD_RESET_URL = "...", etc...)
         - improve prompt / answer generation
         - fix propfind error thing
         - add google auth and / or PASSWORD RESET
@@ -75,7 +76,6 @@ TODO list:
             - note: easy to get rid of in the frontend, but have to remove lots of stuff in backend w/ various function calls and stuff
         - include question prompt generation (e.g. make the answer choices very similar to what you think the user would think so the questions are a little more challenging, etc...)
         - add default background if you scroll to far (like in main page if you scroll too far down)
-        - eventually add footer back (note: requires light mode, discord link, everything in contact page, terms page, copyright(?), and possibly twitter link if we decide to do that)
         - change theme / color / name
         - ability to "star" / "favorite" a course
         - make footer smaller and look better
@@ -273,6 +273,8 @@ COMPLETED:
     ✅ make it so you have to be confirmed to access pages
     ✅ add ability to add multiple room names from Add New Stepping Stone part
     ✅ ADD SHAD-CN
+    ✅ eventually add footer back (note: requires light mode, discord link, everything in contact page, terms page, copyright(?), and possibly twitter link if we decide to do that)
+
 
 
 

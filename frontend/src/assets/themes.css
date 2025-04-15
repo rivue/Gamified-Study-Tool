@@ -62,6 +62,7 @@
     /* Highlights and Accents */
     --highlight-color: #99f6e4;  /* Soft teal */
     --text-color: #f8fafc;      /* Crisp white with slight blue tint */
+    --text-color-secondary: #6c757d;
     --text-color-rgb: 248, 250, 252;
     
     /* Special Colors */
