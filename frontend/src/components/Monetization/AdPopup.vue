@@ -44,7 +44,7 @@ import { ref, computed, onMounted, onUnmounted } from "vue";
       'Your ad could appear here.. <a href="/contact" target="_blank">get in touch.</a>',
       'Grow personally and professionally by making learning a fun part of your daily life.',
       'Would you recommend us to a friend? <br><a href="/contact" target="_blank">What could we do to make that happen?</a>',
-      'Join our community on <a target="_blank" href="https://twitter.com/AscendanceCloud">𝕏</a> and <a target="_blank" href="https://discord.gg/SSGygda5DX">Discord</a> to stay up-to-date with the latest features.',
+      'Join our community on <a target="_blank" href="https://twitter.com/AscendanceCloud">𝕏</a> and <a target="_blank" href="https://discord.gg/33yAcp2qDf">Discord</a> to stay up-to-date with the latest features.',
       'Please consider <a target="_blank" href="https://donate.stripe.com/fZe8Ao9hl63qe9GeUX">donating</a> to help this app grow faster!',
     ]);
     const specialMessage = messages.value.splice(1, 1)[0];

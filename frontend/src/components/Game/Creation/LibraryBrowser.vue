@@ -33,7 +33,7 @@ function fetchLibraries() {
     axios
         .get("/api/libraries")
         .then((response) => {
-            console.log(response.data.mine);
+            // console.log(response.data.mine);
             if (authStore.loggedIn) {
                 myLibraries.value = response.data.mine;
             }

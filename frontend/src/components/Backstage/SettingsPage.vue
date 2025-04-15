@@ -6,7 +6,7 @@
             <h2 class="section-title">Email</h2>
             <p class="profile-info">{{ profile.email }}</p>
             <div class="settings-buttons half-n-half">
-                <MenuButton label="Reset" @click="resetConversation" class="red" />
+                <!-- <MenuButton label="Reset" @click="resetConversation" class="red" /> -->
                 <MenuButton label="Logout" @click="logout" />
             </div>
         </div>
@@ -134,9 +134,9 @@ const changeTheme = () => {
     themeStore.toggleDarkMode();
 };
 
-const resetConversation = async () => {
-    // Commented out functionality
-};
+// const resetConversation = async () => {
+//     // Commented out functionality
+// };
 
 const autoGrow = (event: { target: HTMLTextAreaElement }) => {
     const textarea = event.target;

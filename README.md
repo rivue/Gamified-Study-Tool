@@ -44,7 +44,9 @@ TODO list:
         (currently all 4 were in BottomBar.vue) --> (BASICALLY MAKE BottomBar.vue SMALLER)
 
     general:
-        - for short answer, 1) make it one word (for now) and most importantly 2) make the answer inside the flip card
+        - make a constants file for discord links, twitter / x links, any backend urls, etc...
+        - add tips for making a new stepping stone (i.e. make sure it aligns with what you put, etc... )
+        - for short answer, 1) make it one word (for now) and most importantly 2) make sure the exact word is in the other side of the card
         - fix Aryan's problem with viewing it on his phone
         - look into adding a resizable area somewhere in your site (like how turbo learn has it) but like people can't change it
         - add ability to delete library (have to enter its name exactly)
