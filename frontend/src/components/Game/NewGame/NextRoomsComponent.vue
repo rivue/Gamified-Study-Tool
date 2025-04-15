@@ -13,51 +13,40 @@
         :label="room.roomName"
         :isLoading="room.isLoading"
         :position="index"
-      >
-      </RoomButton>
+      />
     </div>
   </div>
 </template>
 
-<script>
+<script setup lang="ts">
+import { computed } from "vue";
 import { useGameStore } from "@/store/gameStore";
 import RoomButton from "./RoomButton.vue";
 
-export default {
-  name: "NextRoomsComponent",
-  components: {
-    RoomButton,
-  },
-  computed: {
-    gameStore() {
-      return useGameStore();
-    },
-    isVisible() {
-      return this.gameStore.showNext;
-    },
-    rooms() {
-      return this.gameStore.nextRooms.map((roomName) => {
-        const roomState = this.gameStore.roomStates[roomName]?.state || 0;
-        return {
-          roomName,
-          isLoading: roomState === 1, // Assuming state `1` means loading
-        };
-      });
-    },
-  },
-  methods: {
-    openRoom(roomName) {
-      if (this.gameStore.roomStates[roomName].state === 2) {
-        this.gameStore.openRoom(roomName);
-      } 
-    //   else {
-        // this.$router.push("/home")
-    //   }
-    },
-  },
+// Store
+const gameStore = useGameStore();
+
+// Computed visibility flag
+const isVisible = computed(() => gameStore.showNext);
+
+// Room list with metadata
+const rooms = computed(() =>
+  gameStore.nextRooms.map((roomName: string) => {
+    const roomState = gameStore.roomStates[roomName]?.state || 0;
+    return {
+      roomName,
+      isLoading: roomState === 1, // state === 1 means loading
+    };
+  })
+);
+
+// Open room
+const openRoom = (roomName: string) => {
+  if (gameStore.roomStates[roomName]?.state === 2) {
+    gameStore.openRoom(roomName);
+  }
 };
 </script>
-
 
 <style scoped>
 .next-container {
@@ -74,8 +63,8 @@ export default {
   width: 90%;
   margin: 0px auto;
 }
-.next-room-title{
+.next-room-title {
   font-weight: 700;
-  padding:4px;
+  padding: 4px;
 }
 </style>

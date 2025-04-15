@@ -44,6 +44,10 @@ TODO list:
         (currently all 4 were in BottomBar.vue) --> (BASICALLY MAKE BottomBar.vue SMALLER)
 
     general:
+        - make a constants file for discord links, twitter / x links, any backend urls, etc...
+        - add tips for making a new stepping stone (i.e. make sure it aligns with what you put, etc... )
+        - for short answer, 1) make it one word (for now) and most importantly 2) make sure the exact word is in the other side of the card
+        - fix Aryan's problem with viewing it on his phone
         - look into adding a resizable area somewhere in your site (like how turbo learn has it) but like people can't change it
         - add ability to delete library (have to enter its name exactly)
         - add check for duplicate room name for the time being - maybe allow it later down the line?
@@ -88,8 +92,7 @@ TODO list:
         - clean up minor ui thing with learning nodes (when you click on the popup to play the games, for some reason it still highlights the node)
         - modify section splitting logic (5 sentences --> 1k characters or 200 words max or whatever.)
         - only fetch most 30 recent factoids, or summary of factoids or something when doing room generation
-        - one word short answer (make gpt come up with variations so people aren't pissed off w/ super close answers, ex:
-        NCSU, ncsu, NC State, North Carolina State University, etc... or maybe use basic nlp to check?)
+
         - all the other routes and stuff (terms & policies, buying subscription)
 
     create course (library) page:

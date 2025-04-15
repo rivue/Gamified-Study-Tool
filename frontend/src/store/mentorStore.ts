@@ -38,11 +38,11 @@ export const useMentorStore = defineStore('mentorStore', {
             },
         ],               
         currentMentor: null,
-        selectedMentorName: null,
+        selectedMentorName: null as string | null,
         isVisible: false,
     }),
     actions: {
-        confirmSelection(name) {
+        confirmSelection(name: string) {
             if (!this.isVisible) { return; }
             const auth = useAuthStore();
             if (!auth.loggedIn){

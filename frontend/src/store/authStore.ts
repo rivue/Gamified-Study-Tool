@@ -1,16 +1,24 @@
-// store/authStore.js
+// store/authStore.ts
 import { defineStore } from 'pinia';
 import axios from 'axios';
 
+// Define an interface for the auth state
+interface AuthState {
+    loggedIn: boolean;
+    userId: string | null;
+    userTier: string;
+    cloudTokens: number;
+}
+
 export const useAuthStore = defineStore('auth', {
-  state: () => ({
+  state: (): AuthState => ({
     loggedIn: localStorage.getItem('loggedIn') === 'true',
     userId: localStorage.getItem('userId') || '',
     userTier: "free",
     cloudTokens: 0,
   }),
   getters: {
-    user() {
+    user(): { id: string | null; tier: string }  {
       return {
         id: this.userId,
         tier: this.userTier

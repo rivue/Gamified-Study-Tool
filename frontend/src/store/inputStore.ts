@@ -10,7 +10,7 @@ export const useInputStore = defineStore({
         toggleVisibility() {
             this.isInputFieldVisible = !this.isInputFieldVisible;
         },
-        show(origin) {
+        show(origin?: string) {
             if (origin){
                 // console.log("showing"+origin);
             }

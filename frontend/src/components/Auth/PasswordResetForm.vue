@@ -26,57 +26,60 @@
     </div>
 </template>
 
-<script>
+<script setup lang="ts">
 import axios from 'axios';
+import { ref, defineProps } from 'vue';
+import { useRouter } from 'vue-router';
 
-export default {
-    props: ['token'],
-    data() {
-        return {
-            buttonText: "Submit",
-            password: "",
-            confirmPassword: "",
-            passwordError: "",
-        };
-    },
-    methods: {
-        handleSubmit() {
+const props = defineProps<{
+    token: string
+}>();
 
-            if (this.password !== this.confirmPassword) {
-                this.passwordError = "Passwords do not match";
-                this.buttonText = "Submit";
-                return;
-            }
-            if (this.password.length < 8) {
-                this.passwordError = "Passwords must be at least 8 characters long";
-                this.buttonText = "Submit";
-                return;
-            }
-            this.passwordError = "";
-            this.buttonText = "Loading...";
-            axios.post("api/reset-password", {
-                token: this.token,
-                new_password: this.password,
-            })
-                .then((response) => {
-                    if (response.status === 200) {
-                        this.buttonText = "Reset Successful";
-                        setTimeout(() => {
-                            this.$router.push('/login');
-                        }, 2000);
-                    }
-                })
-                .catch(() => {
-                    this.buttonText = "Reset Failed";
-                    this.passwordError = "An error occurred. Please try again.";
-                });
-        }
+const router = useRouter();
+const buttonText = ref("Submit");
+const password = ref("");
+const confirmPassword = ref("");
+const passwordError = ref("");
+const loggingIn = ref(false);
+const loggedIn = ref(false);
+
+const handleSubmit = () => {
+    if (password.value !== confirmPassword.value) {
+        passwordError.value = "Passwords do not match";
+        buttonText.value = "Submit";
+        return;
     }
+    
+    if (password.value.length < 8) {
+        passwordError.value = "Passwords must be at least 8 characters long";
+        buttonText.value = "Submit";
+        return;
+    }
+    
+    passwordError.value = "";
+    buttonText.value = "Loading...";
+    
+    axios.post("api/reset-password", {
+        token: props.token,
+        new_password: password.value,
+    })
+    .then((response) => {
+        if (response.status === 200) {
+            buttonText.value = "Reset Successful";
+            setTimeout(() => {
+                router.push('/login');
+            }, 2000);
+        }
+    })
+    .catch(() => {
+        buttonText.value = "Reset Failed";
+        passwordError.value = "An error occurred. Please try again.";
+    });
 };
 </script>
 
 <style scoped>
-/* Add this for the error message styling */
+/* Styles remain unchanged */
 .error-message {
     color: #ff6b6b;
     font-size: 0.9em;
@@ -110,13 +113,10 @@ form {
     display: flex;
     flex-direction: column;
     align-items: center;
-    /* Change from flex-start to center */
     max-width: 300px;
     width: 100%;
     margin-bottom: 16px;
-    /* Re-add this for spacing between fields */
     margin-left: auto;
-    /* Keep these for horizontal centering */
     margin-right: auto;
 }
 
@@ -124,7 +124,6 @@ form {
     font-size: 0.9em;
     color: var(--text-color);
     align-self: flex-start;
-    /* This keeps labels aligned to the left */
 }
 
 .form-field input[type="text"],
@@ -148,7 +147,6 @@ form {
     padding-bottom: 10px;
 }
 
-/* Add an underline effect */
 .reset-header::after {
     content: '';
     position: absolute;
@@ -165,9 +163,7 @@ form {
     background-color: var(--background-color-1t);
     display: flex;
     justify-content: center;
-    /* Horizontal center */
     align-items: center;
-    /* Vertical center */
     flex-direction: column;
     padding: 10px;
     border-radius: 8px;

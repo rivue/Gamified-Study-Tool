@@ -10,7 +10,6 @@
             <div class="features-container1">
                 <FeaturesComponent />
             </div>
-            <!-- <FeatureGrid /> -->
             <div class="cta-container" @click="redirectLogin">
                 <CtaButton />
             </div>
@@ -28,8 +27,6 @@
                     </div>
                 </div>
             </div>
-            <!-- Add this section before the OpenAI logo -->
-            <!-- COME BACK HERE TO CHANGE IMAGE SIZEVVV-->
             <div class="social-links-container">
                 <h3>Connect With Us</h3>
                 <div class="social-links">
@@ -44,7 +41,6 @@
                     </a>
                 </div>
             </div>
-            <!-- COME BACK HERE ^^^-->
             <img :src="openaiPath" alt="Powered by OpenAI" class="openai" />
             <div class="faq-container">
                 <FaqComponent />
@@ -53,125 +49,104 @@
     </div>
 </template>
 
-<script>
+<script setup lang="ts">
+import { ref, computed, onMounted } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import { usePopupStore } from "@/store/popupStore";
 import { useThemeStore } from "@/store/themeStore";
 import { useAuthStore } from "@/store/authStore";
 import CtaButton from "./LandingPageComponents/CtaButton.vue";
 import FaqComponent from "./LandingPageComponents/FaqComponent.vue";
-// import FeatureGrid from "./LandingPageComponents/FeatureGrid.vue";
-// import SharedContent from "./LandingPageComponents/SharedContent.vue";
 import FeaturesComponent from "./LandingPageComponents/FeaturesComponent.vue";
 
-export default {
-    name: "HomePage",
-    components: {
-        CtaButton,
-        FaqComponent,
-        // SharedContent,
-        // FeatureGrid,
-        FeaturesComponent,
-    },
-    data() {
-        return {
-            items: ["Have Fun", "Discover", "Level Up"],
-            content: [
-                ["Your personal learning journey.", "<b>You</b> decide what to learn. Choose any topic you can describe in a few words. Or let our tutor suggest based on your goals and interests."],
-                ["Learn anything, challenge yourself.", "Embark on a personalized learning adventure with interactive lessons and fun quizzes."],
-                ["Stats, graphs, streaks...", "Seeing progress gives us the rewarding feeling hard work deserves. Track your gains with graphs and stats."]
-            ],
-            activeIndex: null,
-            popupMessage: "",
-        };
-    },
-    created() {
-        const messageCode = this.$route.query.message;
-        this.handleMessageCode(messageCode);
-    },
-    computed: {
-        openaiPath() {
-            const themeStore = useThemeStore();
-            return themeStore.darkMode
-                ? require("@/assets/images/powered-by-openai-badge-outlined-on-light.svg")
-                : require("@/assets/images/powered-by-openai-badge-outlined-on-dark.svg");
-        },
-    },
-    methods: {
-        handleMessageCode(code) {
-            const messages = {
-                expired_registration_token:
-                    "This registration token was expired. A new one has been sent to your email.",
-                invalid_registration_token:
-                    "The registration token you provided is invalid. Please check your email for the correct link or contact support.",
-            };
-            this.popupMessage = messages[code] || "";
-            if (this.popupMessage != "") {
-                const popupStore = usePopupStore();
-                popupStore.showPopup(this.popupMessage);
-            }
-        },
-        redirectLogin() {
-            const authStore = useAuthStore();
-            if (authStore.loggedIn) {
-                this.$router.push("/library");
-            }
-            else {
-                this.$router.push("/login");
-            }
-        },
-        toggleDropdown(index) {
-            if (this.activeDropdown === index) {
-                this.activeDropdown = null;
-                this.activeIndex = null;
-            } else {
-                this.activeDropdown = index;
-                this.activeIndex = index;
-            }
-        },
-        observeFeatures() {
-            const observer = new IntersectionObserver(
-                (entries) => {
-                    entries.forEach((entry) => {
-                        if (entry.isIntersecting) {
-                            entry.target.classList.add("visible");
-                            observer.unobserve(entry.target);
-                        }
-                    });
-                },
-                {
-                    threshold: 1,
-                }
-            );
+// Component name is automatically inferred from the filename when using <script setup>
 
-            const features = document.querySelectorAll(".feature");
-            features.forEach((feature) => observer.observe(feature));
-        },
-        // observeStatInfos() {
-        //   const observer = new IntersectionObserver(
-        //     (entries, observer) => {
-        //       entries.forEach((entry) => {
-        //         if (entry.isIntersecting) {
-        //           entry.target.classList.add("visible");
-        //           observer.unobserve(entry.target);
-        //         }
-        //       });
-        //     },
-        //     {
-        //       threshold: 1,
-        //     }
-        //   );
+// Data properties
+const items = ref(["Have Fun", "Discover", "Level Up"]);
+const content = ref([
+    ["Your personal learning journey.", "<b>You</b> decide what to learn. Choose any topic you can describe in a few words. Or let our tutor suggest based on your goals and interests."],
+    ["Learn anything, challenge yourself.", "Embark on a personalized learning adventure with interactive lessons and fun quizzes."],
+    ["Stats, graphs, streaks...", "Seeing progress gives us the rewarding feeling hard work deserves. Track your gains with graphs and stats."]
+]);
+const activeIndex = ref<number | null>(null);
+const activeDropdown = ref<number | null>(null);
+const popupMessage = ref("");
 
-        //   const stats = document.querySelectorAll(".stat-info");
-        //   stats.forEach((stat) => {
-        //     observer.observe(stat);
-        //   });
-        // },
-    },
-    mounted() {
-        // this.observeStatInfos();
-        this.observeFeatures();
-    },
+// Route and router
+const route = useRoute();
+const router = useRouter();
+
+// Store instances
+const themeStore = useThemeStore();
+const authStore = useAuthStore();
+const popupStore = usePopupStore();
+
+// Computed property
+const openaiPath = computed(() => {
+    return themeStore.darkMode
+        ? require("@/assets/images/powered-by-openai-badge-outlined-on-light.svg")
+        : require("@/assets/images/powered-by-openai-badge-outlined-on-dark.svg");
+});
+
+// Methods
+const handleMessageCode = (code: string | null) => {
+    const messages: Record<string, string> = {
+        expired_registration_token:
+            "This registration token was expired. A new one has been sent to your email.",
+        invalid_registration_token:
+            "The registration token you provided is invalid. Please check your email for the correct link or contact support.",
+    };
+    popupMessage.value = code && messages[code] ? messages[code] : "";
+    if (popupMessage.value !== "") {
+        popupStore.showPopup(popupMessage.value);
+    }
 };
+
+const redirectLogin = () => {
+    if (authStore.loggedIn) {
+        router.push("/library");
+    } else {
+        router.push("/login");
+    }
+};
+
+const toggleDropdown = (index: number) => {
+    if (activeDropdown.value === index) {
+        activeDropdown.value = null;
+        activeIndex.value = null;
+    } else {
+        activeDropdown.value = index;
+        activeIndex.value = index;
+    }
+};
+
+const observeFeatures = () => {
+    const observer = new IntersectionObserver(
+        (entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add("visible");
+                    observer.unobserve(entry.target);
+                }
+            });
+        },
+        {
+            threshold: 1,
+        }
+    );
+
+    const features = document.querySelectorAll(".feature");
+    features.forEach((feature) => observer.observe(feature));
+};
+
+// Lifecycle hooks
+// Created lifecycle hook equivalent
+handleMessageCode(route.query.message as string | null);
+
+// Mounted lifecycle hook
+onMounted(() => {
+    observeFeatures();
+});
 </script>
 
 <style scoped>

@@ -31,7 +31,7 @@ def init_feedback_routes(app):
             return jsonify({"error": "Invalid lesson or challenge id."}), 400
         
         dbh.add_feedback(current_user.id, userInput, lesson_id, challenge_id, rating)
-        return jsonify({"message": "Feedback submitted successfully."}), 201
+        return jsonify({"message": "Feedback submitted successfully."}), 200
     
     @app.route("/api/share", methods=["POST"])
     @login_required

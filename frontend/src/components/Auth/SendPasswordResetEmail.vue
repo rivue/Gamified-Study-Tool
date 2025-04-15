@@ -1,11 +1,10 @@
 <!-- TODO: fix weird vue warn messages that come up when someone types -->
 <template>
     <div class="inspirational-quote">
-        Even the best magicians lose their wands sometimes. Let’s conjure up a little magic to get you back on stage!
+        Even the best magicians lose their wands sometimes. Let's conjure up a little magic to get you back on stage!
     </div>
     <form @submit.prevent="handleSubmit">
         <div class="form-field">
-
             <label for="email">Email:</label>
             <input type="text" id="email" name="email" v-model="email" autocomplete="email" required />
         </div>
@@ -19,37 +18,30 @@
     </form>
 </template>
 
-<script>
-
+<script setup lang="ts">
+import { ref } from 'vue';
 import axios from 'axios';
 
-export default {
-    data() {
-        return {
-            email: "",
-            completed: false,
-            buttonText: "Send Reset Link",
-        };
-    },
-    methods: {
-        handleSubmit() {
-            this.buttonText = "Loading...";
-            this.completed = true;
+const email = ref('');
+const completed = ref(false);
+const buttonText = ref('Send Reset Link');
 
-            axios.post("api/send-reset-link", { email: this.email })
-                .then((response) => {
-                    if (response.status === 200) {
-                        this.buttonText = "Reset Link Sent";
-                        setTimeout(() => {
-                            this.buttonText = "Send Reset Link";
-                        }, 3000);
-                    } 
-                })
-                .catch(() => {
-                    this.buttonText = "Send Reset Link";
-                });
-        },
-    },
+const handleSubmit = () => {
+    buttonText.value = 'Loading...';
+    completed.value = true;
+
+    axios.post('api/send-reset-link', { email: email.value })
+        .then((response) => {
+            if (response.status === 200) {
+                buttonText.value = 'Reset Link Sent';
+                setTimeout(() => {
+                    buttonText.value = 'Send Reset Link';
+                }, 3000);
+            }
+        })
+        .catch(() => {
+            buttonText.value = 'Send Reset Link';
+        });
 };
 </script>
 
@@ -113,5 +105,4 @@ form {
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
     transition: all 0.3s ease;
 }
-
 </style>

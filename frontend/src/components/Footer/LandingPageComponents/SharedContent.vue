@@ -1,90 +1,88 @@
 <template>
-<div class="preview-box">
-  <div class="preview-container" v-if="loaded">
-    <div
-      class="content-button-container"
-      v-for="lesson in extendedLessons"
-      :key="lesson.id"
-    >
-      <ContentButton
-        :showType="false"
-        :content="lesson.lesson_name"
-        :role="'lesson/' + lesson.id"
-        content_type="lesson"
-        @navigate="handleNavigation('/lesson/' + lesson.id)"
-      />
+    <div class="preview-box">
+      <div class="preview-container" v-if="loaded">
+        <div
+          class="content-button-container"
+          v-for="lesson in extendedLessons"
+          :key="lesson.id"
+        >
+          <ContentButton
+            :showType="false"
+            :content="lesson.lesson_name"
+            :role="'lesson/' + lesson.id"
+            content_type="lesson"
+            @navigate="() => handleNavigation(`/lesson/${lesson.id}`)"
+          />
+        </div>
+      </div>
     </div>
-  </div></div>
-</template>
-
-<script>
-import axios from "axios";
-import { usePopupStore } from "@/store/popupStore";
-import ContentButton from "@/components/Chat/ContentButton.vue";
-
-export default {
-  name: "SharedContent",
-  components: {
-    ContentButton,
-  },
-  data() {
-    return {
-      lessons: [],
-      loaded: false,
-    };
-  },
-  created() {
-    this.fetchPublicContent();
-  },
-  computed: {
-    extendedLessons() {
-      return [...this.lessons, ...this.lessons, ...this.lessons];
+  </template>
+  
+  <script setup lang="ts">
+  import { ref, computed, onMounted } from "vue";
+  import { useRouter } from "vue-router";
+  import axios from "axios";
+  import { usePopupStore } from "@/store/popupStore";
+  import ContentButton from "@/components/Chat/ContentButton.vue";
+  
+  interface Lesson {
+    id: number;
+    lesson_name: string;
+  }
+  
+  const lessons = ref<Lesson[]>([]);
+  const loaded = ref(false);
+  const router = useRouter();
+  const popupStore = usePopupStore();
+  
+  const extendedLessons = computed(() =>
+    [...lessons.value, ...lessons.value, ...lessons.value]
+  );
+  
+  const fetchPublicContent = async () => {
+    try {
+      const response = await axios.get("/api/public-content");
+      lessons.value = response.data.lessons;
+      loaded.value = true;
+    } catch (error) {
+      console.error("Error fetching public content:", error);
+      popupStore.showPopup("Failed to load public content.");
     }
-  },
-  methods: {
-    async fetchPublicContent() {
-      try {
-        const response = await axios.get("/api/public-content");
-        this.lessons = response.data.lessons;
-        this.loaded = true;
-      } catch (error) {
-        console.error("Error fetching public content:", error);
-        const popupStore = usePopupStore();
-        popupStore.showPopup(error);
-      }
-    },
-    handleNavigation(path) {
-      this.$router.push(path);
-    },
-  },
-};
-</script>
-
-<style scoped>
-.preview-box {
-  width: 100%;
-  max-width: 1024px;
-  overflow-x: hidden;
-}
-
-.preview-container {
-  width: 100%;
-  display: flex;
-  flex-direction: row;
-  animation: slideRightToLeft 60s linear infinite;
-}
-
-.content-button-container {
-  flex: 0 0 auto;
-  padding: 0 4px;
-}
-
-@keyframes slideRightToLeft {
-  0% {
-    transform: translateX(0%);
+  };
+  
+  const handleNavigation = (path: string) => {
+    router.push(path);
+  };
+  
+  onMounted(fetchPublicContent);
+  </script>
+  
+  <style scoped>
+  .preview-box {
+    width: 100%;
+    max-width: 1024px;
+    overflow-x: hidden;
   }
-  100% {
-    transform: translateX(-100%);
+  
+  .preview-container {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    animation: slideRightToLeft 60s linear infinite;
   }
-}
-</style>
+  
+  .content-button-container {
+    flex: 0 0 auto;
+    padding: 0 4px;
+  }
+  
+  @keyframes slideRightToLeft {
+    0% {
+      transform: translateX(0%);
+    }
+    100% {
+      transform: translateX(-100%);
+    }
+  }
+  </style>
+  

@@ -7,6 +7,13 @@ import { usePopupStore } from "@/store/popupStore";
 import { useAdsStore } from "@/store/adsStore";
 import { useAuthStore } from "@/store/authStore";
 
+type ConversationData = {
+    messages: any; // Replace `any` with the actual type of `messages`
+    actions: any; // Replace `any` with the actual type of `actions`
+    subheading: string; // Optional property
+    progress?: string | number; // Optional property, can be a string or number
+};
+
 export const useMessageStore = defineStore('messageStore', {
     state: () => ({
         messages: [],
@@ -16,20 +23,21 @@ export const useMessageStore = defineStore('messageStore', {
         sending: false,
     }),
     actions: {
-        async updateConversation(data) {
+        async updateConversation(data: ConversationData) {
             this.messages = data.messages;
             this.actions = data.actions;
             if ("subheading" in data) {
                 this.subheading = data.subheading;
 
                 if ("progress" in data) {
-                    this.progress = parseFloat(data.progress) || 0; 
+                    this.progress = parseFloat(data.progress as string) || 0; 
                 }
             }
         },
-        async fetchRecentMessages(currentPath) {
+        async fetchRecentMessages(currentPath: string) {
+            const params: { lesson_id?: string; challenge_id?: string } = {};
+
             let apiEndpoint = "/api/chat";
-            const params = {};
 
             const isLesson = currentPath.includes("/lesson/");
             const isChallenge = currentPath.includes("/challenge/");
@@ -40,7 +48,7 @@ export const useMessageStore = defineStore('messageStore', {
                 params.challenge_id = currentPath.split("/").pop();
             }
             axios
-                .get(apiEndpoint, { params })
+                .get<ConversationData>(apiEndpoint, { params })
                 .then((response) => {
                     this.updateConversation(response.data);
                 })
@@ -52,11 +60,11 @@ export const useMessageStore = defineStore('messageStore', {
                     }
                 });
         },
-        async sendMessage(message, currentPath) {
+        async sendMessage(message: string, currentPath: string) {
             if (this.sending) return "not sent";
 
             // Sanitize input
-            const sanitizeInput = (input) => {
+            const sanitizeInput = (input: string) => {
                 const div = document.createElement("div");
                 div.textContent = input;
                 return div.innerHTML;
@@ -91,9 +99,9 @@ export const useMessageStore = defineStore('messageStore', {
             formData.append("message", sanitizedMessage);
 
             if (isLesson) {
-                formData.append("lesson_id", currentPath.split("/").pop());
+                formData.append("lesson_id", currentPath.split("/").pop() || "");
             } else if (isChallenge) {
-                formData.append("challenge_id", currentPath.split("/").pop());
+                formData.append("challenge_id", currentPath.split("/").pop() || "");
             }
 
             try {
@@ -114,13 +122,17 @@ export const useMessageStore = defineStore('messageStore', {
             } catch (error) {
                 const popupStore = usePopupStore();
                 let errorMessage = "Error sending message: ";
-                if (error.response) {
+            
+                if (axios.isAxiosError(error) && error.response) {
                     errorMessage += error.response.data?.error || `Server responded with status code ${error.response.status}`;
-                } else if (error.request) {
+                } else if (axios.isAxiosError(error) && error.request) {
                     errorMessage += "No response received from server. Please check your network connection.";
-                } else {
+                } else if (error instanceof Error) {
                     errorMessage += error.message;
+                } else {
+                    errorMessage += "An unknown error occurred.";
                 }
+            
                 popupStore.showPopup(errorMessage);
             } finally {
                 adStore.loaded();

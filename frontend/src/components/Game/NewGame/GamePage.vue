@@ -6,7 +6,7 @@
     </div>
 </template>
 
-<script>
+<script setup lang="ts">
 
 import { useGameStore } from "@/store/gameStore";
 
@@ -15,23 +15,14 @@ import LibraryCompletion from './LibraryCompletion.vue';
 import GameToolbar from './GameToolbar.vue';
 import { onBeforeRouteLeave } from "vue-router";
 
-export default
-    {
-        name: "GamePage",
-        components: { GameWindow, LibraryCompletion, GameToolbar },
+const gameStore = useGameStore();
 
+onBeforeRouteLeave((to, from, next) => {
+    console.log("successfully unmounted");
+    gameStore.resetGameState();
+    next();
+});
 
-        setup() {
-            const gameStore = useGameStore();
-
-            onBeforeRouteLeave((to, from, next) => {
-                console.log("successfully unmounted");
-                gameStore.resetGameState();
-                next();
-            });
-
-        },
-    };
 </script>
 
 <style scoped>

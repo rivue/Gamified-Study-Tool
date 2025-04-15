@@ -1,12 +1,13 @@
 // adminStore.js
 import { defineStore } from 'pinia';
 import axios from 'axios';
+import { AxiosError } from 'axios'
 
 export const useAdminStore = defineStore('admin', {
   state: () => ({
     feedback: [],
     userEmails: [],
-    error: null,
+    error: null as AxiosError | unknown | null,
   }),
   actions: {
     async fetchFeedback() {
@@ -14,7 +15,9 @@ export const useAdminStore = defineStore('admin', {
         const response = await axios.get('/api/admin/feedback');
         this.feedback = response.data;
       } catch (error) {
-        this.error = error;
+        if (axios.isAxiosError(error)) {
+            this.error = error;
+        }
       }
     },
     async fetchUserEmails() {

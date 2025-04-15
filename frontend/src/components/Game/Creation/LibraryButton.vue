@@ -8,21 +8,17 @@
   </button>
 </template>
 
-<script>
-export default {
-  name: "LibraryButton",
-  props: {
-    library: {
-      type: Object,
-      required: true,
-    },
-  },
-  methods: {
-    goToLibrary() {
-      this.$router.push(`/lessons/${this.library.id}`);
-    },
-  },
-};
+<script setup lang="ts">
+import { useRouter } from "vue-router";
+
+const props = defineProps<{
+    library: { id: number, library_topic: string, image_url: string };
+}>();
+
+const router = useRouter()
+function goToLibrary() {
+  router.push(`/lessons/${props.library.id}`);
+}
 </script>
 
 <style scoped>

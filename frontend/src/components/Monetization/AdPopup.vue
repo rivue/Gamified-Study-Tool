@@ -32,38 +32,35 @@
   </transition>
 </template>
 
-<script>
+<script setup lang="ts">
 import { useAdsStore } from "@/store/adsStore";
 import { ref, computed, onMounted, onUnmounted } from "vue";
 
-export default {
-  name: "AdPopup",
-  setup() {
     const ads = useAdsStore();
-    const messages = ref([
+    const messages = ref<string[]>([
       '<a href="/plan" target="_blank">Paid plans</a> use the most accurate and powerful AI models available.',
       'Complete at least one lesson daily to keep a streak!',
       "Generating lessons and quizzes takes about 2-3× longer than regular replies. Thank you for your patience.",
       'Your ad could appear here.. <a href="/contact" target="_blank">get in touch.</a>',
       'Grow personally and professionally by making learning a fun part of your daily life.',
       'Would you recommend us to a friend? <br><a href="/contact" target="_blank">What could we do to make that happen?</a>',
-      'Join our community on <a target="_blank" href="https://twitter.com/AscendanceCloud">𝕏</a> and <a target="_blank" href="https://discord.gg/SSGygda5DX">Discord</a> to stay up-to-date with the latest features.',
+      'Join our community on <a target="_blank" href="https://twitter.com/AscendanceCloud">𝕏</a> and <a target="_blank" href="https://discord.gg/33yAcp2qDf">Discord</a> to stay up-to-date with the latest features.',
       'Please consider <a target="_blank" href="https://donate.stripe.com/fZe8Ao9hl63qe9GeUX">donating</a> to help this app grow faster!',
     ]);
     const specialMessage = messages.value.splice(1, 1)[0];
     messages.value.sort(() => Math.random() - 0.5);
     messages.value.splice(1, 0, specialMessage);
 
-    let messageIndex = ref(0);
+    let messageIndex = ref<number>(0);
     const randomMessage = computed(() => messages.value[messageIndex.value]);
 
     const changeMessage = () => {
       messageIndex.value = (messageIndex.value + 1) % messages.value.length;
     };
 
-    let messageInterval;
+    let messageInterval: ReturnType<typeof setInterval>;
 
-    const handleKeyPress = (event) => {
+    const handleKeyPress = (event: KeyboardEvent) => {
       if (event.key === "Enter" && !ads.isLoading) {
         handleResponseClick();
       }
@@ -83,13 +80,6 @@ export default {
       window.removeEventListener("keydown", handleKeyPress);
     });
 
-    return {
-      ads,
-      randomMessage,
-      handleResponseClick,
-    };
-  },
-};
 </script>
 
 <style>

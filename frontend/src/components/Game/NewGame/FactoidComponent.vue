@@ -1,87 +1,79 @@
 <!-- Factoid.vue -->
 <template>
-  <div v-if="factoidVisible != null && factoidText" class="factoid-overlay" @click="flipFactoid">
-  <div class="factoid-box">
-    <div class="factoid-content">
-      <p v-html="factoidText"></p>
+    <div v-if="factoidVisible != null && factoidText" class="factoid-overlay" @click="flipFactoid">
+        <div class="factoid-box">
+            <div class="factoid-content">
+                <p v-html="factoidText"></p>
+            </div>
+        </div>
     </div>
-  </div>
-  </div>
 </template>
 
 
-<script>
+<script setup lang="ts">
+import { computed, watch, onMounted } from 'vue';
 import { useGameStore } from '@/store/gameStore';
-import { watch, onMounted } from 'vue';
 
-export default {
-  name: "FactoidComponent",
-  computed: {
-    factoidVisible() {
-      const store = useGameStore();
-      return store.factoidVisible;
-    },
-    factoidText() {
-      const store = useGameStore();
-      let content = store.factoids[store.factoidVisible]?.factoid_text || 'No factoid text'
-      // Bold
-      let regex;
-      regex = /\*\*([^*]*?)\*\*/g;
-      content = content.replace(regex, "<strong>$1</strong>");
+const gameStore = useGameStore();
 
-      // Italics
-      regex = /_([^_]*?)_|\*([^*]*?)\*/g;
-      content = content.replace(regex, "<em>$1$2</em>");
-      return content;
+const factoidVisible = computed(() => gameStore.factoidVisible);
+
+const factoidText = computed(() => {
+    
+    if (!gameStore.factoidVisible) {
+        return null;
     }
-  },
-  methods: {
-    flipFactoid () {
-      const store = useGameStore();
-      store.toggleFactoid();
-    }
-  },
-  setup() {
-    const store = useGameStore();
-    onMounted(() => {
-      watch(() => store.factoidVisible, () => {
-      }, { immediate: true });
-    });
-  }
+
+    let raw = gameStore.factoids[gameStore.factoidVisible]?.factoid_text || 'No factoid text'
+    // Bold
+    let formatted  = raw.replace(/\*\*([^*]*?)\*\*/g, "<strong>$1</strong>");
+
+    // Italics
+    formatted = formatted.replace(/_([^_]*?)_|\*([^*]*?)\*/g, "<em>$1$2</em>");
+    return formatted;
+});
+
+function flipFactoid() {
+    gameStore.toggleFactoid();
 }
+
+onMounted(() => {
+    watch(() => gameStore.factoidVisible, () => {
+    }, { immediate: true });
+});
 </script>
 
 <style scoped>
 .factoid-overlay {
-  position: absolute;
-  height: 82%;
-  aspect-ratio: 1 / 1;
-  max-width: 100%;
-  z-index: 110;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
+    position: absolute;
+    height: 82%;
+    aspect-ratio: 1 / 1;
+    max-width: 100%;
+    z-index: 110;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
 }
 
-.factoid-box{
-  position: absolute;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 96%;
+.factoid-box {
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 96%;
 }
 
 .factoid-content {
-  position: absolute;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: left;
-  padding: 1em;
-  z-index: 111;
-  font-size: 1.2em;
-  background-color: var(--background-haze);
-  box-shadow: 0 16px 16px var(--background-color-2t), 0 -16px 16px var(--background-color-2t); 
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: left;
+    padding: 1em;
+    z-index: 111;
+    font-size: 1.2em;
+    background-color: var(--background-haze);
+    box-shadow: 0 16px 16px var(--background-color-2t), 0 -16px 16px var(--background-color-2t);
 }
 </style>

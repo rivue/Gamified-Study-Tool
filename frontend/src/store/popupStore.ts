@@ -1,7 +1,7 @@
-// store/popupStore.js
+// store/popupStore.ts
 import { defineStore } from 'pinia'
 
-export const usePopupStore = defineStore('popup', {
+export const usePopupStore = defineStore('popupStore', {
   // state
   state: () => ({
     isVisible: false,
@@ -9,7 +9,7 @@ export const usePopupStore = defineStore('popup', {
   }),
   // actions
   actions: {
-    showPopup(message) {
+    showPopup(message: string) {
       this.isVisible = true
       this.message = message
     },

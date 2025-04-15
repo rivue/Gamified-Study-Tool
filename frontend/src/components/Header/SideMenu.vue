@@ -76,53 +76,33 @@
 </template>
 
 
-<script>
+<script setup lang="ts">
 import SideMenuButton from "@/components/Menus/SideMenuButton.vue";
 import { useMenuStore } from "@/store/menuStore";
 import { useAuthStore } from "@/store/authStore";
+import { useRouter, useRoute } from "vue-router";
+import { computed } from "vue";
 
-export default {
-  name: "SideMenu",
-  components: {
-    SideMenuButton,
-  },
-  computed: {
-    sideMenuOpen() {
-      const menuStore = useMenuStore();
-      return menuStore.sideMenuOpen;
-    },
-    loggedIn() {
-      const authStore = useAuthStore();
-      return authStore.loggedIn;
-    },
-    isRouteActive() {
-      return (route, pattern = null) => {
-        // Special handling for root route to prevent it from matching all paths
-        if (route === "/" && this.$route.path !== "/") {
-          return false;
-        }
-        if (pattern) {
-          const regex = new RegExp(pattern);
-          if (regex.test(this.$route.path)) {
-            return true;
-          }
-        }
-        return this.$route.path === route;
-      };
-    },
-  },
-  methods: {
-    openRoute(route) {
-      this.$router.push(route);
-      this.hideMenu();
-    },
-    hideMenu() {
-      const menuStore = useMenuStore();
-      menuStore.hideSideMenu();
-    },
-  },
-};
+const menuStore = useMenuStore();
+const authStore = useAuthStore();
+const router = useRouter();
+const route = useRoute();
+
+const sideMenuOpen = computed(() => menuStore.sideMenuOpen);
+const loggedIn = computed(() => authStore.loggedIn);
+
+function isRouteActive(target: string, pattern: string | null = null): boolean {
+  if (target === "/" && route.path !== "/") return false;
+  if (pattern && new RegExp(pattern).test(route.path)) return true;
+  return route.path === target;
+}
+
+function openRoute(target: string) {
+  router.push(target);
+  menuStore.hideSideMenu();
+}
 </script>
+
   
 <style scoped>
 .side-menu {

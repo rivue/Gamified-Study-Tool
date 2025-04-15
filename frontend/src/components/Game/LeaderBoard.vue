@@ -69,86 +69,78 @@
     </div>
   </div>
 </template>
+<script setup lang="ts">
+import { ref, computed, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
+import axios from 'axios';
 
-<script>
-import axios from "axios";
+const route = useRoute();
+const scores = ref<any[] | null>(null);
+const libraryId = ref<number | null>(null);
+const originalLibraryId = ref<number | null>(null);
+const currentURL = ref(window.location.href);
+const copySuccessMessageVisible = ref(false);
 
-export default {
-  name: "LeaderBoard",
-  data() {
-    return {
-      scores: null,
-      libraryId: null,
-      originalLibraryId: null,
-      currentURL: window.location.href,
-      copySuccessMessageVisible: false,
-    };
-  },
-  computed: {
-    isLibraryMode() {
-      return !!this.libraryId;
-    },
-  },
-  created() {
-    this.checkRoute();
-    this.fetchScores();
-  },
-  methods: {
-    checkRoute() {
-      // Check if route matches /lessons/:id
-      if (this.$route.params && this.$route.params.id) {
-        const id = parseInt(this.$route.params.id, 10);
-        if (!isNaN(id)) {
-          this.libraryId = id;
-          this.originalLibraryId = id;
-        }
-      }
-    },
-    async fetchScores() {
-      try {
-        let url = "/api/scores";
-        if (this.isLibraryMode) {
-          url = `/api/scores/library/${this.libraryId}`;
-        }
-        const response = await axios.get(url);
-        this.scores = response.data.slice(0, 5); // Ensure only top 5 are shown
-      } catch (error) {
-        this.scores = null;
-        console.error("Error fetching scores:", error);
-      }
-    },
-    copyShareLink() {
-      // Modern approach using the Clipboard API
-      navigator.clipboard
-        .writeText(this.currentURL)
-        .then(() => {
-          this.copySuccessMessageVisible = true;
-          setTimeout(() => {
-            this.copySuccessMessageVisible = false;
-          }, 1500);
-        })
-        .catch((err) => {
-          console.error("Failed to copy text: ", err);
-        });
-    },
-    toggleMode() {
-      if (this.isLibraryMode) {
-        // Switch to global mode
-        this.libraryId = null;
-      } else {
-        // Switch back to library mode if we had one before
-        if (this.originalLibraryId) {
-          this.libraryId = this.originalLibraryId;
-        } else {
-          // If no original libraryId found, remain in global mode
-          return;
-        }
-      }
-      this.fetchScores();
-    },
-  },
-};
+const isLibraryMode = computed(() => !!libraryId.value);
+
+function checkRoute() {
+  const idParam = route.params.id;
+  if (idParam && typeof idParam === 'string') {
+    const id = parseInt(idParam, 10);
+    if (!isNaN(id)) {
+      libraryId.value = id;
+      originalLibraryId.value = id;
+    }
+  }
+}
+
+async function fetchScores() {
+  try {
+    let url = '/api/scores';
+    if (isLibraryMode.value) {
+      url = `/api/scores/library/${libraryId.value}`;
+    }
+    const response = await axios.get(url);
+    scores.value = response.data.slice(0, 5);
+  } catch (error) {
+    scores.value = null;
+    console.error('Error fetching scores:', error);
+  }
+}
+
+function copyShareLink() {
+  navigator.clipboard
+    .writeText(currentURL.value)
+    .then(() => {
+      copySuccessMessageVisible.value = true;
+      setTimeout(() => {
+        copySuccessMessageVisible.value = false;
+      }, 1500);
+    })
+    .catch((err) => {
+      console.error('Failed to copy text: ', err);
+    });
+}
+
+function toggleMode() {
+  if (isLibraryMode.value) {
+    libraryId.value = null;
+  } else {
+    if (originalLibraryId.value) {
+      libraryId.value = originalLibraryId.value;
+    } else {
+      return;
+    }
+  }
+  fetchScores();
+}
+
+onMounted(() => {
+  checkRoute();
+  fetchScores();
+});
 </script>
+
 
 <style scoped>
 /* Fade transition for the "Copied!" text */
