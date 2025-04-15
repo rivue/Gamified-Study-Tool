@@ -6,7 +6,7 @@
         </div>
 
         <template v-else>
-            <LibraryCarousel v-if="loggedIn && browsingLibraries" title="My Courses" :libraries="myLibraries" />
+            <LibraryCarousel v-if="loggedIn && browsingLibraries" :libraries="myLibraries" />
         </template>
     </div>
 </template>
