@@ -1,4 +1,5 @@
 <template>
+    <h1>Login</h1>
     <div class="inspirational-quote">
         The stars in the universe are not just for us to see, but to remind us we can shine just as brightly. Let's continue your story.
     </div>

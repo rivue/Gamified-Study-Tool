@@ -1,4 +1,5 @@
 <template>
+    <h1>Signup</h1>
     <div class="inspirational-quote">
         Stars can't shine without darkness. Your brilliant journey begins here.
     </div>

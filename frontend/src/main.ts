@@ -86,6 +86,7 @@ import axios from 'axios';
         // { path: '/plan', component: defineAsyncComponent(() => import('./components/Monetization/PlanPage.vue')), meta: { title: 'Rivue.ai | Premium Plans' } },
         { path: '/login', component: defineAsyncComponent(() => import('./components/Auth/LoginSignupPopup.vue')), meta: { title: 'Rivue.ai | Login/Signup' } },
         // { path: '/admin', component: defineAsyncComponent(() => import('./components/Auth/AdminPage.vue')), meta: { title: 'Rivue.ai | Admin' } },
+        { path: '/verify', component: defineAsyncComponent(() => import('./components/Auth/VerifyEmail.vue')), meta: { title: 'Rivue.ai | Verify Email' }},
         { path: '/verify/:token', component: defineAsyncComponent(() => import('./components/Auth/VerifyEmail.vue')), meta: { title: 'Rivue.ai | Verify Email' }},
         { path: '/reset-password/:token', component: defineAsyncComponent(() => import('./components/Auth/PasswordResetForm.vue')), props: true, meta: { title: 'Rivue.ai | Password Reset' }},
         
@@ -129,7 +130,6 @@ router.beforeEach(async (to, from, next) => {
     //     const toRoomName = to.path.split('/')[3];
     //     gameStore.fetchLibraryDetails(toLibraryId, toRoomName);
     // }
-
     const publicPaths = [
         '/',
         '/changelog',
@@ -137,9 +137,21 @@ router.beforeEach(async (to, from, next) => {
         '/terms',
         '/contact',
         '/plan',
+        '/verify', // Explicitly add /verify as a public path
     ];
-    console.debug(to.path)
-    const requiresAuth = !publicPaths.includes(to.path) && !to.path.startsWith('/verify/') && !to.path.startsWith('/reset-password/');
+    console.debug(to.path);
+    
+    // Check if the path is a reset password path
+    const isResetPasswordPath = to.path.startsWith('/reset-password/');
+    
+    // Check if the path is /verify exactly (public) or starts with /verify/ (requires auth)
+    const isPublicVerifyPath = to.path === '/verify';
+    const isProtectedVerifyPath = to.path.startsWith('/verify/') && to.path !== '/verify';
+    
+    const requiresAuth = !publicPaths.includes(to.path) && 
+                         !isResetPasswordPath && 
+                         !(isPublicVerifyPath) && 
+                         (isProtectedVerifyPath || !to.path.startsWith('/verify'));
 
     if (to.meta.requiresCreator && to.params.id) {
         // Only proceed with this check if the user is logged in

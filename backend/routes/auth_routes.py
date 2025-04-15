@@ -56,7 +56,7 @@ def init_auth_routes(app):
 
     @app.route('/api/check-auth', methods=['GET'])
     def check_auth():
-        if current_user.is_authenticated and current_user.confirmed:
+        if current_user and current_user.is_authenticated and current_user.confirmed:
             return jsonify({'loggedIn': True, 'userTier': get_user_tier(current_user.id), 'requestCount': get_daily_request_count(current_user.id), 'userId': current_user.id})
         else:
             return jsonify({'loggedIn': False, 'userTier': None}), 400
@@ -121,7 +121,8 @@ def init_auth_routes(app):
             if os.getenv('FLASK_ENV') == 'production':
                 frontend_url = "https://rivue.ai"
             else:
-                frontend_url = "http://localhost:8080"
+                # frontend_url = "http://localhost:8080"
+                frontend_url = "https://rivue.ai"
             confirmation_link = f"{frontend_url}/verify/{new_user.confirmation_token}"
             send_email(email, Registration, confirmation_link)
             return jsonify({})

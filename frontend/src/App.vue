@@ -6,7 +6,7 @@
     <div class="app-container" :class="themeClass">
         <div v-if="!hideHeaderFooter">
             <TopBar />
-            <SubHeader v-if="loggedIn & shouldShowChat & subheaderExists" :key="forceUpdateKey" />
+            <SubHeader v-if="loggedIn && shouldShowChat && subheaderExists" :key="forceUpdateKey" />
             <SideMenu />
             <MentorSelection />
         </div>
@@ -20,7 +20,7 @@
                 <AdPopup />
             </div>
         </div>
-        <BottomBar v-if="( !loggedIn | !shouldShowChat) && !hideHeaderFooter" />
+        <BottomBar v-if="( !loggedIn || !shouldShowChat) && !hideHeaderFooter" />
     </div>
 </template>
 

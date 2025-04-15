@@ -23,6 +23,9 @@
                         <button class="toggle-btn" @click="toggleForms('signup')">
                             Don't have an account? <span class="underline-text">Sign up</span>
                         </button>
+                        <button class="toggle-btn" @click="toEmailVerificationScreen()">
+                            Email not verified? <span class="underline-text">Send me a new email</span>
+                        </button>
                     </div>
                 </div>
             </transition>
@@ -71,6 +74,9 @@ const handleLoginSuccess = () => {
     authStore.login();
     const redirectPath = route.query.redirect?.toString() || "/";
     router.push(redirectPath);
+};
+const toEmailVerificationScreen = () => {
+    router.push("/verify");
 };
 
 const handleSignupSuccess = () => {

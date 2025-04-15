@@ -1,5 +1,6 @@
 <!-- TODO: fix weird vue warn messages that come up when someone types -->
 <template>
+    <h1>Password Reset</h1>
     <div class="inspirational-quote">
         Even the best magicians lose their wands sometimes. Let's conjure up a little magic to get you back on stage!
     </div>
