@@ -172,8 +172,27 @@ class Library(db.Model):
 
     room_names = db.Column(MutableList.as_mutable(JSON), nullable=False)
     image_url = db.Column(db.String(200), nullable=False, default=DEFAULT_IMAGE_URL)
+    
+    units = db.relationship('LibraryUnit', backref='library', cascade="all, delete-orphan", lazy=True)
 
     factoids = db.relationship('LibraryFactoid', backref='library')
+
+class LibraryUnit(db.Model):
+    __tablename__ = "library_unit"
+    id = db.Column(db.Integer, primary_key=True)
+    library_id = db.Column(db.Integer, db.ForeignKey('library.id'), nullable=False)
+    unit_name = db.Column(db.String(200), nullable=False)
+    
+    sections = db.relationship('LibrarySection', backref='unit', cascade="all, delete-orphan", lazy=True)
+
+class LibrarySection(db.Model):
+    __tablename__ = "library_section"
+    id = db.Column(db.Integer, primary_key=True)
+    unit_id = db.Column(db.Integer, db.ForeignKey('library_unit.id'), nullable=False)
+    section_name = db.Column(db.String(200), nullable=False)
+    
+    # Link factoids to a section
+    factoids = db.relationship('LibraryFactoid', backref='section', cascade="all, delete-orphan", lazy=True)
 
 class LibraryRoomState(db.Model): # maps users to states of rooms they are in
     id = db.Column(db.Integer, primary_key=True)
@@ -210,6 +229,7 @@ class LibraryFactoid(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     library_id = db.Column(db.Integer, db.ForeignKey('library.id'), nullable=False)
     room_name = db.Column(db.String(200), nullable=False)
+    section_id = db.Column(db.Integer, db.ForeignKey('library_section.id'), nullable=True)
     lesson_name = db.Column(db.String(200), nullable=False)
     factoid_content = db.Column(db.Text, nullable=False)
 
