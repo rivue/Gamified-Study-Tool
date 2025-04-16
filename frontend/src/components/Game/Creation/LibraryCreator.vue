@@ -23,14 +23,14 @@
                         <div v-if="topicSpaceError" class="error-message">
                             Topic must not start or end with a space.
                         </div>
-                    </div> 
+                    </div>
                 </div>
- 
- 
+
+
                 <div class="libgen-section">
                     <div class="libgen-section">
- 
- 
+
+
                         <!-- File Upload Section -->
                         <div class="form-group file-upload">
                             <div class="libgen-title">Upload File</div>
@@ -47,8 +47,8 @@
                             </div>
                         </div>
                     </div>
- 
- 
+
+
                     <!-- Room Names Section with Groups -->
                     <div class="form-group room-names">
                         <div class="libgen-title">
@@ -57,7 +57,7 @@
                         <div class="room-input-container">
                             <!-- Group controls -->
                             <div class="group-controls">
-                                
+
                                 <div class="group-input-wrapper">
                                     <input type="text" v-model="newGroupName" placeholder="Enter unit/chapter name"
                                         :class="{ 'input-error': groupError || groupTypingError || groupSpaceError }"
@@ -75,7 +75,7 @@
                                         with a space.</div>
                                 </div>
                             </div>
- 
+
                             <!-- Groups list -->
                             <div class="groups-container">
                                 <div v-for="(group, groupIndex) in groups" :key="groupIndex" class="group-item">
@@ -86,7 +86,7 @@
                                             <button class="remove-btn" @click="removeGroup(groupIndex)">×</button>
                                         </div>
                                     </div>
- 
+
                                     <!-- Sections for this group -->
                                     <div class="group-sections">
                                         <div class="section-chips">
@@ -97,12 +97,12 @@
                                                     @click="removeSection(groupIndex, sectionIndex)">×</button>
                                             </div>
                                         </div>
- 
+
                                         <!-- Section input for this group -->
                                         <div class="section-input-wrapper">
                                             <input type="text" v-model="group.newSectionName"
                                                 placeholder="Enter section name"
-                                                :class="{ 'input-error': group.sectionError }" maxlength="40"
+                                                :class="{ 'input-error': groupSectionError }" maxlength="40"
                                                 :disabled="group.sections.length >= 15 || disableExtras"
                                                 @keyup.enter="addSection(groupIndex)" />
                                             <button class="add-btn" @click="addSection(groupIndex)"
@@ -110,11 +110,15 @@
                                                 Add Section
                                             </button>
                                         </div>
+                                        <div class="error-container">
+                                            <div v-if="groupSectionError" class="error-message">Please enter a section name.
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
- 
- 
+
+
                             <div class="helper-text">
                                 🐙 Structure your course with units/chapters and sections for better organization.
                             </div>
@@ -126,104 +130,99 @@
                             </div>
                         </div>
                     </div>
- 
- 
- 
- 
+
+
+
+
                 </div>
-                
-                
+
+
                 <!-- CTA Button -->
                 <div class="cta-container">
                     <CtaButton :buttonText="submitButtonText" @click="handleSubmit"
-                    :isSubmitting="buttonDisabled.isSubmitting || buttonDisabled.noRooms" />
+                        :isSubmitting="buttonDisabled.isSubmitting || buttonDisabled.noRooms" />
                 </div>
             </div>
             <library-browser />
         </div>
     </div>
- </template>
- 
- 
- <script setup lang="ts">
- import { ref, computed, onMounted, onUnmounted } from 'vue';
- import { useRoute, useRouter } from 'vue-router';
- import axios from "axios";
- import { storeToRefs } from "pinia";
- import {
+</template>
+
+
+<script setup lang="ts">
+import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import axios from "axios";
+import { storeToRefs } from "pinia";
+import {
     useTypingEffect,
- } from "@/scripts/placeholderTyping";
- 
- 
- import { useLibGenStore } from "@/store/libGenStore";
- import { usePopupStore } from "@/store/popupStore";
- import { useAuthStore } from "@/store/authStore";
- import CtaButton from "../../Footer/LandingPageComponents/CtaButton.vue";
- import LibraryBrowser from "./LibraryBrowser.vue";
- 
- 
- // New or modified data for groups
- interface Group {
+} from "@/scripts/placeholderTyping";
+
+
+import { useLibGenStore } from "@/store/libGenStore";
+import { usePopupStore } from "@/store/popupStore";
+import { useAuthStore } from "@/store/authStore";
+import CtaButton from "../../Footer/LandingPageComponents/CtaButton.vue";
+import LibraryBrowser from "./LibraryBrowser.vue";
+
+
+// New or modified data for groups
+interface Group {
     name: string;
     sections: string[];
     newSectionName: string;
     sectionError: boolean;
- }
- 
- 
- const route = useRoute();
- const router = useRouter();
- const libGenStore = useLibGenStore();
- const authStore = useAuthStore();
- const popupStore = usePopupStore();
- // New refs for groups
- const groups = ref<Group[]>([]);
- const newGroupName = ref("");
- const groupError = ref(false);
- const groupTypingError = ref(false);
- const groupSpaceError = ref(false);
- 
- 
- 
- 
- const { topics } = storeToRefs(libGenStore);
- 
- 
- const typingEffectStop = ref(() => { });
- const topic = ref("");
- const topicError = ref(false);
- const topicTypingError = ref(false);
- const topicSpaceError = ref(false);
- const roomError = ref(false);
- const roomTypingError = ref(false);
- const roomSpaceError = ref(false);
- const safeTopics = ref([
+}
+
+
+const route = useRoute();
+const router = useRouter();
+const libGenStore = useLibGenStore();
+const authStore = useAuthStore();
+const popupStore = usePopupStore();
+// New refs for groups
+const groups = ref<Group[]>([]);
+const newGroupName = ref("");
+const groupError = ref(false);
+const groupTypingError = ref(false);
+const groupSpaceError = ref(false);
+const groupSectionError = ref(false);
+
+const { topics } = storeToRefs(libGenStore);
+
+
+const typingEffectStop = ref(() => { });
+const topic = ref("");
+const topicError = ref(false);
+const topicTypingError = ref(false);
+const topicSpaceError = ref(false);
+const safeTopics = ref([
     "Engineering 101",
     "Materials Science",
     "Health and Fitness",
- ]);
- const libraryDifficulty = ref("Normal");
- const buttonDisabled = ref({
+]);
+const libraryDifficulty = ref("Normal");
+const buttonDisabled = ref({
     noRooms: true,
     isSubmitting: false,
- });
- const selectedFile = ref<File | null>(null);
- const topicInput = ref<HTMLInputElement | null>(null);
- const fileInput = ref<HTMLInputElement | null>(null);
- 
- 
- // Computed properties
- const computedTopics = computed(() => {
+});
+const selectedFile = ref<File | null>(null);
+const topicInput = ref<HTMLInputElement | null>(null);
+const fileInput = ref<HTMLInputElement | null>(null);
+
+
+// Computed properties
+const computedTopics = computed(() => {
     return topics.value.length > 0 ? topics.value : safeTopics.value;
- });
- 
- 
- const libgenRoute = computed(() => {
+});
+
+
+const libgenRoute = computed(() => {
     return route.path === "/library";
- });
- 
- 
- const submitButtonText = computed(() => {
+});
+
+
+const submitButtonText = computed(() => {
     if (buttonDisabled.value.isSubmitting) {
         return "Loading (~45s)";
     }
@@ -234,16 +233,15 @@
         return "Explore!";
     }
     // return isSubmitting ? isSubmitting.isEmpty ? "hi there" : "Loading (~45s)" : "Explore!";
- });
- 
- 
- const disableExtras = computed(() => {
+});
+
+
+const disableExtras = computed(() => {
     return !authStore.loggedIn;
- });
- 
- 
- // Methods for group management
- const addGroup = () => {
+});
+
+// Methods for group management
+const addGroup = () => {
     const trimmedName = newGroupName.value.trim();
     if (trimmedName && groups.value.length < 10) {
         groupError.value = false;
@@ -255,66 +253,66 @@
         if (groupSpaceError.value) {
             return;
         }
- 
- 
+
+
         groups.value.push({
             name: trimmedName,
             sections: [],
             newSectionName: "",
             sectionError: false
         });
- 
- 
+
+
         buttonDisabled.value.noRooms = false;
         newGroupName.value = "";
     }
- };
- 
- 
- const removeGroup = (groupIndex: number) => {
+};
+
+
+const removeGroup = (groupIndex: number) => {
     groups.value.splice(groupIndex, 1);
     if (getTotalSectionCount() === 0) {
         buttonDisabled.value.noRooms = true;
     }
- };
- 
- 
- // Methods for section management
- const addSection = (groupIndex: number) => {
+};
+
+
+// Methods for section management
+const addSection = (groupIndex: number) => {
     const group = groups.value[groupIndex];
     const trimmedName = group.newSectionName.trim();
- 
- 
+
+
     if (trimmedName && group.sections.length < 15) {
         group.sectionError = false;
- 
- 
+
+
         // Validate section name
         const typingError = !/^[a-zA-Z ]+$/.test(trimmedName);
         const spaceError = trimmedName[0] === " " || trimmedName[trimmedName.length - 1] === " ";
- 
- 
+
+
         if (typingError || spaceError) {
-            group.sectionError = true;
+            groupSectionError.value = true;
             return;
         }
- 
- 
+
+
         group.sections.push(trimmedName);
         group.newSectionName = "";
         buttonDisabled.value.noRooms = false;
     }
- };
- 
- const removeSection = (groupIndex: number, sectionIndex: number) => {
+};
+
+const removeSection = (groupIndex: number, sectionIndex: number) => {
     groups.value[groupIndex].sections.splice(sectionIndex, 1);
     if (getTotalSectionCount() === 0) {
         buttonDisabled.value.noRooms = true;
     }
- };
- 
- // Methods
- const handlePaste = (event: ClipboardEvent) => {
+};
+
+// Methods
+const handlePaste = (event: ClipboardEvent) => {
     if (!event.clipboardData) return;
     const pastedText = event.clipboardData.getData("text");
     if (pastedText.length > 80) {
@@ -322,17 +320,17 @@
             "Briefly describe the topic you wish to learn about in up to 80 characters.</br>Add other info into the <b>Extra</b> field."
         );
     }
- };
- 
- 
- const selectInputText = (event: FocusEvent) => {
+};
+
+
+const selectInputText = (event: FocusEvent) => {
     if (event.target instanceof HTMLInputElement) {
         event.target.select();
     }
- };
- 
- 
- const handleFileUpload = (event: Event) => {
+};
+
+
+const handleFileUpload = (event: Event) => {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
         const file = input.files[0];
@@ -343,128 +341,101 @@
         }
         selectedFile.value = file;
     }
- };
- 
- 
- const removeFile = () => {
+};
+
+
+const removeFile = () => {
     selectedFile.value = null;
     if (fileInput.value) fileInput.value.value = '';
- };
- 
- 
- // Helper function to count total sections across all groups
- const getTotalSectionCount = () => {
+};
+
+
+// Helper function to count total sections across all groups
+const getTotalSectionCount = () => {
     return groups.value.reduce((total, group) => total + group.sections.length, 0);
- };
- 
- const handleSubmit = () => {
+};
+
+const hasErrors = (): boolean => {
     if (!authStore.loggedIn) {
         // must login to submit
         popupStore.showPopup(
             "Please login to continue."
         );
-        return;
+        return true;
     }
- 
- 
+
+
     if (topic.value.trim() === "") {
         topicError.value = true;
-        return;
+        return true;
     }
+
     topicError.value = false;
+
     topicTypingError.value = !/^[a-zA-Z ]+$/.test(topic.value);
+
     if (topicTypingError.value) {
-        return;
+        return true;
     }
+
     topicSpaceError.value = topic.value[0] === " " || topic.value[topic.value.length - 1] === " ";
     if (topicSpaceError.value) {
-        return;
+        return true;
     }
 
-    console.log("hi there 0")
-
-    // if (roomNames.value.length === 0) {
-    //     roomError.value = true;
-    //     return;
-    // }
-
-    console.log("hi there 1")
-
-    // for (let roomName of roomNames.value) {
-    //     if (roomName.trim() === "") {
-    //         roomError.value = true;
-    //         return;
-    //     }
-    // }
-
-    console.log("hi there 2")
-
-    // roomError.value = false;
-    // roomTypingError.value = roomNames.value.some(roomName => !/^[a-zA-Z ]+$/.test(roomName));
-    // if (roomTypingError.value) {
-    //     return;
-    // }
-
-    console.log("hi there 3")
-
-    // roomSpaceError.value = roomNames.value.some(roomName => roomName[0] === " " || roomName[roomName.length - 1] === " ");
-    // if (roomSpaceError.value) {
-    //     return;
-    // }
-    
-    console.log("hi there 4")
- 
     const urlPattern =
         /^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)$/;
     if (urlPattern.test(topic.value)) {
         popupStore.showPopup(
             "We do not currently support links.</br>Try entering the topic of the website instead.</br>Note: This app can teach you about anything, but will not do your homework!"
         );
-        return;
+        return true;
     }
- 
+
     buttonDisabled.value.isSubmitting = true;
- 
+
     // Check if there are groups and sections
     if (groups.value.length === 0 || getTotalSectionCount() === 0) {
-        groupError.value = true;
-        return;
+        group.sectionError.value = true;
+        return true;
     }
- 
+
     // Validate all group and section names
-    let hasErrors = false;
     for (const group of groups.value) {
         if (group.name.trim() === "" || group.sections.length === 0) {
-            hasErrors = true;
-            break;
+            return true;
         }
- 
- 
+
+
         for (const section of group.sections) {
             if (section.trim() === "" || !/^[a-zA-Z ]+$/.test(section) ||
                 section[0] === " " || section[section.length - 1] === " ") {
-                hasErrors = true;
-                break;
+                return true;
             }
         }
     }
- 
- 
-    if (hasErrors) {
+
+    return false;
+
+}
+
+const handleSubmit = () => {
+
+    if (hasErrors()) {
         popupStore.showPopup("Please check all unit and section names.");
+        buttonDisabled.value.isSubmitting = false;
         return;
     }
- 
- 
+
     // Flatten groups and sections into the format expected by your API
     const formData = new FormData();
- 
- 
+
+
     if (selectedFile.value) {
         formData.append("selectedFile", selectedFile.value);
     }
- 
- 
+
+
     // Add group structure data
     groups.value.forEach((group, index) => {
         formData.append(`groupNames[${index}]`, group.name);
@@ -472,8 +443,8 @@
             formData.append(`groupSections[${index}][]`, section);
         });
     });
- 
- 
+
+
     formData.append("topic", topic.value);
     formData.append("language", "English");
     formData.append("extraContext", ""); // TODO delete later (from backend and library model)
@@ -483,8 +454,8 @@
     if (selectedFile.value) {
         formData.append("selectedFile", selectedFile.value);
     }
- 
- 
+
+
     axios
         .post("/api/library/generate", formData, {
             headers: {
@@ -515,11 +486,11 @@
         .finally(() => {
             buttonDisabled.value.isSubmitting = false;
         });
- };
- 
- 
- // Lifecycle hooks
- onMounted(() => {
+};
+
+
+// Lifecycle hooks
+onMounted(() => {
     libraryDifficulty.value = "Normal";
     if (computedTopics.value.length > 0 && topicInput.value) {
         const { start, stop } = useTypingEffect(topicInput.value, computedTopics.value);
@@ -528,32 +499,32 @@
     } else {
         //console.log("never started");
     }
- });
- 
- 
- onUnmounted(() => {
+});
+
+
+onUnmounted(() => {
     typingEffectStop.value();
- });
- </script>
- 
- 
- <style scoped>
- .library-gen-page {
+});
+</script>
+
+
+<style scoped>
+.library-gen-page {
     display: flex;
     justify-content: flex-start;
     /* Align content at the top */
     display: flex;
     flex-direction: column;
     width: 100%;
- }
- 
- 
- .libgen-section {
+}
+
+
+.libgen-section {
     width: 100%;
- }
- 
- 
- .form-container {
+}
+
+
+.form-container {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -562,97 +533,97 @@
     max-width: 1000px;
     margin: 0 auto;
     padding: 1em;
- }
- 
- 
- .libgen-create {
+}
+
+
+.libgen-create {
     flex-direction: column;
     align-items: center;
     width: 100%;
     margin: 0 auto;
     background: var(--background-color-1t);
- }
- 
- 
- .form-group {
+}
+
+
+.form-group {
     display: flex;
     flex-direction: column;
     width: 100%;
     margin-bottom: 1em;
- }
- 
- 
- .libgen-title {
+}
+
+
+.libgen-title {
     margin-left: 1em;
     margin-bottom: -0.125em;
     font-size: 0.8em;
     opacity: 0.7;
- }
- 
- 
- .title-bar {
+}
+
+
+.title-bar {
     display: flex;
     flex-direction: row;
     align-items: baseline;
- }
- 
- 
- .input-error {
+}
+
+
+.input-error {
     border-color: red;
- }
- 
- 
- .error-message {
+}
+
+
+.error-message {
     color: red;
     font-size: 0.8em;
     margin-top: 0.5em;
- }
- 
- 
- .option {
+}
+
+
+.option {
     background: #00000000;
     opacity: 0.8;
     color: var(--highlight-color);
- }
- 
- 
- input[type="text"]::placeholder {
+}
+
+
+input[type="text"]::placeholder {
     color: var(--text-color);
-    
- }
- 
- 
- .input {
+
+}
+
+
+.input {
     margin-left: 2px;
     margin-right: 2px;
- }
- 
- .form-container input[type="text"] {
+}
+
+.form-container input[type="text"] {
     background-color: rgb(0, 0, 0, 0);
     border: 1px solid var(--text-color);
     border-radius: 4px;
     width: 100%;
     box-sizing: border-box;
- }
- 
- select {
+}
+
+select {
     padding: 10px;
     border: 1px solid var(--element-color-1);
- }
- 
- input[type="text"] {
+}
+
+input[type="text"] {
     padding: 8px;
     /* background: var(--background-color-1t); */
- }
- 
- .cta-container {
+}
+
+.cta-container {
     width: 100%;
     max-width: 720px;
     margin: 0 auto;
- }
- 
- 
- .toggle-button {
+}
+
+
+.toggle-button {
     margin-left: 0;
     color: var(--text-color);
     opacity: 0.7;
@@ -660,30 +631,30 @@
     border: none;
     font-size: 0.8em;
     cursor: pointer;
- }
- 
- 
- .file-upload {
+}
+
+
+.file-upload {
     margin-bottom: 2em;
- }
- 
- 
- .file-input-container {
+}
+
+
+.file-input-container {
     display: flex;
     flex-direction: column;
     gap: 0.5em;
- }
- 
- 
- .file-input-container input[type="file"] {
+}
+
+
+.file-input-container input[type="file"] {
     padding: 8px;
     border: 1px solid var(--text-color);
     border-radius: 4px;
     background-color: rgb(0, 0, 0, 0);
- }
- 
- 
- .selected-file {
+}
+
+
+.selected-file {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -691,10 +662,10 @@
     border-radius: 4px;
     font-size: 0.9em;
     border: 1px solid var(--text-color);
- }
- 
- 
- .remove-file-btn {
+}
+
+
+.remove-file-btn {
     background: none;
     border: none;
     color: var(--text-color);
@@ -702,56 +673,56 @@
     padding: 0 0.5em;
     font-size: 1.2em;
     opacity: 0.7;
- }
- 
- 
- .remove-file-btn:hover {
+}
+
+
+.remove-file-btn:hover {
     opacity: 1;
- }
- 
- 
- .room-input-container {
+}
+
+
+.room-input-container {
     display: flex;
     flex-direction: column;
     gap: 0.5em;
     margin-bottom: 1em;
- }
- 
- 
- .room-input-wrapper {
+}
+
+
+.room-input-wrapper {
     display: flex;
     gap: 0.5em;
- }
- 
- 
- .room-input-wrapper input {
+}
+
+
+.room-input-wrapper input {
     flex-grow: 1;
- }
- 
- 
- .add-room-btn {
+}
+
+
+.add-room-btn {
     padding: 8px 16px;
     background-color: var(--element-color-1);
     border: none;
     border-radius: 4px;
     color: var(--text-color);
     cursor: pointer;
- }
- 
- 
- .add-room-btn:disabled {
+}
+
+
+.add-room-btn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
- }
- 
- 
- .room-count {
+}
+
+
+.room-count {
     font-size: 0.8em;
     opacity: 0.7;
     text-align: right;
- }
- 
- .remove-room-btn {
+}
+
+.remove-room-btn {
     background: none;
     border: none;
     color: var(--text-color);
@@ -762,47 +733,47 @@
     display: flex;
     align-items: center;
     justify-content: center;
- }
- 
- .remove-room-btn:hover {
+}
+
+.remove-room-btn:hover {
     opacity: 1;
- }
- 
- .helper-text {
+}
+
+.helper-text {
     font-size: 0.8em;
     opacity: 0.7;
     margin-top: 0.5em;
     text-align: center;
     color: var(--text-color);
- }
- 
- 
- /* New styles for groups */
- .group-controls {
+}
+
+
+/* New styles for groups */
+.group-controls {
     margin-bottom: 16px;
- }
- 
- 
- .section-heading {
+}
+
+
+.section-heading {
     font-size: 0.9em;
     font-weight: 600;
     margin-bottom: 8px;
     color: var(--text-color);
- }
- 
- 
- .group-input-wrapper {
+}
+
+
+.group-input-wrapper {
     display: flex;
     gap: 0.5em;
- }
- 
- 
- .group-input-wrapper input {
+}
+
+
+.group-input-wrapper input {
     flex-grow: 1;
- }
- 
- 
- .add-btn {
+}
+
+
+.add-btn {
     padding: 8px 16px;
     background-color: var(--element-color-1);
     border: none;
@@ -810,60 +781,60 @@
     color: var(--text-color);
     cursor: pointer;
     white-space: no-wrap;
- }
- 
- .add-btn:disabled {
+}
+
+.add-btn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
- }
- 
- .error-container {
+}
+
+.error-container {
     margin-top: 4px;
- }
- 
- .groups-container {
+}
+
+.groups-container {
     display: flex;
     flex-direction: column;
     gap: 16px;
     margin-bottom: 16px;
- }
- 
- 
- .group-item {
+}
+
+
+.group-item {
     border: 1px solid var(--text-color);
     border-radius: 8px;
     padding: 12px;
- }
- 
- 
- .group-header {
+}
+
+
+.group-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 12px;
- }
- 
- 
- .group-title {
+}
+
+
+.group-title {
     font-weight: 600;
     font-size: 1em;
- }
- 
- 
- .group-actions {
+}
+
+
+.group-actions {
     display: flex;
     align-items: center;
     gap: 12px;
- }
- 
- 
- .section-count {
+}
+
+
+.section-count {
     font-size: 0.8em;
     opacity: 0.7;
- }
- 
- 
- .remove-btn {
+}
+
+
+.remove-btn {
     background: none;
     border: none;
     color: var(--text-color);
@@ -873,42 +844,42 @@
     display: flex;
     align-items: center;
     justify-content: center;
- }
- 
- 
- .remove-btn:hover {
+}
+
+
+.remove-btn:hover {
     opacity: 1;
- }
- 
- 
- .group-sections {
+}
+
+
+.group-sections {
     display: flex;
     flex-direction: column;
     gap: 12px;
- }
- 
- 
- .section-input-wrapper {
+}
+
+
+.section-input-wrapper {
     display: flex;
     gap: 0.5em;
     border: var(--text-color);
- }
- 
- 
- .section-input-wrapper input {
+}
+
+
+.section-input-wrapper input {
     flex-grow: 1;
- }
- 
- 
- .section-chips {
+}
+
+
+.section-chips {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
     margin-bottom: 8px;
- }
- 
- 
- .section-chip {
+}
+
+
+.section-chip {
     display: flex;
     align-items: center;
     gap: 6px;
@@ -916,10 +887,10 @@
     background-color: var(--element-color-1);
     border-radius: 16px;
     font-size: 0.85em;
- }
- 
- 
- .remove-section-btn {
+}
+
+
+.remove-section-btn {
     background: none;
     border: none;
     color: var(--text-color);
@@ -930,12 +901,10 @@
     display: flex;
     align-items: center;
     justify-content: center;
- }
- 
- 
- .remove-section-btn:hover {
+}
+
+
+.remove-section-btn:hover {
     opacity: 1;
- }
- </style>
- 
- 
+}
+</style>
