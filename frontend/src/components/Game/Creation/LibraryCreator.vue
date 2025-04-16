@@ -1,9 +1,9 @@
 <template>
     <div class="library-gen-page">
         <div class="form-container" @keydown.enter="handleSubmit">
-            <h1 v-if="libgenRoute">Create a Course to Explore</h1>
             <!-- Topic Selection -->
-            <div class="libgen-create">
+            <div class="libgen-create p-16 br-4" style="border: 1px solid var(--text-color); border-radius: 5px;">
+                <h1 v-if="libgenRoute">Create a Course to Explore</h1>
                 <div class="libgen-section">
                     <div class="form-group topic-selection">
                         <div class="libgen-title">Course name</div>
@@ -34,7 +34,7 @@
                         <!-- File Upload Section -->
                         <div class="form-group file-upload">
                             <div class="libgen-title">Upload File</div>
-                            <div class="file-input-container text-[var(--light-highlight)]">
+                            <div class="file-input-container text-[var(--text-color)] border-[var(--text-color)]">
                                 <input type="file" id="fileInput" ref="fileInput" @change="handleFileUpload"
                                     :disabled="disableExtras" accept=".pdf" />
                                 <div v-if="selectedFile" class="selected-file">
@@ -131,13 +131,13 @@
  
  
                 </div>
-            </div>
- 
- 
-            <!-- CTA Button -->
-            <div class="cta-container">
-                <CtaButton :buttonText="submitButtonText" @click="handleSubmit"
+                
+                
+                <!-- CTA Button -->
+                <div class="cta-container">
+                    <CtaButton :buttonText="submitButtonText" @click="handleSubmit"
                     :isSubmitting="buttonDisabled.isSubmitting || buttonDisabled.noRooms" />
+                </div>
             </div>
             <library-browser />
         </div>
@@ -390,9 +390,6 @@
     return groups.value.reduce((total, group) => total + group.sections.length, 0);
  };
  
- 
- 
- 
  const handleSubmit = () => {
     if (!authStore.loggedIn) {
         // must login to submit
@@ -511,7 +508,7 @@
     if (selectedFile.value) {
         formData.append("selectedFile", selectedFile.value);
     }
-    roomNames.value.forEach(room => formData.append("roomNames", room));
+    // roomNames.value.forEach(room => formData.append("roomNames", room));
  
  
     axios
@@ -598,8 +595,8 @@
     flex-direction: column;
     align-items: center;
     width: 100%;
-    max-width: 720px;
     margin: 0 auto;
+    background: var(--background-color-1t);
  }
  
  
@@ -646,36 +643,33 @@
  
  
  input[type="text"]::placeholder {
-    color: var(--highlight-color);
+    color: var(--text-color);
+    
  }
  
  
  .input {
-    background-color: var(--background-color);
     margin-left: 2px;
     margin-right: 2px;
  }
  
- 
  .form-container input[type="text"] {
-    background-color: var(--background-color);
-    border: 1px solid var(--element-color-1);
+    background-color: rgb(0, 0, 0, 0);
+    border: 1px solid var(--text-color);
     border-radius: 4px;
     width: 100%;
     box-sizing: border-box;
  }
- 
  
  select {
     padding: 10px;
     border: 1px solid var(--element-color-1);
  }
  
- 
  input[type="text"] {
     padding: 8px;
+    /* background: var(--background-color-1t); */
  }
- 
  
  .cta-container {
     width: 100%;
@@ -709,9 +703,9 @@
  
  .file-input-container input[type="file"] {
     padding: 8px;
-    border: 1px solid var(--element-color-1);
+    border: 1px solid var(--text-color);
     border-radius: 4px;
-    background-color: var(--background-color);
+    background-color: rgb(0, 0, 0, 0);
  }
  
  
@@ -784,25 +778,6 @@
     text-align: right;
  }
  
- 
- .room-chips {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5em;
- }
- 
- 
- .room-chip {
-    display: flex;
-    align-items: center;
-    gap: 0.5em;
-    padding: 4px 8px;
-    background-color: var(--element-color-1);
-    border-radius: 16px;
-    font-size: 0.9em;
- }
- 
- 
  .remove-room-btn {
     background: none;
     border: none;
@@ -816,11 +791,9 @@
     justify-content: center;
  }
  
- 
  .remove-room-btn:hover {
     opacity: 1;
  }
- 
  
  .helper-text {
     font-size: 0.8em;
@@ -880,15 +853,13 @@
     flex-direction: column;
     gap: 16px;
     margin-bottom: 16px;
-    background-color: var(--background-color-1t);
  }
  
  
  .group-item {
-    border: 1px solid var(--element-color-1);
+    border: 1px solid var(--text-color);
     border-radius: 8px;
     padding: 12px;
-    background-color: var(--background-color-2, rgba(255, 255, 255, 0.05));
  }
  
  
@@ -947,6 +918,7 @@
  .section-input-wrapper {
     display: flex;
     gap: 0.5em;
+    border: var(--text-color);
  }
  
  
