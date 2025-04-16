@@ -57,7 +57,7 @@
                         <div class="room-input-container">
                             <!-- Group controls -->
                             <div class="group-controls">
-                                <div class="section-heading">Units/Chapters</div>
+                                
                                 <div class="group-input-wrapper">
                                     <input type="text" v-model="newGroupName" placeholder="Enter unit/chapter name"
                                         :class="{ 'input-error': groupError || groupTypingError || groupSpaceError }"
@@ -76,7 +76,6 @@
                                 </div>
                             </div>
  
- 
                             <!-- Groups list -->
                             <div class="groups-container">
                                 <div v-for="(group, groupIndex) in groups" :key="groupIndex" class="group-item">
@@ -88,7 +87,6 @@
                                         </div>
                                     </div>
  
- 
                                     <!-- Sections for this group -->
                                     <div class="group-sections">
                                         <div class="section-chips">
@@ -99,7 +97,6 @@
                                                     @click="removeSection(groupIndex, sectionIndex)">×</button>
                                             </div>
                                         </div>
- 
  
                                         <!-- Section input for this group -->
                                         <div class="section-input-wrapper">
@@ -866,25 +863,24 @@
     border-radius: 4px;
     color: var(--text-color);
     cursor: pointer;
+    white-space: no-wrap;
  }
- 
  
  .add-btn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
  }
  
- 
  .error-container {
     margin-top: 4px;
  }
- 
  
  .groups-container {
     display: flex;
     flex-direction: column;
     gap: 16px;
     margin-bottom: 16px;
+    background-color: var(--background-color-1t);
  }
  
  
