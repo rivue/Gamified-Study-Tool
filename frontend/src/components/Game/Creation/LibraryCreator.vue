@@ -714,10 +714,9 @@
     align-items: center;
     justify-content: space-between;
     padding: 0.5em;
-    background-color: var(--background-color);
-    border: 1px solid var(--element-color-1);
     border-radius: 4px;
     font-size: 0.9em;
+    border: 1px solid var(--text-color);
  }
  
  
