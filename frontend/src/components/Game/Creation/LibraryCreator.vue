@@ -23,18 +23,18 @@
                         <div v-if="topicSpaceError" class="error-message">
                             Topic must not start or end with a space.
                         </div>
-                    </div>
+                    </div> 
                 </div>
-
-                <!-- Hidden Sections -->
+ 
+ 
                 <div class="libgen-section">
                     <div class="libgen-section">
-
+ 
+ 
                         <!-- File Upload Section -->
                         <div class="form-group file-upload">
                             <div class="libgen-title">Upload File</div>
-                            <div class="file-input-container text-[var(--light-highlight)]
-">
+                            <div class="file-input-container text-[var(--light-highlight)]">
                                 <input type="file" id="fileInput" ref="fileInput" @change="handleFileUpload"
                                     :disabled="disableExtras" accept=".pdf" />
                                 <div v-if="selectedFile" class="selected-file">
@@ -47,48 +47,96 @@
                             </div>
                         </div>
                     </div>
-
-                    <!-- Room Names Section -->
+ 
+ 
+                    <!-- Room Names Section with Groups -->
                     <div class="form-group room-names">
                         <div class="libgen-title">
-                            Section Names
+                            Course Structure
                         </div>
                         <div class="room-input-container">
-                            <div class="room-input-wrapper">
-                                <input type="text" v-model="newRoomName" placeholder="Enter section names"
-                                    :class="{ 'input-error': roomError || roomTypingError || roomSpaceError }"
-                                    maxlength="40" :disabled="roomNames.length >= 30 || disableExtras"
-                                    @keyup.enter="addRoom" />
-                                <button class="add-room-btn" @click="addRoom"
-                                    :disabled="!newRoomName.trim() || roomNames.length >= 30 || disableExtras">
-                                    Add
-                                </button>
-                            </div>
-                            <div class="room-count" v-if="roomNames.length > 0">
-                                {{ roomNames.length }}/30 rooms
-                            </div>
-                            <div class="room-chips">
-                                <div v-for="(room, index) in roomNames" :key="index" class="room-chip">
-                                    {{ room }}
-                                    <button class="remove-room-btn" @click="removeRoom(index)">×</button>
+                            <!-- Group controls -->
+                            <div class="group-controls">
+                                <div class="section-heading">Units/Chapters</div>
+                                <div class="group-input-wrapper">
+                                    <input type="text" v-model="newGroupName" placeholder="Enter unit/chapter name"
+                                        :class="{ 'input-error': groupError || groupTypingError || groupSpaceError }"
+                                        maxlength="40" :disabled="disableExtras" @keyup.enter="addGroup" />
+                                    <button class="add-btn" @click="addGroup"
+                                        :disabled="!newGroupName.trim() || groups.length >= 10 || disableExtras">
+                                        Add Unit
+                                    </button>
+                                </div>
+                                <div class="error-container">
+                                    <div v-if="groupError" class="error-message">Please enter a valid unit name.</div>
+                                    <div v-if="groupTypingError" class="error-message">Unit name can only have spaces or
+                                        letters.</div>
+                                    <div v-if="groupSpaceError" class="error-message">Unit name must not start or end
+                                        with a space.</div>
                                 </div>
                             </div>
+ 
+ 
+                            <!-- Groups list -->
+                            <div class="groups-container">
+                                <div v-for="(group, groupIndex) in groups" :key="groupIndex" class="group-item">
+                                    <div class="group-header">
+                                        <div class="group-title">{{ group.name }}</div>
+                                        <div class="group-actions">
+                                            <span class="section-count">{{ group.sections.length }} sections</span>
+                                            <button class="remove-btn" @click="removeGroup(groupIndex)">×</button>
+                                        </div>
+                                    </div>
+ 
+ 
+                                    <!-- Sections for this group -->
+                                    <div class="group-sections">
+                                        <div class="section-chips">
+                                            <div v-for="(section, sectionIndex) in group.sections" :key="sectionIndex"
+                                                class="section-chip">
+                                                {{ section }}
+                                                <button class="remove-section-btn"
+                                                    @click="removeSection(groupIndex, sectionIndex)">×</button>
+                                            </div>
+                                        </div>
+ 
+ 
+                                        <!-- Section input for this group -->
+                                        <div class="section-input-wrapper">
+                                            <input type="text" v-model="group.newSectionName"
+                                                placeholder="Enter section name"
+                                                :class="{ 'input-error': group.sectionError }" maxlength="40"
+                                                :disabled="group.sections.length >= 15 || disableExtras"
+                                                @keyup.enter="addSection(groupIndex)" />
+                                            <button class="add-btn" @click="addSection(groupIndex)"
+                                                :disabled="!group.newSectionName?.trim() || group.sections.length >= 15 || disableExtras">
+                                                Add Section
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+ 
+ 
                             <div class="helper-text">
-                                🐙 Sections are how course content is divided up.
+                                🐙 Structure your course with units/chapters and sections for better organization.
                             </div>
                             <div class="helper-text">
-                                🐙 We try to make the content of each section based on its name, so if a section is
-                                named "mitosis" the content of that section is based on mitosis, etc...
+                                🐙 You can create up to 10 units, with up to 15 sections each.
                             </div>
                             <div class="helper-text">
-                                🐙 Don't worry about adding all rooms or files now - you can add and generate more later!
+                                🐙 Don't worry about adding everything now - you can add more later!
                             </div>
                         </div>
                     </div>
-
+ 
+ 
+ 
+ 
                 </div>
             </div>
-
+ 
+ 
             <!-- CTA Button -->
             <div class="cta-container">
                 <CtaButton :buttonText="submitButtonText" @click="handleSubmit"
@@ -97,68 +145,92 @@
             <library-browser />
         </div>
     </div>
-</template>
-
-<script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
-import axios from "axios";
-import { storeToRefs } from "pinia";
-import {
+ </template>
+ 
+ 
+ <script setup lang="ts">
+ import { ref, computed, onMounted, onUnmounted } from 'vue';
+ import { useRoute, useRouter } from 'vue-router';
+ import axios from "axios";
+ import { storeToRefs } from "pinia";
+ import {
     useTypingEffect,
-} from "@/scripts/placeholderTyping";
-
-import { useLibGenStore } from "@/store/libGenStore";
-import { usePopupStore } from "@/store/popupStore";
-import { useAuthStore } from "@/store/authStore";
-import CtaButton from "../../Footer/LandingPageComponents/CtaButton.vue";
-import LibraryBrowser from "./LibraryBrowser.vue";
-
-const route = useRoute();
-const router = useRouter();
-const libGenStore = useLibGenStore();
-const authStore = useAuthStore();
-const popupStore = usePopupStore();
-
-const { topics } = storeToRefs(libGenStore);
-
-
-
-const typingEffectStop = ref(() => { });
-const topic = ref("");
-const topicError = ref(false);
-const topicTypingError = ref(false);
-const topicSpaceError = ref(false);
-const roomError = ref(false);
-const roomTypingError = ref(false);
-const roomSpaceError = ref(false);
-const safeTopics = ref([
+ } from "@/scripts/placeholderTyping";
+ 
+ 
+ import { useLibGenStore } from "@/store/libGenStore";
+ import { usePopupStore } from "@/store/popupStore";
+ import { useAuthStore } from "@/store/authStore";
+ import CtaButton from "../../Footer/LandingPageComponents/CtaButton.vue";
+ import LibraryBrowser from "./LibraryBrowser.vue";
+ 
+ 
+ // New or modified data for groups
+ interface Group {
+    name: string;
+    sections: string[];
+    newSectionName: string;
+    sectionError: boolean;
+ }
+ 
+ 
+ const route = useRoute();
+ const router = useRouter();
+ const libGenStore = useLibGenStore();
+ const authStore = useAuthStore();
+ const popupStore = usePopupStore();
+ // New refs for groups
+ const groups = ref<Group[]>([]);
+ const newGroupName = ref("");
+ const groupError = ref(false);
+ const groupTypingError = ref(false);
+ const groupSpaceError = ref(false);
+ 
+ 
+ 
+ 
+ const { topics } = storeToRefs(libGenStore);
+ 
+ 
+ const typingEffectStop = ref(() => { });
+ const topic = ref("");
+ const topicError = ref(false);
+ const topicTypingError = ref(false);
+ const topicSpaceError = ref(false);
+ const roomError = ref(false);
+ const roomTypingError = ref(false);
+ const roomSpaceError = ref(false);
+ const safeTopics = ref([
     "Innovative breakdance moves",
     "How to identify misinformation",
     "Origins of the Olympic games",
-]);
-const libraryDifficulty = ref("Normal");
-const buttonDisabled = ref({
+ ]);
+ const libraryDifficulty = ref("Normal");
+ const buttonDisabled = ref({
     noRooms: true,
     isSubmitting: false,
-});
-const selectedFile = ref<File | null>(null);
-const newRoomName = ref("");
-const roomNames = ref<string[]>([]);
-const topicInput = ref<HTMLInputElement | null>(null);
-const fileInput = ref<HTMLInputElement | null>(null);
-
-
-// Computed properties
-const computedTopics = computed(() => {
+ });
+ const selectedFile = ref<File | null>(null);
+ const newRoomName = ref("");
+ const roomNames = ref<string[]>([]);
+ const topicInput = ref<HTMLInputElement | null>(null);
+ const fileInput = ref<HTMLInputElement | null>(null);
+ 
+ 
+ 
+ 
+ // Computed properties
+ const computedTopics = computed(() => {
     return topics.value.length > 0 ? topics.value : safeTopics.value;
-});
-
-const libgenRoute = computed(() => {
+ });
+ 
+ 
+ const libgenRoute = computed(() => {
     return route.path === "/library";
-});
-
-const submitButtonText = computed(() => {
+ });
+ 
+ 
+ const submitButtonText = computed(() => {
     if (buttonDisabled.value.isSubmitting) {
         return "Loading (~45s)";
     }
@@ -169,14 +241,89 @@ const submitButtonText = computed(() => {
         return "Explore!";
     }
     // return isSubmitting ? isSubmitting.isEmpty ? "hi there" : "Loading (~45s)" : "Explore!";
-});
-
-const disableExtras = computed(() => {
+ });
+ 
+ 
+ const disableExtras = computed(() => {
     return !authStore.loggedIn;
-});
-
-// Methods
-const handlePaste = (event: ClipboardEvent) => {
+ });
+ 
+ 
+ // Methods for group management
+ const addGroup = () => {
+    const trimmedName = newGroupName.value.trim();
+    if (trimmedName && groups.value.length < 10) {
+        groupError.value = false;
+        groupTypingError.value = !/^[a-zA-Z ]+$/.test(trimmedName);
+        if (groupTypingError.value) {
+            return;
+        }
+        groupSpaceError.value = trimmedName[0] === " " || trimmedName[trimmedName.length - 1] === " ";
+        if (groupSpaceError.value) {
+            return;
+        }
+ 
+ 
+        groups.value.push({
+            name: trimmedName,
+            sections: [],
+            newSectionName: "",
+            sectionError: false
+        });
+ 
+ 
+        buttonDisabled.value.noRooms = false;
+        newGroupName.value = "";
+    }
+ };
+ 
+ 
+ const removeGroup = (groupIndex: number) => {
+    groups.value.splice(groupIndex, 1);
+    if (getTotalSectionCount() === 0) {
+        buttonDisabled.value.noRooms = true;
+    }
+ };
+ 
+ 
+ // Methods for section management
+ const addSection = (groupIndex: number) => {
+    const group = groups.value[groupIndex];
+    const trimmedName = group.newSectionName.trim();
+ 
+ 
+    if (trimmedName && group.sections.length < 15) {
+        group.sectionError = false;
+ 
+ 
+        // Validate section name
+        const typingError = !/^[a-zA-Z ]+$/.test(trimmedName);
+        const spaceError = trimmedName[0] === " " || trimmedName[trimmedName.length - 1] === " ";
+ 
+ 
+        if (typingError || spaceError) {
+            group.sectionError = true;
+            return;
+        }
+ 
+ 
+        group.sections.push(trimmedName);
+        group.newSectionName = "";
+        buttonDisabled.value.noRooms = false;
+    }
+ };
+ 
+ 
+ const removeSection = (groupIndex: number, sectionIndex: number) => {
+    groups.value[groupIndex].sections.splice(sectionIndex, 1);
+    if (getTotalSectionCount() === 0) {
+        buttonDisabled.value.noRooms = true;
+    }
+ };
+ 
+ 
+ // Methods
+ const handlePaste = (event: ClipboardEvent) => {
     if (!event.clipboardData) return;
     const pastedText = event.clipboardData.getData("text");
     if (pastedText.length > 80) {
@@ -184,15 +331,17 @@ const handlePaste = (event: ClipboardEvent) => {
             "Briefly describe the topic you wish to learn about in up to 80 characters.</br>Add other info into the <b>Extra</b> field."
         );
     }
-};
-
-const selectInputText = (event: FocusEvent) => {
+ };
+ 
+ 
+ const selectInputText = (event: FocusEvent) => {
     if (event.target instanceof HTMLInputElement) {
         event.target.select();
     }
-};
-
-const handleFileUpload = (event: Event) => {
+ };
+ 
+ 
+ const handleFileUpload = (event: Event) => {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
         const file = input.files[0];
@@ -203,14 +352,16 @@ const handleFileUpload = (event: Event) => {
         }
         selectedFile.value = file;
     }
-};
-
-const removeFile = () => {
+ };
+ 
+ 
+ const removeFile = () => {
     selectedFile.value = null;
     if (fileInput.value) fileInput.value.value = '';
-};
-
-const addRoom = () => {
+ };
+ 
+ 
+ const addRoom = () => {
     const trimmedName = newRoomName.value.trim();
     if (trimmedName && roomNames.value.length < 30) {
         roomError.value = false;
@@ -226,16 +377,26 @@ const addRoom = () => {
         buttonDisabled.value.noRooms = false;
         newRoomName.value = "";
     }
-};
-
-const removeRoom = (index: number) => {
+ };
+ 
+ 
+ const removeRoom = (index: number) => {
     roomNames.value.splice(index, 1);
     if (roomNames.value.length === 0) {
         buttonDisabled.value.noRooms = true; // disables submit button until roomNames is not empty (must have room names to submit)
     }
-};
-
-const handleSubmit = () => {
+ };
+ 
+ 
+ // Helper function to count total sections across all groups
+ const getTotalSectionCount = () => {
+    return groups.value.reduce((total, group) => total + group.sections.length, 0);
+ };
+ 
+ 
+ 
+ 
+ const handleSubmit = () => {
     if (!authStore.loggedIn) {
         // must login to submit
         popupStore.showPopup(
@@ -243,7 +404,8 @@ const handleSubmit = () => {
         );
         return;
     }
-
+ 
+ 
     if (topic.value.trim() === "") {
         topicError.value = true;
         return;
@@ -257,7 +419,8 @@ const handleSubmit = () => {
     if (topicSpaceError.value) {
         return;
     }
-
+ 
+ 
     if (roomNames.value.length === 0) {
         roomError.value = true;
         return;
@@ -277,7 +440,8 @@ const handleSubmit = () => {
     if (roomSpaceError.value) {
         return;
     }
-
+ 
+ 
     const urlPattern =
         /^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)$/;
     if (urlPattern.test(topic.value)) {
@@ -286,11 +450,61 @@ const handleSubmit = () => {
         );
         return;
     }
-
+ 
+ 
     buttonDisabled.value.isSubmitting = true;
-
+ 
+ 
+    // Check if there are groups and sections
+    if (groups.value.length === 0 || getTotalSectionCount() === 0) {
+        groupError.value = true;
+        return;
+    }
+ 
+ 
+    // Validate all group and section names
+    let hasErrors = false;
+    for (const group of groups.value) {
+        if (group.name.trim() === "" || group.sections.length === 0) {
+            hasErrors = true;
+            break;
+        }
+ 
+ 
+        for (const section of group.sections) {
+            if (section.trim() === "" || !/^[a-zA-Z ]+$/.test(section) ||
+                section[0] === " " || section[section.length - 1] === " ") {
+                hasErrors = true;
+                break;
+            }
+        }
+    }
+ 
+ 
+    if (hasErrors) {
+        popupStore.showPopup("Please check all unit and section names.");
+        return;
+    }
+ 
+ 
+    // Flatten groups and sections into the format expected by your API
     const formData = new FormData();
-
+ 
+ 
+    if (selectedFile.value) {
+        formData.append("selectedFile", selectedFile.value);
+    }
+ 
+ 
+    // Add group structure data
+    groups.value.forEach((group, index) => {
+        formData.append(`groupNames[${index}]`, group.name);
+        group.sections.forEach(section => {
+            formData.append(`groupSections[${index}][]`, section);
+        });
+    });
+ 
+ 
     formData.append("topic", topic.value);
     formData.append("language", "English");
     formData.append("extraContext", ""); // TODO delete later (from backend and library model)
@@ -301,7 +515,8 @@ const handleSubmit = () => {
         formData.append("selectedFile", selectedFile.value);
     }
     roomNames.value.forEach(room => formData.append("roomNames", room));
-
+ 
+ 
     axios
         .post("/api/library/generate", formData, {
             headers: {
@@ -332,10 +547,11 @@ const handleSubmit = () => {
         .finally(() => {
             buttonDisabled.value.isSubmitting = false;
         });
-};
-
-// Lifecycle hooks
-onMounted(() => {
+ };
+ 
+ 
+ // Lifecycle hooks
+ onMounted(() => {
     libraryDifficulty.value = "Normal";
     if (computedTopics.value.length > 0 && topicInput.value) {
         const { start, stop } = useTypingEffect(topicInput.value, computedTopics.value);
@@ -344,28 +560,32 @@ onMounted(() => {
     } else {
         //console.log("never started");
     }
-});
-
-onUnmounted(() => {
+ });
+ 
+ 
+ onUnmounted(() => {
     typingEffectStop.value();
-});
-</script>
-
-<style scoped>
-.library-gen-page {
+ });
+ </script>
+ 
+ 
+ <style scoped>
+ .library-gen-page {
     display: flex;
     justify-content: flex-start;
     /* Align content at the top */
     display: flex;
     flex-direction: column;
     width: 100%;
-}
-
-.libgen-section {
+ }
+ 
+ 
+ .libgen-section {
     width: 100%;
-}
-
-.form-container {
+ }
+ 
+ 
+ .form-container {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -374,86 +594,100 @@ onUnmounted(() => {
     max-width: 1000px;
     margin: 0 auto;
     padding: 1em;
-}
-
-.libgen-create {
+ }
+ 
+ 
+ .libgen-create {
     flex-direction: column;
     align-items: center;
     width: 100%;
     max-width: 720px;
     margin: 0 auto;
-}
-
-.form-group {
+ }
+ 
+ 
+ .form-group {
     display: flex;
     flex-direction: column;
     width: 100%;
     margin-bottom: 1em;
-}
-
-.libgen-title {
+ }
+ 
+ 
+ .libgen-title {
     margin-left: 1em;
     margin-bottom: -0.125em;
     font-size: 0.8em;
     opacity: 0.7;
-}
-
-.title-bar {
+ }
+ 
+ 
+ .title-bar {
     display: flex;
     flex-direction: row;
     align-items: baseline;
-}
-
-.input-error {
+ }
+ 
+ 
+ .input-error {
     border-color: red;
-}
-
-.error-message {
+ }
+ 
+ 
+ .error-message {
     color: red;
     font-size: 0.8em;
     margin-top: 0.5em;
-}
-
-.option {
+ }
+ 
+ 
+ .option {
     background: #00000000;
     opacity: 0.8;
     color: var(--highlight-color);
-}
-
-input[type="text"]::placeholder {
+ }
+ 
+ 
+ input[type="text"]::placeholder {
     color: var(--highlight-color);
-}
-
-.input {
+ }
+ 
+ 
+ .input {
     background-color: var(--background-color);
     margin-left: 2px;
     margin-right: 2px;
-}
-
-.form-container input[type="text"] {
+ }
+ 
+ 
+ .form-container input[type="text"] {
     background-color: var(--background-color);
     border: 1px solid var(--element-color-1);
     border-radius: 4px;
     width: 100%;
     box-sizing: border-box;
-}
-
-select {
+ }
+ 
+ 
+ select {
     padding: 10px;
     border: 1px solid var(--element-color-1);
-}
-
-input[type="text"] {
+ }
+ 
+ 
+ input[type="text"] {
     padding: 8px;
-}
-
-.cta-container {
+ }
+ 
+ 
+ .cta-container {
     width: 100%;
     max-width: 720px;
     margin: 0 auto;
-}
-
-.toggle-button {
+ }
+ 
+ 
+ .toggle-button {
     margin-left: 0;
     color: var(--text-color);
     opacity: 0.7;
@@ -461,26 +695,30 @@ input[type="text"] {
     border: none;
     font-size: 0.8em;
     cursor: pointer;
-}
-
-.file-upload {
+ }
+ 
+ 
+ .file-upload {
     margin-bottom: 2em;
-}
-
-.file-input-container {
+ }
+ 
+ 
+ .file-input-container {
     display: flex;
     flex-direction: column;
     gap: 0.5em;
-}
-
-.file-input-container input[type="file"] {
+ }
+ 
+ 
+ .file-input-container input[type="file"] {
     padding: 8px;
     border: 1px solid var(--element-color-1);
     border-radius: 4px;
     background-color: var(--background-color);
-}
-
-.selected-file {
+ }
+ 
+ 
+ .selected-file {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -489,9 +727,10 @@ input[type="text"] {
     border: 1px solid var(--element-color-1);
     border-radius: 4px;
     font-size: 0.9em;
-}
-
-.remove-file-btn {
+ }
+ 
+ 
+ .remove-file-btn {
     background: none;
     border: none;
     color: var(--text-color);
@@ -499,55 +738,64 @@ input[type="text"] {
     padding: 0 0.5em;
     font-size: 1.2em;
     opacity: 0.7;
-}
-
-.remove-file-btn:hover {
+ }
+ 
+ 
+ .remove-file-btn:hover {
     opacity: 1;
-}
-
-.room-input-container {
+ }
+ 
+ 
+ .room-input-container {
     display: flex;
     flex-direction: column;
     gap: 0.5em;
     margin-bottom: 1em;
-}
-
-.room-input-wrapper {
+ }
+ 
+ 
+ .room-input-wrapper {
     display: flex;
     gap: 0.5em;
-}
-
-.room-input-wrapper input {
+ }
+ 
+ 
+ .room-input-wrapper input {
     flex-grow: 1;
-}
-
-.add-room-btn {
+ }
+ 
+ 
+ .add-room-btn {
     padding: 8px 16px;
     background-color: var(--element-color-1);
     border: none;
     border-radius: 4px;
     color: var(--text-color);
     cursor: pointer;
-}
-
-.add-room-btn:disabled {
+ }
+ 
+ 
+ .add-room-btn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
-}
-
-.room-count {
+ }
+ 
+ 
+ .room-count {
     font-size: 0.8em;
     opacity: 0.7;
     text-align: right;
-}
-
-.room-chips {
+ }
+ 
+ 
+ .room-chips {
     display: flex;
     flex-wrap: wrap;
     gap: 0.5em;
-}
-
-.room-chip {
+ }
+ 
+ 
+ .room-chip {
     display: flex;
     align-items: center;
     gap: 0.5em;
@@ -555,9 +803,10 @@ input[type="text"] {
     background-color: var(--element-color-1);
     border-radius: 16px;
     font-size: 0.9em;
-}
-
-.remove-room-btn {
+ }
+ 
+ 
+ .remove-room-btn {
     background: none;
     border: none;
     color: var(--text-color);
@@ -568,17 +817,184 @@ input[type="text"] {
     display: flex;
     align-items: center;
     justify-content: center;
-}
-
-.remove-room-btn:hover {
+ }
+ 
+ 
+ .remove-room-btn:hover {
     opacity: 1;
-}
-
-.helper-text {
+ }
+ 
+ 
+ .helper-text {
     font-size: 0.8em;
     opacity: 0.7;
     margin-top: 0.5em;
     text-align: center;
     color: var(--text-color);
-}
-</style>
+ }
+ 
+ 
+ /* New styles for groups */
+ .group-controls {
+    margin-bottom: 16px;
+ }
+ 
+ 
+ .section-heading {
+    font-size: 0.9em;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--text-color);
+ }
+ 
+ 
+ .group-input-wrapper {
+    display: flex;
+    gap: 0.5em;
+ }
+ 
+ 
+ .group-input-wrapper input {
+    flex-grow: 1;
+ }
+ 
+ 
+ .add-btn {
+    padding: 8px 16px;
+    background-color: var(--element-color-1);
+    border: none;
+    border-radius: 4px;
+    color: var(--text-color);
+    cursor: pointer;
+ }
+ 
+ 
+ .add-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+ }
+ 
+ 
+ .error-container {
+    margin-top: 4px;
+ }
+ 
+ 
+ .groups-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 16px;
+ }
+ 
+ 
+ .group-item {
+    border: 1px solid var(--element-color-1);
+    border-radius: 8px;
+    padding: 12px;
+    background-color: var(--background-color-2, rgba(255, 255, 255, 0.05));
+ }
+ 
+ 
+ .group-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+ }
+ 
+ 
+ .group-title {
+    font-weight: 600;
+    font-size: 1em;
+ }
+ 
+ 
+ .group-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+ }
+ 
+ 
+ .section-count {
+    font-size: 0.8em;
+    opacity: 0.7;
+ }
+ 
+ 
+ .remove-btn {
+    background: none;
+    border: none;
+    color: var(--text-color);
+    cursor: pointer;
+    font-size: 1.2em;
+    opacity: 0.7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+ }
+ 
+ 
+ .remove-btn:hover {
+    opacity: 1;
+ }
+ 
+ 
+ .group-sections {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+ }
+ 
+ 
+ .section-input-wrapper {
+    display: flex;
+    gap: 0.5em;
+ }
+ 
+ 
+ .section-input-wrapper input {
+    flex-grow: 1;
+ }
+ 
+ 
+ .section-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 8px;
+ }
+ 
+ 
+ .section-chip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    background-color: var(--element-color-1);
+    border-radius: 16px;
+    font-size: 0.85em;
+ }
+ 
+ 
+ .remove-section-btn {
+    background: none;
+    border: none;
+    color: var(--text-color);
+    cursor: pointer;
+    padding: 0;
+    font-size: 1.1em;
+    opacity: 0.7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+ }
+ 
+ 
+ .remove-section-btn:hover {
+    opacity: 1;
+ }
+ </style>
+ 
+ 

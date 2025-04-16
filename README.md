@@ -69,7 +69,6 @@ TODO list:
         - migrate from pinecone-client to pinecone (not really a migration, just a typo I think, shouldn't take too long)
         - possibly fix weird ssl module warning thing when I run the backend
         - reduce bundle (currently @ 261 KiB, want to be ideally below 244)
-        - ACCOUNT FOR MOBILE SCREEN SIZES!!
         - add support for multiple file upload (possibly)
         - add other routes back in, eventually
         - remove library difficulty, mentor, language, etc... from db course structure, backend, frontend course creation screen
