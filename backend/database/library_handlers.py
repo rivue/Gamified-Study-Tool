@@ -16,13 +16,13 @@ from database.models import (
 
 
 def create_library(
-    user_id, library_topic, room_names, difficulty, language, language_difficulty,guide
+    user_id, library_topic, difficulty, language, language_difficulty,guide
 ):
     try:
         library = Library(
             user_id=user_id,
             library_topic=library_topic,
-            room_names=room_names,
+            room_names="deleteLater",
             difficulty=difficulty,
             language=language,
             language_difficulty=language_difficulty,

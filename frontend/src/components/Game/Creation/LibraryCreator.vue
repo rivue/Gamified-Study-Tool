@@ -18,7 +18,7 @@
                             Please enter a topic.
                         </div>
                         <div v-if="topicTypingError" class="error-message">
-                            Topic can only have spaces or letters.
+                            Topic can only have spaces or letters and must be at least 4 characters long.
                         </div>
                         <div v-if="topicSpaceError" class="error-message">
                             Topic must not start or end with a space.
@@ -29,7 +29,6 @@
 
                 <div class="libgen-section">
                     <div class="libgen-section">
-
 
                         <!-- File Upload Section -->
                         <div class="form-group file-upload">
@@ -60,7 +59,7 @@
 
                                 <div class="group-input-wrapper">
                                     <input type="text" v-model="newGroupName" placeholder="Enter unit/chapter name"
-                                        :class="{ 'input-error': groupError || groupTypingError || groupSpaceError }"
+                                        :class="{ 'input-error': groupError || groupTypingError || groupSpaceError || groupEmptyError }"
                                         maxlength="40" :disabled="disableExtras" @keyup.enter="addGroup" />
                                     <button class="add-btn" @click="addGroup"
                                         :disabled="!newGroupName.trim() || groups.length >= 10 || disableExtras">
@@ -70,9 +69,11 @@
                                 <div class="error-container">
                                     <div v-if="groupError" class="error-message">Please enter a valid unit name.</div>
                                     <div v-if="groupTypingError" class="error-message">Unit name can only have spaces or
-                                        letters.</div>
+                                        letters and must be at least 4 characters long.</div>
                                     <div v-if="groupSpaceError" class="error-message">Unit name must not start or end
                                         with a space.</div>
+                                    <div v-if="groupEmptyError" class="error-message">Must have at least one Unit</div>
+
                                 </div>
                             </div>
 
@@ -102,8 +103,8 @@
                                         <div class="section-input-wrapper">
                                             <input type="text" v-model="group.newSectionName"
                                                 placeholder="Enter section name"
-                                                :class="{ 'input-error': groupSectionError }" maxlength="40"
-                                                :disabled="group.sections.length >= 15 || disableExtras"
+                                                :class="{ 'input-error': groupNoSectionErrors[groupIndex] || groupSectionNamingErrors[groupIndex] }"
+                                                maxlength="40" :disabled="group.sections.length >= 15 || disableExtras"
                                                 @keyup.enter="addSection(groupIndex)" />
                                             <button class="add-btn" @click="addSection(groupIndex)"
                                                 :disabled="!group.newSectionName?.trim() || group.sections.length >= 15 || disableExtras">
@@ -111,7 +112,11 @@
                                             </button>
                                         </div>
                                         <div class="error-container">
-                                            <div v-if="groupSectionError" class="error-message">Please enter a section name.
+                                            <div v-if="groupNoSectionErrors[groupIndex]" class="error-message">
+                                                Every Unit must have at least one section
+                                            </div>
+                                            <div v-if="groupSectionNamingErrors[groupIndex]" class="error-message">
+                                                Section names must only have letters or spaces and must be at least 4 characters long.
                                             </div>
                                         </div>
                                     </div>
@@ -130,12 +135,7 @@
                             </div>
                         </div>
                     </div>
-
-
-
-
                 </div>
-
 
                 <!-- CTA Button -->
                 <div class="cta-container">
@@ -150,7 +150,7 @@
 
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { ref, reactive, watch, computed, onMounted, onUnmounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import axios from "axios";
 import { storeToRefs } from "pinia";
@@ -182,14 +182,32 @@ const authStore = useAuthStore();
 const popupStore = usePopupStore();
 // New refs for groups
 const groups = ref<Group[]>([]);
+const groupNoSectionErrors = ref<boolean[]>([])
+const groupSectionNamingErrors = ref<boolean[]>([])
 const newGroupName = ref("");
 const groupError = ref(false);
 const groupTypingError = ref(false);
 const groupSpaceError = ref(false);
-const groupSectionError = ref(false);
+const groupEmptyError = ref(false);
 
 const { topics } = storeToRefs(libGenStore);
 
+watch(
+    () => groups.value.length,
+    (len) => {
+        groupNoSectionErrors.value = Array(len).fill(false)
+    },
+    { immediate: true }
+)
+
+watch(
+  () => groups.value.length,
+  (len) => {
+    groupNoSectionErrors.value      = Array(len).fill(false);
+    groupSectionNamingErrors.value  = Array(len).fill(false);
+  },
+  { immediate: true }
+);
 
 const typingEffectStop = ref(() => { });
 const topic = ref("");
@@ -242,18 +260,23 @@ const disableExtras = computed(() => {
 
 // Methods for group management
 const addGroup = () => {
+    
     const trimmedName = newGroupName.value.trim();
+    
     if (trimmedName && groups.value.length < 10) {
+        
         groupError.value = false;
-        groupTypingError.value = !/^[a-zA-Z ]+$/.test(trimmedName);
+        groupTypingError.value = !/^[a-zA-Z ]+$/.test(trimmedName) || trimmedName.length < 4;
+        
         if (groupTypingError.value) {
             return;
         }
+        
         groupSpaceError.value = trimmedName[0] === " " || trimmedName[trimmedName.length - 1] === " ";
+        
         if (groupSpaceError.value) {
             return;
         }
-
 
         groups.value.push({
             name: trimmedName,
@@ -262,8 +285,8 @@ const addGroup = () => {
             sectionError: false
         });
 
-
         buttonDisabled.value.noRooms = false;
+        groupEmptyError.value = false;
         newGroupName.value = "";
     }
 };
@@ -282,25 +305,25 @@ const addSection = (groupIndex: number) => {
     const group = groups.value[groupIndex];
     const trimmedName = group.newSectionName.trim();
 
+    groupSectionNamingErrors.value[groupIndex] = false;
 
     if (trimmedName && group.sections.length < 15) {
         group.sectionError = false;
 
 
         // Validate section name
-        const typingError = !/^[a-zA-Z ]+$/.test(trimmedName);
+        const typingError = !/^[a-zA-Z ]+$/.test(trimmedName) || trimmedName.length < 4;
         const spaceError = trimmedName[0] === " " || trimmedName[trimmedName.length - 1] === " ";
 
-
         if (typingError || spaceError) {
-            groupSectionError.value = true;
+            groupSectionNamingErrors.value[groupIndex] = true;
             return;
-        }
-
-
-        group.sections.push(trimmedName);
-        group.newSectionName = "";
-        buttonDisabled.value.noRooms = false;
+    }
+    
+    groupNoSectionErrors.value[groupIndex] = false;
+    group.sections.push(trimmedName);
+    group.newSectionName = "";
+    buttonDisabled.value.noRooms = false;
     }
 };
 
@@ -356,6 +379,7 @@ const getTotalSectionCount = () => {
 };
 
 const hasErrors = (): boolean => {
+
     if (!authStore.loggedIn) {
         // must login to submit
         popupStore.showPopup(
@@ -364,6 +388,7 @@ const hasErrors = (): boolean => {
         return true;
     }
 
+    buttonDisabled.value.isSubmitting = true;
 
     if (topic.value.trim() === "") {
         topicError.value = true;
@@ -372,7 +397,7 @@ const hasErrors = (): boolean => {
 
     topicError.value = false;
 
-    topicTypingError.value = !/^[a-zA-Z ]+$/.test(topic.value);
+    topicTypingError.value = !/^[a-zA-Z ]+$/.test(topic.value) || topic.value.length < 4;
 
     if (topicTypingError.value) {
         return true;
@@ -392,11 +417,22 @@ const hasErrors = (): boolean => {
         return true;
     }
 
-    buttonDisabled.value.isSubmitting = true;
 
     // Check if there are groups and sections
-    if (groups.value.length === 0 || getTotalSectionCount() === 0) {
-        group.sectionError.value = true;
+    if (groups.value.length === 0) {
+        groupEmptyError.value = true;
+        return true;
+    }
+
+    groupEmptyError.value = false;
+
+    groupNoSectionErrors.value = groups.value.map(g => g.sections.length === 0)
+
+    if (groupNoSectionErrors.value.some(err => err)) {
+        return true;
+    }
+
+    if (groupSectionNamingErrors.value.some(err => err)) {
         return true;
     }
 
@@ -575,7 +611,7 @@ onUnmounted(() => {
 
 .error-message {
     color: red;
-    font-size: 0.8em;
+    font-size: 1em;
     margin-top: 0.5em;
 }
 
@@ -617,9 +653,9 @@ input[type="text"] {
 }
 
 .cta-container {
-    width: 100%;
-    max-width: 720px;
-    margin: 0 auto;
+    display: block;
+    width: fit-content;
+    margin: 1em auto 0;
 }
 
 

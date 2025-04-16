@@ -98,9 +98,15 @@ TODO list:
         - add support for links / pdfs / other things and get rid of things like difficulty, tutor, etc... then actually start generating stuff to study
         - after user submits something and is waiting, display a loading bar or wheel or something letting the user know that it is generating
 
+
+    potential work for rod / calvin / caleb:
+        - let units / sections / courses have spacings / duplicate values as others in db / weird characters / numbers, #($^@{"?}*), etc...
+        - change from rag --> kag
+            - very nlp involved + graph stuff, etc...
+
     game page:
         - break up error checking in frontend for unit creation
-        - implement game "score" logic (if you get >80% #attemps:number of questions ratio) then you get more / less points or something, etc..)
+        - implement game "score" logic (if you get >80% #attemps:number of questions ratio) then you get more / less points or something, etc...
         - investigate into what clouds and diamonds in game screen were used for so I can probably use them later
         - remove time from db then remove all references to "timer", "end time" or "starting time" in gameStore.js
         - add possibly a hint button as well (3 hints per question?)

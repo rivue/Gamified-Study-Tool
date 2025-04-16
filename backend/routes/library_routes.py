@@ -76,45 +76,36 @@ def init_library_routes(app):
                 language_difficulty = "Normal"
 
         # Extra context checks
-        # extra_context = request.form.get("extraContent") TODO: comment back in later
-        # if extra_context:
-        #     extra_context = clean(extra_context)
-        #     if len(extra_context) > 200:
-        #         return jsonify({"error": "Extra context is too long. Maximum 200 characters allowed."}), 400
-        # print("test output library_routes")
-        # # Check for existing library
-        # if not extra_context:
-        #     existing_library = lbh.get_library_id(topic, library_difficulty, language, language_difficulty, guide)
-        #     if existing_library:
-        #         # Now check if first room exists
-        #         user_id = current_user.id if not isinstance(current_user, AnonymousUserMixin) else None
-        #         existing_content = lbh.retrieve_library_room_contents(existing_library, topic, user_id)
-        #         if existing_content:
-        #             return jsonify(status="success", library_id=existing_library)
-        #         else:
-        #             try:
-        #                 # Generate room content asynchronously
-        #                 room_future = executor.submit(lgn.generate_libroom_content, user_id, topic, existing_library)
-        #                 room_contents = room_future.result()
-        #                 lbh.save_library_room_contents(existing_library, topic, room_contents, user_id=user_id)
-        #                 return jsonify(status="success", library_id=existing_library)
-        #             except Exception as e:
-        #                 return jsonify(status="error", message=f"Failed to generate room content {e}"), 500
-
-        
-        room_names = request.form.getlist('roomNames')
-        if room_names:
-            print(room_names)
-        else:
-            return jsonify({"error": f"Must specify room names for now, also we are in the process of breaking things"}), 400
+        extra_context = request.form.get("extraContent")
+        if extra_context:
+            extra_context = clean(extra_context)
+            if len(extra_context) > 200:
+                return jsonify({"error": "Extra context is too long. Maximum 200 characters allowed."}), 400
+        print("test output library_routes")
+        # Check for existing library
+        if not extra_context:
+            existing_library = lbh.get_library_id(topic, library_difficulty, language, language_difficulty, guide)
+            if existing_library:
+                # Now check if first room exists
+                user_id = current_user.id if not isinstance(current_user, AnonymousUserMixin) else None
+                existing_content = lbh.retrieve_library_room_contents(existing_library, topic, user_id)
+                if existing_content:
+                    return jsonify(status="success", library_id=existing_library)
+                else:
+                    try:
+                        # Generate room content asynchronously
+                        room_future = executor.submit(lgn.generate_libroom_content, user_id, topic, existing_library)
+                        room_contents = room_future.result()
+                        lbh.save_library_room_contents(existing_library, topic, room_contents, user_id=user_id)
+                        return jsonify(status="success", library_id=existing_library)
+                    except Exception as e:
+                        return jsonify(status="error", message=f"Failed to generate room content {e}"), 500
         
         groups = parse_group_structure()
         if groups:
             print("Parsed Groups:", groups)
         else:
             print("No groups provided.")
-
-        return jsonify({"error": f"in the process of breaking things"}), 400
 
         try :
             selected_file = request.files.get("selectedFile").read()
@@ -141,7 +132,7 @@ def init_library_routes(app):
             return jsonify({"error": f"Message breaks our usage policy. Please check our guidelines.\n{message}"}), 400
 
         # Creates library database object
-        library_response, status_code = lbh.create_library(user_id, topic, room_names, library_difficulty, language, language_difficulty, guide)
+        library_response, status_code = lbh.create_library(user_id, topic, library_difficulty, language, language_difficulty, guide)
 
         if status_code == 201:
             
@@ -151,8 +142,9 @@ def init_library_routes(app):
         else:
             raise Exception("Library creation failed")
 
+        return jsonify(status="failed", message="breaking things rn, brb"), 400
         try:
-
+            
             futures_dict = {}
             for room_name in room_names:
                 rag_context = query_and_respond_pinecone(room_name, library_id)
