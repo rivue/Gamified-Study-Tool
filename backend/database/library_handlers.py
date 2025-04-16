@@ -22,7 +22,7 @@ def create_library(
         library = Library(
             user_id=user_id,
             library_topic=library_topic,
-            room_names="deleteLater",
+            room_names=[],
             difficulty=difficulty,
             language=language,
             language_difficulty=language_difficulty,

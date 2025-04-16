@@ -35,11 +35,12 @@
                             <div class="libgen-title">Upload File</div>
                             <div class="file-input-container text-[var(--text-color)] border-[var(--text-color)]">
                                 <input type="file" id="fileInput" ref="fileInput" @change="handleFileUpload"
-                                    :disabled="disableExtras" accept=".pdf" />
+                                    :disabled="disableExtras" :class="{'input-error': noFileError}" accept=".pdf" />
                                 <div v-if="selectedFile" class="selected-file">
                                     Selected: {{ selectedFile.name }}
                                     <button class="remove-file-btn" @click="removeFile">×</button>
                                 </div>
+                                <div v-if="noFileError" class="error-message">Must have at least one file.</div>
                                 <div class="helper-text">
                                     🐙 Only accepting .pdf files that are 500kb or less for now - we're still building!
                                 </div>
@@ -214,6 +215,7 @@ const topic = ref("");
 const topicError = ref(false);
 const topicTypingError = ref(false);
 const topicSpaceError = ref(false);
+const noFileError = ref(false);
 const safeTopics = ref([
     "Engineering 101",
     "Materials Science",
@@ -234,11 +236,9 @@ const computedTopics = computed(() => {
     return topics.value.length > 0 ? topics.value : safeTopics.value;
 });
 
-
 const libgenRoute = computed(() => {
     return route.path === "/library";
 });
-
 
 const submitButtonText = computed(() => {
     if (buttonDisabled.value.isSubmitting) {
@@ -387,6 +387,13 @@ const hasErrors = (): boolean => {
         );
         return true;
     }
+
+    if (!selectedFile.value) {
+        noFileError.value = true;
+        return true;
+    }
+
+    noFileError.value = false;
 
     buttonDisabled.value.isSubmitting = true;
 

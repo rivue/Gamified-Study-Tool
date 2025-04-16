@@ -81,7 +81,7 @@ def init_library_routes(app):
             extra_context = clean(extra_context)
             if len(extra_context) > 200:
                 return jsonify({"error": "Extra context is too long. Maximum 200 characters allowed."}), 400
-        print("test output library_routes")
+
         # Check for existing library
         if not extra_context:
             existing_library = lbh.get_library_id(topic, library_difficulty, language, language_difficulty, guide)
@@ -142,13 +142,55 @@ def init_library_routes(app):
         else:
             raise Exception("Library creation failed")
 
-        return jsonify(status="failed", message="breaking things rn, brb"), 400
         try:
-            
+
+            # def print_form_values():
+            form = request.form.to_dict(flat=False)
+                # Simple debug print of all form values
+           
+                
+                # Specifically print group-related data
+            for key, values in form.items():
+                if 'groupNames' in key:
+                    print(f"Group name {key}: {values[0]}")
+                elif 'groupSections' in key:
+                    print(f"Group sections {key}: {values}")
+
+            return jsonify({"error": "breaking things rn"}), 400
             futures_dict = {}
-            for room_name in room_names:
-                rag_context = query_and_respond_pinecone(room_name, library_id)
+            #  print("Form data:")
+            # # for key, values in form.items():
+            #     # print(f"  {key}: {values}")
+            #     section_names = []
+            # for key, values in request.form.items():
+            #     if 'groupSections' in key:
+            #         section_names.extend(values)
+
+            # # For debugging
+            # print(f"Processing sections: {section_names}")
+
+            # # Set up concurrent tasks
+            # futures_dict = {}
+            # for section_name in section_names:
+            #     if section_name:  # Skip empty section names
+            #         rag_context = query_and_respond_pinecone(section_name, library_id)
+            #         future = executor.submit(
+            #             lgn.generate_room_content, 
+            #             user_id, 
+            #             section_name, 
+            #             library_difficulty, 
+            #             language, 
+            #             language_difficulty, 
+            #             extra_context, 
+            #             guide, 
+            #             rag_context
+            #         )
+            #         futures_dict[future] = section_name
+            for room_name in room_names: # for 'groupSections' in key, values in form.items()?
+                rag_context = query_and_respond_pinecone(room_name, library_id) # replace room_name with section names, pinecone doesn't need
+                                                                                # units
                 future = executor.submit(lgn.generate_room_content, user_id, room_name, library_difficulty, language, language_difficulty, extra_context, guide, rag_context)
+                                                                                # can replace room_name --> section names here as well. Nothing db related here
                 futures_dict[future] = room_name
 
             completed_rooms = {}
