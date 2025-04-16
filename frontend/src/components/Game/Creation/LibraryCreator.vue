@@ -198,9 +198,9 @@
  const roomTypingError = ref(false);
  const roomSpaceError = ref(false);
  const safeTopics = ref([
-    "Innovative breakdance moves",
-    "How to identify misinformation",
-    "Origins of the Olympic games",
+    "Engineering 101",
+    "Materials Science",
+    "Health and Fitness",
  ]);
  const libraryDifficulty = ref("Normal");
  const buttonDisabled = ref({
@@ -208,12 +208,8 @@
     isSubmitting: false,
  });
  const selectedFile = ref<File | null>(null);
- const newRoomName = ref("");
- const roomNames = ref<string[]>([]);
  const topicInput = ref<HTMLInputElement | null>(null);
  const fileInput = ref<HTMLInputElement | null>(null);
- 
- 
  
  
  // Computed properties
@@ -310,14 +306,12 @@
     }
  };
  
- 
  const removeSection = (groupIndex: number, sectionIndex: number) => {
     groups.value[groupIndex].sections.splice(sectionIndex, 1);
     if (getTotalSectionCount() === 0) {
         buttonDisabled.value.noRooms = true;
     }
  };
- 
  
  // Methods
  const handlePaste = (event: ClipboardEvent) => {
@@ -358,33 +352,6 @@
  };
  
  
- const addRoom = () => {
-    const trimmedName = newRoomName.value.trim();
-    if (trimmedName && roomNames.value.length < 30) {
-        roomError.value = false;
-        roomTypingError.value = !/^[a-zA-Z ]+$/.test(trimmedName);
-        if (roomTypingError.value) {
-            return;
-        }
-        roomSpaceError.value = trimmedName[0] === " " || trimmedName[trimmedName.length - 1] === " ";
-        if (roomSpaceError.value) {
-            return;
-        }
-        roomNames.value.push(trimmedName);
-        buttonDisabled.value.noRooms = false;
-        newRoomName.value = "";
-    }
- };
- 
- 
- const removeRoom = (index: number) => {
-    roomNames.value.splice(index, 1);
-    if (roomNames.value.length === 0) {
-        buttonDisabled.value.noRooms = true; // disables submit button until roomNames is not empty (must have room names to submit)
-    }
- };
- 
- 
  // Helper function to count total sections across all groups
  const getTotalSectionCount = () => {
     return groups.value.reduce((total, group) => total + group.sections.length, 0);
@@ -413,28 +380,39 @@
     if (topicSpaceError.value) {
         return;
     }
- 
- 
-    if (roomNames.value.length === 0) {
-        roomError.value = true;
-        return;
-    }
-    for (let roomName of roomNames.value) {
-        if (roomName.trim() === "") {
-            roomError.value = true;
-            return;
-        }
-    }
-    roomError.value = false;
-    roomTypingError.value = roomNames.value.some(roomName => !/^[a-zA-Z ]+$/.test(roomName));
-    if (roomTypingError.value) {
-        return;
-    }
-    roomSpaceError.value = roomNames.value.some(roomName => roomName[0] === " " || roomName[roomName.length - 1] === " ");
-    if (roomSpaceError.value) {
-        return;
-    }
- 
+
+    console.log("hi there 0")
+
+    // if (roomNames.value.length === 0) {
+    //     roomError.value = true;
+    //     return;
+    // }
+
+    console.log("hi there 1")
+
+    // for (let roomName of roomNames.value) {
+    //     if (roomName.trim() === "") {
+    //         roomError.value = true;
+    //         return;
+    //     }
+    // }
+
+    console.log("hi there 2")
+
+    // roomError.value = false;
+    // roomTypingError.value = roomNames.value.some(roomName => !/^[a-zA-Z ]+$/.test(roomName));
+    // if (roomTypingError.value) {
+    //     return;
+    // }
+
+    console.log("hi there 3")
+
+    // roomSpaceError.value = roomNames.value.some(roomName => roomName[0] === " " || roomName[roomName.length - 1] === " ");
+    // if (roomSpaceError.value) {
+    //     return;
+    // }
+    
+    console.log("hi there 4")
  
     const urlPattern =
         /^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)$/;
@@ -445,16 +423,13 @@
         return;
     }
  
- 
     buttonDisabled.value.isSubmitting = true;
- 
  
     // Check if there are groups and sections
     if (groups.value.length === 0 || getTotalSectionCount() === 0) {
         groupError.value = true;
         return;
     }
- 
  
     // Validate all group and section names
     let hasErrors = false;
@@ -508,7 +483,6 @@
     if (selectedFile.value) {
         formData.append("selectedFile", selectedFile.value);
     }
-    // roomNames.value.forEach(room => formData.append("roomNames", room));
  
  
     axios
