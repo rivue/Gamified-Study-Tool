@@ -144,54 +144,45 @@ def init_library_routes(app):
 
         try:
 
-            # def print_form_values():
             form = request.form.to_dict(flat=False)
-                # Simple debug print of all form values
-           
-                
-                # Specifically print group-related data
+
+            # Create a mapping of units to sections and collect all section names
+            section_unit_map = {}
+            section_names = []
+            unit_names = []  # New list to store unique unit names
+
+            # Parse the group structure from the form data
             for key, values in form.items():
-                if 'groupNames' in key:
-                    print(f"Group name {key}: {values[0]}")
-                elif 'groupSections' in key:
-                    print(f"Group sections {key}: {values}")
+                if key.startswith('groupSections[') and key.endswith('][]'):
+                    # Extract group index from the key (format: "groupSections[index][]")
+                    group_index = key[len('groupSections['):-3]  # Remove 'groupSections[' and '[]'
+                    
+                    # Get the corresponding group name if available
+                    group_name = form.get(f'groupNames[{group_index}]', ['Group ' + group_index])[0]
+                    
+                    # Add group name to unit_names if not already there
+                    if group_name and group_name not in unit_names:
+                        unit_names.append(group_name)
+                        section_unit_map[group_name] = []  # Initialize the list of sections for this unit
+                    
+                    # Add all section names to our list and map them to their group
+                    for section in values:
+                        if section:  # Skip empty section names
+                            section_names.append(section)
+                            section_unit_map[group_name].append(section)  # Add section to the unit's list
 
+            print(f"Section names: {section_names}")
+            print(f"Unit to sections mapping: {section_unit_map}")
+            print(f"Unit names: {unit_names}")
             return jsonify({"error": "breaking things rn"}), 400
+
             futures_dict = {}
-            #  print("Form data:")
-            # # for key, values in form.items():
-            #     # print(f"  {key}: {values}")
-            #     section_names = []
-            # for key, values in request.form.items():
-            #     if 'groupSections' in key:
-            #         section_names.extend(values)
-
-            # # For debugging
-            # print(f"Processing sections: {section_names}")
-
-            # # Set up concurrent tasks
-            # futures_dict = {}
-            # for section_name in section_names:
-            #     if section_name:  # Skip empty section names
-            #         rag_context = query_and_respond_pinecone(section_name, library_id)
-            #         future = executor.submit(
-            #             lgn.generate_room_content, 
-            #             user_id, 
-            #             section_name, 
-            #             library_difficulty, 
-            #             language, 
-            #             language_difficulty, 
-            #             extra_context, 
-            #             guide, 
-            #             rag_context
-            #         )
-            #         futures_dict[future] = section_name
-            for room_name in room_names: # for 'groupSections' in key, values in form.items()?
-                rag_context = query_and_respond_pinecone(room_name, library_id) # replace room_name with section names, pinecone doesn't need
-                                                                                # units
-                future = executor.submit(lgn.generate_room_content, user_id, room_name, library_difficulty, language, language_difficulty, extra_context, guide, rag_context)
-                                                                                # can replace room_name --> section names here as well. Nothing db related here
-                futures_dict[future] = room_name
+            for section_name in section_names:
+                if section_name: # Skip empty section names
+                    print(f"Processing sections: {section_name}")
+                    rag_context = query_and_respond_pinecone(section_name, library_id)
+                    future = executor.submit(lgn.generate_room_content, user_id, section_name, library_difficulty, language, language_difficulty, extra_context, guide, rag_context)
+                    futures_dict[future] = section_name
 
             completed_rooms = {}
             for future in concurrent.futures.as_completed(futures_dict):
@@ -205,7 +196,12 @@ def init_library_routes(app):
                     user_id = current_user.id if not isinstance(current_user, AnonymousUserMixin) else None
                     # print("user_id in library_routes.py")
                     print(f"room_contents library_routes 176: {room_contents}")
-                    lbh.save_library_room_contents(library_id, room_name, room_contents, user_id)
+                    lbh.save_library_room_contents(library_id, section_unit_map, room_contents, user_id)
+                    return jsonify({"error": "breaking things rn"}), 400
+
+                    # create library units
+                    lbh.create_library_units(library_id, room_name, groups)
+
                     completed_rooms[room_name] = True
                     # print(f"Successfully generated and saved content for room: {room_name}")
 
