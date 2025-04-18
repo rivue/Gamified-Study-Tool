@@ -179,12 +179,13 @@ class Library(db.Model):
     
     def attach_unit(self, unit: 'LibraryUnit'):
         """Attach a unit to this library"""
+        
         if not isinstance(unit, LibraryUnit):
             raise ValueError("unit must be an instance of LibraryUnit")
-
+        
         if unit.library_id == self.id:
             return unit
-
+        
         unit.library_id = self.id
 
         db.session.flush()

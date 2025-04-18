@@ -174,7 +174,6 @@ def init_library_routes(app):
             print(f"Section names: {section_names}")
             print(f"Unit to sections mapping: {section_unit_map}")
             print(f"Unit names: {unit_names}")
-            return jsonify({"error": "breaking things rn"}), 400
 
             futures_dict = {}
             for section_name in section_names:
@@ -186,18 +185,19 @@ def init_library_routes(app):
 
             completed_rooms = {}
             for future in concurrent.futures.as_completed(futures_dict):
+                
                 print("future")
                 
                 room_name = futures_dict[future]
                 
                 try:
+
                     room_contents = future.result()
-                    # print(f"room_contents: {room_contents}")
+
                     user_id = current_user.id if not isinstance(current_user, AnonymousUserMixin) else None
-                    # print("user_id in library_routes.py")
-                    print(f"room_contents library_routes 176: {room_contents}")
+
                     lbh.save_library_room_contents(library_id, section_unit_map, room_contents, user_id)
-                    return jsonify({"error": "breaking things rn"}), 400
+                    return jsonify({"error": "breaking things rn (generate_library)"}), 400
 
                     # create library units
                     lbh.create_library_units(library_id, room_name, groups)

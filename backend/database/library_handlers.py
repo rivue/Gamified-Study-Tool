@@ -1,6 +1,7 @@
 from datetime import datetime
 from flask import jsonify
 from sqlalchemy import func, distinct
+from contextlib import contextmanager
 import random
 import math
 from database.models import (
@@ -8,14 +9,22 @@ from database.models import (
     User,
     Library,
     LibraryUnit,
-    LibraryFactoid,
     LibrarySection,
+    LibraryFactoid,
     LibraryQuestion,
     LibraryQuestionChoice,
     LibraryRoomState,
     LibraryCompletion
 )
 
+@contextmanager
+def db_transaction():
+    try:
+        yield
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        raise e
 
 def create_library(
     user_id, library_topic, difficulty, language, language_difficulty,guide
@@ -42,22 +51,56 @@ def create_library(
         db.session.rollback()
         return jsonify({"message": str(e)}), 400
     
-def create_unit(library_id, unit_name):
+def create_unit_and_add(library_id, unit_name):
     try:
         unit = LibraryUnit(
             library_id=library_id,
             unit_name=unit_name
         )
+
+        library = Library.query.get(library_id)
+
         db.session.add(unit)
-        db.session.flush()
+
+        if not unit or not library:
+            return jsonify({"error": "Library or Unit not found"}), 404
+        
+        library.attach_unit(unit)
+
+        print(f"Library {library_id} units:")
+        for unit in library.units:
+            print(f"  - Unit ID: {unit.id}, Name: {unit.unit_name}")
+
         return (
             jsonify(
-                {"message": "Unit created successfully", "unit_id": unit.id}
+                {"message": "Unit created and added successfully", "unit": unit.id}
             ),
             201,
         )
     except Exception as e:
-        db.session.rollback()
+        return jsonify({"message": str(e)}), 400
+    
+def create_section_and_add(unit_id, section_name):
+    try:
+        unit = LibraryUnit.query.get(unit_id)
+
+        if not unit or not section_name:
+            return jsonify({"error": "Library or Section not found"}), 404
+
+        section = unit.add_section(section_name)
+
+        if not section:
+            return jsonify({"error": "Section failed to generate"}), 404
+        
+        db.session.flush()
+
+        return (
+            jsonify(
+                {"message": "Section created and added successfully", "section": section.id}
+            ),
+            201,
+        )
+    except Exception as e:
         return jsonify({"message": str(e)}), 400
 
 def get_library_id(library_topic, difficulty, language, language_difficulty, guide):
@@ -150,73 +193,88 @@ def save_library_room_contents(library_id, section_unit_map, lessons, user_id):
         # add unit
         # add sections, then add to unit
         # add factoids then add to sections
+        with db_transaction():
+            for unit_name, sections in section_unit_map.items():
 
-        for unit_name in section_unit_map:
-
-            # 1.1) create unit
-            response = create_unit(library_id, unit_name)
-            unit_id = response.json['unit_id']
-            
-            if unit_id is None:
-                return jsonify(status="error", message="Failed to create unit"), 200
-            
-
-            # 1.2) add unit to library
-            response, status = add_unit_to_library(library_id, room_name)
-            
-            if not response or status != 200:
-                return jsonify(status="error", message="Failed to add room name to library"), 200
-            
-            # TODO TEST RIGHT HERE AND COME BACK RIGHT HERE TO THIS!!!
-            
-            # add_library_room_state(user_id, library_id, room_name, num_lessons)
-            
-            return jsonify({"error": "breaking things rn"}), 400
-
-            for index, item in enumerate(lessons["factoids"]):
-                
-                lesson_name = "factoid_set_" + str(math.floor(index/9) + 1)
-                
-                print(f"item: {item}")
-
-                factoid_content = item["factoid_text"]
-                question_data = item["question"]
-                print("after lesson_name")
-                # Add factoid to library
-                factoid_response, status_code = add_factoid_to_library(
-                    library_id, room_name, factoid_content, lesson_name
-                )
-                print(f"factoid_response: {factoid_response}")
+                # 1.1 + 1.2) create unit and add to library
+                response_obj, status_code = create_unit_and_add(library_id, unit_name)
+                                
                 if status_code != 201:
-                    return factoid_response
-                factoid_id = factoid_response.json["factoid_id"]
-                print(f"factoid_id: {factoid_id}")
-                # Add question to factoid
-                question_type = question_data["type"]
-                question_text = question_data["text"]
-                correct_choice = question_data["correct_choice"]
-                
-                # wrong_choices = question_data["wrong_choices"]
-                wrong_choices = question_data.get("wrong_choices", [])
+                    print(response_obj.get_json()['message'])
+                    message = response_obj.get_json()['message']
+                    return jsonify(status="error", message=message.to_str()), 200
+                                
+                unit_id = response_obj.get_json()["unit"]
 
-                question_response, status_code = add_question_to_factoid(
-                    factoid_id, question_text, correct_choice, wrong_choices, question_type
-                )
-                print(f"question_response: {question_response}")
-                # problem here, start debugging tomorrow
-                if status_code != 201:
-                    return question_response
-                responses.append(
-                    {
-                        "factoid_response": factoid_response.json,
-                        "question_response": question_response.json,
-                    }
-                )
+                for section in sections:
+
+                    # 2.1 + 2.2) create sections and add to unit
+                    response_obj, status_code = create_section_and_add(unit_id, section)
+
+                    if status_code != 201:
+                        print(response_obj.get_json()['message'])
+                        message = response_obj.get_json()['message']
+                        return jsonify(status="error", message=message.to_str()), 200
+                    
+                    section_id = response_obj.get_json()["section"]
+
+                    # 3.1 + 3.2) create factoids and add to sections
+                    
+                    # 4) add room states
+                    # TODO COME BACK RIGHT HERE AND START WORKING ON LIBRARY_ROOM_STATE (
+                    # (CHANGE TO ADD_SECTION_USER_STATE OR SOMETHING!!!
+                    add_library_room_state(user_id, library_id, room_name, num_lessons)
+                    
+                    print("breaking things on slrc")
+                    return jsonify(status="error", message="breaking things rn (slrc)"), 400
+                    
+                    # 4) add factoids to sections
+                    for index, item in enumerate(lessons["factoids"]):
+                        
+                        lesson_name = "factoid_set_" + str(math.floor(index/9) + 1)
+                        
+                        print(f"item: {item}")
+
+                        factoid_content = item["factoid_text"]
+                        question_data = item["question"]
+                        print("after lesson_name")
+                        # Add factoid to library
+                        factoid_response, status_code = add_factoid_to_library(
+                            library_id, room_name, factoid_content, lesson_name
+                        )
+                        print(f"factoid_response: {factoid_response}")
+                        if status_code != 201:
+                            return factoid_response
+                        factoid_id = factoid_response.json["factoid_id"]
+                        print(f"factoid_id: {factoid_id}")
+                        # Add question to factoid
+                        question_type = question_data["type"]
+                        question_text = question_data["text"]
+                        correct_choice = question_data["correct_choice"]
+                        
+                        # wrong_choices = question_data["wrong_choices"]
+                        wrong_choices = question_data.get("wrong_choices", [])
+
+                        question_response, status_code = add_question_to_factoid(
+                            factoid_id, question_text, correct_choice, wrong_choices, question_type
+                        )
+                        print(f"question_response: {question_response}")
+                        
+                        
+                        
+                        
+                        if status_code != 201:
+                            return question_response
+                        responses.append(
+                            {
+                                "factoid_response": factoid_response.json,
+                                "question_response": question_response.json,
+                            }
+                        )
 
         return jsonify(status="success", data=responses)
     
     except Exception as e:
-        db.session.rollback()
         print("Exception save_library_room_contents")
         print("message: ", str(e))
         return jsonify({"message": str(e)}), 400
@@ -379,30 +437,6 @@ def add_question_to_factoid(factoid_id, question_text, correct_choice, wrong_cho
     except Exception as e:
         db.session.rollback()
         return jsonify({"message": str(e)}), 400
-
-# def add_room_name_to_library(library_id, new_room_name):
-def add_unit_to_library(library_id, unit_id):
-    try:
-
-        unit = LibraryUnit.query.get(unit_id)
-        library = Library.query.get(library.id)
-
-        if not unit or not library:
-            return jsonify({"error": "Library or Unit not found"}), 404
-        
-        library.attach_unit(unit_id)
-
-        # Commit changes
-        db.session.commit()
-        
-        return jsonify({"message": "Room added successfully", "library_id": library_id, "new_unit": unit_id}), 200
-
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({
-            "error": f"Failed to add room: {str(e)}",
-            "library_id": library_id
-        }), 500
 
 def get_factoid(factoid_id):
     factoid = LibraryFactoid.query.get(factoid_id)
@@ -701,6 +735,8 @@ def model_to_dict(model_instance, exclude=None):
 
 # Adding as_dict methods to models
 Library.as_dict = lambda self: model_to_dict(self)
+LibraryUnit.as_dict = lambda self: model_to_dict(self)
+LibrarySection.as_dict = lambda self: model_to_dict(self)
 LibraryFactoid.as_dict = lambda self: model_to_dict(self)
 LibraryQuestion.as_dict = lambda self: model_to_dict(self)
 LibraryQuestionChoice.as_dict = lambda self: model_to_dict(self)

@@ -44,6 +44,9 @@ TODO list:
         (currently all 4 were in BottomBar.vue) --> (BASICALLY MAKE BottomBar.vue SMALLER)
 
     general:
+        - add two buttons right next to each other and right above "play"
+            1) video button where a manim video is generated about the subject possibly
+            2) other resources button where other youtube videos / articles are researched in relation to the topic (grab the resources based on content, not necessarily the name of the section)
         - add ability to see uploaded files in library and maybe even file preview
         - add ability to add friends to a course + leaderboard as well
         - make a constants file for discord links, twitter / x links, any backend urls, etc...
