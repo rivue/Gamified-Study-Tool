@@ -218,15 +218,12 @@ def save_library_room_contents(library_id, section_unit_map, lessons, user_id):
                     
                     section_id = response_obj.get_json()["section"]
 
-                    # 3.1 + 3.2) create factoids and add to sections
                     
-                    # 4) add room states
-                    # TODO COME BACK RIGHT HERE AND START WORKING ON LIBRARY_ROOM_STATE (
-                    # (CHANGE TO ADD_SECTION_USER_STATE OR SOMETHING!!!
-                    add_library_room_state(user_id, library_id, room_name, num_lessons)
+                    # 3) add room states
+                    add_section_user_state(user_id, library_id, section_id, num_lessons)
                     
-                    print("breaking things on slrc")
-                    return jsonify(status="error", message="breaking things rn (slrc)"), 400
+                    # 4.1 + 4.2) create factoids and add to sections
+
                     
                     # 4) add factoids to sections
                     for index, item in enumerate(lessons["factoids"]):
@@ -239,13 +236,14 @@ def save_library_room_contents(library_id, section_unit_map, lessons, user_id):
                         question_data = item["question"]
                         print("after lesson_name")
                         # Add factoid to library
-                        factoid_response, status_code = add_factoid_to_library(
-                            library_id, room_name, factoid_content, lesson_name
+                        factoid_response, status_code = add_factoid_to_section(
+                            section_id, factoid_content, lesson_name
                         )
                         print(f"factoid_response: {factoid_response}")
+                        print(f"factoid_response get_json: {factoid_response.get_json()}")
                         if status_code != 201:
                             return factoid_response
-                        factoid_id = factoid_response.json["factoid_id"]
+                        factoid_id = factoid_response.get_json()["factoid_id"]
                         print(f"factoid_id: {factoid_id}")
                         # Add question to factoid
                         question_type = question_data["type"]
@@ -260,9 +258,6 @@ def save_library_room_contents(library_id, section_unit_map, lessons, user_id):
                         )
                         print(f"question_response: {question_response}")
                         
-                        
-                        
-                        
                         if status_code != 201:
                             return question_response
                         responses.append(
@@ -271,6 +266,8 @@ def save_library_room_contents(library_id, section_unit_map, lessons, user_id):
                                 "question_response": question_response.json,
                             }
                         )
+                        print("breaking things on slrc")
+                        return jsonify(status="error", message="breaking things rn (slrc)"), 400
 
         return jsonify(status="success", data=responses)
     
@@ -346,12 +343,13 @@ def retrieve_library_room_contents(library_id, room_name, user_id):
 
     return {"room_name": room_name, "factoids": room_contents}
 
-def add_library_room_state(user_id, library_id, room_name, num_lessons, initial_lesson_state=1):
+def add_section_user_state(user_id, library_id, section_id, num_lessons, initial_lesson_state=1):
 
     # Check if a record already exists for this user, library, and room
     existing_state = LibraryRoomState.query.filter_by(
         user_id=user_id,
-        library_id=library_id,
+        # library_id=library_id, # TODO might be issue but idk
+        section_id=section_id,
     ).first()
     
     if existing_state:
@@ -360,8 +358,9 @@ def add_library_room_state(user_id, library_id, room_name, num_lessons, initial_
     # Create new library room state
     new_state = LibraryRoomState(
         user_id=user_id,
-        library_id=library_id,
+        library_id=library_id, # we don't need bc of new model
         room_name="placeholder",
+        section_id=section_id,
         num_lessons=num_lessons,
         lesson_state=initial_lesson_state
     )
@@ -392,10 +391,10 @@ def increase_lesson_state(user_id, library_id, room_name):
     
     return state, False  # Lesson state already at maximum
 
-def add_factoid_to_library(library_id, room_name, factoid_content, lesson_name):
+def add_factoid_to_section(section_id, factoid_content, lesson_name):
     try:
         factoid = LibraryFactoid(
-            library_id=library_id, room_name=room_name, factoid_content=factoid_content, lesson_name=lesson_name
+            section_id=section_id, lesson_name=lesson_name, factoid_content=factoid_content
         )
         db.session.add(factoid)
         db.session.commit()

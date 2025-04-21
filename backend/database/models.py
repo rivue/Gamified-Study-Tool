@@ -221,7 +221,7 @@ class LibraryRoomState(db.Model): # maps users to states of rooms they are in
     library_id = db.Column(db.Integer, db.ForeignKey('library.id'), nullable=False)
 
     room_name = db.Column(db.String(200), nullable=False)
-    factoid_id = db.Column(db.Integer, db.ForeignKey('library_factoid.id'), nullable=True)
+    section_id = db.Column(db.Integer, db.ForeignKey('library_section.id'), nullable=True)
 
     num_lessons = db.Column(db.Integer, nullable=False)
     lesson_state = db.Column(db.Integer, nullable=False)  # 1-state 1, 2-state 2, 3-state 3, 4-state 4, etc...
@@ -255,15 +255,13 @@ class LibraryCompletion(db.Model):
 
 class LibraryFactoid(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    library_id = db.Column(db.Integer, db.ForeignKey('library.id'), nullable=False)
-    room_name = db.Column(db.String(200), nullable=False)
+    library_id = db.Column(db.Integer, db.ForeignKey('library.id'), nullable=True)
+    room_name = db.Column(db.String(200), nullable=True)
     section_id = db.Column(db.Integer, db.ForeignKey('library_section.id'), nullable=True)
     lesson_name = db.Column(db.String(200), nullable=False)
     factoid_content = db.Column(db.Text, nullable=False)
 
     questions = db.relationship('LibraryQuestion', backref='factoid')
-
-    room_states = db.relationship("LibraryRoomState", backref="factoid", lazy=True)
 
 class LibraryQuestion(db.Model):
     id = db.Column(db.Integer, primary_key=True)

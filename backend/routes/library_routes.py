@@ -239,6 +239,7 @@ def init_library_routes(app):
 
         # Check if the library has a default image and possibly trigger image generation
         response, status_code = lbh.has_default_image(library_id)
+        
         if status_code != 200:
             return response
 

@@ -22,14 +22,14 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('library_id', sa.Integer(), nullable=False),
     sa.Column('unit_name', sa.String(length=200), nullable=False),
-    sa.ForeignKeyConstraint(['library_id'], ['library.id'], ),
+    sa.ForeignKeyConstraint(['library_id'], ['library.id'], name='fk_library_unit_library_id'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('library_section',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('unit_id', sa.Integer(), nullable=False),
     sa.Column('section_name', sa.String(length=200), nullable=False),
-    sa.ForeignKeyConstraint(['unit_id'], ['library_unit.id'], ),
+    sa.ForeignKeyConstraint(['unit_id'], ['library_unit.id'], name='fk_library_section_unit_id'),
     sa.PrimaryKeyConstraint('id')
     )
     with op.batch_alter_table('library_factoid', schema=None) as batch_op:

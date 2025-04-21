@@ -25,7 +25,7 @@ onMounted(async () => {
     const libraryId = route.params.id;
     const roomName = route.params.roomName;
     try {
-        await gameStore.fetchLibraryDetails(libraryId, roomName);
+        await gameStore.fetchLibraryDetails(libraryId.toString(), roomName.toString());
         if (!abortController.signal.aborted && !gameStore.libraryError) {
             gameStore.startGame();
         }
