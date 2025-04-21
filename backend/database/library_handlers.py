@@ -177,6 +177,8 @@ def get_library_details(library_id):
         return jsonify({'error': str(e)}), 500
 
 def get_library_room_state(user_id, library_id, section_id=None):
+    
+    print(f" user_id: {user_id}, library_id: {library_id}, section_id: {section_id}")
 
     if not section_id: # for all rooms (ex: map page)
         room_states = LibraryRoomState.query.filter_by(
@@ -306,9 +308,12 @@ def retrieve_library_room_contents(library_id, section_id, user_id):
     # map user id, library id, and room name in map to retrieve state
     # send state and factoids for that state back
     curr_state = get_library_room_state(user_id, library_id, section_id)
+
     print(f"curr_state: {curr_state}")
+
     if not curr_state:
         return None
+    
     print("after curr_state check")
     
     if curr_state["lesson_state"] > curr_state["num_lessons"]:
@@ -328,6 +333,7 @@ def retrieve_library_room_contents(library_id, section_id, user_id):
         
     if len(factoids) < 3:
         return None
+    
     print(f"factoids: {factoids}")
 
     room_contents = []

@@ -255,8 +255,13 @@ def init_library_routes(app):
         # print(library_topic)
         # library_topic = "science thing"
         if library_topic:
-            
-            room_data = lbh.retrieve_library_room_contents(library_id, library_topic, user_id)
+            section_id = None
+            for unit in library.units:
+                for section in unit.sections:
+                    if section.name == library_topic:
+                        section_id = section.id
+                        break
+            room_data = lbh.retrieve_library_room_contents(library_id, section_id, user_id)
             print("after retrieve")
             print(f"room_data: {room_data}")
 
@@ -279,7 +284,7 @@ def init_library_routes(app):
                     return jsonify(status="error", message="Room not found"), 404
         else:
             room_data = lbh.get_library_room_state(user_id, library_id)
-            room_data = room_data
+            # room_data = room_data
         test = library_data.get("room_names")
         print(f"library_data.room_names: {test}")
         return jsonify(status="success", data=library_data, room_data=room_data)
