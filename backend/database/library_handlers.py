@@ -137,9 +137,8 @@ def get_library(library_id, user_id=None, click=True):
     library_data["tutorial"] = True # default
     if user_id:
         for unit in library.units:
-            unit_data = unit.as_dict()
-            unit_data["sections"] = [section.section_name for section in unit.sections]
-            library_data["room_names"].append(unit_data)
+            for section in unit.sections:
+                library_data["room_names"].append(section.section_name)
 
         existing_completion = LibraryCompletion.query.filter_by(library_id=library_id, user_id=user_id).first()
         if existing_completion:

@@ -201,7 +201,7 @@
     </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import {
     StarIcon,
@@ -427,7 +427,8 @@ const getIconForIndex = (index) => {
 }
 
 // Format room name for display
-const formatRoomName = (name) => {
+const formatRoomName = (name: string) => {
+    console.log(name);
     return name
         .split('_')
         .map(word => word.charAt(0).toUpperCase() + word.slice(1))
