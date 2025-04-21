@@ -227,6 +227,7 @@ def init_library_routes(app):
     def get_library(library_id):
         
         library_topic = request.args.get("library_topic", None)
+        section_id = request.args.get("section_id", None)
 
         user_id = current_user.id if not isinstance(current_user, AnonymousUserMixin) else None
         library = lbh.get_library(library_id, user_id)
@@ -256,11 +257,7 @@ def init_library_routes(app):
         # library_topic = "science thing"
         if library_topic:
             section_id = None
-            for unit in library.units:
-                for section in unit.sections:
-                    if section.name == library_topic:
-                        section_id = section.id
-                        break
+            # TODO when I get back: finish writing get_section in line 163ish of library_handler.py
             room_data = lbh.retrieve_library_room_contents(library_id, section_id, user_id)
             print("after retrieve")
             print(f"room_data: {room_data}")

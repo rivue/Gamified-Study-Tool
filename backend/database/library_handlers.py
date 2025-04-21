@@ -160,6 +160,17 @@ def get_library(library_id, user_id=None, click=True):
     library_data["clicks"] = library.clicks
     return jsonify(library_data)
 
+def get_section(library_id, section_id, user_id):
+    try:
+        section = LibrarySection.query.get(
+            library_id, 
+            section_id, 
+            user_id
+            )
+        return something idk yet
+    except Exception as e:
+        return something else idk yet
+    
 def get_library_details(library_id):
     try:
         library = Library.query.get(library_id)
@@ -177,7 +188,7 @@ def get_library_details(library_id):
         return jsonify({'error': str(e)}), 500
 
 def get_library_room_state(user_id, library_id, section_id=None):
-    
+
     print(f" user_id: {user_id}, library_id: {library_id}, section_id: {section_id}")
 
     if not section_id: # for all rooms (ex: map page)
