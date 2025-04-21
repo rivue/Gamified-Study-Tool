@@ -139,6 +139,7 @@ def get_library(library_id, user_id=None, click=True):
     if user_id:
         inc = 0
         print("hi")
+        print(f"library_units: {library.units}")
         for unit in library.units:
             print(f"unit: {unit.unit_name}")
             for section in unit.sections:
@@ -189,7 +190,7 @@ def get_library_room_state(user_id, library_id, section_id=None):
         state = LibraryRoomState.query.filter_by(
             user_id=user_id,
             library_id=library_id,
-            room_name="placeholderlrs1234",
+            # room_name="placeholderlrs1234",
             section_id=section_id,
         ).first()
         return state.as_dict() if state else None
@@ -359,7 +360,7 @@ def retrieve_library_room_contents(library_id, section_id, user_id):
             {"factoid_text": factoid.factoid_content, "questions": questions, "room_state": curr_state}
         )
 
-    return {"room_name": room_name, "factoids": room_contents}
+    return {"factoids": room_contents}
 
 def add_section_user_state(user_id, library_id, section_id, num_lessons, initial_lesson_state=1):
 
