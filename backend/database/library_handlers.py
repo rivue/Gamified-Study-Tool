@@ -124,9 +124,10 @@ def get_library_id(library_topic, difficulty, language, language_difficulty, gui
 
 
 def get_library(library_id, user_id=None, click=True):
+
     library = Library.query.get(library_id)
+
     if not library:
-        
         return jsonify({"message": "Library not found"}), 404
     
     if click:
@@ -136,9 +137,14 @@ def get_library(library_id, user_id=None, click=True):
     library_data = library.as_dict()
     library_data["tutorial"] = True # default
     if user_id:
+        inc = 0
+        print("hi")
         for unit in library.units:
+            print(f"unit: {unit.unit_name}")
             for section in unit.sections:
                 library_data["room_names"].append(section.section_name)
+                inc += 1
+                print(inc)
 
         existing_completion = LibraryCompletion.query.filter_by(library_id=library_id, user_id=user_id).first()
         if existing_completion:
