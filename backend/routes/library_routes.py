@@ -197,13 +197,10 @@ def init_library_routes(app):
                     user_id = current_user.id if not isinstance(current_user, AnonymousUserMixin) else None
 
                     lbh.save_library_room_contents(library_id, section_unit_map, room_contents, user_id)
-                    return jsonify({"error": "breaking things rn (generate_library)"}), 400
 
-                    # create library units
-                    lbh.create_library_units(library_id, room_name, groups)
 
                     completed_rooms[room_name] = True
-                    # print(f"Successfully generated and saved content for room: {room_name}")
+                    print(f"Successfully generated and saved content for room: {room_name}")
 
                 except Exception as e:
                     
@@ -239,7 +236,7 @@ def init_library_routes(app):
 
         # Check if the library has a default image and possibly trigger image generation
         response, status_code = lbh.has_default_image(library_id)
-        
+
         if status_code != 200:
             return response
 
@@ -279,7 +276,8 @@ def init_library_routes(app):
         else:
             room_data = lbh.get_library_room_state(user_id, library_id)
             room_data = room_data
-
+        test = library_data.get("room_names")
+        print(f"library_data.room_names: {test}")
         return jsonify(status="success", data=library_data, room_data=room_data)
         
     @app.route('/api/library/room', methods=['POST'])

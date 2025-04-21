@@ -134,8 +134,13 @@ def get_library(library_id, user_id=None, click=True):
         db.session.commit()
         
     library_data = library.as_dict()
-    library_data["tutorial"] = True #default
+    library_data["tutorial"] = True # default
     if user_id:
+        for unit in library.units:
+            unit_data = unit.as_dict()
+            unit_data["sections"] = [section.section_name for section in unit.sections]
+            library_data["room_names"].append(unit_data)
+
         existing_completion = LibraryCompletion.query.filter_by(library_id=library_id, user_id=user_id).first()
         if existing_completion:
             library_data["score"] = existing_completion.score
@@ -165,9 +170,9 @@ def get_library_details(library_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-def get_library_room_state(user_id, library_id, room_name=None):
+def get_library_room_state(user_id, library_id, section_id=None):
 
-    if not room_name: # for all rooms (ex: map page)
+    if not section_id: # for all rooms (ex: map page)
         room_states = LibraryRoomState.query.filter_by(
             user_id=user_id,
             library_id=library_id
@@ -179,7 +184,8 @@ def get_library_room_state(user_id, library_id, room_name=None):
         state = LibraryRoomState.query.filter_by(
             user_id=user_id,
             library_id=library_id,
-            room_name=room_name
+            room_name="placeholderlrs1234",
+            section_id=section_id,
         ).first()
         return state.as_dict() if state else None
 
@@ -234,13 +240,21 @@ def save_library_room_contents(library_id, section_unit_map, lessons, user_id):
 
                         factoid_content = item["factoid_text"]
                         question_data = item["question"]
+
                         print("after lesson_name")
+                        
+                        section = LibrarySection.query.get(section_id)
+                        print(f"# factoids in section: {section.factoids}")
                         # Add factoid to library
                         factoid_response, status_code = add_factoid_to_section(
                             section_id, factoid_content, lesson_name
                         )
+
+                        section = LibrarySection.query.get(section_id)
+                        print(f"# factoids in section: {section.factoids}")
+
                         print(f"factoid_response: {factoid_response}")
-                        print(f"factoid_response get_json: {factoid_response.get_json()}")
+
                         if status_code != 201:
                             return factoid_response
                         factoid_id = factoid_response.get_json()["factoid_id"]
@@ -266,9 +280,8 @@ def save_library_room_contents(library_id, section_unit_map, lessons, user_id):
                                 "question_response": question_response.json,
                             }
                         )
-                        print("breaking things on slrc")
-                        return jsonify(status="error", message="breaking things rn (slrc)"), 400
 
+                     
         return jsonify(status="success", data=responses)
     
     except Exception as e:
@@ -277,7 +290,7 @@ def save_library_room_contents(library_id, section_unit_map, lessons, user_id):
         return jsonify({"message": str(e)}), 400
 
 
-def retrieve_library_room_contents(library_id, room_name, user_id):
+def retrieve_library_room_contents(library_id, section_id, user_id):
 
     # user HAS to be logged
     if not user_id:
@@ -286,7 +299,7 @@ def retrieve_library_room_contents(library_id, room_name, user_id):
     # query lesson room state map
     # map user id, library id, and room name in map to retrieve state
     # send state and factoids for that state back
-    curr_state = get_library_room_state(user_id, library_id, room_name)
+    curr_state = get_library_room_state(user_id, library_id, section_id)
     print(f"curr_state: {curr_state}")
     if not curr_state:
         return None
@@ -295,7 +308,7 @@ def retrieve_library_room_contents(library_id, room_name, user_id):
     if curr_state["lesson_state"] > curr_state["num_lessons"]:
         # User has completed all lessons, randomly get 7-9 factoids
         all_factoids = LibraryFactoid.query.filter_by(
-            library_id=library_id, room_name=room_name
+            library_id=library_id, section_id=section_id
         ).all()
         
         # Randomly select between 7-9 factoids or all if less than 7
@@ -304,7 +317,7 @@ def retrieve_library_room_contents(library_id, room_name, user_id):
     else:
         # Get factoids for the current lesson state
         factoids = LibraryFactoid.query.filter_by(
-            library_id=library_id, room_name=room_name, lesson_name=f"factoid_set_{curr_state['lesson_state']}"
+            library_id=library_id, section_id=section_id, lesson_name=f"factoid_set_{curr_state['lesson_state']}"
         ).all()
         
     if len(factoids) < 3:
