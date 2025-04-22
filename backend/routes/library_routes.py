@@ -227,12 +227,9 @@ def init_library_routes(app):
     def get_library(library_id):
         
         library_topic = request.args.get("library_topic", None)
-        unit_id = request.args.get("unit_id", None)
 
         user_id = current_user.id if not isinstance(current_user, AnonymousUserMixin) else None
         library = lbh.get_library(library_id, user_id)
-
-        print("after get_library in lbh")
 
         if not library:
             return jsonify(status="error", message="Library not found"), 404
@@ -242,7 +239,7 @@ def init_library_routes(app):
 
         if status_code != 200:
             return response
-
+        
         # If there's a default image and the click count is divisible by 4, queue up image generation
         if response.json['has_default_image'] and library.get_json().get("clicks") % 4 == 0:
             executor.submit(generate_images_task, library_id)
@@ -252,43 +249,32 @@ def init_library_routes(app):
 
         # Attempt to retrieve existing room contents
         room_data = None
-        # print("library api")
-        # print(library_topic)
-        # library_topic = "science thing"
-        if library_topic and unit_id:
 
-            # library_topic is really just section name btw
-            section_data, status_code = lbh.get_section(library_id, library_topic, user_id) # TODO: NEED unit id
+        if library_topic:
 
-            print(f"section_data: {section_data}")
-            print(f"status_code: {status_code}")
+            unit_id, section_id = library.get_json().get('section_to_unit_map').get(library_topic)
+            print(f"section_id: {section_id}")
+            room_data = lbh.retrieve_library_room_contents(library_id, section_id, user_id)
+            print("after retrieve")
+            print(f"room_data: {room_data}")
 
-            if status_code != 201 or section_data is None:
-                print("Section not found")
-
-            else:
-                print(section_data.id)
-                room_data = lbh.retrieve_library_room_contents(library_id, section_data.id, user_id)
-                print("after retrieve")
-                print(f"room_data: {room_data}")
-
-                if not room_data:
-                    if library_topic in library_data.get('room_names'):
-                        print("get_library if lt in ld")
-                        # try:
-                        #     # If no content exists, generate the room content
-                        #     room_contents = lgn.generate_libroom_content(
-                        #         user_id,
-                        #         library_topic,
-                        #         library_id
-                        #     )
-                        #     print(f"room_contents library_routes 240: {room_contents}")
-                        #     lbh.save_library_room_contents(library_id, library_topic, room_contents)
-                        #     room_data = room_contents
-                        # except Exception as e:
-                        #     return jsonify(status="error", message="Failed to generate room content"), 500
-                    else:
-                        return jsonify(status="error", message="Room not found"), 404
+            if not room_data:
+                if library_topic in library_data.get('room_names'):
+                    print("get_library if lt in ld")
+                    # try:
+                    #     # If no content exists, generate the room content
+                    #     room_contents = lgn.generate_libroom_content(
+                    #         user_id,
+                    #         library_topic,
+                    #         library_id
+                    #     )
+                    #     print(f"room_contents library_routes 240: {room_contents}")
+                    #     lbh.save_library_room_contents(library_id, library_topic, room_contents)
+                    #     room_data = room_contents
+                    # except Exception as e:
+                    #     return jsonify(status="error", message="Failed to generate room content"), 500
+                else:
+                    return jsonify(status="error", message="Room not found"), 404
         else:
             room_data = lbh.get_library_room_state(user_id, library_id)
             # return a map of room names --> unit ids

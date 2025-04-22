@@ -1,7 +1,7 @@
 <template>
     <div class="game-page">
         <game-toolbar />
-        <game-window :section-unitid-map="stateFromHistory" />
+        <game-window />
         <library-completion />
     </div>
 </template>
@@ -14,8 +14,6 @@ import GameWindow from "./GameWindow.vue";
 import LibraryCompletion from './LibraryCompletion.vue';
 import GameToolbar from './GameToolbar.vue';
 import { onBeforeRouteLeave } from "vue-router";
-
-const stateFromHistory = window.history.state.state?.sectionUnitidMap;
 
 const gameStore = useGameStore();
 

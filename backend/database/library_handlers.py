@@ -141,15 +141,10 @@ def get_library(library_id, user_id=None, click=True):
 
     if user_id:
         inc = 0
-        print("hi")
-        print(f"library_units: {library.units}")
         for unit in library.units:
-            print(f"unit: {unit.unit_name}")
             for section in unit.sections:
                 library_data["room_names"].append(section.section_name)
-                section_to_unit_map[section.section_name] = unit.id
-                inc += 1
-                print(inc)
+                section_to_unit_map[section.section_name] = (unit.id, section.id)
 
         existing_completion = LibraryCompletion.query.filter_by(library_id=library_id, user_id=user_id).first()
         if existing_completion:
@@ -164,23 +159,6 @@ def get_library(library_id, user_id=None, click=True):
     library_data["clicks"] = library.clicks
     library_data["section_to_unit_map"] = section_to_unit_map
     return jsonify(library_data)
-
-def get_section(library_id, section_name, user_id):
-
-    try:
-
-        section = LibrarySection.query.get(
-            section_name, 
-            # TODO: NEED UNIT_ID
-            )
-        
-        if not section:
-            return jsonify({"message": "Section not found"}), 404
-        
-        return {"section_id":section.id, "section_name":section.section_name}, 201
-    
-    except Exception as e:
-        return None, 404
     
 def get_library_details(library_id):
     try:
@@ -329,7 +307,7 @@ def retrieve_library_room_contents(library_id, section_id, user_id):
     # query lesson room state map
     # map user id, library id, and room name in map to retrieve state
     # send state and factoids for that state back
-    curr_state = get_library_room_state(user_id, library_id, section_id) # user_id? no, you need UNIT_ID
+    curr_state = get_library_room_state(user_id, library_id, section_id) 
 
     print(f"curr_state: {curr_state}")
 
@@ -352,7 +330,9 @@ def retrieve_library_room_contents(library_id, section_id, user_id):
         factoids = LibraryFactoid.query.filter_by(
             library_id=library_id, section_id=section_id, lesson_name=f"factoid_set_{curr_state['lesson_state']}"
         ).all()
-        
+    
+    print(f"length of factoids: {len(factoids)}")
+
     if len(factoids) < 3:
         return None
     

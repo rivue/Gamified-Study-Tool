@@ -236,11 +236,7 @@ const props = defineProps({
     roomData: {
         type: Object,
         required: true
-    },
-    sectionUnitidMap: {
-        type: Object,
-        required: true
-    },
+    }
 
 })
 
@@ -534,8 +530,7 @@ const getNodeOffset = (index) => {
 
 const startLesson = (roomName) => {
     console.debug(`Starting lesson for ${roomName}`)
-    router.push(`/lessons/${library_id}/${roomName}`,
-        state: {sectionUnitidMap: props.sectionUnitidMap}
+    router.push(`/lessons/${library_id}/${roomName}`
     )
     // TODO: figure out how to push section-unitid-map to the next url redirect
 }
