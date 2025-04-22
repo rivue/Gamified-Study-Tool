@@ -385,17 +385,16 @@ def add_section_user_state(user_id, library_id, section_id, num_lessons, initial
     # Check if a record already exists for this user, library, and room
     existing_state = LibraryRoomState.query.filter_by(
         user_id=user_id,
-        # library_id=library_id, # TODO might be issue but idk
         section_id=section_id,
     ).first()
     
     if existing_state:
-        return existing_state  # Return existing state without creating a duplicate
+        return existing_state
     
     # Create new library room state
     new_state = LibraryRoomState(
         user_id=user_id,
-        library_id=library_id, # we don't need bc of new model
+        library_id=library_id,
         room_name="placeholder",
         section_id=section_id,
         num_lessons=num_lessons,
@@ -570,7 +569,7 @@ def is_center_room(library_id, room_name):
         return jsonify({"message": "Library not found"}), 404
     return room_name == library.library_topic
 
-def update_game_end(user_id, library_id, room_name):#, score,time, completed_rooms, is_complete):
+def update_game_end(user_id, library_id, room_name):
     try:
         user = User.query.get(user_id)
 

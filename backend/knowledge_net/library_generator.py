@@ -9,7 +9,7 @@ import functions
 
 def suggest_library_wing(user_id, selected_node, library_difficulty, language, language_difficulty, extra_context):
     def generate_rooms():
-        system_msg = sys_library(library_difficulty, language, language_difficulty,extra_context)
+        system_msg = sys_library(library_difficulty, language, language_difficulty, extra_context)
         user_msg = f"Library Wing main topic: {selected_node}."
         function = [functions.GenerateLibraryRoomNames]
         function_call = {"name": function[0]['name']}

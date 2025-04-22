@@ -50,8 +50,9 @@ import axios from 'axios';
                 try {
                     const response = await axios.get(`/api/library/${to.params.id}`);
                     if (response.data?.status === "success") {
-                        const roomList = response.data.data.room_names || [];
+                        const roomList = response.data.data.room_names[0] || [];
                         roomList.includes(to.params.roomName) ? next() : next(`/lessons/${to.params.id}`);
+
                     } else {
                         next('/library');
                     }

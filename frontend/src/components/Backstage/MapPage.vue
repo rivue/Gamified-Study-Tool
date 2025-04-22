@@ -72,8 +72,6 @@ const fetchLibraryData = async (): Promise<void> => {
                 },
             };
             
-            console.log(library.value.data.room_names);
-            console.log(library.value.room_data);
         } else {
             throw new Error("Invalid response data");
         }
