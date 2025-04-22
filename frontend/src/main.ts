@@ -43,6 +43,7 @@ import axios from 'axios';
     const routes = [
         // Main routes
         {
+            name: 'GamePage',
             path: '/lessons/:id/:roomName',
             component: defineAsyncComponent(() => import('./components/Game/NewGame/GamePage.vue')),
             meta: { title: 'Rivue.ai | Explore Library', hideHeaderFooter: true },
@@ -120,17 +121,7 @@ router.beforeEach(async (to, from, next) => {
     const loading = useLoadingStore()
     if (!from.matched.length) loading.start()
     console.debug("idk")
-    // const gameStore = useGameStore();
 
-    // if (from.path.startsWith('/library/')) {
-    //     gameStore.resetGameState();
-    // }
-
-    // if (to.path.startsWith('/library/') && from.path.startsWith('/library/')) {
-    //     const toLibraryId = to.path.split('/')[2];
-    //     const toRoomName = to.path.split('/')[3];
-    //     gameStore.fetchLibraryDetails(toLibraryId, toRoomName);
-    // }
     const publicPaths = [
         '/',
         '/changelog',

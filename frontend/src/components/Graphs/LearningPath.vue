@@ -55,7 +55,7 @@
                                             lesson {{ getRoomData(roomName[1]).lesson_state }} / {{ getRoomData(roomName[1]).num_lessons }}
                                         </span>
                                     </div>
-                                    <button @click.stop="startLesson(roomName[0])"
+                                    <button @click.stop="startLesson(roomName)"
                                         class="w-full rounded-xl py-2 px-4 font-medium flex items-center justify-center gap-2 transition-colors"
                                         style="background-color: var(--light-text); color: var(--element-color-1);">
                                         <span
@@ -220,6 +220,7 @@ import {
     DocumentIcon,
     XCircleIcon
 } from '@heroicons/vue/24/solid'
+import { useGameStore } from '@/store/gameStore'
 import { useRouter } from 'vue-router';
 import axios from 'axios';
 
@@ -246,6 +247,7 @@ const selectedFile = ref(null)
 const nodeNameErrors = ref([])
 const fileError = ref('')
 const isAddingNode = ref(false)
+const gameStore = useGameStore()
 
 // Local copy of room names for reactivity
 const localRoomNames = ref([...props.roomNames])
@@ -526,8 +528,12 @@ const getNodeOffset = (index) => {
     return Math.sin(index * 0.7) * amplitude
 }
 
-const startLesson = (roomName) => {
-    router.push(`/lessons/${library_id}/${roomName}`)
+const startLesson = (roomData) => {
+    gameStore.setSectionId(roomData[1]);
+    router.push({
+      name: 'GamePage',
+      params: { id: library_id, roomName: roomData[0] },
+    })
 }
 
 const scroll = (direction) => {

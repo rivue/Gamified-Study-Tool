@@ -42,13 +42,19 @@ export const useGameStore = defineStore("gameStore", {
         completion: 0,
         noGeneratedRooms: false,
         libraryError: false,
+        sectionId: '',
     }),
     actions: {
+        setSectionId(sectionId: string) {
+            this.sectionId = sectionId;
+            console.log("sectionId: ", this.sectionId);
+        },
         setId(libraryId: string) {
             this.resetGameState();
             this.libraryId = libraryId;
         },
         startGame() {
+            console.log(this.sectionId);
             if (this.timeSpent !== 0) {
                 this.hideGameInfo();
                 return;
@@ -112,9 +118,19 @@ export const useGameStore = defineStore("gameStore", {
             return true;
         },
         async fetchLibraryDetails(libraryId: string, roomNameThing: string) {
-            
+
+            let sectionid = '';
+
+            if (this.sectionId) {
+                const sectionid = this.sectionId
+            }
+
             this.libraryError = false;
             this.setId(libraryId);
+
+            if (sectionid !== '') {
+                this.setSectionId(sectionid);
+            }
             
             try {
                 const response = await axios.get(`/api/library/${libraryId}`, {params: {library_topic: roomNameThing}});
@@ -252,18 +268,20 @@ export const useGameStore = defineStore("gameStore", {
 
             let data = {
                 libraryId: this.libraryId,
-                roomName: this.libraryTopic,
+                sectionId: this.sectionId,
                 
                 // libraryId: this.libraryId,
                 // score: this.score,
                 // time: 500,
                 // completed: completedRooms
             };
+            console.log(this.sectionId);
             axios
                 .post(`/api/library/end`, data)
                 .then(response => {
                     if (response.data.status === "success") {
                         this.completed = true;
+                        this.setSectionId('');
                     } else {
                         console.error("Failed to end game:", response.data.message);
                     }

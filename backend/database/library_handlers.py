@@ -407,13 +407,13 @@ def add_section_user_state(user_id, library_id, section_id, num_lessons, initial
     
     return new_state
 
-def increase_lesson_state(user_id, library_id, room_name):
+def increase_lesson_state(user_id, library_id, section_id):
 
     # Get the state for this user, library, and room
     state = LibraryRoomState.query.filter_by(
         user_id=user_id,
         library_id=library_id,
-        room_name=room_name
+        section_id=section_id
     ).first()
     
     if not state:
