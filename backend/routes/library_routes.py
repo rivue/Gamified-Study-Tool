@@ -227,7 +227,6 @@ def init_library_routes(app):
     def get_library(library_id):
         
         library_topic = request.args.get("library_topic", None)
-        section_id = request.args.get("section_id", None)
 
         user_id = current_user.id if not isinstance(current_user, AnonymousUserMixin) else None
         library = lbh.get_library(library_id, user_id)
@@ -256,29 +255,36 @@ def init_library_routes(app):
         # print(library_topic)
         # library_topic = "science thing"
         if library_topic:
-            section_id = None
-            # TODO when I get back: finish writing get_section in line 163ish of library_handler.py
-            room_data = lbh.retrieve_library_room_contents(library_id, section_id, user_id)
-            print("after retrieve")
-            print(f"room_data: {room_data}")
+            section_data, status_code = lbh.get_section(library_id, library_topic, user_id)
+            if status_code != 200 or section_data is None:
+            # Handle error case
+                print("Section not found")
+            else:
+            # Now you can access the section name directly
+                section_name = section_data["section_name"]
+                room_data = lbh.retrieve_library_room_contents(library_id, section_name, user_id)
+                print(section_data.id)
+                room_data = lbh.retrieve_library_room_contents(library_id, section_data.id, user_id)
+                print("after retrieve")
+                print(f"room_data: {room_data}")
 
-            if not room_data:
-                if library_topic in library_data.get('room_names'):
-                    print("get_library if lt in ld")
-                    # try:
-                    #     # If no content exists, generate the room content
-                    #     room_contents = lgn.generate_libroom_content(
-                    #         user_id,
-                    #         library_topic,
-                    #         library_id
-                    #     )
-                    #     print(f"room_contents library_routes 240: {room_contents}")
-                    #     lbh.save_library_room_contents(library_id, library_topic, room_contents)
-                    #     room_data = room_contents
-                    # except Exception as e:
-                    #     return jsonify(status="error", message="Failed to generate room content"), 500
-                else:
-                    return jsonify(status="error", message="Room not found"), 404
+                if not room_data:
+                    if library_topic in library_data.get('room_names'):
+                        print("get_library if lt in ld")
+                        # try:
+                        #     # If no content exists, generate the room content
+                        #     room_contents = lgn.generate_libroom_content(
+                        #         user_id,
+                        #         library_topic,
+                        #         library_id
+                        #     )
+                        #     print(f"room_contents library_routes 240: {room_contents}")
+                        #     lbh.save_library_room_contents(library_id, library_topic, room_contents)
+                        #     room_data = room_contents
+                        # except Exception as e:
+                        #     return jsonify(status="error", message="Failed to generate room content"), 500
+                    else:
+                        return jsonify(status="error", message="Room not found"), 404
         else:
             room_data = lbh.get_library_room_state(user_id, library_id)
             # room_data = room_data

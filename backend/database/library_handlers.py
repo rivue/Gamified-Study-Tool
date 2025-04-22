@@ -161,15 +161,22 @@ def get_library(library_id, user_id=None, click=True):
     return jsonify(library_data)
 
 def get_section(library_id, section_id, user_id):
+
     try:
+
         section = LibrarySection.query.get(
             library_id, 
             section_id, 
             user_id
             )
-        return something idk yet
+        
+        if not section:
+            return jsonify({"message": "Section not found"}), 404
+        
+        return {"section_id":section.id, "section_name":section.section_name}, 201
+    
     except Exception as e:
-        return something else idk yet
+        return None, 404
     
 def get_library_details(library_id):
     try:
