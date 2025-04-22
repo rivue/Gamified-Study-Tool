@@ -287,11 +287,11 @@ def init_library_routes(app):
     @app.route('/api/library/room', methods=['POST'])
     def generate_room():
         user_id = current_user.id if not isinstance(current_user, AnonymousUserMixin) else None
-        subtopics = request.form.getlist("roomNames")  # Get list of subtopics
+        section_names = request.form.getlist("roomNames")  # Get list of section names
         library_id = request.form.get("libraryId")
 
         # Validate inputs
-        if not subtopics:
+        if not section_names:
             return jsonify(status="error", message="No subtopics provided"), 400
         if not library_id:
             return jsonify(status="error", message="No library ID provided"), 400
@@ -318,6 +318,8 @@ def init_library_routes(app):
             if not library_response or library_response.status_code == "error":
                 return jsonify(status="error", message="Can only generate library rooms for valid libraries"), 400
 
+            library = library_response.get_json()
+
             # Process each subtopic
             results = []
             rag_context = None
@@ -325,9 +327,10 @@ def init_library_routes(app):
                 process_document(selected_file, library_id)
 
             futures_dict = {}
-            for subtopic in subtopics:
+            for subtopic in section_names:
                 # Check for existing content
-                existing_content = lbh.retrieve_library_room_contents(library_id, subtopic, user_id)
+                unit_id, section_id = library.get('section_to_unit_map').get(subtopic)
+                existing_content = lbh.retrieve_library_room_contents(library_id, section_id, user_id)
                 if existing_content:
                     results.append({"subtopic": subtopic, "status": "success", "data": existing_content})
                     continue
@@ -354,7 +357,7 @@ def init_library_routes(app):
 
                     # Save the generated content
                     print(f" library_id: {library_id} subtopic: {subtopic} subtopic_contents: {subtopic_contents} user_id: {user_id}")
-                    lbh.save_library_room_contents(library_id, subtopic, subtopic_contents, user_id)
+                    lbh.save_library_room_contents(library_id, library.get('section_to_unit_map'), subtopic_contents, user_id)
                     results.append({"subtopic": subtopic, "status": "success", "data": subtopic_contents})
                     completed_subtopics[subtopic] = True
 

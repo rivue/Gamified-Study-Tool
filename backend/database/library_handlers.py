@@ -142,15 +142,17 @@ def get_library(library_id, user_id=None, click=True):
     print("before if user_id")
     if user_id:
         unit_list = []
+        room_names = []
         for unit in library.units:
             print(unit.unit_name)
             unit_list.append(unit.unit_name)
             print("hello")
             for section in unit.sections:
                 print(section)
-                library_data["room_names"].append((section.section_name, section.id))
+                room_names.append((section.section_name, section.id))
                 section_to_unit_map[section.section_name] = (unit.id, section.id)
 
+        library_data["room_names"] = room_names
         library_data["units"] = unit_list
         existing_completion = LibraryCompletion.query.filter_by(library_id=library_id, user_id=user_id).first()
         if existing_completion:
@@ -210,9 +212,6 @@ def save_library_room_contents(library_id, section_unit_map, lessons, user_id):
         responses = []
         num_lessons = 3
 
-        # add unit
-        # add sections, then add to unit
-        # add factoids then add to sections
         with db_transaction():
             for unit_name, sections in section_unit_map.items():
 
@@ -322,10 +321,6 @@ def retrieve_library_room_contents(library_id, section_id, user_id):
     
     if curr_state["lesson_state"] > curr_state["num_lessons"]:
         # User has completed all lessons, randomly get 7-9 factoids
-
-
-        library = get_library(library_id)
-        print("successful")
 
         all_factoids = LibraryFactoid.query.filter_by(
             section_id=section_id

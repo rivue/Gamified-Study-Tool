@@ -400,6 +400,21 @@ const addNewNodes = async () => {
 
 // Function to get the corresponding room data by room name
 const getRoomData = (sectionId: any) => {
+    console.log(props.roomData);
+    // st props = defineProps({
+    // libraryId: {
+    //     type: Number,
+    //     required: true
+    // },
+   console.log(props.roomNames);// roomNames: {
+    //     type: Array,
+    //     required: true
+    // },
+   console.log(props.roomData)//: {
+    //     type: Object,
+    //     required: true
+    // }
+
     // Find the room data where room_name matches roomName
     for (let i = 0; i < props.roomData.length; i++) {
         if (props.roomData[i].section_id === sectionId) {
