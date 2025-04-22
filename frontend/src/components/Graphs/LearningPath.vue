@@ -236,7 +236,12 @@ const props = defineProps({
     roomData: {
         type: Object,
         required: true
-    }
+    },
+    sectionUnitidMap: {
+        type: Object,
+        required: true
+    },
+
 })
 
 // State for adding new nodes
@@ -529,7 +534,10 @@ const getNodeOffset = (index) => {
 
 const startLesson = (roomName) => {
     console.debug(`Starting lesson for ${roomName}`)
-    router.push(`/lessons/${library_id}/${roomName}`)
+    router.push(`/lessons/${library_id}/${roomName}`,
+        state: {sectionUnitidMap: props.sectionUnitidMap}
+    )
+    // TODO: figure out how to push section-unitid-map to the next url redirect
 }
 
 const scroll = (direction) => {

@@ -136,6 +136,9 @@ def get_library(library_id, user_id=None, click=True):
         
     library_data = library.as_dict()
     library_data["tutorial"] = True # default
+
+    section_to_unit_map = {}
+
     if user_id:
         inc = 0
         print("hi")
@@ -144,6 +147,7 @@ def get_library(library_id, user_id=None, click=True):
             print(f"unit: {unit.unit_name}")
             for section in unit.sections:
                 library_data["room_names"].append(section.section_name)
+                section_to_unit_map[section.section_name] = unit.id
                 inc += 1
                 print(inc)
 
@@ -158,16 +162,16 @@ def get_library(library_id, user_id=None, click=True):
             library_data["tutorial"] = False
 
     library_data["clicks"] = library.clicks
+    library_data["section_to_unit_map"] = section_to_unit_map
     return jsonify(library_data)
 
-def get_section(library_id, section_id, user_id):
+def get_section(library_id, section_name, user_id):
 
     try:
 
         section = LibrarySection.query.get(
-            library_id, 
-            section_id, 
-            user_id
+            section_name, 
+            # TODO: NEED UNIT_ID
             )
         
         if not section:
@@ -325,7 +329,7 @@ def retrieve_library_room_contents(library_id, section_id, user_id):
     # query lesson room state map
     # map user id, library id, and room name in map to retrieve state
     # send state and factoids for that state back
-    curr_state = get_library_room_state(user_id, library_id, section_id)
+    curr_state = get_library_room_state(user_id, library_id, section_id) # user_id? no, you need UNIT_ID
 
     print(f"curr_state: {curr_state}")
 

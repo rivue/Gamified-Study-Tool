@@ -16,6 +16,12 @@ import { useGameStore } from "@/store/gameStore";
 import { usePopupStore } from "@/store/popupStore";
 import axios from 'axios';
 
+const props = defineProps({
+    sectionUnitidMap: {
+        type: Object,
+        required: true,
+    }
+})
 const route = useRoute();
 const gameStore = useGameStore();
 const loading = ref(true);

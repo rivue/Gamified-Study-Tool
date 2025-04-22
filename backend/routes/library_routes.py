@@ -227,6 +227,7 @@ def init_library_routes(app):
     def get_library(library_id):
         
         library_topic = request.args.get("library_topic", None)
+        unit_id = request.args.get("unit_id", None)
 
         user_id = current_user.id if not isinstance(current_user, AnonymousUserMixin) else None
         library = lbh.get_library(library_id, user_id)
@@ -254,15 +255,18 @@ def init_library_routes(app):
         # print("library api")
         # print(library_topic)
         # library_topic = "science thing"
-        if library_topic:
-            section_data, status_code = lbh.get_section(library_id, library_topic, user_id)
-            if status_code != 200 or section_data is None:
-            # Handle error case
+        if library_topic and unit_id:
+
+            # library_topic is really just section name btw
+            section_data, status_code = lbh.get_section(library_id, library_topic, user_id) # TODO: NEED unit id
+
+            print(f"section_data: {section_data}")
+            print(f"status_code: {status_code}")
+
+            if status_code != 201 or section_data is None:
                 print("Section not found")
+
             else:
-            # Now you can access the section name directly
-                section_name = section_data["section_name"]
-                room_data = lbh.retrieve_library_room_contents(library_id, section_name, user_id)
                 print(section_data.id)
                 room_data = lbh.retrieve_library_room_contents(library_id, section_data.id, user_id)
                 print("after retrieve")
@@ -287,9 +291,11 @@ def init_library_routes(app):
                         return jsonify(status="error", message="Room not found"), 404
         else:
             room_data = lbh.get_library_room_state(user_id, library_id)
+            # return a map of room names --> unit ids
             # room_data = room_data
         test = library_data.get("room_names")
         print(f"library_data.room_names: {test}")
+        print(f"room_data: {room_data}")
         return jsonify(status="success", data=library_data, room_data=room_data)
         
     @app.route('/api/library/room', methods=['POST'])

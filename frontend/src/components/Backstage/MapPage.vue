@@ -5,7 +5,8 @@
             <LearningPath 
             :libraryId="library.data.id"
             :room-names="library.data.room_names"
-            :room-data="library.room_data" />
+            :room-data="library.room_data" 
+            :section-unitid-map="library.section_to_unit_map" />
         </div>
         <div v-else-if="loading">
             <p>Loading...</p>
