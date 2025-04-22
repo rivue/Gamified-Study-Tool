@@ -41,7 +41,7 @@
                             <div class="relative">
                                 <!-- Red close button in top-right -->
                                 <div @click.stop="selectedRoom = null"
-                                    class="absolute -top-3 -right-3 w-8 h-8 rounded-full flex items-center justify-center cursor-pointer"
+                                    class="absolute -top-3 -right-3 w-8 h-8 rounded-full flex items-center justify-center cursro-pointer"
                                     style="background-color: red;">
                                     <XMarkIcon class="w-4 h-4" style="color: var(--light-text);" />
                                 </div>
@@ -49,18 +49,17 @@
                                 <!-- Main tooltip content -->
                                 <div class="rounded-2xl p-4 shadow-lg"
                                     style="background-color: var(--element-color-1); color: var(--light-text);">
-                                    <div class="font-medium mb-3">{{ formatRoomName(roomName) }} <br>
+                                    <div class="font-medium mb-3">{{ formatRoomName(roomName[0]) }} <br>
                                         <span
-                                            v-if="getRoomData(roomName) && getRoomData(roomName).lesson_state <= getRoomData(roomName).num_lessons">
-                                            lesson {{ getRoomData(roomName).lesson_state }} / {{
-                                                getRoomData(roomName).num_lessons }}
+                                            v-if="getRoomData(roomName[1]) && getRoomData(roomName[1]).lesson_state <= getRoomData(roomName[1]).num_lessons">
+                                            lesson {{ getRoomData(roomName[1]).lesson_state }} / {{ getRoomData(roomName[1]).num_lessons }}
                                         </span>
                                     </div>
-                                    <button @click.stop="startLesson(roomName)"
+                                    <button @click.stop="startLesson(roomName[0])"
                                         class="w-full rounded-xl py-2 px-4 font-medium flex items-center justify-center gap-2 transition-colors"
                                         style="background-color: var(--light-text); color: var(--element-color-1);">
                                         <span
-                                            v-if="getRoomData(roomName) && getRoomData(roomName).lesson_state <= getRoomData(roomName).num_lessons">PLAY</span>
+                                            v-if="getRoomData(roomName[1]) && getRoomData(roomName[1]).lesson_state <= getRoomData(roomName[1]).num_lessons">PLAY</span>
                                         <span v-else>REVIEW</span>
                                     </button>
                                 </div>
@@ -398,10 +397,10 @@ const addNewNodes = async () => {
 }
 
 // Function to get the corresponding room data by room name
-const getRoomData = (roomName) => {
+const getRoomData = (sectionId: any) => {
     // Find the room data where room_name matches roomName
     for (let i = 0; i < props.roomData.length; i++) {
-        if (props.roomData[i].room_name === roomName) {
+        if (props.roomData[i].section_id === sectionId) {
             return props.roomData[i];
         }
     }
@@ -429,7 +428,6 @@ const getIconForIndex = (index) => {
 
 // Format room name for display
 const formatRoomName = (name: string) => {
-    console.log(name);
     return name
         .split('_')
         .map(word => word.charAt(0).toUpperCase() + word.slice(1))
@@ -529,10 +527,7 @@ const getNodeOffset = (index) => {
 }
 
 const startLesson = (roomName) => {
-    console.debug(`Starting lesson for ${roomName}`)
-    router.push(`/lessons/${library_id}/${roomName}`
-    )
-    // TODO: figure out how to push section-unitid-map to the next url redirect
+    router.push(`/lessons/${library_id}/${roomName}`)
 }
 
 const scroll = (direction) => {

@@ -44,6 +44,7 @@ TODO list:
         (currently all 4 were in BottomBar.vue) --> (BASICALLY MAKE BottomBar.vue SMALLER)
 
     general:
+        - should not be able to make duplicate unit and section names
         - fix the fact that refresh is triggering /api/<whatever> three different times
         - add two buttons right next to each other and right above "play"
             1) video button where a manim video is generated about the subject possibly

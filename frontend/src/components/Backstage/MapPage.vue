@@ -56,7 +56,9 @@ function capitalizeWords(str: string | null | undefined): string {
 
 // Fetch library data
 const fetchLibraryData = async (): Promise<void> => {
+    
     try {
+
         const response = await axios.get(`/api/library/${libraryId}`, {
             signal: abortController.signal
         });
@@ -70,10 +72,12 @@ const fetchLibraryData = async (): Promise<void> => {
                 },
             };
             
-            console.debug(library.value.data.room_names);
+            console.log(library.value.data.room_names);
+            console.log(library.value.room_data);
         } else {
             throw new Error("Invalid response data");
         }
+
     } catch (error: any) {
         // Handle the error
         const popupStore = usePopupStore();

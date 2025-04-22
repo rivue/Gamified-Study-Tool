@@ -139,13 +139,19 @@ def get_library(library_id, user_id=None, click=True):
 
     section_to_unit_map = {}
 
+    print("before if user_id")
     if user_id:
-        inc = 0
+        unit_list = []
         for unit in library.units:
+            print(unit.unit_name)
+            unit_list.append(unit.unit_name)
+            print("hello")
             for section in unit.sections:
-                library_data["room_names"].append(section.section_name)
+                print(section)
+                library_data["room_names"].append((section.section_name, section.id))
                 section_to_unit_map[section.section_name] = (unit.id, section.id)
 
+        library_data["units"] = unit_list
         existing_completion = LibraryCompletion.query.filter_by(library_id=library_id, user_id=user_id).first()
         if existing_completion:
             library_data["score"] = existing_completion.score
@@ -258,14 +264,12 @@ def save_library_room_contents(library_id, section_unit_map, lessons, user_id):
                             section_id, factoid_content, lesson_name
                         )
 
-                        section = LibrarySection.query.get(section_id)
-                        print(f"# factoids in section: {section.factoids}")
-
                         print(f"factoid_response: {factoid_response}")
 
                         if status_code != 201:
                             return factoid_response
                         factoid_id = factoid_response.get_json()["factoid_id"]
+
                         print(f"factoid_id: {factoid_id}")
                         # Add question to factoid
                         question_type = question_data["type"]
@@ -318,17 +322,23 @@ def retrieve_library_room_contents(library_id, section_id, user_id):
     
     if curr_state["lesson_state"] > curr_state["num_lessons"]:
         # User has completed all lessons, randomly get 7-9 factoids
+
+
+        library = get_library(library_id)
+        print("successful")
+
         all_factoids = LibraryFactoid.query.filter_by(
-            library_id=library_id, section_id=section_id
+            section_id=section_id
         ).all()
-        
+    
         # Randomly select between 7-9 factoids or all if less than 7
         num_factoids = min(random.randint(7, 9), len(all_factoids))
         factoids = random.sample(all_factoids, num_factoids) if len(all_factoids) >= num_factoids else all_factoids
+
     else:
         # Get factoids for the current lesson state
         factoids = LibraryFactoid.query.filter_by(
-            library_id=library_id, section_id=section_id, lesson_name=f"factoid_set_{curr_state['lesson_state']}"
+            section_id=section_id, lesson_name=f"factoid_set_{curr_state['lesson_state']}"
         ).all()
     
     print(f"length of factoids: {len(factoids)}")
@@ -765,5 +775,6 @@ LibraryUnit.as_dict = lambda self: model_to_dict(self)
 LibrarySection.as_dict = lambda self: model_to_dict(self)
 LibraryFactoid.as_dict = lambda self: model_to_dict(self)
 LibraryQuestion.as_dict = lambda self: model_to_dict(self)
+LibraryRoomState.as_dict = lambda self: model_to_dict(self)
 LibraryQuestionChoice.as_dict = lambda self: model_to_dict(self)
 LibraryCompletion.as_dict = lambda self: model_to_dict(self)

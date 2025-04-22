@@ -198,7 +198,6 @@ def init_library_routes(app):
 
                     lbh.save_library_room_contents(library_id, section_unit_map, room_contents, user_id)
 
-
                     completed_rooms[room_name] = True
                     print(f"Successfully generated and saved content for room: {room_name}")
 
@@ -252,7 +251,7 @@ def init_library_routes(app):
 
         if library_topic:
 
-            unit_id, section_id = library.get_json().get('section_to_unit_map').get(library_topic)
+            unit_id, section_id = library_data.get('section_to_unit_map').get(library_topic)
             print(f"section_id: {section_id}")
             room_data = lbh.retrieve_library_room_contents(library_id, section_id, user_id)
             print("after retrieve")
@@ -277,7 +276,8 @@ def init_library_routes(app):
                     return jsonify(status="error", message="Room not found"), 404
         else:
             room_data = lbh.get_library_room_state(user_id, library_id)
-            # return a map of room names --> unit ids
+            # return a map of room names --> unit 
+            print(f"room_data: {room_data}")
             # room_data = room_data
         test = library_data.get("room_names")
         print(f"library_data.room_names: {test}")
