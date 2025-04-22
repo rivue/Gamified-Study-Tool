@@ -47,14 +47,12 @@ export const useGameStore = defineStore("gameStore", {
     actions: {
         setSectionId(sectionId: string) {
             this.sectionId = sectionId;
-            console.log("sectionId: ", this.sectionId);
         },
         setId(libraryId: string) {
             this.resetGameState();
             this.libraryId = libraryId;
         },
         startGame() {
-            console.log(this.sectionId);
             if (this.timeSpent !== 0) {
                 this.hideGameInfo();
                 return;
