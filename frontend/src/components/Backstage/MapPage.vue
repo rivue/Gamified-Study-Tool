@@ -5,7 +5,8 @@
             <LearningPath 
             :libraryId="library.data.id"
             :room-names="library.data.room_names"
-            :room-data="library.room_data" 
+            :room-data="library.room_data"
+            :unit-section-map="library.data.unit_section_map" 
             />
         </div>
         <div v-else-if="loading">
@@ -72,7 +73,7 @@ const fetchLibraryData = async (): Promise<void> => {
                     library_topic: capitalizeWords(response.data.data.library_topic),
                 },
             };
-            
+            console.log(response.data.unit_section_map);
         } else {
             throw new Error("Invalid response data");
         }

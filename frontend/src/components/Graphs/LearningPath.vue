@@ -252,6 +252,8 @@ const gameStore = useGameStore()
 // Local copy of room names for reactivity
 const localRoomNames = ref([...props.roomNames])
 
+// const unitSectionMap = ref([...props.roomData.])
+
 // Convert room names to nodes
 const nodes = computed(() => localRoomNames.value || [])
 
@@ -406,11 +408,11 @@ const getRoomData = (sectionId: any) => {
     //     type: Number,
     //     required: true
     // },
-   console.log(props.roomNames);// roomNames: {
+   console.log(props.roomNames); // roomNames: {
     //     type: Array,
     //     required: true
     // },
-   console.log(props.roomData)//: {
+   console.log(props.roomData) //: {
     //     type: Object,
     //     required: true
     // }

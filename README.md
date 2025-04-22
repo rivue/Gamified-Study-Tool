@@ -44,6 +44,8 @@ TODO list:
         (currently all 4 were in BottomBar.vue) --> (BASICALLY MAKE BottomBar.vue SMALLER)
 
     general:
+        - add a "scroll to front", "scroll to current", and "scroll to end" feature for map page
+            - also, maybe change it to vertical
         - should not be able to make duplicate unit and section names
         - fix the fact that refresh is triggering /api/<whatever> three different times
         - add two buttons right next to each other and right above "play"

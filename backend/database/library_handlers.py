@@ -148,12 +148,14 @@ def get_library(library_id, user_id=None, click=True):
             print(unit.unit_name)
             unit_list.append(unit.unit_name)
             print("hello")
-            unit_to_section_map.append[(unit.id, unit.unit_name)] = []
             for section in unit.sections:
                 print(section)
                 room_names.append((section.section_name, section.id))
                 section_to_unit_map[section.section_name] = (unit.id, section.id)
-                unit_to_section_map[(unit.id, unit.unit_name).append({'id': section.id, 'name': section.section_name})]
+                if unit.unit_name in unit_to_section_map:
+                    unit_to_section_map[unit.unit_name].append((section.id, section.section_name))
+                else:
+                    unit_to_section_map[unit.unit_name] = (section.id, section.section_name)
 
         library_data["room_names"] = room_names
         library_data["units"] = unit_list
@@ -169,8 +171,9 @@ def get_library(library_id, user_id=None, click=True):
 
     library_data["clicks"] = library.clicks
     library_data["section_to_unit_map"] = section_to_unit_map
+    print(len(unit_to_section_map))
     library_data["unit_to_section_map"] = unit_to_section_map
-    # TODO COME BACK RIGHT HERE AND SEPERATE SECTIONS BY UNITS IN THE FRONTEND
+    
     return jsonify(library_data)
     
 def get_library_details(library_id):
