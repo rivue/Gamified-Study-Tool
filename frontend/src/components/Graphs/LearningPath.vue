@@ -30,74 +30,82 @@
             <div class="flex items-center gap-24 min-h-screen py-24 relative">
                 <!-- Added left padding to ensure first nodes are visible -->
                 <div class="w-24 flex-shrink-0"></div>
-
-                <template v-for="(roomName, index) in nodes" :key="index">
-                    <div class="relative flex-shrink-0 group perspective" :style="{
-                        transform: `translateY(${getNodeOffset(index)}px)`
-                    }" @click="handleNodeClick(roomName)">
-                        <!-- Tooltip -->
-                        <div v-if="selectedRoom === roomName"
-                            class="absolute -top-32 left-1/2 -translate-x-1/2 w-64 z-50">
-                            <div class="relative">
-                                <!-- Red close button in top-right -->
-                                <div @click.stop="selectedRoom = null"
-                                    class="absolute -top-3 -right-3 w-8 h-8 rounded-full flex items-center justify-center cursro-pointer"
-                                    style="background-color: red;">
-                                    <XMarkIcon class="w-4 h-4" style="color: var(--light-text);" />
-                                </div>
-
-                                <!-- Main tooltip content -->
-                                <div class="rounded-2xl p-4 shadow-lg"
-                                    style="background-color: var(--element-color-1); color: var(--light-text);">
-                                    <div class="font-medium mb-3">{{ formatRoomName(roomName[0]) }} <br>
-                                        <span
-                                            v-if="getRoomData(roomName[1]) && getRoomData(roomName[1]).lesson_state <= getRoomData(roomName[1]).num_lessons">
-                                            lesson {{ getRoomData(roomName[1]).lesson_state }} / {{ getRoomData(roomName[1]).num_lessons }}
-                                        </span>
+                
+                <!-- Unit Headers -->
+                <template v-for="(unit, unitIndex) in unitData" :key="unit.unit_id">
+                    <div class="absolute top-0 left-1/2 -translate-x-1/2 text-center font-medium text-lg"
+                        style="color: var(--highlight-color);">
+                        {{ unit.unit_name }}
+                    </div>
+                </template>
+                
+                <!-- Loop through units and their sections -->
+                <template v-for="(unit, unitIndex) in unitData" :key="unit.unit_id">
+                    <template v-for="(section, sectionIndex) in unit.sections" :key="section.section_id">
+                        <div class="relative flex-shrink-0 group perspective" 
+                            :style="{
+                                transform: `translateY(${getNodeOffset(getGlobalSectionIndex(unitIndex, sectionIndex))}px)`
+                            }" 
+                            @click="handleNodeClick([section.section_name, section.section_id])">
+                            
+                            <!-- Tooltip -->
+                            <div v-if="selectedRoom && selectedRoom[1] === section.section_id"
+                                class="absolute -top-32 left-1/2 -translate-x-1/2 w-64 z-50">
+                                <div class="relative">
+                                    <!-- Red close button in top-right -->
+                                    <div @click.stop="selectedRoom = null"
+                                        class="absolute -top-3 -right-3 w-8 h-8 rounded-full flex items-center justify-center cursro-pointer"
+                                        style="background-color: red;">
+                                        <XMarkIcon class="w-4 h-4" style="color: var(--light-text);" />
                                     </div>
-                                    <button @click.stop="startLesson(roomName)"
-                                        class="w-full rounded-xl py-2 px-4 font-medium flex items-center justify-center gap-2 transition-colors"
-                                        style="background-color: var(--light-text); color: var(--element-color-1);">
-                                        <span
-                                            v-if="getRoomData(roomName[1]) && getRoomData(roomName[1]).lesson_state <= getRoomData(roomName[1]).num_lessons">PLAY</span>
-                                        <span v-else>REVIEW</span>
-                                    </button>
+
+                                    <!-- Main tooltip content -->
+                                    <div class="rounded-2xl p-4 shadow-lg"
+                                        style="background-color: var(--element-color-1); color: var(--light-text);">
+                                        <div class="font-medium mb-3">{{ formatRoomName(section.section_name) }} <br>
+                                            <span v-if="getRoomData(section.section_id) && getRoomData(section.section_id).lesson_state <= getRoomData(section.section_id).num_lessons">
+                                                lesson {{ getRoomData(section.section_id).lesson_state }} / {{ getRoomData(section.section_id).num_lessons }}
+                                            </span>
+                                        </div>
+                                        <button @click.stop="startLesson([section.section_name, section.section_id])"
+                                            class="w-full rounded-xl py-2 px-4 font-medium flex items-center justify-center gap-2 transition-colors"
+                                            style="background-color: var(--light-text); color: var(--element-color-1);">
+                                            <span v-if="getRoomData(section.section_id) && getRoomData(section.section_id).lesson_state <= getRoomData(section.section_id).num_lessons">PLAY</span>
+                                            <span v-else>REVIEW</span>
+                                        </button>
+                                    </div>
+
+                                    <!-- Triangle pointer -->
+                                    <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 transform rotate-45"
+                                        style="background-color: var(--element-color-1);" />
                                 </div>
-
-                                <!-- Triangle pointer -->
-                                <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 transform rotate-45"
-                                    style="background-color: var(--element-color-1);" />
                             </div>
-                        </div>
 
-                        <div
-                            class="relative transform-gpu transition-all duration-300 group-hover:scale-105 group-hover:-translate-y-2">
-                            <div class="absolute -bottom-4 left-1/2 -translate-x-1/2 w-40 h-8 rounded-full blur-xl transform-gpu transition-all duration-300 group-hover:w-44"
-                                style="background-color: var(--background-color-1t);"></div>
+                            <div class="relative transform-gpu transition-all duration-300 group-hover:scale-105 group-hover:-translate-y-2">
+                                <div class="absolute -bottom-4 left-1/2 -translate-x-1/2 w-40 h-8 rounded-full blur-xl transform-gpu transition-all duration-300 group-hover:w-44"
+                                    style="background-color: var(--background-color-1t);"></div>
 
-                            <div class="relative w-48 h-48">
                                 <div class="absolute inset-0 rounded-full transform-gpu translate-y-2 blur-sm opacity-50"
-                                    style="background-color: var(--color-primary-darker);"></div>
+                                    :style="{ backgroundColor: getUnitColor(unitIndex, 'darker') }"></div>
 
                                 <div class="absolute inset-0 rounded-full transform-gpu translate-y-1"
-                                    style="background-color: var(--color-primary-dark);"></div>
+                                    :style="{ backgroundColor: getUnitColor(unitIndex, 'dark') }"></div>
 
                                 <div class="absolute inset-0 rounded-full flex items-center justify-center cursor-pointer shadow-lg transform-gpu transition-all duration-300"
-                                    style="background: var(--button-gradient);">
-                                    <component :is="getIconForIndex(index)"
+                                    :style="{ background: getUnitGradient(unitIndex) }">
+                                    <component :is="getIconForIndex(getGlobalSectionIndex(unitIndex, sectionIndex))"
                                         class="w-24 h-24 transform-gpu transition-all duration-300 group-hover:scale-110"
                                         style="color: var(--light-text);" />
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </template>
                 </template>
 
                 <!-- Added right padding to ensure last nodes have space -->
                 <div class="w-24 flex-shrink-0"></div>
             </div>
         </div>
-
         <!-- Add Node Modal -->
         <Transition name="modal">
             <div v-if="showAddNodeModal" class="fixed inset-0 flex items-center justify-center z-50 p-4"
@@ -236,8 +244,11 @@ const props = defineProps({
     roomData: {
         type: Object,
         required: true
+    },
+    unitSectionMap: {
+        type: Object,
+        required: true
     }
-
 })
 
 // State for adding new nodes
@@ -249,17 +260,23 @@ const fileError = ref('')
 const isAddingNode = ref(false)
 const gameStore = useGameStore()
 
-// Local copy of room names for reactivity
-const localRoomNames = ref([...props.roomNames])
+// Process and organize the unit and section data
+const unitData = computed(() => {
+    
+    // props.unitSectionMap.forEach((unit, index) => {
+    //         console.log(`Unit ${index}:`, unit)
+    //     })
 
-// const unitSectionMap = ref([...props.roomData.])
+    // console.log("Unit Section Map:", props.unitSectionMap)
+  
 
-// Convert room names to nodes
-const nodes = computed(() => localRoomNames.value || [])
-
-// Update local copy when props change
-watch(() => props.roomNames, (newVal) => {
-    localRoomNames.value = [...newVal]
+    return props.unitSectionMap.map(unit => {
+        return {
+            unit_id: unit.unit_id,
+            unit_name: unit.unit_name,
+            sections: unit.sections || []
+        }
+    })
 })
 
 // Track selected room for tooltip
@@ -269,6 +286,35 @@ const library_id = props.libraryId;
 
 // File input handling
 const fileInput = ref(null)
+
+// Color schemes for units
+const unitColors = [
+    { base: '#2ecc71', dark: '#27ae60', darker: '#1e8449' }, // green
+    { base: '#f1c40f', dark: '#f39c12', darker: '#e67e22' }, // yellow
+    { base: '#3498db', dark: '#2980b9', darker: '#1f618d' }, // blue
+    { base: '#e74c3c', dark: '#c0392b', darker: '#922b21' }  // red
+]
+
+// Get color for a unit based on its index
+const getUnitColor = (unitIndex, variant = 'base') => {
+    const colorIndex = unitIndex % unitColors.length
+    return unitColors[colorIndex][variant]
+}
+
+// Get gradient for a unit based on its index
+const getUnitGradient = (unitIndex) => {
+    const colorIndex = unitIndex % unitColors.length
+    return `linear-gradient(135deg, ${unitColors[colorIndex].base}, ${unitColors[colorIndex].dark})`
+}
+
+// Get global section index (for offset and icon selection)
+const getGlobalSectionIndex = (unitIndex, sectionIndex) => {
+    let count = 0
+    for (let i = 0; i < unitIndex; i++) {
+        count += unitData.value[i].sections.length
+    }
+    return count + sectionIndex
+}
 
 const handleFileSelection = (event) => {
     const file = event.target.files[0]
@@ -314,14 +360,14 @@ const formatFileSize = (bytes) => {
 
 // Add a new node name field
 const addNodeNameField = () => {
-  newNodeNames.value.push('')
-  nodeNameErrors.value.push('')
+    newNodeNames.value.push('')
+    nodeNameErrors.value.push('')
 }
 
 // Remove a node name field
 const removeNodeName = (index) => {
-  newNodeNames.value.splice(index, 1)
-  nodeNameErrors.value.splice(index, 1)
+    newNodeNames.value.splice(index, 1)
+    nodeNameErrors.value.splice(index, 1)
 }
 
 // Function to add a new node
@@ -332,92 +378,66 @@ const addNewNodes = async () => {
 
     const trimmedNames = newNodeNames.value.map(name => name.trim())
     trimmedNames.forEach((name, index) => {
-    if (!name) {
-      nodeNameErrors.value[index] = 'Please enter a node name'
-      hasError = true
-    } else if (!/^[a-zA-Z ]+$/.test(name)) {
-      nodeNameErrors.value[index] = 'Node name can only contain letters and spaces'
-      hasError = true
-    } else if (name.length > 40) {
-      nodeNameErrors.value[index] = 'Node name must be 40 characters or less'
-      hasError = true
-    } else if (localRoomNames.value.includes(name)) {
-      nodeNameErrors.value[index] = 'This node name already exists'
-      hasError = true
-    } else if (trimmedNames.indexOf(name) !== index) {
-      nodeNameErrors.value[index] = 'Duplicate node name in this form'
-      hasError = true
-    }
-  })
-
-  if (hasError) return
-
-  isAddingNode.value = true
-  const currentAbortController = new AbortController();
-
-  try {
-    // Add each node
-    const formData = new FormData()
-    formData.append('libraryId', library_id)
-    // Append all room names with the same key name
-    // for (const name of trimmedNames) {
-        // formData.append('roomNames', name)
-    // }
-    trimmedNames.forEach(room => formData.append("roomNames", room));
-
-    // Add file if present (same file for all nodes)
-    if (selectedFile.value) {
-        console.debug(selectedFile.value)
-        formData.append('file', selectedFile.value)
-    }
-      
-    const response = await axios.post('/api/library/room', formData, {
-        signal: currentAbortController.signal,
-        headers: {
-          'Content-Type': 'multipart/form-data'
+        if (!name) {
+            nodeNameErrors.value[index] = 'Please enter a node name'
+            hasError = true
+        } else if (!/^[a-zA-Z ]+$/.test(name)) {
+            nodeNameErrors.value[index] = 'Node name can only contain letters and spaces'
+            hasError = true
+        } else if (name.length > 40) {
+            nodeNameErrors.value[index] = 'Node name must be 40 characters or less'
+            hasError = true
+        } else if (trimmedNames.indexOf(name) !== index) {
+            nodeNameErrors.value[index] = 'Duplicate node name in this form'
+            hasError = true
         }
     })
 
-    if (currentAbortController.signal.aborted) return; // Don't proceed if aborted
-      
-    if (response.data && response.data.status === "success") {
-        for (const name of trimmedNames) {
-            localRoomNames.value.push(name)
-        }
-    }
+    if (hasError) return
 
-    // Clear form
-    newNodeNames.value = [''] // Reset to one empty field
-    removeFile()
-    showAddNodeModal.value = false
-    window.location.reload(); // TODO for showing new nodes / stepping stones, but theres 
-    // probably a better way to do this
-  } catch (error) {
-    console.error('Error adding nodes:', error)
-    nodeNameErrors.value[0] = error.message || 'Failed to add nodes. Please try again.'
-  } finally {
-    isAddingNode.value = false
-  }
+    isAddingNode.value = true
+    const currentAbortController = new AbortController();
+
+    try {
+        // Add each node
+        const formData = new FormData()
+        formData.append('libraryId', library_id)
+        
+     // Append all room names with the same key name
+        trimmedNames.forEach(room => formData.append("roomNames", room));
+
+        // Add file if present (same file for all nodes)
+        if (selectedFile.value) {
+            console.debug(selectedFile.value)
+            formData.append('file', selectedFile.value)
+        }
+            
+        const response = await axios.post('/api/library/room', formData, {
+            signal: currentAbortController.signal,
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        })
+
+        if (currentAbortController.signal.aborted) return; // Don't proceed if aborted
+            
+        if (response.data && response.data.status === "success") {
+            // Clear form and refresh to show new nodes
+            newNodeNames.value = [''] // Reset to one empty field
+            removeFile()
+            showAddNodeModal.value = false
+            window.location.reload();
+        }
+    } catch (error) {
+        console.error('Error adding nodes:', error)
+        nodeNameErrors.value[0] = error.message || 'Failed to add nodes. Please try again.'
+    } finally {
+        isAddingNode.value = false
+    }
 }
 
-// Function to get the corresponding room data by room name
-const getRoomData = (sectionId: any) => {
-    console.log(props.roomData);
-    // st props = defineProps({
-    // libraryId: {
-    //     type: Number,
-    //     required: true
-    // },
-   console.log(props.roomNames); // roomNames: {
-    //     type: Array,
-    //     required: true
-    // },
-   console.log(props.roomData) //: {
-    //     type: Object,
-    //     required: true
-    // }
-
-    // Find the room data where room_name matches roomName
+// Function to get the corresponding room data by section ID
+const getRoomData = (sectionId) => {
     for (let i = 0; i < props.roomData.length; i++) {
         if (props.roomData[i].section_id === sectionId) {
             return props.roomData[i];
@@ -446,7 +466,8 @@ const getIconForIndex = (index) => {
 }
 
 // Format room name for display
-const formatRoomName = (name: string) => {
+const formatRoomName = (name) => {
+    if (!name) return '';
     return name
         .split('_')
         .map(word => word.charAt(0).toUpperCase() + word.slice(1))
@@ -463,8 +484,7 @@ let scrollTimeoutId = null;
 // Scroll to center on first load
 onMounted(() => {
     // If there are nodes and the container exists, scroll to position
-    // some nodes may not be visible at first depending on the starting position
-    if (nodes.value.length > 0 && scrollContainer.value) {
+    if (unitData.value.length > 0 && scrollContainer.value) {
         // Calculate an appropriate starting position based on available width
         scrollTimeoutId = setTimeout(() => {
             // This gives time for the layout to render before scrolling
@@ -483,7 +503,6 @@ onUnmounted(() => {
         console.debug("LearningPath unmounting, cleared initial scroll timeout.");
     }
 });
-
 
 // Add these variables
 const startY = ref(0)
@@ -534,22 +553,23 @@ const stopDragging = () => {
     isDragging.value = false
 }
 
-const handleNodeClick = (roomName) => {
+const handleNodeClick = (sectionData) => {
     if (!hasMoved.value) {
-        selectedRoom.value = selectedRoom.value === roomName ? null : roomName
+        selectedRoom.value = selectedRoom.value && selectedRoom.value[1] === sectionData[1] ? null : sectionData
     }
 }
 
 const getNodeOffset = (index) => {
+    // const amplitude = Let's change this to code so it looks better
     const amplitude = 80
     return Math.sin(index * 0.7) * amplitude
 }
 
-const startLesson = (roomData) => {
-    gameStore.setSectionId(roomData[1]);
+const startLesson = (sectionData) => {
+    gameStore.setSectionId(sectionData[1]);
     router.push({
-      name: 'GamePage',
-      params: { id: library_id, roomName: roomData[0] },
+        name: 'GamePage',
+        params: { id: library_id, roomName: sectionData[0] },
     })
 }
 
@@ -565,11 +585,10 @@ const scroll = (direction) => {
     })
 }
 
-// Handle scroll event (if needed)
+// Handle scroll event
 const handleScroll = () => {
     // Implement if needed
 }
-
 </script>
 
 <style scoped>
