@@ -227,7 +227,7 @@ def save_library_room_contents(library_id, section_unit_map, lessons, user_id):
                 response_obj, status_code = create_unit_and_add(library_id, unit_name)
                                 
                 if status_code != 201:
-                    print(response_obj.get_json()['message'])
+                    # print(response_obj.get_json()['message'])
                     message = response_obj.get_json()['message']
                     return jsonify(status="error", message=message.to_str()), 200
                                 
@@ -235,9 +235,9 @@ def save_library_room_contents(library_id, section_unit_map, lessons, user_id):
 
                 print(unit_name + "unit_name #" + str(curr))
                 curr += 1
-                print(f"sections: {sections}")
+                # print(f"sections: {sections}")
                 for section in sections:
-                    print(section + "section")
+                    # print(section + "section")
 
                     # 2.1 + 2.2) create sections and add to unit
                     response_obj, status_code = create_section_and_add(unit_id, section)
@@ -260,7 +260,7 @@ def save_library_room_contents(library_id, section_unit_map, lessons, user_id):
                         
                         lesson_name = "factoid_set_" + str(math.floor(index/9) + 1)
                         
-                        print(f"item: {item}")
+                        # print(f"item: {item}")
 
                         factoid_content = item["factoid_text"]
                         question_data = item["question"]
@@ -268,19 +268,19 @@ def save_library_room_contents(library_id, section_unit_map, lessons, user_id):
                         print("after lesson_name")
                         
                         section = LibrarySection.query.get(section_id)
-                        print(f"# factoids in section: {section.factoids}")
+                        # print(f"# factoids in section: {section.factoids}")
                         # Add factoid to library
                         factoid_response, status_code = add_factoid_to_section(
                             section_id, factoid_content, lesson_name
                         )
 
-                        print(f"factoid_response: {factoid_response}")
+                        # print(f"factoid_response: {factoid_response}")
 
                         if status_code != 201:
                             return factoid_response
                         factoid_id = factoid_response.get_json()["factoid_id"]
 
-                        print(f"factoid_id: {factoid_id}")
+                        # print(f"factoid_id: {factoid_id}")
                         # Add question to factoid
                         question_type = question_data["type"]
                         question_text = question_data["text"]
@@ -292,7 +292,7 @@ def save_library_room_contents(library_id, section_unit_map, lessons, user_id):
                         question_response, status_code = add_question_to_factoid(
                             factoid_id, question_text, correct_choice, wrong_choices, question_type
                         )
-                        print(f"question_response: {question_response}")
+                        # print(f"question_response: {question_response}")
                         
                         if status_code != 201:
                             return question_response
@@ -503,14 +503,14 @@ def add_choices_to_question(question_id, correct_choice, wrong_choices):
 
         # Add correct choice
         for choice in correct_choice:
-            print("choice", choice)
+            # print("choice", choice)
             correct = LibraryQuestionChoice(
                 question_id=question_id, choice_text=choice, is_correct=True
             )
             db.session.add(correct)
             
         for choice in wrong_choices:
-            print("choice", choice)
+            # print("choice", choice)
             wrong = LibraryQuestionChoice(
                 question_id=question_id, choice_text=choice, is_correct=False
             )

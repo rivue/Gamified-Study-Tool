@@ -186,28 +186,23 @@ def init_library_routes(app):
             completed_rooms = {}
             for future in concurrent.futures.as_completed(futures_dict):
                 
-                print("future")
-                
                 room_name = futures_dict[future]
+                completed_rooms[room_name] = True
+                print(f"Successfully generated content for room: {room_name}")
+
+            # Check if all rooms were successfully completed
+            if all(completed_rooms.values()):
                 
                 try:
 
                     room_contents = future.result()
-
                     user_id = current_user.id if not isinstance(current_user, AnonymousUserMixin) else None
-
                     lbh.save_library_room_contents(library_id, section_unit_map, room_contents, user_id)
 
-                    completed_rooms[room_name] = True
-                    print(f"Successfully generated and saved content for room: {room_name}")
-
                 except Exception as e:
-                    
-                    print(f"Error generating content for room {room_name}: {str(e)}")
+                    print(f"Error saving generated content: {str(e)}")
                     completed_rooms[room_name] = False
 
-            # Check if all rooms were successfully completed
-            if all(completed_rooms.values()):
                 library = lbh.get_library(library_id, user_id, False)
                 return jsonify(status="success", library_data=library.get_json())
             else:
@@ -277,11 +272,10 @@ def init_library_routes(app):
         else:
             room_data = lbh.get_library_room_state(user_id, library_id)
             # return a map of room names --> unit 
-            print(f"room_data: {room_data}")
             # room_data = room_data
         test = library_data.get("room_names")
-        print(f"library_data.room_names: {test}")
-        print(f"room_data: {room_data}")
+        print(f"library_data section names: {test}")
+        # print(f"room_data: {room_data}")
         return jsonify(status="success", data=library_data, room_data=room_data)
         
     @app.route('/api/library/room', methods=['POST'])
