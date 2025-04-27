@@ -34,7 +34,7 @@ IDEAS:
 
 TODO list:
 
-    LAUNCH LIST: goal: July 14th, (note: once you are tired / exhausted from working on something big, chip away at easier things to keep motivated or whatever, maybe try to use claude 3.7 in the way anthropic uses it w/ git-branching / versioning?)
+    LAUNCH LIST: goal: July 1th, (note: once you are tired / exhausted from working on something big, chip away at easier things to keep motivated or whatever, maybe try to use claude 3.7 in the way anthropic uses it w/ git-branching / versioning?)
 
         hard probably (goal: 2 high level bullet points / wk):
         - ⭐️ Finish sections + units
