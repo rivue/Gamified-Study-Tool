@@ -1,185 +1,187 @@
 <template>
-    <div class="fixed left-8 right-8 top-0 bottom-0 overflow-hidden">
-        <button @click="scroll('left')"
+    <div v-if="isDataReady">
+
+        <div class="fixed left-8 right-8 top-0 bottom-0 overflow-hidden">
+            <button @click="scroll('left')"
             class="fixed left-8 top-1/2 -translate-y-1/2 bg-black/30 backdrop-blur-sm shadow-lg rounded-full p-4 hover:bg-black/40 z-10"
             style="color: var(--highlight-color);">
             <ChevronLeftIcon class="w-12 h-12" />
         </button>
-
+        
         <button @click="scroll('right')"
-            class="fixed right-8 top-1/2 -translate-y-1/2 bg-black/30 backdrop-blur-sm shadow-lg rounded-full p-4 hover:bg-black/40 z-10"
-            style="color: var(--highlight-color);">
-            <ChevronRightIcon class="w-12 h-12" />
-        </button>
+        class="fixed right-8 top-1/2 -translate-y-1/2 bg-black/30 backdrop-blur-sm shadow-lg rounded-full p-4 hover:bg-black/40 z-10"
+        style="color: var(--highlight-color);">
+        <ChevronRightIcon class="w-12 h-12" />
+    </button>
+    
+    <!-- Fixed Add Stepping Stone Button - Center Top -->
+    <div class="fixed top-48 left-1/2 -translate-x-1/2 z-10">
+        <button @click="showAddNodeModal = true"
+        class="shadow-lg rounded-full p-4 flex items-center justify-center transition-colors"
+        style="background-color: var(--element-color-1); color: var(--light-text);">
+        <PlusIcon class="w-6 h-6" />
+        <span class="ml-2 font-medium">Add New Stepping Stones</span>
+    </button>
+</div>
 
-        <!-- Fixed Add Stepping Stone Button - Center Top -->
-        <div class="fixed top-48 left-1/2 -translate-x-1/2 z-10">
-            <button @click="showAddNodeModal = true"
-                class="shadow-lg rounded-full p-4 flex items-center justify-center transition-colors"
-                style="background-color: var(--element-color-1); color: var(--light-text);">
-                <PlusIcon class="w-6 h-6" />
-                <span class="ml-2 font-medium">Add New Stepping Stones</span>
-            </button>
-        </div>
+<div ref="scrollContainer"
+class="w-full h-full overflow-x-auto overflow-y-hidden cursor-grab active:cursor-grabbing"
+@mousedown="startDragging" @mousemove="drag" @mouseup="stopDragging" @mouseleave="stopDragging"
+@touchstart="startDragging" @touchmove="drag" @touchend="stopDragging" @scroll="handleScroll">
+<!-- Modified to ensure first node is visible -->
+<div class="flex items-center gap-24 min-h-screen py-24 relative">
+    <!-- Added left padding to ensure first nodes are visible -->
+    <div class="w-24 flex-shrink-0"></div>
+    
+    <!-- Unit Headers -->
+    <template v-for="(unit, unitIndex) in rawUnitData" :key="unit.unit_id">
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 text-center font-medium text-lg"
+        style="color: var(--highlight-color);">
+        {{ unit.unit_name }}
+    </div>
+</template>
+{{ rawUnitData }}
+<!-- Loop through units and their sections -->
+<template v-for="(unit, unitIndex) in rawUnitData" :key="unit.unit_id">
+    <!-- {{ unit }} -->
+    <template v-for="(section, sectionIndex) in unit.sections" :key="section.section_id">
+        <div class="relative flex-shrink-0 group perspective" :style="{
+            transform: `translateY(${getNodeOffset(getGlobalSectionIndex(unitIndex, sectionIndex))}px)`
+        }" @click="handleNodeClick([section.section_name, section.section_id])">
 
-        <div ref="scrollContainer"
-            class="w-full h-full overflow-x-auto overflow-y-hidden cursor-grab active:cursor-grabbing"
-            @mousedown="startDragging" @mousemove="drag" @mouseup="stopDragging" @mouseleave="stopDragging"
-            @touchstart="startDragging" @touchmove="drag" @touchend="stopDragging" @scroll="handleScroll">
-            <!-- Modified to ensure first node is visible -->
-            <div class="flex items-center gap-24 min-h-screen py-24 relative">
-                <!-- Added left padding to ensure first nodes are visible -->
-                <div class="w-24 flex-shrink-0"></div>
+<!-- Tooltip -->
+<div v-if="selectedRoom && selectedRoom[1] === section.section_id"
+class="absolute -top-32 left-1/2 -translate-x-1/2 w-64 z-50">
+<div class="relative">
+    <!-- Red close button in top-right -->
+    <div @click.stop="selectedRoom = null"
+    class="absolute -top-3 -right-3 w-8 h-8 rounded-full flex items-center justify-center cursro-pointer"
+    style="background-color: red;">
+    <XMarkIcon class="w-4 h-4" style="color: var(--light-text);" />
+</div>
 
-                <!-- Unit Headers -->
-                <template v-for="(unit, unitIndex) in rawUnitData" :key="unit.unit_id">
-                    <div class="absolute top-0 left-1/2 -translate-x-1/2 text-center font-medium text-lg"
-                        style="color: var(--highlight-color);">
-                        {{ unit.unit_name }}
-                    </div>
-                </template>
-                {{ rawUnitData }}
-                <!-- Loop through units and their sections -->
-                <template v-for="(unit, unitIndex) in rawUnitData" :key="unit.unit_id">
-                    <!-- {{ unit }} -->
-                    <template v-for="(section, sectionIndex) in unit.sections" :key="section.section_id">
-                        <div class="relative flex-shrink-0 group perspective" :style="{
-                            transform: `translateY(${getNodeOffset(getGlobalSectionIndex(unitIndex, sectionIndex))}px)`
-                        }" @click="handleNodeClick([section.section_name, section.section_id])">
-
-                            <!-- Tooltip -->
-                            <div v-if="selectedRoom && selectedRoom[1] === section.section_id"
-                                class="absolute -top-32 left-1/2 -translate-x-1/2 w-64 z-50">
-                                <div class="relative">
-                                    <!-- Red close button in top-right -->
-                                    <div @click.stop="selectedRoom = null"
-                                        class="absolute -top-3 -right-3 w-8 h-8 rounded-full flex items-center justify-center cursro-pointer"
-                                        style="background-color: red;">
-                                        <XMarkIcon class="w-4 h-4" style="color: var(--light-text);" />
-                                    </div>
-
-                                    <!-- Main tooltip content -->
-                                    <div class="rounded-2xl p-4 shadow-lg"
-                                        style="background-color: var(--element-color-1); color: var(--light-text);">
-                                        <div class="font-medium mb-3">{{ formatRoomName(section.section_name) }} <br>
-                                            <span
-                                                v-if="getRoomData(section.section_id) && getRoomData(section.section_id).lesson_state <= getRoomData(section.section_id).num_lessons">
-                                                lesson {{ getRoomData(section.section_id).lesson_state }} / {{
+<!-- Main tooltip content -->
+<div class="rounded-2xl p-4 shadow-lg"
+style="background-color: var(--element-color-1); color: var(--light-text);">
+<div class="font-medium mb-3">{{ formatRoomName(section.section_name) }} <br>
+    <span
+    v-if="getRoomData(section.section_id) && getRoomData(section.section_id).lesson_state <= getRoomData(section.section_id).num_lessons">
+    lesson {{ getRoomData(section.section_id).lesson_state }} / {{
                                                 getRoomData(section.section_id).num_lessons }}
                                             </span>
                                         </div>
                                         <button @click.stop="startLesson([section.section_name, section.section_id])"
-                                            class="w-full rounded-xl py-2 px-4 font-medium flex items-center justify-center gap-2 transition-colors"
-                                            style="background-color: var(--light-text); color: var(--element-color-1);">
-                                            <span
-                                                v-if="getRoomData(section.section_id) && getRoomData(section.section_id).lesson_state <= getRoomData(section.section_id).num_lessons">PLAY</span>
-                                            <span v-else>REVIEW</span>
-                                        </button>
-                                    </div>
-
-                                    <!-- Triangle pointer -->
-                                    <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 transform rotate-45"
-                                        style="background-color: var(--element-color-1);" />
+                                        class="w-full rounded-xl py-2 px-4 font-medium flex items-center justify-center gap-2 transition-colors"
+                                        style="background-color: var(--light-text); color: var(--element-color-1);">
+                                        <span
+                                        v-if="getRoomData(section.section_id) && getRoomData(section.section_id).lesson_state <= getRoomData(section.section_id).num_lessons">PLAY</span>
+                                        <span v-else>REVIEW</span>
+                                    </button>
                                 </div>
-                            </div>
-
-                            <div
-                                class="relative transform-gpu transition-all duration-300 group-hover:scale-105 group-hover:-translate-y-2">
-                                <div class="absolute -bottom-4 left-1/2 -translate-x-1/2 w-40 h-8 rounded-full blur-xl transform-gpu transition-all duration-300 group-hover:w-44"
-                                    style="background-color: var(--background-color-1t);"></div>
-
-                                <div class="absolute inset-0 rounded-full transform-gpu translate-y-2 blur-sm opacity-50"
-                                    :style="{ backgroundColor: getUnitColor(unitIndex, 'darker') }"></div>
-
-                                <div class="absolute inset-0 rounded-full transform-gpu translate-y-1"
-                                    :style="{ backgroundColor: getUnitColor(unitIndex, 'dark') }"></div>
-
-                                <div class="absolute inset-0 rounded-full flex items-center justify-center cursor-pointer shadow-lg transform-gpu transition-all duration-300"
-                                    :style="{ background: getUnitGradient(unitIndex) }">
-                                    <component :is="getIconForIndex(getGlobalSectionIndex(unitIndex, sectionIndex))"
-                                        class="w-24 h-24 transform-gpu transition-all duration-300 group-hover:scale-110"
-                                        style="color: var(--light-text);" />
-                                </div>
+                                
+                                <!-- Triangle pointer -->
+                                <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 transform rotate-45"
+                                style="background-color: var(--element-color-1);" />
                             </div>
                         </div>
-                    </template>
-                </template>
-
-                <!-- Added right padding to ensure last nodes have space -->
-                <div class="w-24 flex-shrink-0"></div>
-            </div>
-        </div>
-        <!-- Add Node Modal -->
-        <Transition name="modal">
-            <div v-if="showAddNodeModal" class="fixed inset-0 flex items-center justify-center z-50 p-4"
-                style="background-color: var(--background-haze);">
-                <div class="rounded-2xl p-6 w-full max-w-md shadow-xl border"
-                    style="background-color: var(--background-color); color: var(--light-text); border-color: var(--color-primary-dark);">
-                    <div class="flex justify-between items-center mb-4">
-                        <h2 class="text-xl font-semibold" style="color: var(--light-text);">Add New Stepping Stones</h2>
-                        <button @click="showAddNodeModal = false" style="color: var(--highlight-color);">
-                            <XMarkIcon class="w-6 h-6" />
-                        </button>
+                        
+                        <div
+                        class="relative transform-gpu transition-all duration-300 group-hover:scale-105 group-hover:-translate-y-2">
+                        <div class="absolute -bottom-4 left-1/2 -translate-x-1/2 w-40 h-8 rounded-full blur-xl transform-gpu transition-all duration-300 group-hover:w-44"
+                        style="background-color: var(--background-color-1t);"></div>
+                        
+                        <div class="absolute inset-0 rounded-full transform-gpu translate-y-2 blur-sm opacity-50"
+                        :style="{ backgroundColor: getUnitColor(unitIndex, 'darker') }"></div>
+                        
+                        <div class="absolute inset-0 rounded-full transform-gpu translate-y-1"
+                        :style="{ backgroundColor: getUnitColor(unitIndex, 'dark') }"></div>
+                        
+                        <div class="absolute inset-0 rounded-full flex items-center justify-center cursor-pointer shadow-lg transform-gpu transition-all duration-300"
+                        :style="{ background: getUnitGradient(unitIndex) }">
+                        <component :is="getIconForIndex(getGlobalSectionIndex(unitIndex, sectionIndex))"
+                        class="w-24 h-24 transform-gpu transition-all duration-300 group-hover:scale-110"
+                        style="color: var(--light-text);" />
                     </div>
+                </div>
+            </div>
+        </template>
+    </template>
+    
+    <!-- Added right padding to ensure last nodes have space -->
+    <div class="w-24 flex-shrink-0"></div>
+</div>
+</div>
+<!-- Add Node Modal -->
+<Transition name="modal">
+    <div v-if="showAddNodeModal" class="fixed inset-0 flex items-center justify-center z-50 p-4"
+    style="background-color: var(--background-haze);">
+    <div class="rounded-2xl p-6 w-full max-w-md shadow-xl border"
+    style="background-color: var(--background-color); color: var(--light-text); border-color: var(--color-primary-dark);">
+    <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-semibold" style="color: var(--light-text);">Add New Stepping Stones</h2>
+        <button @click="showAddNodeModal = false" style="color: var(--highlight-color);">
+            <XMarkIcon class="w-6 h-6" />
+        </button>
+    </div>
+    
+    <div class="space-y-4">
+        <!-- Dynamic list of node names -->
+        <div>
+            <label class="block text-sm font-medium mb-1"
+            style="color: var(--highlight-color);">Stepping Stone
+            Names</label>
+            <div v-for="(node, index) in newNodeNames" :key="index"
+            class="flex items-center gap-2 mb-2">
+            <input v-model="newNodeNames[index]" type="text" class="w-full p-2 border rounded-lg"
+            style="background-color: var(--background-color-1t); color: var(--light-text); border-color: var(--color-primary-dark);"
+            placeholder="Enter Stepping Stone name" maxlength="40" />
+            <button v-if="newNodeNames.length > 1" @click="removeNodeName(index)"
+                class="text-red-400 hover:text-red-300">
+                <XCircleIcon class="w-6 h-6" />
+            </button>
+        </div>
+        <button @click="addNodeNameField" class="mt-2 text-sm font-medium flex items-center gap-1"
+        style="color: var(--highlight-color);">
+        <PlusIcon class="w-4 h-4" />
+        Add Another Node
+    </button>
+    <p v-if="nodeNameErrors.length" class="mt-1 text-sm"
+    style="color: var(--color-primary-light);">
+    <!-- {{ nodeNameErrors }} -->
+    <span v-for="(error, index) in nodeNameErrors" :key="index">{{ error }}<br></span>
+    
+</p>
+</div>
 
-                    <div class="space-y-4">
-                        <!-- Dynamic list of node names -->
+<div>
+    <label class="block text-sm font-medium mb-1" style="color: var(--highlight-color);">Upload
+        Resource
+        (optional)<br>Note: Stepping stone content is based on this resource and all previously
+        uploaded resources in this library </label>
+        <div class="border border-dashed rounded-lg p-4 text-center"
+        style="background-color: var(--background-color-1t); border-color: var(--color-primary-light);">
+        <input type="file" ref="fileInput" @change="handleFileSelection" class="hidden"
+        accept=".pdf,.doc,.docx,.txt" />
+        <div v-if="!selectedFile" @click="$refs.fileInput.click()" class="cursor-pointer">
+            <DocumentPlusIcon class="w-12 h-12 mx-auto"
+            style="color: var(--color-primary-light);" />
+            <p class="mt-2 text-sm" style="color: var(--highlight-color);">Click to upload (max
+                500KB)
+            </p>
+            <p class="mt-1 text-xs" style="color: var(--color-primary-light);">PDF, DOC, DOCX,
+                TXT</p>
+            </div>
+            <div v-else class="text-left">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <DocumentIcon class="w-8 h-8 mr-2"
+                        style="color: var(--color-primary-light);" />
                         <div>
-                            <label class="block text-sm font-medium mb-1"
-                                style="color: var(--highlight-color);">Stepping Stone
-                                Names</label>
-                            <div v-for="(node, index) in newNodeNames" :key="index"
-                                class="flex items-center gap-2 mb-2">
-                                <input v-model="newNodeNames[index]" type="text" class="w-full p-2 border rounded-lg"
-                                    style="background-color: var(--background-color-1t); color: var(--light-text); border-color: var(--color-primary-dark);"
-                                    placeholder="Enter Stepping Stone name" maxlength="40" />
-                                <button v-if="newNodeNames.length > 1" @click="removeNodeName(index)"
-                                    class="text-red-400 hover:text-red-300">
-                                    <XCircleIcon class="w-6 h-6" />
-                                </button>
-                            </div>
-                            <button @click="addNodeNameField" class="mt-2 text-sm font-medium flex items-center gap-1"
-                                style="color: var(--highlight-color);">
-                                <PlusIcon class="w-4 h-4" />
-                                Add Another Node
-                            </button>
-                            <p v-if="nodeNameErrors.length" class="mt-1 text-sm"
-                                style="color: var(--color-primary-light);">
-                                <!-- {{ nodeNameErrors }} -->
-                                <span v-for="(error, index) in nodeNameErrors" :key="index">{{ error }}<br></span>
-
-                            </p>
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-medium mb-1" style="color: var(--highlight-color);">Upload
-                                Resource
-                                (optional)<br>Note: Stepping stone content is based on this resource and all previously
-                                uploaded resources in this library </label>
-                            <div class="border border-dashed rounded-lg p-4 text-center"
-                                style="background-color: var(--background-color-1t); border-color: var(--color-primary-light);">
-                                <input type="file" ref="fileInput" @change="handleFileSelection" class="hidden"
-                                    accept=".pdf,.doc,.docx,.txt" />
-                                <div v-if="!selectedFile" @click="$refs.fileInput.click()" class="cursor-pointer">
-                                    <DocumentPlusIcon class="w-12 h-12 mx-auto"
-                                        style="color: var(--color-primary-light);" />
-                                    <p class="mt-2 text-sm" style="color: var(--highlight-color);">Click to upload (max
-                                        500KB)
-                                    </p>
-                                    <p class="mt-1 text-xs" style="color: var(--color-primary-light);">PDF, DOC, DOCX,
-                                        TXT</p>
-                                </div>
-                                <div v-else class="text-left">
-                                    <div class="flex items-center justify-between">
-                                        <div class="flex items-center">
-                                            <DocumentIcon class="w-8 h-8 mr-2"
-                                                style="color: var(--color-primary-light);" />
-                                            <div>
-                                                <p class="text-sm font-medium truncate"
-                                                    style="color: var(--highlight-color);">
-                                                    {{ selectedFile.name }}</p>
-                                                <p class="text-xs" style="color: var(--color-primary-light);">{{
-                                                    formatFileSize(selectedFile.size) }}</p>
+                            <p class="text-sm font-medium truncate"
+                            style="color: var(--highlight-color);">
+                            {{ selectedFile.name }}</p>
+                            <p class="text-xs" style="color: var(--color-primary-light);">{{
+                                formatFileSize(selectedFile.size) }}</p>
                                             </div>
                                         </div>
                                         <button @click.prevent="removeFile" class="text-red-400 hover:text-red-300">
@@ -190,25 +192,29 @@
                                 <p v-if="fileError" class="mt-2 text-sm text-red-400">{{ fileError }}</p>
                             </div>
                         </div>
-
+                        
                         <div class="flex gap-3 justify-end mt-6">
                             <button @click="showAddNodeModal = false" class="px-4 py-2 border rounded-lg"
-                                style="border-color: var(--color-primary); color: var(--highlight-color);">
-                                Cancel
-                            </button>
-                            <button @click="addNewNodes" class="px-4 py-2 rounded-lg focus:outline-none focus:ring-2"
-                                style="background: var(--button-gradient); color: var(--light-text);"
-                                :disabled="isAddingNode">
-                                <span v-if="isAddingNode">Adding...</span>
-                                <span v-else>Add Stepping Stone</span>
-                            </button>
-                        </div>
-                    </div>
+                            style="border-color: var(--color-primary); color: var(--highlight-color);">
+                            Cancel
+                        </button>
+                        <button @click="addNewNodes" class="px-4 py-2 rounded-lg focus:outline-none focus:ring-2"
+                        style="background: var(--button-gradient); color: var(--light-text);"
+                        :disabled="isAddingNode">
+                        <span v-if="isAddingNode">Adding...</span>
+                        <span v-else>Add Stepping Stone</span>
+                    </button>
                 </div>
             </div>
-        </Transition>
-
+        </div>
     </div>
+</Transition>
+
+</div>
+</div>
+<div v-else>
+    <p>Preparing your learning path...</p>
+</div>
 </template>
 
 <script setup lang="ts">
@@ -252,6 +258,10 @@ const props = defineProps({
         type: Array,
         required: true
     }
+})
+
+const isDataReady = computed(() => {
+    return props.unitSectionMap && props.unitSectionMap.length > 0
 })
 
 const rawUnitData = ref();

@@ -107,7 +107,7 @@ def init_library_routes(app):
         else:
             print("No groups provided.")
 
-        try :
+        try:
             selected_file = request.files.get("selectedFile").read()
             if not selected_file:
                 return jsonify({"error": "No file provided (request.json)"}), 400

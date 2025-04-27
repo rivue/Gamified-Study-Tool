@@ -220,6 +220,7 @@ def save_library_room_contents(library_id, section_unit_map, lessons, user_id):
         num_lessons = 3
 
         with db_transaction():
+            curr = 1
             for unit_name, sections in section_unit_map.items():
 
                 # 1.1 + 1.2) create unit and add to library
@@ -232,7 +233,11 @@ def save_library_room_contents(library_id, section_unit_map, lessons, user_id):
                                 
                 unit_id = response_obj.get_json()["unit"]
 
+                print(unit_name + "unit_name #" + str(curr))
+                curr += 1
+                print(f"sections: {sections}")
                 for section in sections:
+                    print(section + "section")
 
                     # 2.1 + 2.2) create sections and add to unit
                     response_obj, status_code = create_section_and_add(unit_id, section)
@@ -249,7 +254,6 @@ def save_library_room_contents(library_id, section_unit_map, lessons, user_id):
                     add_section_user_state(user_id, library_id, section_id, num_lessons)
                     
                     # 4.1 + 4.2) create factoids and add to sections
-
                     
                     # 4) add factoids to sections
                     for index, item in enumerate(lessons["factoids"]):
