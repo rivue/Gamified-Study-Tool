@@ -8,7 +8,7 @@ IDEAS:
         - create cheap vr cardboard cutouts of headsets where you can put your phone --> give to high schools possibly for free once you partner with them
             - have to think specifically of who / what to target for MVP, etc... so as little time as possibly gets wasted building something that either 1) is outside of my domain of expertise or 2) other people might build (repeat of unclear jupyterhub research)
             - not sure where to go from there, lots of places though
-        - see google doc for more plansyour resume
+        - see google doc for more plans for resume (or just repomix this whole codebase into gpt / grok / gemini / claude, etc..)
             - Built a custom text extraction pipeline using Optical Character Recognition to extract text from pdf textbooks with 97% accuracy
                 (add image to text ocr thing on resume)
 
@@ -44,76 +44,98 @@ TODO list:
         (currently all 4 were in BottomBar.vue) --> (BASICALLY MAKE BottomBar.vue SMALLER)
 
     general:
-        - add a "scroll to front", "scroll to current", and "scroll to end" feature for map page
+    study tool additions / ideas:
+
+        - ⭐️ Finish sections + units
+            - ⭐️ Add section to each unit
+        - ⭐️ Delete sections / units / courses (requires entering the name of the unit / course)
+            - ⭐️ Deleting from both DB and pinecone as well
+        - ⭐️ Terms of use / Policy Page legal agreement thing
+            - ⭐️ Look at websites and stuff for this
+        - ⭐️ Friend / invite friends / share features / leaderboard
+            - ⭐️ Should I make them private or public?
+            - ⭐️ Public by default, and add a settings to make them private
+            - ⭐️ For Private, make it so people have to use like an 8 digit invite code that maybe the course owner can set or something
+        - ⭐️ Syllabus to section / unit mapping thing
+        - ⭐️ In creating a new course, add checkboxes for different types of modes (fill-in-the-blank, t/f, mcq, etc…)
+
+        - ⭐️ For course owner, add a “settings” button maybe to the left  / right of the course name
+                this would enable them to add people / delete people I think? or see users or something
+                for normal users there could be an i-card button used to see course files or something, maybe 
+                users could add a note for each unit or something
+        - there could be a button on the game screen that says “review most missed questions” or some equivalent
+        - there could also be “boss missions” mixed in either at the end of units or mixed in randomly with more difficult questions or cumulative review or something
+        other thing:
+        - ⭐️ visibility of different courses? are they all public like quilt or am I trying to form a tight knit group like turbolearn / clash of clans?
+            - default public, creator can toggle private / public both in course creation and after course is created
+        - possibly change outline of course, like maybe make it wrap around to the right, then do a u-turn and wrap around to the left, with the user scrolling up / down
+        ...instead of left / right
+
+        - ⭐️ add a "scroll to front", "scroll to current", and "scroll to end" feature for map page
             - also, maybe change it to vertical
-        - should not be able to make duplicate unit and section names
+        - ⭐️ should not be able to make duplicate unit and section names
         - fix the fact that refresh is triggering /api/<whatever> three different times
         - add two buttons right next to each other and right above "play"
             1) video button where a manim video is generated about the subject possibly
             2) other resources button where other youtube videos / articles are researched in relation to the topic (grab the resources based on content, not necessarily the name of the section)
-        - add ability to see uploaded files in library and maybe even file preview
-        - add ability to add friends to a course + leaderboard as well
+        - ⭐️ add ability to see uploaded files in library and maybe even file preview
+        - ⭐️ add ability to add friends to a course + leaderboard as well
         - make a constants file for discord links, twitter / x links, any backend urls, etc...
-        - add tips for making a new stepping stone (i.e. make sure it aligns with what you put, etc... )
+        - ⭐️ add tips for making a new stepping stone (i.e. make sure it aligns with what you put, etc... )
         - for short answer, 1) make it one word (for now) and most importantly 2) make sure the exact word is in the other side of the card
-        - fix Aryan's problem with viewing it on his phone
+        - ⭐️ fix Aryan's problem with viewing it on his phone
         - look into adding a resizable area somewhere in your site (like how turbo learn has it) but like people can't change it
-        - add ability to delete library (have to enter its name exactly)
-        - add check for duplicate room name for the time being - maybe allow it later down the line?
+        - ⭐️ add ability to delete library (have to enter its name exactly)
+        - ⭐️ add check for duplicate room name for the time being - maybe allow it later down the line?
         - when you mouse over the popup for the lesson that has the # of lessons / x button, it should not cause the button to hover
-        - improve ui with libraries / courses in library creation screen
-        - add ability to change color of image of courses
-        - remove lesson ids, lesson names, password reset tokens and confirmation tokens from urls and communicate them somewhere else
+        - ??? remove lesson ids, lesson names, password reset tokens and confirmation tokens from urls and communicate them somewhere else
             - make it like duolingo where doing the actual lesson is /learn or something
-        - add page after you finish a game session, but make it have confetti or an animation or something
+        - ⭐️ add page after you finish a game session, but make it have confetti or an animation or something
         - should email / pwd reset tokens be visible via the url or should they be more secret?
         - how long do email confirmation tokens last / how long do password reset tokens last / what do I do when they're done?
         - improve prompt / answer generation
         - fix propfind error thing
-        - add google auth and / or PASSWORD RESET
-        
-        - add a slot for an image in each question for reference or description or something - like maybe an image of a bridge or trigonometry or something
+        - ⭐️ add google auth
+        - (maybe later to make sure it works) add a slot for an image in each question for reference or description or something - like maybe an image of a bridge or trigonometry or something
         - migrate from pinecone-client to pinecone (not really a migration, just a typo I think, shouldn't take too long)
         - possibly fix weird ssl module warning thing when I run the backend
         - reduce bundle (currently @ 261 KiB, want to be ideally below 244)
-        - add support for multiple file upload (possibly)
         - add other routes back in, eventually
-        - remove library difficulty, mentor, language, etc... from db course structure, backend, frontend course creation screen
+        - ⭐️ remove library difficulty, mentor, language, etc... from db course structure, backend, frontend course creation screen
             - note: easy to get rid of in the frontend, but have to remove lots of stuff in backend w/ various function calls and stuff
         - include question prompt generation (e.g. make the answer choices very similar to what you think the user would think so the questions are a little more challenging, etc...)
-        - add default background if you scroll to far (like in main page if you scroll too far down)
+        - ⭐️ add default background if you scroll to far (like in main page if you scroll too far down)
         - change theme / color / name
-        - ability to "star" / "favorite" a course
-        - make footer smaller and look better
+        - ⭐️ ability to "star" / "favorite" a course
+        - make footer even smaller and look better
         - contact image on main sidebar?
         - add about route back in (could be something about how I want to help students study, or I could just not add it back in)
-        - significant ui rehaul *** --> kinnu, duolingo, saved instagram design reels etc..
+        - ⭐️ significant ui rehaul *** --> kinnu, duolingo, saved instagram design reels etc..
             - copy openais font?
         
         - change gpt 4o-mini to deepseek (deepseek once I test reliable function calling or parsing) or other model for cost
         - eventually look into custom api / llm specifically designed for education or review or whatever
         - *possibly* add a slider to each course based on how lenient the course creator wants the fuzzy string matcher to be (for misspelled words)
-        - improve completion screen a bit
-        - add support for .txt files for the create library thing
+        - ⭐️ improve completion screen a bit
         - clean up minor ui thing with learning nodes (when you click on the popup to play the games, for some reason it still highlights the node)
-        - modify section splitting logic (5 sentences --> 1k characters or 200 words max or whatever.)
         - only fetch most 30 recent factoids, or summary of factoids or something when doing room generation
 
-        - all the other routes and stuff (terms & policies, buying subscription)
+        - ⭐️ all the other routes and stuff (terms & policies, buying subscription)
 
     create course (library) page:
-        - add support for links / pdfs / other things and get rid of things like difficulty, tutor, etc... then actually start generating stuff to study
-        - after user submits something and is waiting, display a loading bar or wheel or something letting the user know that it is generating
+        - ⭐️ add support for links / pdfs / other things and get rid of things like difficulty, tutor, etc... then actually start generating stuff to study
+            - add support for multiple file upload as well
+        - ⭐️ after user submits something and is waiting, display a loading bar or wheel or something letting the user know that it is generating
 
 
     potential work for rod / calvin / caleb:
-        - let units / sections / courses have spacings / duplicate values as others in db / weird characters / numbers, #($^@{"?}*), etc...
+        - ⭐️ let units / sections / courses have spacings / duplicate values as others in db / weird characters / numbers, #($^@{"?}*), etc...
         - change from rag --> kag
             - very nlp involved + graph stuff, etc...
 
     game page:
         - break up error checking in frontend for unit creation
-        - implement game "score" logic (if you get >80% #attemps:number of questions ratio) then you get more / less points or something, etc...
+        - ⭐️ implement game "score" logic (if you get >80% #attemps:number of questions ratio) then you get more / less points or something, etc...
         - investigate into what clouds and diamonds in game screen were used for so I can probably use them later
         - remove time from db then remove all references to "timer", "end time" or "starting time" in gameStore.js
         - add possibly a hint button as well (3 hints per question?)
@@ -287,7 +309,8 @@ COMPLETED:
     ✅ add ability to add multiple room names from Add New Stepping Stone part
     ✅ ADD SHAD-CN
     ✅ eventually add footer back (note: requires light mode, discord link, everything in contact page, terms page, copyright(?), and possibly twitter link if we decide to do that)
-
+    ✅ improve ui with libraries / courses in library creation screen
+    ✅ add password reset
 
 
 
