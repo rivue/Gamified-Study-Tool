@@ -44,6 +44,7 @@ TODO list:
             - ⭐️ Deleting from both DB and pinecone as well
         - ⭐️ leaderboard / game point tracking system
         - ⭐️ UI redesign / rehaul *** --> kinnu, duolingo, saved instagram design reels etc..
+            - Note: 1) try to see what horizontal --> vertical learning path looks like, and possibly make a vertical bar on the side for settings, i-card, files list, adding a new stepping stone, etc... but maybe keep lesson name and current unit name at the top?
         - ⭐️ Stripe implementation
             - have to think abt what different payment levels mean / how I want to do it
         - ⭐️ For course owner, add a “settings” gear button maybe to the left  / right of the course name

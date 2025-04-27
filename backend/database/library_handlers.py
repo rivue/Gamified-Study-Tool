@@ -122,7 +122,6 @@ def get_library_id(library_topic, difficulty, language, language_difficulty, gui
         print(f"Error fetching library: {str(e)}")
         return None
 
-
 def get_library(library_id, user_id=None, click=True):
 
     library = Library.query.get(library_id)
@@ -155,7 +154,7 @@ def get_library(library_id, user_id=None, click=True):
                 if unit.unit_name in unit_to_section_map:
                     unit_to_section_map[unit.unit_name].append((section.id, section.section_name))
                 else:
-                    unit_to_section_map[unit.unit_name] = (section.id, section.section_name)
+                    unit_to_section_map[unit.unit_name] = [(section.id, section.section_name)]
 
         library_data["room_names"] = room_names
         library_data["units"] = unit_list

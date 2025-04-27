@@ -73,7 +73,6 @@ const fetchLibraryData = async (): Promise<void> => {
                     library_topic: capitalizeWords(response.data.data.library_topic),
                 },
             };
-            console.log(library.value.data.unit_to_section_map);
         } else {
             throw new Error("Invalid response data");
         }

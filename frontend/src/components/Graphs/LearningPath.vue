@@ -30,24 +30,23 @@
             <div class="flex items-center gap-24 min-h-screen py-24 relative">
                 <!-- Added left padding to ensure first nodes are visible -->
                 <div class="w-24 flex-shrink-0"></div>
-                
+
                 <!-- Unit Headers -->
-                <template v-for="(unit, unitIndex) in unitData" :key="unit.unit_id">
+                <template v-for="(unit, unitIndex) in rawUnitData" :key="unit.unit_id">
                     <div class="absolute top-0 left-1/2 -translate-x-1/2 text-center font-medium text-lg"
                         style="color: var(--highlight-color);">
                         {{ unit.unit_name }}
                     </div>
                 </template>
-                
+                {{ rawUnitData }}
                 <!-- Loop through units and their sections -->
-                <template v-for="(unit, unitIndex) in unitData" :key="unit.unit_id">
+                <template v-for="(unit, unitIndex) in rawUnitData" :key="unit.unit_id">
+                    <!-- {{ unit }} -->
                     <template v-for="(section, sectionIndex) in unit.sections" :key="section.section_id">
-                        <div class="relative flex-shrink-0 group perspective" 
-                            :style="{
-                                transform: `translateY(${getNodeOffset(getGlobalSectionIndex(unitIndex, sectionIndex))}px)`
-                            }" 
-                            @click="handleNodeClick([section.section_name, section.section_id])">
-                            
+                        <div class="relative flex-shrink-0 group perspective" :style="{
+                            transform: `translateY(${getNodeOffset(getGlobalSectionIndex(unitIndex, sectionIndex))}px)`
+                        }" @click="handleNodeClick([section.section_name, section.section_id])">
+
                             <!-- Tooltip -->
                             <div v-if="selectedRoom && selectedRoom[1] === section.section_id"
                                 class="absolute -top-32 left-1/2 -translate-x-1/2 w-64 z-50">
@@ -63,14 +62,17 @@
                                     <div class="rounded-2xl p-4 shadow-lg"
                                         style="background-color: var(--element-color-1); color: var(--light-text);">
                                         <div class="font-medium mb-3">{{ formatRoomName(section.section_name) }} <br>
-                                            <span v-if="getRoomData(section.section_id) && getRoomData(section.section_id).lesson_state <= getRoomData(section.section_id).num_lessons">
-                                                lesson {{ getRoomData(section.section_id).lesson_state }} / {{ getRoomData(section.section_id).num_lessons }}
+                                            <span
+                                                v-if="getRoomData(section.section_id) && getRoomData(section.section_id).lesson_state <= getRoomData(section.section_id).num_lessons">
+                                                lesson {{ getRoomData(section.section_id).lesson_state }} / {{
+                                                getRoomData(section.section_id).num_lessons }}
                                             </span>
                                         </div>
                                         <button @click.stop="startLesson([section.section_name, section.section_id])"
                                             class="w-full rounded-xl py-2 px-4 font-medium flex items-center justify-center gap-2 transition-colors"
                                             style="background-color: var(--light-text); color: var(--element-color-1);">
-                                            <span v-if="getRoomData(section.section_id) && getRoomData(section.section_id).lesson_state <= getRoomData(section.section_id).num_lessons">PLAY</span>
+                                            <span
+                                                v-if="getRoomData(section.section_id) && getRoomData(section.section_id).lesson_state <= getRoomData(section.section_id).num_lessons">PLAY</span>
                                             <span v-else>REVIEW</span>
                                         </button>
                                     </div>
@@ -81,7 +83,8 @@
                                 </div>
                             </div>
 
-                            <div class="relative transform-gpu transition-all duration-300 group-hover:scale-105 group-hover:-translate-y-2">
+                            <div
+                                class="relative transform-gpu transition-all duration-300 group-hover:scale-105 group-hover:-translate-y-2">
                                 <div class="absolute -bottom-4 left-1/2 -translate-x-1/2 w-40 h-8 rounded-full blur-xl transform-gpu transition-all duration-300 group-hover:w-44"
                                     style="background-color: var(--background-color-1t);"></div>
 
@@ -234,7 +237,7 @@ import axios from 'axios';
 
 const props = defineProps({
     libraryId: {
-        type: Number,
+        type: String,
         required: true
     },
     roomNames: {
@@ -246,10 +249,16 @@ const props = defineProps({
         required: true
     },
     unitSectionMap: {
-        type: Object,
+        type: Array,
         required: true
     }
 })
+
+const rawUnitData = ref();
+
+watch(() => props.unitSectionMap, (newVal) => {
+    rawUnitData.value = newVal;
+}, { deep: true, immediate: true })
 
 // State for adding new nodes
 const showAddNodeModal = ref(false)
@@ -259,25 +268,6 @@ const nodeNameErrors = ref([])
 const fileError = ref('')
 const isAddingNode = ref(false)
 const gameStore = useGameStore()
-
-// Process and organize the unit and section data
-const unitData = computed(() => {
-    
-    // props.unitSectionMap.forEach((unit, index) => {
-    //         console.log(`Unit ${index}:`, unit)
-    //     })
-
-    // console.log("Unit Section Map:", props.unitSectionMap)
-  
-
-    return props.unitSectionMap.map(unit => {
-        return {
-            unit_id: unit.unit_id,
-            unit_name: unit.unit_name,
-            sections: unit.sections || []
-        }
-    })
-})
 
 // Track selected room for tooltip
 const selectedRoom = ref(null)
@@ -311,7 +301,7 @@ const getUnitGradient = (unitIndex) => {
 const getGlobalSectionIndex = (unitIndex, sectionIndex) => {
     let count = 0
     for (let i = 0; i < unitIndex; i++) {
-        count += unitData.value[i].sections.length
+        count += rawUnitData.value[i].sections.length
     }
     return count + sectionIndex
 }
@@ -402,8 +392,8 @@ const addNewNodes = async () => {
         // Add each node
         const formData = new FormData()
         formData.append('libraryId', library_id)
-        
-     // Append all room names with the same key name
+
+        // Append all room names with the same key name
         trimmedNames.forEach(room => formData.append("roomNames", room));
 
         // Add file if present (same file for all nodes)
@@ -411,7 +401,7 @@ const addNewNodes = async () => {
             console.debug(selectedFile.value)
             formData.append('file', selectedFile.value)
         }
-            
+
         const response = await axios.post('/api/library/room', formData, {
             signal: currentAbortController.signal,
             headers: {
@@ -420,7 +410,7 @@ const addNewNodes = async () => {
         })
 
         if (currentAbortController.signal.aborted) return; // Don't proceed if aborted
-            
+
         if (response.data && response.data.status === "success") {
             // Clear form and refresh to show new nodes
             newNodeNames.value = [''] // Reset to one empty field
@@ -484,7 +474,7 @@ let scrollTimeoutId = null;
 // Scroll to center on first load
 onMounted(() => {
     // If there are nodes and the container exists, scroll to position
-    if (unitData.value.length > 0 && scrollContainer.value) {
+    if (rawUnitData.value.length > 0 && scrollContainer.value) {
         // Calculate an appropriate starting position based on available width
         scrollTimeoutId = setTimeout(() => {
             // This gives time for the layout to render before scrolling
@@ -513,7 +503,7 @@ const router = useRouter();
 const startDragging = (e) => {
     isDragging.value = true
     hasMoved.value = false
-    
+
     if (e.type.includes('touch')) {
         startX.value = e.touches[0].pageX - scrollContainer.value.offsetLeft
         startY.value = e.touches[0].pageY
@@ -521,13 +511,13 @@ const startDragging = (e) => {
         startX.value = e.pageX - scrollContainer.value.offsetLeft
         e.preventDefault() // Only prevent default for mouse events
     }
-    
+
     scrollLeft.value = scrollContainer.value.scrollLeft
 }
 
 const drag = (e) => {
     if (!isDragging.value) return
-    
+
     let x, y
     if (e.type.includes('touch')) {
         x = e.touches[0].pageX - scrollContainer.value.offsetLeft
@@ -536,11 +526,11 @@ const drag = (e) => {
         x = e.pageX - scrollContainer.value.offsetLeft
         e.preventDefault()
     }
-    
+
     // Calculate distance moved
     const diffX = Math.abs(x - startX.value)
     const diffY = Math.abs(y - startY.value)
-    
+
     // Only consider it a drag if moved more than threshold
     if (diffX > tapThreshold || diffY > tapThreshold) {
         hasMoved.value = true
