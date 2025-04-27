@@ -42,19 +42,19 @@ TODO list:
             - ⭐️ add button / underlined text in the course screen that shows a small popup when clicked / hovered that says "course not here? --> if you made a course before March 15th, 2025 (or whatever date), we might have made broken changes. We are still learning and will not do this again. Please feel free to generate another course."
         - ⭐️ Delete sections / units / courses / libraries (requires entering the name of the unit / course)
             - ⭐️ Deleting from both DB and pinecone as well
-        - ⭐️ Friend / invite friends / share features / leaderboard
-            - ⭐️ Should I make them private or public?
-            - ⭐️ Public by default, and add a settings to make them private
-            - ⭐️ For Private, make it so people have to use like an 8 digit invite code that maybe the course owner can set or something
+        - ⭐️ leaderboard / game point tracking system
         - ⭐️ UI redesign / rehaul *** --> kinnu, duolingo, saved instagram design reels etc..
         - ⭐️ Stripe implementation
-        - ⭐️ visibility of different courses? are they all public like quizlet or am I trying to form a tight knit group like turbolearn / clash of clans?
-            - ⭐️ default public, creator can toggle private / public both in course creation and after course is created
-            - ⭐️ add ability / a page for searching for public courses
+            - have to think abt what different payment levels mean / how I want to do it
         - ⭐️ For course owner, add a “settings” gear button maybe to the left  / right of the course name
                 this would enable them to add people / delete people I think? or see users or something
                 for normal users there could be an i-card button used to see course files or something, maybe 
                 users could add a note for each unit or something
+        - ⭐️ visibility of different courses? are they all public like quizlet or am I trying to form a tight knit group like turbolearn / clash of clans?
+            - ⭐️ default public, creator can toggle private / public both in course creation and after course is created
+            - ⭐️ add ability / a page for searching for public courses
+            - ⭐️ for private, users would need some sort of short invite code, but maybe don't necessarily need to be friends for now, maybe it could be like kahoot or something where they don't have to be friends
+                    but I could add it later if I see demand based on data or something
         - ⭐️ add google auth
         - ⭐️ let units / sections / courses have spacings / duplicate values as others in db / weird characters / numbers, #($^@{"?}*), etc...
             - ⭐️ add support for links / pdfs / other things and get rid of things like difficulty, tutor, etc... then actually start generating stuff to study
