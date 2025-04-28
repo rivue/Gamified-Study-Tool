@@ -1,5 +1,8 @@
 <template>
-    <div v-if="isDataReady">
+    <!-- <div v-if="isDataReady"> -->
+        <div style="position: fixed; top: 10px; left: 10px; z-index: 100; background: white; padding: 10px; max-height: 300px; overflow: auto;">
+    <pre>{{ JSON.stringify(rawUnitData, null, 2) }}</pre>
+</div>
         <div class="fixed left-8 right-8 top-0 bottom-0 overflow-hidden">
             <button @click="scroll('left')"
                 class="fixed left-8 top-1/2 -translate-y-1/2 bg-black/30 backdrop-blur-sm shadow-lg rounded-full p-4 hover:bg-black/40 z-10"
@@ -32,17 +35,16 @@
                         <div class="w-24 flex-shrink-0"></div>
 
                         <!-- Unit Headers -->
+                         {{ rawUnitData }}
                         <template v-for="(unit, unitIndex) in rawUnitData" :key="unit.unit_id">
-                            <div class="absolute top-0 left-1/2 -translate-x-1/2 text-center font-medium text-lg"
-                                style="color: var(--highlight-color);">
-                                {{ unit.unit_name }}
-                            </div>
-                        </template>
-                        {{ rawUnitData }}
-                        <!-- Loop through units and their sections -->
-                        <template v-for="(unit, unitIndex) in rawUnitData" :key="unit.unit_id">
-                            <!-- {{ unit }} -->
-                            <template v-for="(section, sectionIndex) in unit.sections" :key="section.section_id">
+                            <!-- Loop through units and their sections -->
+                            {{ unit }}
+                            {{ unitIndex }}
+                            {{ rawUnitData }}
+                            <template v-for="(section, sectionIndex) in rawUnitData[unitIndex]" :key="section.section_id">
+                                {{ section }}
+                                {{ sectionIndex }}
+                                {{ unitIndex }}
                                 <div class="relative flex-shrink-0 group perspective" :style="{
                                     transform: `translateY(${getNodeOffset(getGlobalSectionIndex(unitIndex, sectionIndex))}px)`
                                 }" @click="handleNodeClick([section.section_name, section.section_id])">
@@ -91,10 +93,10 @@
                                             style="background-color: var(--background-color-1t);"></div>
 
                                         <div class="absolute inset-0 rounded-full transform-gpu translate-y-2 blur-sm opacity-50"
-                                            :style="{ backgroundColor: getUnitColor(unitIndex, 'darker') }"></div>
+                                            :style="{ backgroundColor: getUnitColor(unitIndex) }"></div>
 
                                         <div class="absolute inset-0 rounded-full transform-gpu translate-y-1"
-                                            :style="{ backgroundColor: getUnitColor(unitIndex, 'dark') }"></div>
+                                            :style="{ backgroundColor: getUnitColor(unitIndex) }"></div>
 
                                         <div class="absolute inset-0 rounded-full flex items-center justify-center cursor-pointer shadow-lg transform-gpu transition-all duration-300"
                                             :style="{ background: getUnitGradient(unitIndex) }">
@@ -130,8 +132,7 @@
                                 <!-- Dynamic list of node names -->
                                 <div>
                                     <label class="block text-sm font-medium mb-1"
-                                        style="color: var(--highlight-color);">Stepping Stone
-                                        Names</label>
+                                        style="color: var(--highlight-color);">Stepping Stone Names</label>
                                     <div v-for="(node, index) in newNodeNames" :key="index"
                                         class="flex items-center gap-2 mb-2">
                                         <input v-model="newNodeNames[index]" type="text"
@@ -224,10 +225,10 @@
 
             </div>
         </div>
-        </div>
-        <div v-else>
+        <!-- </div> -->
+        <!-- <div v-else>
             <p>Preparing your learning path...</p>
-        </div>
+        </div> -->
 </template>
 
 <script setup lang="ts">
@@ -273,14 +274,17 @@ const props = defineProps({
     }
 })
 
-const isDataReady = computed(() => {
-    return rawUnitData; //props.unitSectionMap && props.unitSectionMap.length > 0
-})
+// const isDataReady = computed(() => {
+//     return rawUnitData; //props.unitSectionMap && props.unitSectionMap.length > 0
+// })
 
 const rawUnitData = ref();
 
 watch(() => props.unitSectionMap, (newVal) => {
+    console.log("hi");
+    console.log(newVal);
     rawUnitData.value = newVal;
+    console.log(rawUnitData.value);
 }, { deep: true, immediate: true })
 
 // State for adding new nodes
@@ -302,22 +306,23 @@ const fileInput = ref(null)
 
 // Color schemes for units
 const unitColors = [
-    { base: '#2ecc71', dark: '#27ae60', darker: '#1e8449' }, // green
-    { base: '#f1c40f', dark: '#f39c12', darker: '#e67e22' }, // yellow
-    { base: '#3498db', dark: '#2980b9', darker: '#1f618d' }, // blue
-    { base: '#e74c3c', dark: '#c0392b', darker: '#922b21' }  // red
+    '#2ecc71', // green
+    '#f1c40f', // yellow
+    '#3498db', // blue
+    '#e74c3c', // red
 ]
 
 // Get color for a unit based on its index
-const getUnitColor = (unitIndex, variant = 'base') => {
+const getUnitColor = (unitIndex) => {
     const colorIndex = unitIndex % unitColors.length
-    return unitColors[colorIndex][variant]
+    console.log(colorIndex);
+    return unitColors[colorIndex];
 }
 
 // Get gradient for a unit based on its index
 const getUnitGradient = (unitIndex) => {
     const colorIndex = unitIndex % unitColors.length
-    return `linear-gradient(135deg, ${unitColors[colorIndex].base}, ${unitColors[colorIndex].dark})`
+    return `linear-gradient(135deg, ${unitColors[colorIndex]}, ${unitColors[colorIndex]})`
 }
 
 // Get global section index (for offset and icon selection)
