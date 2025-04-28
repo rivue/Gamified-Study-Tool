@@ -95,6 +95,8 @@ TODO list:
     general:
     study tool additions / ideas:
         
+        - maybe ask users how knowledgeable they are with a unit / course / section before they start?
+            not sure how many extra questions I would need to generate for this to work though...
         - clean up unneeded db model variables from db
         - there could be a button on the game screen that says “review most missed questions” or some equivalent
         - there could also be “boss missions” mixed in either at the end of units or mixed in randomly with more difficult questions or cumulative review or something
