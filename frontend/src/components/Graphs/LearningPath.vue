@@ -34,15 +34,8 @@
                 <!-- Unit Headers -->
                 <template v-for="([unit], unitName, unitIndex) in rawUnitData" :key="unit.unit_id">
                     <!-- Loop through units and their sections -->
-                    <!-- {{ unitIndex }}
-                         {{ unit }}
-                         {{ unitName }}
-                         {{ rawUnitData }} -->
                     <template v-for="([sectionId, sectionName], sectionIndex) in rawUnitData[unitName]"
                         :key="sectionIndex">
-                        <!-- {{ sectionId }}
-                            {{ sectionName }}
-                            {{ sectionIndex }} -->
                         <div class="relative flex-shrink-0 group perspective" :style="{
                             transform: `translateY(${getNodeOffset(getGlobalSectionIndex(unitName, unitIndex, sectionIndex))}px)`
                         }" @click="handleNodeClick(sectionId)">
@@ -90,8 +83,6 @@
                                     style="background-color: var(--background-color-1t);"></div>
 
                                 <div class="relative w-48 h-48">
-                                    <div class="absolute inset-0 rounded-full transform-gpu translate-y-2 blur-sm opacity-50"
-                                        :style="{ backgroundColor: getUnitColor(unitIndex) }"></div>
 
                                     <div class="absolute inset-0 rounded-full transform-gpu translate-y-1"
                                         :style="{ backgroundColor: getUnitColor(unitIndex) }"></div>
@@ -153,7 +144,7 @@
                                 style="color: var(--color-primary-light);">
                                 <!-- {{ nodeNameErrors }} -->
                                 <span v-for="(error, index) in nodeNameErrors" :key="index">{{ error
-                                    }}<br></span>
+                                }}<br></span>
 
                             </p>
                         </div>
@@ -271,11 +262,7 @@ const props = defineProps({
 const rawUnitData = ref();
 
 watch(() => props.unitSectionMap, (newVal) => {
-    console.log("hi");
-    console.log(newVal);
     rawUnitData.value = newVal;
-    console.log(props.roomData);
-    console.log(rawUnitData.value);
 }, { deep: true, immediate: true })
 
 // State for adding new nodes
@@ -306,7 +293,6 @@ const unitColors = [
 // Get color for a unit based on its index
 const getUnitColor = (unitIndex) => {
     const colorIndex = unitIndex % unitColors.length
-    console.log(colorIndex);
     return unitColors[colorIndex];
 }
 
@@ -564,7 +550,6 @@ const stopDragging = () => {
 
 const handleNodeClick = (sectionId) => {
     if (!hasMoved.value) {
-        console.log(sectionId);
         selectedRoomId.value = selectedRoomId.value && selectedRoomId.value === sectionId ? null : sectionId
     }
 }
@@ -576,6 +561,7 @@ const getNodeOffset = (index) => {
 }
 
 const startLesson = (sectionName, sectionId) => {
+    console.log(`${sectionName}+${sectionId}`);
     gameStore.setSectionId(sectionId);
     router.push({
         name: 'GamePage',
