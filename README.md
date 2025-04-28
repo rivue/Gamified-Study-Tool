@@ -39,6 +39,7 @@ TODO list:
         hard probably (goal: 2 high level bullet points / wk):
         - ⭐️ Finish sections + units
             - ⭐️ Add ability to add each section to each unit
+            - ⭐️ Add ability to add a unit
             - ⭐️ add button / underlined text in the course screen that shows a small popup when clicked / hovered that says "course not here? --> if you made a course before March 15th, 2025 (or whatever date), we might have made broken changes. We are still learning and will not do this again. Please feel free to generate another course."
         - ⭐️ Delete sections / units / courses / libraries (requires entering the name of the unit / course)
             - ⭐️ Deleting from both DB and pinecone as well
@@ -75,7 +76,7 @@ TODO list:
         - ⭐️ add some other types of games / questions (ex: true / false, very detailed / specific questions, sorting, compare / contrast, analigies, image based stuff (not sure how to implement) 6 options choose 1-6, etc... see list below)
         - ⭐️ all the other routes and stuff (terms & policies, buying subscription)
         
-        easy (same as medium):
+        easy (same as medium): 
         - ⭐️ fix Aryan's problem with viewing it on his phone
         - ⭐️ should not be able to make duplicate unit and section names
         - ⭐️ add a "scroll to front", "scroll to current", and "scroll to end" feature for map page

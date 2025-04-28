@@ -33,20 +33,20 @@
                     <!-- Unit Headers -->
                     <template v-for="([unit], unitName, unitIndex) in rawUnitData" :key="unit.unit_id">
                         <!-- Loop through units and their sections -->
-                         {{ unitIndex }}
+                         <!-- {{ unitIndex }}
                          {{ unit }}
                          {{ unitName }}
-                         {{ rawUnitData }}
+                         {{ rawUnitData }} -->
                         <template v-for="([sectionId, sectionName], sectionIndex) in rawUnitData[unitName]" :key="sectionIndex">
-                            {{ sectionId }}
+                            <!-- {{ sectionId }}
                             {{ sectionName }}
-                            {{ sectionIndex }}
+                            {{ sectionIndex }} -->
                             <div class="relative flex-shrink-0 group perspective" :style="{
-                                transform: `translateY(${getNodeOffset(getGlobalSectionIndex(unitIndex, sectionIndex))}px)`
-                             }" @click="handleNodeClick([sectionName.section_name, section.section_id])">
+                                transform: `translateY(${getNodeOffset(getGlobalSectionIndex(unitName, unitIndex, sectionIndex))}px)`
+                             }" @click="handleNodeClick([sectionName, sectionId])">
 
                                 <!-- Tooltip -->
-                                <div v-if="selectedRoom && selectedRoom[1] === section.section_id"
+                                <div v-if="selectedRoom && selectedRoom[1] === sectionId"
                                     class="absolute -top-32 left-1/2 -translate-x-1/2 w-64 z-50">
                                     <div class="relative">
                                         <!-- Red close button in top-right -->
@@ -62,17 +62,17 @@
                                             <div class="font-medium mb-3">{{ formatRoomName(section.section_name) }}
                                                 <br>
                                                 <span
-                                                    v-if="getRoomData(section.section_id) && getRoomData(section.section_id).lesson_state <= getRoomData(section.section_id).num_lessons">
-                                                    lesson {{ getRoomData(section.section_id).lesson_state }} / {{
-                                                        getRoomData(section.section_id).num_lessons }}
+                                                    v-if="getRoomData(sectionId) && getRoomData(sectionId).lesson_state <= getRoomData(sectionId).num_lessons">
+                                                    lesson {{ getRoomData(sectionId).lesson_state }} / {{
+                                                        getRoomData(sectionId).num_lessons }}
                                                 </span>
                                             </div>
                                             <button
-                                                @click.stop="startLesson([section.section_name, section.section_id])"
+                                                @click.stop="startLesson(sectionName, sectionId)"
                                                 class="w-full rounded-xl py-2 px-4 font-medium flex items-center justify-center gap-2 transition-colors"
                                                 style="background-color: var(--light-text); color: var(--element-color-1);">
                                                 <span
-                                                    v-if="getRoomData(section.section_id) && getRoomData(section.section_id).lesson_state <= getRoomData(section.section_id).num_lessons">PLAY</span>
+                                                    v-if="getRoomData(sectionId) && getRoomData(sectionId).lesson_state <= getRoomData(sectionId).num_lessons">PLAY</span>
                                                 <span v-else>REVIEW</span>
                                             </button>
                                         </div>
@@ -96,7 +96,7 @@
 
                                     <div class="absolute inset-0 rounded-full flex items-center justify-center cursor-pointer shadow-lg transform-gpu transition-all duration-300"
                                         :style="{ background: getUnitGradient(unitIndex) }">
-                                        <component :is="getIconForIndex(getGlobalSectionIndex(unitIndex, sectionIndex))"
+                                        <component :is="getIconForIndex(getGlobalSectionIndex(unitName, unitIndex, sectionIndex))"
                                             class="w-24 h-24 transform-gpu transition-all duration-300 group-hover:scale-110"
                                             style="color: var(--light-text);" />
                                     </div>
@@ -274,6 +274,7 @@ watch(() => props.unitSectionMap, (newVal) => {
     console.log("hi");
     console.log(newVal);
     rawUnitData.value = newVal;
+    console.log(props.roomData);
     console.log(rawUnitData.value);
 }, { deep: true, immediate: true })
 
@@ -316,12 +317,12 @@ const getUnitGradient = (unitIndex) => {
 }
 
 // Get global section index (for offset and icon selection)
-const getGlobalSectionIndex = (unitIndex, sectionIndex) => {
+const getGlobalSectionIndex = (unitName: any, unitIndex: number, sectionIndex: number) => {
     let count = 0
     for (let i = 0; i < unitIndex; i++) {
-        count += rawUnitData.value[i].sections.length
+        count += rawUnitData.value[unitName][unitIndex].length;
     }
-    return count + sectionIndex
+    return count + sectionIndex;
 }
 
 const handleFileSelection = (event) => {
@@ -445,7 +446,7 @@ const addNewNodes = async () => {
 }
 
 // Function to get the corresponding room data by section ID
-const getRoomData = (sectionId) => {
+const getRoomData = (sectionId: Number) => {
     for (let i = 0; i < props.roomData.length; i++) {
         if (props.roomData[i].section_id === sectionId) {
             return props.roomData[i];
@@ -561,9 +562,9 @@ const stopDragging = () => {
     isDragging.value = false
 }
 
-const handleNodeClick = (sectionData) => {
+const handleNodeClick = (sectionName, sectionId) => {
     if (!hasMoved.value) {
-        selectedRoom.value = selectedRoom.value && selectedRoom.value[1] === sectionData[1] ? null : sectionData
+        selectedRoom.value = selectedRoom.value && selectedRoom.value[1] === sectionId ? null : sectionId
     }
 }
 
@@ -573,11 +574,11 @@ const getNodeOffset = (index) => {
     return Math.sin(index * 0.7) * amplitude
 }
 
-const startLesson = (sectionData) => {
-    gameStore.setSectionId(sectionData[1]);
+const startLesson = (sectionName, sectionId) => {
+    gameStore.setSectionId(sectionId);
     router.push({
         name: 'GamePage',
-        params: { id: library_id, roomName: sectionData[0] },
+        params: { id: library_id, roomName: sectionName },
     })
 }
 
