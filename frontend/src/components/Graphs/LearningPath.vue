@@ -45,14 +45,14 @@
                             {{ sectionIndex }} -->
                         <div class="relative flex-shrink-0 group perspective" :style="{
                             transform: `translateY(${getNodeOffset(getGlobalSectionIndex(unitName, unitIndex, sectionIndex))}px)`
-                        }" @click="handleNodeClick([sectionName, sectionId])">
+                        }" @click="handleNodeClick(sectionId)">
 
                             <!-- Tooltip -->
-                            <div v-if="selectedRoom && selectedRoom[1] === sectionId"
+                            <div v-if="selectedRoomId && selectedRoomId === sectionId"
                                 class="absolute -top-32 left-1/2 -translate-x-1/2 w-64 z-50">
                                 <div class="relative">
                                     <!-- Red close button in top-right -->
-                                    <div @click.stop="selectedRoom = null"
+                                    <div @click.stop="selectedRoomId = null"
                                         class="absolute -top-3 -right-3 w-8 h-8 rounded-full flex items-center justify-center cursor-pointer"
                                         style="background-color: red;">
                                         <XMarkIcon class="w-4 h-4" style="color: var(--light-text);" />
@@ -61,7 +61,7 @@
                                     <!-- Main tooltip content -->
                                     <div class="rounded-2xl p-4 shadow-lg"
                                         style="background-color: var(--element-color-1); color: var(--light-text);">
-                                        <div class="font-medium mb-3">{{ formatRoomName(section.section_name) }}
+                                        <div class="font-medium mb-3">{{ formatRoomName(sectionName) }}
                                             <br>
                                             <span
                                                 v-if="getRoomData(sectionId) && getRoomData(sectionId).lesson_state <= getRoomData(sectionId).num_lessons">
@@ -288,7 +288,7 @@ const isAddingNode = ref(false)
 const gameStore = useGameStore()
 
 // Track selected room for tooltip
-const selectedRoom = ref(null)
+const selectedRoomId = ref(null)
 
 const library_id = props.libraryId;
 
@@ -562,9 +562,10 @@ const stopDragging = () => {
     isDragging.value = false
 }
 
-const handleNodeClick = (sectionName, sectionId) => {
+const handleNodeClick = (sectionId) => {
     if (!hasMoved.value) {
-        selectedRoom.value = selectedRoom.value && selectedRoom.value[1] === sectionId ? null : sectionId
+        console.log(sectionId);
+        selectedRoomId.value = selectedRoomId.value && selectedRoomId.value === sectionId ? null : sectionId
     }
 }
 
