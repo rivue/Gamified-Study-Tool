@@ -38,14 +38,15 @@ TODO list:
 
         hard probably (goal: 2 high level bullet points / wk):
         - ⭐️ Finish sections + units
-            - ⭐️ Add ability to add each section to each unit
-            - ⭐️ Add ability to add a unit
+            - ⭐️ Add ability to add each section to each unit (later --> come back to)
+            - ⭐️ Add ability to add a unit (later --> come back to)
             - ⭐️ add button / underlined text in the course screen that shows a small popup when clicked / hovered that says "course not here? --> if you made a course before March 15th, 2025 (or whatever date), we might have made broken changes. We are still learning and will not do this again. Please feel free to generate another course."
-        - ⭐️ Delete sections / units / courses / libraries (requires entering the name of the unit / course)
-            - ⭐️ Deleting from both DB and pinecone as well
+        - ⭐️ Delete sections / units / courses / libraries (requires entering the name of the unit / course just for accidental reasons)
+            - ⭐️ Remember to delete from both DB and pinecone as well, as well as respective child / parent courses / units / sections / libraries, etc...
         - ⭐️ leaderboard / game point tracking system
-        - ⭐️ UI redesign / rehaul *** --> kinnu, duolingo, saved instagram design reels etc..
+        - (might take at least a couple weeks) e⭐️ UI redesign / rehaul *** --> kinnu, duolingo, saved instagram design reels etc..
             - Note: 1) try to see what horizontal --> vertical learning path looks like, and possibly make a vertical bar on the side for settings, i-card, files list, adding a new stepping stone, etc... but maybe keep lesson name and current unit name at the top?
+            - also note: ask gemini / grok / gpt / claude for some ui design tips like adding a menu bar, or ui tips / tricks / helpful websites / youtube videos, etc...
         - ⭐️ Stripe implementation
             - have to think abt what different payment levels mean / how I want to do it
         - ⭐️ For course owner, add a “settings” gear button maybe to the left  / right of the course name
