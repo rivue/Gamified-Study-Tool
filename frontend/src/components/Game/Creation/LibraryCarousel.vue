@@ -1,5 +1,4 @@
 <template>
-
     <div class="library-list p-16">
         <div class="list-header">
 
@@ -9,9 +8,13 @@
             class="mb-4 text-lg bg-transparent border-[1px] border-solid border-[var(--text-color)] rounded-[4px] placeholder-[var(--text-color)] text-[var(--text-color)]"
             type="text" v-model="searchQuery" @input="filterLibraries" @keydown="handleSearchKeydown"
             placeholder="Search courses..." />
-        <div class="missing-courses-notice p-4 mb-4 border-[1px] border-solid border-[var(--text-color)] rounded-[4px] bg-[var(--background-color-2t)]">
+        <div
+            class="missing-courses-notice p-4 mb-4 border-[1px] border-solid border-[var(--text-color)] rounded-[4px] bg-[var(--background-color-2t)]">
             <p class="text-[var(--text-color)]">
-                <strong>Missing courses?</strong> We're working fast to bring the best experience possible and might have broken some things. If you made a course before April 28th, 2025, you may not be able to see your course listed. We are still learning and will not do this again. Please feel free to generate another course, we sincerely apologize for any inconvenience and aim to not do this again.
+                <strong>Missing courses?</strong> We're working fast to bring the best experience possible and might
+                have broken some things. If you made a course before April 28th, 2025, you may not be able to see your
+                course listed. We are still learning and will not do this again. Please feel free to generate another
+                course, we sincerely apologize for any inconvenience and aim to not do this again.
             </p>
         </div>
         <!-- Conditional rendering based on library count -->
@@ -24,6 +27,12 @@
                             class="cursor-pointer text-[var(--text-color)] hover:text-white hover:bg-[var(--element-color-1)] border-[1px] border-solid border-[var(--text-color)]"
                             @click="goToLibrary(library.id)">
 
+                            <TableCell><button
+                                    class="star-button flex items-center justify-center w-8 h-8 rounded-full hover:bg-[var(--background-color-2)]">
+                                    <Star v-if="library.is_favorited"
+                                        class="text-[var(--text-color)] hover:text-yellow-500" size="20" />
+                                    <StarFilled v-else class="text-yellow-500" size="20" />
+                                </button></TableCell>
                             <TableCell class="text-xl text-center p-4">{{ library.library_topic }}</TableCell>
                         </TableRow>
                     </template>
@@ -73,7 +82,7 @@ import { Table, TableRow, TableBody, TableCell } from "@/components/ui/table";
 
 // Props
 const props = defineProps<{
-    libraries: Array<{ clicks: number; context: any; difficulty: string; guide: string; id: number; image_url: string, language: string; language_difficulty: string; likes: number; library_topic: string }>;
+    libraries: Array<{ clicks: number; context: any; difficulty: string; guide: string; id: number; image_url: string, language: string; language_difficulty: string; likes: number; is_favorited: boolean, library_topic: string }>;
 }>();
 
 // State

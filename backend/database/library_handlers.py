@@ -14,6 +14,7 @@ from database.models import (
     LibraryQuestion,
     LibraryQuestionChoice,
     LibraryRoomState,
+    LibraryFavorites,
     LibraryCompletion
 )
 
@@ -44,6 +45,27 @@ def create_library(
         return (
             jsonify(
                 {"message": "Library created successfully", "library_id": library.id}
+            ),
+            201,
+        )
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"message": str(e)}), 400
+
+def create_library_favorite(
+    user_id, library_id
+):
+    try:
+        library_favorites = LibraryFavorites(
+            user_id=user_id,
+            library_id=library_id,
+            is_favorited=False,
+        )
+        db.session.add(library_favorites)
+        db.session.commit()
+        return (
+            jsonify(
+                {"message": "Library Favorites object created successfully", "library_favorites_id": library_favorites.id}
             ),
             201,
         )
@@ -144,34 +166,36 @@ def get_library(library_id, user_id=None, click=True):
         unit_list = []
         room_names = []
         for unit in library.units:
-            print(unit.unit_name)
             unit_list.append(unit.unit_name)
-            print("hello")
             for section in unit.sections:
-                print(section)
                 room_names.append((section.section_name, section.id))
                 section_to_unit_map[section.section_name] = (unit.id, section.id)
                 if unit.unit_name in unit_to_section_map:
                     unit_to_section_map[unit.unit_name].append((section.id, section.section_name))
                 else:
                     unit_to_section_map[unit.unit_name] = [(section.id, section.section_name)]
-
         library_data["room_names"] = room_names
         library_data["units"] = unit_list
+
         existing_completion = LibraryCompletion.query.filter_by(library_id=library_id, user_id=user_id).first()
         if existing_completion:
             library_data["score"] = existing_completion.score
             library_data["best_time"] = existing_completion.time
             library_data["completion"] = len(existing_completion.completed_rooms.split(","))*4
         any_completion = LibraryCompletion.query.filter_by(user_id=user_id, is_complete=True).first()
-        print(any_completion)
+
         if any_completion:
             library_data["tutorial"] = False
 
     library_data["clicks"] = library.clicks
     library_data["section_to_unit_map"] = section_to_unit_map
-    print(len(unit_to_section_map))
     library_data["unit_to_section_map"] = unit_to_section_map
+
+    favorited_status = LibraryFavorites.query.filter_by(
+        user_id=user_id,
+        library_id=library_id
+    ).first()
+    library_data["favorited_status"] = favorited_status.is_favorited
     
     return jsonify(library_data)
     
@@ -212,7 +236,6 @@ def get_library_room_state(user_id, library_id, section_id=None):
         ).first()
         return state.as_dict() if state else None
 
-# def save_library_room_contents(library_id, room_name, lessons, user_id):
 def save_library_room_contents(library_id, section_unit_map, lessons, user_id):
 
     try:
@@ -433,6 +456,79 @@ def increase_lesson_state(user_id, library_id, section_id):
     
     return state, False  # Lesson state already at maximum
 
+def get_library_favorited_status(library_id, user_id):
+    try:
+        library_favorites = LibraryFavorites.query.filter_by(
+            library_id=library_id,
+            user_id=user_id
+        ).first()
+
+
+        if not library_favorites:
+            return jsonify({"message": "Library favorites not found"}), 404
+
+        library = Library.query.get(library_id)
+
+        if not library:
+            return jsonify({'error': 'Library not found'}), 404
+        
+        response_data = {}
+        
+        response_data["library_favorites"] = library_favorites
+        response_data["num_favorites"] = library.likes
+        
+        return jsonify(response_data), 200
+    except Exception as e:
+        return jsonify({"message": str(e)}), 400
+
+def update_library_favorited_status(library_id, user_id, status: bool):
+    try:
+
+        if status not in [True, False]:
+            return jsonify({"message": "Invalid status"}), 400
+
+        library_favorites = LibraryFavorites.query.filter_by(
+            library_id=library_id,
+            user_id=user_id
+        ).first()
+
+        if not library_favorites:
+            return jsonify({"message": "Library favorites not found"}), 404
+        
+        library = Library.query.get(library_id)
+        if library is None:
+            return jsonify({'error': 'Library not found'}), 404
+        
+        if library_favorites.is_favorited != status:
+
+            update_library_likes(library_id, status)        
+            library_favorites.is_favorited = status
+            
+            db.session.commit()
+        
+        return jsonify({"message": "Library favorites status updated successfully"}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"message": str(e)}), 400
+    
+def update_library_likes(library_id, status):
+    try:
+        library = Library.query.get(library_id)
+        if library is None:
+            return jsonify({'error': 'Library not found'}), 404
+        
+        if status not in [True, False]:
+            return jsonify({"message": "Invalid status"}), 400
+        if status:
+            library.likes += 1
+        else:
+            library.likes = max(0, library.likes - 1)
+        db.session.commit()
+    
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"message": str(e)}), 400
+
 def add_factoid_to_section(section_id, factoid_content, lesson_name):
     try:
         factoid = LibraryFactoid(
@@ -581,7 +677,7 @@ def update_game_end(user_id, library_id, room_name):
 
         if not user:
             return jsonify({'status': 'error', 'message': 'User not found'}), 404
-        
+         
         increase_lesson_state(user_id, library_id, room_name)
 
         # existing_completion = LibraryCompletion.query.filter_by(library_id=library_id, user_id=user_id).first()
@@ -631,23 +727,13 @@ def get_libraries_info(user_id=None):
     }
 
     if user_id is not None:
-        my_libraries = Library.query.filter_by(user_id=user_id).order_by(Library.id.desc()).limit(40).all()
+        my_libraries = Library.query.filter_by(user_id=user_id).order_by(Library.id.desc()).all()
+        my_libraries = [lib for lib in my_libraries if len(lib.room_names) == 0]  # Filter for empty room_names
+        my_libraries = my_libraries[:40]
         my_dicts = [model_to_dict(library, exclude=['room_names', 'factoids']) for library in my_libraries]
         response_data['mine'] = my_dicts
 
     return jsonify(response_data)
-
-def like_library(library_id):
-    try:
-        library = Library.query.get(library_id)
-        if library is None:
-            return jsonify({'error': 'Library not found'}), 404
-        
-        library.likes += 1
-        db.session.commit()
-        return jsonify({'message': 'Like added successfully', 'likes': library.likes}), 200
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
     
 def has_default_image(library_id):
     try:
@@ -722,8 +808,6 @@ def get_top_scores_by_unique_users(limit=5):
 
     return query.all()
 
-
-
 def get_library_top_scores_by_unique_users(library_id, limit=5):
     """
     Returns the top 'limit' scores for a specific library, ensuring unique users,
@@ -758,10 +842,6 @@ def get_library_top_scores_by_unique_users(library_id, limit=5):
     )
 
     return query.all()
-
-
-
-
 
 # UTILSSSS 
         

@@ -34,20 +34,21 @@ IDEAS:
 
 TODO list:
 
-    LAUNCH LIST: goal: July 1th, (note: once you are tired / exhausted from working on something big, chip away at easier things to keep motivated or whatever, maybe try to use claude 3.7 in the way anthropic uses it w/ git-branching / versioning?)
+    LAUNCH LIST: goal: July 6th, (note: once you are tired / exhausted from working on something big, chip away at easier things to keep motivated or whatever, maybe try to use claude 3.7 in the way anthropic uses it w/ git-branching / versioning?)
 
         hard probably (goal: 2 high level bullet points / wk):
-        - ⭐️ Finish sections + units
+        - ✅ ⭐️ Finish sections + units
             - ⭐️ Add ability to add each section to each unit (later --> come back to, reminder to make it account for 1-n number of sections no matter how that looks. add new stepping stones button is commented out for now)
                 - one idea) add lines in between the nodes and when the course owner mouses over them, it hovers a small node with a "plus" icon
                 - second idea) adds a node at the end of all the nodes (I don't like this one though)
                 - third idea) for course owner, add an "edit" button and "delete / trash can" button when you hover over the course or click it or something, maybe add an "edit mode" in the main bar thing I'm going to add?
             - ⭐️ Add ability to add a unit (later --> come back to, reminder to make it account for 1-n number of sections no matter how that looks)
-            - ⭐️ Add button / underlined text in the course screen that shows a small popup when clicked / hovered that says "course not here? --> if you made a course before March 15th, 2025 (or whatever date), we might have made broken changes. We are still learning and will not do this again. Please feel free to generate another course."
-        - ⭐️ Delete sections / units / courses / libraries (requires entering the name of the unit / course just for accidental reasons)
+            - ⭐️ Add ability for users to actually see the unit name
+            - ✅ ⭐️ Add underlined text in the course screen that shows a small popup when clicked / hovered that says "course not here? --> if you made a course before March 15th, 2025 (or whatever date), we might have made broken changes. We are still learning and will not do this again. Please feel free to generate another course."
+        - ⭐️ (would like to implement visibility of different courses first) Delete sections / units / courses / libraries (requires entering the name of the unit / course just for accidental reasons)
             - ⭐️ Remember to delete from both DB and pinecone as well, as well as respective child / parent courses / units / sections / libraries, etc...
         - ⭐️ leaderboard / game point tracking system
-        - (might take at least a couple weeks) e⭐️ UI redesign / rehaul *** --> kinnu, duolingo, saved instagram design reels etc..
+        - (might take at least a couple weeks) ⭐️ UI redesign / rehaul *** --> kinnu, duolingo, saved instagram design reels etc..
             - Note: 1) try to see what horizontal --> vertical learning path looks like, and possibly make a vertical bar on the side for settings, i-card, files list, adding a new stepping stone, etc... but maybe keep lesson name and current unit name at the top?
             - note: maybe change top navbar to be a constant hovering side menu on the side / bottom of the screen maybe similar to duolingo and possibly replace "my library", "settings", etc.. with actual icons
             - also note: ask gemini / grok / gpt / claude for some ui design tips like adding a menu bar, or ui tips / tricks / helpful websites / youtube videos, etc...
@@ -100,7 +101,7 @@ TODO list:
 
     general:
     study tool additions / ideas:
-        
+        - change the name of all functions in library_handlers to use get, update, create, delete only
         - maybe ask users how knowledgeable they are with a unit / course / section before they start?
             not sure how many extra questions I would need to generate for this to work though...
         - clean up unneeded db model variables from db
