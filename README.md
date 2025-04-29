@@ -96,6 +96,7 @@ TODO list:
         - ⭐️ after user submits something and is waiting, display a loading bar or wheel or something letting the user know that it is generating
         - ⭐️ add page after you finish a game session, but make it have confetti or an animation or something
         - ⭐️ add default background if you scroll to far (like in main page if you scroll too far down)
+        - ⭐️ make unit / chapters more clear (e.g. Exam 1, Exam 2, etc... and e.g. Mitosis, Cell Replication, etc... sections names must be relevant to the things they describe)
 
     OTHER PAGES:
         - terms and policies page
