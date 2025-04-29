@@ -1,7 +1,6 @@
 <template>
     <div class="library-list p-16">
         <div class="list-header">
-
             <h1>My Courses</h1>
         </div>
         <Input
@@ -19,22 +18,20 @@
         </div>
         <!-- Conditional rendering based on library count -->
         <div v-if="libraries.length > 0" class="list-table">
-
             <Table>
                 <TableBody>
                     <template v-if="paginatedLibraries.length">
                         <TableRow v-for="library in paginatedLibraries" :key="library.id"
                             class="cursor-pointer text-[var(--text-color)] hover:text-white hover:bg-[var(--element-color-1)] border-[1px] border-solid border-[var(--text-color)]"
                             @click="goToLibrary(library.id)">
-
                             <TableCell>
+                                {{ libraryFavoritesMap[library.id] }}
                                 <button
-                                    @click.stop="updateFavoritedStatus(library.id, libraryFavoritesMap[library.id] === false)"
+                                    @click.stop="updateFavoritedStatus(library.id, libraryFavoritesMap[library.id])"
                                     class="star-button flex items-center justify-center w-8 h-8 rounded-full hover:bg-[var(--background-color-2)]">
-                                    <!-- {{  libraryFavoritesMap[library.id] }} -->
                                     <StarIcon v-if="libraryFavoritesMap[library.id] === true"
-                                        class="text-[var(--text-color)] hover:text-yellow-500" size="20" />
-                                    <PlusIcon v-else class="text-yellow-500" size="20" />
+                                        class="text-yellow-500 hover:text-yellow-400" size="20" />
+                                    <StarIcon v-else class="text-white-500 hover:text-yellow-300" size="20" />
                                 </button>
                             </TableCell>
                             <TableCell class="text-xl text-center p-4">{{ library.library_topic }}</TableCell>
@@ -51,7 +48,7 @@
 
         <!-- Display this when there are no libraries -->
         <div v-else class="no-libraries">
-            <p>You don’t have any courses yet!</p>
+            <p>You don't have any courses yet!</p>
             <p>Use the form above to create your first course and start learning.</p>
         </div>
 
@@ -69,7 +66,6 @@
                         :class="{ 'active': currentPage === page }" @click="goToPage(page)">
                         {{ page }}
                     </button>
-
                 </div>
                 <button class="pagination-btn" :disabled="currentPage === totalPages" @click="nextPage">
                     Next <span class="pagination-icon">→</span>
@@ -97,6 +93,8 @@ const itemsPerPage = 5;
 const router = useRouter();
 const searchQuery = ref("");
 const filteredLibraries = ref<Array<any>>([]);
+// Create a reactive reference to libraryFavoritesMap
+const libraryFavoritesMap = computed(() => props.libraryFavoritesMap);
 
 // Filtering function
 function filterLibraries() {
@@ -105,9 +103,7 @@ function filterLibraries() {
     } else {
         const query = searchQuery.value.toLowerCase();
         filteredLibraries.value = props.libraries.filter(library =>
-            library.library_topic.toLowerCase().includes(query) // ||
-            //   library.language.toLowerCase().includes(query) ||
-            //   library.difficulty.toLowerCase().includes(query)
+            library.library_topic.toLowerCase().includes(query)
         );
     }
     // Reset to first page when filtering
@@ -116,11 +112,6 @@ function filterLibraries() {
 
 // Watch for changes to the libraries prop
 watch(() => props.libraries, (newLibraries) => {
-    // Update filtered libraries when props change
-    filterLibraries();
-}, { deep: true });
-
-watch(() => props.libraryFavoriteMap, (newLibraries) => {
     // Update filtered libraries when props change
     filterLibraries();
 }, { deep: true });
@@ -172,15 +163,15 @@ function goToLibrary(id: number) {
 }
 
 function updateFavoritedStatus(libraryId: number, oldStatus: boolean) {
-    console.log(!!oldStatus);
+    const newStatus = oldStatus === true ? false : true;
     axios
         .post(`/api/library/favorited_status/${libraryId}`, {
-            newStatus: !oldStatus,
+            newStatus: newStatus,
         })
         .then((response) => {
             if (response.status === 200) {
                 // Update the local favorites map
-                props.libraryFavoritesMap[libraryId] = !oldStatus;
+                props.libraryFavoritesMap[libraryId] = newStatus;
             }
         })
         .catch((error) => {
