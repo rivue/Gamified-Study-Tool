@@ -9,7 +9,11 @@
             class="mb-4 text-lg bg-transparent border-[1px] border-solid border-[var(--text-color)] rounded-[4px] placeholder-[var(--text-color)] text-[var(--text-color)]"
             type="text" v-model="searchQuery" @input="filterLibraries" @keydown="handleSearchKeydown"
             placeholder="Search courses..." />
-
+        <div class="missing-courses-notice p-4 mb-4 border-[1px] border-solid border-[var(--text-color)] rounded-[4px] bg-[var(--background-color-2t)]">
+            <p class="text-[var(--text-color)]">
+                <strong>Missing courses?</strong> We're working fast to bring the best experience possible and might have broken some things. If you made a course before April 28th, 2025, you may not be able to see your course listed. We are still learning and will not do this again. Please feel free to generate another course, we sincerely apologize for any inconvenience and aim to not do this again.
+            </p>
+        </div>
         <!-- Conditional rendering based on library count -->
         <div v-if="libraries.length > 0" class="list-table">
 

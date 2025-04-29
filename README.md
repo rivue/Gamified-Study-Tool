@@ -38,9 +38,12 @@ TODO list:
 
         hard probably (goal: 2 high level bullet points / wk):
         - ⭐️ Finish sections + units
-            - ⭐️ Add ability to add each section to each unit (later --> come back to)
-            - ⭐️ Add ability to add a unit (later --> come back to)
-            - ⭐️ add button / underlined text in the course screen that shows a small popup when clicked / hovered that says "course not here? --> if you made a course before March 15th, 2025 (or whatever date), we might have made broken changes. We are still learning and will not do this again. Please feel free to generate another course."
+            - ⭐️ Add ability to add each section to each unit (later --> come back to, reminder to make it account for 1-n number of sections no matter how that looks. add new stepping stones button is commented out for now)
+                - one idea) add lines in between the nodes and when the course owner mouses over them, it hovers a small node with a "plus" icon
+                - second idea) adds a node at the end of all the nodes (I don't like this one though)
+                - third idea) for course owner, add an "edit" button and "delete / trash can" button when you hover over the course or click it or something, maybe add an "edit mode" in the main bar thing I'm going to add?
+            - ⭐️ Add ability to add a unit (later --> come back to, reminder to make it account for 1-n number of sections no matter how that looks)
+            - ⭐️ Add button / underlined text in the course screen that shows a small popup when clicked / hovered that says "course not here? --> if you made a course before March 15th, 2025 (or whatever date), we might have made broken changes. We are still learning and will not do this again. Please feel free to generate another course."
         - ⭐️ Delete sections / units / courses / libraries (requires entering the name of the unit / course just for accidental reasons)
             - ⭐️ Remember to delete from both DB and pinecone as well, as well as respective child / parent courses / units / sections / libraries, etc...
         - ⭐️ leaderboard / game point tracking system
