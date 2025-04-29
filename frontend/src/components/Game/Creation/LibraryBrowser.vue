@@ -38,6 +38,8 @@ function fetchLibraries() {
             if (authStore.loggedIn) {
                 myLibraries.value = response.data.mine;
                 favoritesMap.value = response.data.favorites_map;
+                console.log("favorited_map: ", response.data.favorites_map);
+
             }
         })
         .catch((error) => {

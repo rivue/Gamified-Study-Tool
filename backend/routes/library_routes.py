@@ -139,7 +139,7 @@ def init_library_routes(app):
             library_id = library_response.get_json().get("library_id")
             print("library_id after status_code")
             
-            library_favorites_response, library_favorites_status_code = lbh.create_library_favorites(user_id, library_id)
+            library_favorites_response, library_favorites_status_code = lbh.create_library_favorite(user_id, library_id)
             
             if library_favorites_status_code == 201:
                 process_document(selected_file, library_id) # extract embeddings + and upload to pinecone
@@ -429,12 +429,16 @@ def init_library_routes(app):
         try:
             if request.method == "POST":    
                 data = request.get_json()
-                new_status = data.get('status')
+                new_status = data.get('newStatus')
                 user_id = current_user.id if not isinstance(current_user, AnonymousUserMixin) else None
                 if not user_id:
                     return jsonify(status="error", message="Must be logged in to favorite libraries."), 403
                 
-                lbh.update_library_favorited_status(user_id, library_id, new_status)
+                update_value, response_status = lbh.update_library_favorited_status(user_id, library_id, new_status)
+                
+                if response_status != 200:
+                    return jsonify(status="error", message="Failed to update library favorited status."), 500
+                
                 return jsonify({'status': 'success', 'message': 'Library favorited status updated successfully.'}), 200
             
             elif request.method == "GET":

@@ -482,7 +482,7 @@ def get_library_favorited_status(library_id, user_id):
 
 def update_library_favorited_status(library_id, user_id, status: bool):
     try:
-
+        print("lbh.start")
         if status not in [True, False]:
             return jsonify({"message": "Invalid status"}), 400
 
@@ -490,25 +490,29 @@ def update_library_favorited_status(library_id, user_id, status: bool):
             library_id=library_id,
             user_id=user_id
         ).first()
-
+        print("lbh.library_favorites")
+        print(user_id, library_id)
+        print(library_favorites)
         if not library_favorites:
-            return jsonify({"message": "Library favorites not found"}), 404
+            return jsonify({"error": "Library favorites not found"}), 404
         
         library = Library.query.get(library_id)
         if library is None:
             return jsonify({'error': 'Library not found'}), 404
+        print("lbh.lib")
         
         if library_favorites.is_favorited != status:
 
             update_library_likes(library_id, status)        
             library_favorites.is_favorited = status
-            
+            print("lbh.update_library_fav_status")
             db.session.commit()
-        
+        print("lbh.success")
         return jsonify({"message": "Library favorites status updated successfully"}), 200
     except Exception as e:
+        print("lbh.fail: ", str(e))
         db.session.rollback()
-        return jsonify({"message": str(e)}), 400
+        return jsonify({"error": str(e)}), 400
     
 def update_library_likes(library_id, status):
     try:
@@ -728,8 +732,8 @@ def get_libraries_info(user_id=None):
     if user_id is not None:
         my_libraries = Library.query.filter_by(user_id=user_id).order_by(Library.id.desc()).all()
         
-        favorited_map = {fav.library_id: fav.is_favorited for fav in LibraryFavorites.query.filter_by(user_id=user_id).all()}
-            
+        favorited_map = {fav.id: fav.is_favorited for fav in LibraryFavorites.query.filter_by(user_id=user_id).all()}
+        print(favorited_map)
         my_libraries = [lib for lib in my_libraries if len(lib.room_names) == 0]  # Filter for empty room_names
         my_libraries = my_libraries[:40]
         my_dicts = [model_to_dict(library, exclude=['room_names', 'factoids']) for library in my_libraries]

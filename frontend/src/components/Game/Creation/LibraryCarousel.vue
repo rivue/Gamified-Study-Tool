@@ -29,10 +29,11 @@
 
                             <TableCell>
                                 <button
+                                    @click.stop="updateFavoritedStatus(library.id, libraryFavoritesMap[library.id] === false)"
                                     class="star-button flex items-center justify-center w-8 h-8 rounded-full hover:bg-[var(--background-color-2)]">
-                                    <Star v-if="library_favorites_map[library.id] === false"
+                                    <StarIcon v-if="libraryFavoritesMap[library.id] === false"
                                         class="text-[var(--text-color)] hover:text-yellow-500" size="20" />
-                                    <StarFilled v-else class="text-yellow-500" size="20" />
+                                    <PlusIcon v-else class="text-yellow-500" size="20" />
                                 </button>
                             </TableCell>
                             <TableCell class="text-xl text-center p-4">{{ library.library_topic }}</TableCell>
@@ -80,12 +81,13 @@
 import { ref, computed, watch, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { Input } from "@/components/ui/input";
+import { StarIcon, PlusIcon } from "@heroicons/vue/24/solid";
 import { Table, TableRow, TableBody, TableCell } from "@/components/ui/table";
-
+import axios from "axios";
 // Props
 const props = defineProps<{
     libraries: Array<{ clicks: number; context: any; difficulty: string; guide: string; id: number; image_url: string, language: string; language_difficulty: string; likes: number; library_topic: string }>;
-    library_favorites_map: Record<number, boolean>;
+    libraryFavoritesMap: Record<number, boolean>;
 }>();
 
 // State
@@ -161,6 +163,23 @@ const displayedPages = computed(() => {
 // Methods
 function goToLibrary(id: number) {
     router.push(`/lessons/${id}`);
+}
+
+function updateFavoritedStatus(libraryId: number, oldStatus: boolean) {
+    console.log("hi")
+    axios
+        .post(`/api/library/favorited_status/${libraryId}`, {
+            newStatus: !oldStatus,
+        })
+        .then((response) => {
+            if (response.status === 200) {
+                // Update the local favorites map
+                props.libraryFavoritesMap[libraryId] = !oldStatus;
+            }
+        })
+        .catch((error) => {
+            console.error("Error updating favorite status:", error);
+        });
 }
 
 function handleSearchKeydown(event: KeyboardEvent) {
