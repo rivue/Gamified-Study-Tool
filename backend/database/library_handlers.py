@@ -725,7 +725,7 @@ def get_libraries_info(user_id=None):
     if user_id is not None:
         my_libraries = Library.query.filter_by(user_id=user_id).order_by(Library.id.desc()).all()
         
-        favorited_map = {fav.id: fav.is_favorited for fav in LibraryFavorites.query.filter_by(user_id=user_id).all()}
+        favorited_map = {fav.library_id: fav.is_favorited for fav in LibraryFavorites.query.filter_by(user_id=user_id).all()}
         print(favorited_map)
         my_libraries = [lib for lib in my_libraries if len(lib.room_names) == 0]  # Filter for empty room_names
         my_libraries = my_libraries[:40]

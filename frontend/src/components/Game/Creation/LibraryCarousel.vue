@@ -25,7 +25,6 @@
                             class="cursor-pointer text-[var(--text-color)] hover:text-white hover:bg-[var(--element-color-1)] border-[1px] border-solid border-[var(--text-color)]"
                             @click="goToLibrary(library.id)">
                             <TableCell>
-                                {{ libraryFavoritesMap[library.id] }}
                                 <button
                                     @click.stop="updateFavoritedStatus(library.id, libraryFavoritesMap[library.id])"
                                     class="star-button flex items-center justify-center w-8 h-8 rounded-full hover:bg-[var(--background-color-2)]">
@@ -78,7 +77,7 @@
 import { ref, computed, watch, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { Input } from "@/components/ui/input";
-import { StarIcon, PlusIcon } from "@heroicons/vue/24/solid";
+import { StarIcon } from "@heroicons/vue/24/solid";
 import { Table, TableRow, TableBody, TableCell } from "@/components/ui/table";
 import axios from "axios";
 // Props
@@ -93,7 +92,6 @@ const itemsPerPage = 5;
 const router = useRouter();
 const searchQuery = ref("");
 const filteredLibraries = ref<Array<any>>([]);
-// Create a reactive reference to libraryFavoritesMap
 const libraryFavoritesMap = computed(() => props.libraryFavoritesMap);
 
 // Filtering function
@@ -119,6 +117,7 @@ watch(() => props.libraries, (newLibraries) => {
 // Initialize on component mount
 onMounted(() => {
     filteredLibraries.value = [...props.libraries];
+    TODO WHEN I COME BACK - make sure filtered libraries appear first on the list
 });
 
 // Computed values
