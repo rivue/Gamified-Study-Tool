@@ -77,7 +77,7 @@
 import { ref, computed, watch, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { Input } from "@/components/ui/input";
-import { StarIcon } from "@heroicons/vue/24/solid";
+import { StarIcon, PlusIcon } from "@heroicons/vue/24/solid";
 import { Table, TableRow, TableBody, TableCell } from "@/components/ui/table";
 import axios from "axios";
 // Props
@@ -92,15 +92,28 @@ const itemsPerPage = 5;
 const router = useRouter();
 const searchQuery = ref("");
 const filteredLibraries = ref<Array<any>>([]);
+// Create a reactive reference to libraryFavoritesMap
 const libraryFavoritesMap = computed(() => props.libraryFavoritesMap);
 
 // Filtering function
 function filterLibraries() {
+    let libraries = [...props.libraries];
+    
+    // First, sort libraries so favorited ones appear first
+    libraries.sort((a, b) => {
+        const aFavorited = props.libraryFavoritesMap[a.id] === true;
+        const bFavorited = props.libraryFavoritesMap[b.id] === true;
+        
+        if (aFavorited && !bFavorited) return -1;
+        if (!aFavorited && bFavorited) return 1;
+        return 0;
+    });
+    
     if (!searchQuery.value.trim()) {
-        filteredLibraries.value = [...props.libraries];
+        filteredLibraries.value = libraries;
     } else {
         const query = searchQuery.value.toLowerCase();
-        filteredLibraries.value = props.libraries.filter(library =>
+        filteredLibraries.value = libraries.filter(library =>
             library.library_topic.toLowerCase().includes(query)
         );
     }
@@ -114,10 +127,15 @@ watch(() => props.libraries, (newLibraries) => {
     filterLibraries();
 }, { deep: true });
 
+// Watch for changes to the favorites map to re-sort when favorites change
+watch(() => props.libraryFavoritesMap, () => {
+    // Re-sort libraries when favorites change
+    filterLibraries();
+}, { deep: true });
+
 // Initialize on component mount
 onMounted(() => {
     filteredLibraries.value = [...props.libraries];
-    TODO WHEN I COME BACK - make sure filtered libraries appear first on the list
 });
 
 // Computed values

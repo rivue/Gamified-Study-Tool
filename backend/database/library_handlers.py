@@ -283,27 +283,19 @@ def save_library_room_contents(library_id, section_unit_map, lessons, user_id):
                         
                         lesson_name = "factoid_set_" + str(math.floor(index/9) + 1)
                         
-                        # print(f"item: {item}")
-
                         factoid_content = item["factoid_text"]
                         question_data = item["question"]
-
-                        print("after lesson_name")
                         
                         section = LibrarySection.query.get(section_id)
-                        # print(f"# factoids in section: {section.factoids}")
                         # Add factoid to library
                         factoid_response, status_code = add_factoid_to_section(
                             section_id, factoid_content, lesson_name
                         )
 
-                        # print(f"factoid_response: {factoid_response}")
-
                         if status_code != 201:
                             return factoid_response
                         factoid_id = factoid_response.get_json()["factoid_id"]
 
-                        # print(f"factoid_id: {factoid_id}")
                         # Add question to factoid
                         question_type = question_data["type"]
                         question_text = question_data["text"]
@@ -315,8 +307,6 @@ def save_library_room_contents(library_id, section_unit_map, lessons, user_id):
                         question_response, status_code = add_question_to_factoid(
                             factoid_id, question_text, correct_choice, wrong_choices, question_type
                         )
-                        # print(f"question_response: {question_response}")
-                        
                         if status_code != 201:
                             return question_response
                         responses.append(
@@ -345,8 +335,6 @@ def retrieve_library_room_contents(library_id, section_id, user_id):
     # map user id, library id, and room name in map to retrieve state
     # send state and factoids for that state back
     curr_state = get_library_room_state(user_id, library_id, section_id)
-
-    print(f"curr_state: {curr_state}")
 
     if not curr_state:
         return None
@@ -726,7 +714,6 @@ def get_libraries_info(user_id=None):
         my_libraries = Library.query.filter_by(user_id=user_id).order_by(Library.id.desc()).all()
         
         favorited_map = {fav.library_id: fav.is_favorited for fav in LibraryFavorites.query.filter_by(user_id=user_id).all()}
-        print(favorited_map)
         my_libraries = [lib for lib in my_libraries if len(lib.room_names) == 0]  # Filter for empty room_names
         my_libraries = my_libraries[:40]
         my_dicts = [model_to_dict(library, exclude=['room_names', 'factoids']) for library in my_libraries]
