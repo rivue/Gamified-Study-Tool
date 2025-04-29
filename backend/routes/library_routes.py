@@ -132,15 +132,21 @@ def init_library_routes(app):
             return jsonify({"error": f"Message breaks our usage policy. Please check our guidelines.\n{message}"}), 400
 
         # Creates library database object
-        library_response, status_code = lbh.create_library(user_id, topic, library_difficulty, language, language_difficulty, guide)
+        library_response, library_response_status_code = lbh.create_library(user_id, topic, library_difficulty, language, language_difficulty, guide)
 
-        if status_code == 201:
+        if library_response_status_code == 201:
             
             library_id = library_response.get_json().get("library_id")
-            print("library_id after status_code")
-            process_document(selected_file, library_id) # extract embeddings + and upload to pinecone
+            
+            library_favorites_response, library_favorites_status_code = lbh.create_library_favorite(user_id, library_id)
+            
+            if library_favorites_status_code == 201:
+                process_document(selected_file, library_id) # extract embeddings + and upload to pinecone
+            else:
+                return jsonify(status="error", message="Failed to create library favorites"), 500
+
         else:
-            raise Exception("Library creation failed")
+            return jsonify(status="error", message="Failed to create library"), 500
 
         try:
 
@@ -171,14 +177,9 @@ def init_library_routes(app):
                             section_names.append(section)
                             section_unit_map[group_name].append(section)  # Add section to the unit's list
 
-            print(f"Section names: {section_names}")
-            print(f"Unit to sections mapping: {section_unit_map}")
-            print(f"Unit names: {unit_names}")
-
             futures_dict = {}
             for section_name in section_names:
                 if section_name: # Skip empty section names
-                    print(f"Processing sections: {section_name}")
                     rag_context = query_and_respond_pinecone(section_name, library_id)
                     future = executor.submit(lgn.generate_room_content, user_id, section_name, library_difficulty, language, language_difficulty, extra_context, guide, rag_context)
                     futures_dict[future] = section_name
@@ -188,7 +189,6 @@ def init_library_routes(app):
                 
                 room_name = futures_dict[future]
                 completed_rooms[room_name] = True
-                print(f"Successfully generated content for room: {room_name}")
 
             # Check if all rooms were successfully completed
             if all(completed_rooms.values()):
@@ -222,7 +222,6 @@ def init_library_routes(app):
         
         library_topic = request.args.get("library_topic", None)
 
-        print(f"library_topic: {library_topic}")
 
         user_id = current_user.id if not isinstance(current_user, AnonymousUserMixin) else None
         library = lbh.get_library(library_id, user_id)
@@ -249,14 +248,10 @@ def init_library_routes(app):
         if library_topic:
 
             unit_id, section_id = library_data.get('section_to_unit_map').get(library_topic)
-            print(f"section_id: {section_id}")
             room_data = lbh.retrieve_library_room_contents(library_id, section_id, user_id)
-            print("after retrieve")
-            print(f"room_data: {room_data}")
 
             if not room_data:
                 if library_topic in library_data.get('room_names'):
-                    print("get_library if lt in ld")
                     # try:
                     #     # If no content exists, generate the room content
                     #     room_contents = lgn.generate_libroom_content(
@@ -276,7 +271,6 @@ def init_library_routes(app):
             # return a map of room names --> unit 
             # room_data = room_data
         test = library_data.get("room_names")
-        print(f"library_data section names: {test}")
         # print(f"room_data: {room_data}")
         return jsonify(status="success", data=library_data, room_data=room_data)
         
@@ -334,7 +328,6 @@ def init_library_routes(app):
                 # Generate new content for this subtopic
                 try:
 
-                    print("before rag_context")
                     rag_context = query_and_respond_pinecone(subtopic, library_id)
                     print(f"rag context: {rag_context}")
                     future = executor.submit(lgn.generate_libroom_content, user_id, subtopic, library_id, rag_context)
@@ -345,14 +338,11 @@ def init_library_routes(app):
 
             completed_subtopics = {}
             for future in concurrent.futures.as_completed(futures_dict):
-                print("before subtopic")
                 subtopic = futures_dict[future]
-                print("after subtopic")
                 try: 
                     subtopic_contents = future.result()
 
                     # Save the generated content
-                    print(f" library_id: {library_id} subtopic: {subtopic} subtopic_contents: {subtopic_contents} user_id: {user_id}")
                     lbh.save_library_room_contents(library_id, library.get('section_to_unit_map'), subtopic_contents, user_id)
                     results.append({"subtopic": subtopic, "status": "success", "data": subtopic_contents})
                     completed_subtopics[subtopic] = True
@@ -383,7 +373,6 @@ def init_library_routes(app):
 
             # Call the separate DB logic function
             rooms = lbh.get_available_generated_rooms(library_id)
-            print(rooms)
             # Success response
             return jsonify({
                 "status": "success",
@@ -401,7 +390,6 @@ def init_library_routes(app):
         data = request.get_json()
         library_id = data.get('libraryId')
         section_id = data.get('sectionId')
-        print(f"section_id: {section_id}")
 
         # score = data.get('score')
         # time = data.get('time')
@@ -420,16 +408,43 @@ def init_library_routes(app):
             return response, status
         except Exception as e:
             return jsonify({'status': 'error', 'message': str(e)}), 500
+
+    @app.route("/api/library/favorited_status/<int:library_id>", methods=["POST", "GET"])
+    def library_favorited_status(library_id):
+        try:
+            if request.method == "POST":    
+                data = request.get_json()
+                new_status = data.get('newStatus')
+                user_id = current_user.id if not isinstance(current_user, AnonymousUserMixin) else None
+                if not user_id:
+                    return jsonify(status="error", message="Must be logged in to favorite libraries."), 403
+                
+                update_value, response_status = lbh.update_library_favorited_status(user_id, library_id, new_status)
+                
+                if response_status != 200:
+                    return jsonify(status="error", message="Failed to update library favorited status."), 500
+                
+                return jsonify({'status': 'success', 'message': 'Library favorited status updated successfully.'}), 200
+            
+            elif request.method == "GET":
+                user_id = current_user.id if not isinstance(current_user, AnonymousUserMixin) else None
+                if not user_id:
+                    return jsonify(status="error", message="Must be logged in to check library favorited status."), 403
+                
+                favorited_status = lbh.get_library_favorited_status(user_id, library_id)
+            
+                if favorited_status is None:
+                    return jsonify(status="error", message="Library not found."), 404
+                
+                return jsonify({'status': 'success', 'is_favorited': favorited_status}), 200
+
+        except Exception as e:
+            return jsonify(status="error", message=f"Failed to update library favorited status: {str(e)}"), 500
         
     @app.route("/api/libraries", methods=["GET"])
     def get_libraries():
         user_id = current_user.id if not isinstance(current_user, AnonymousUserMixin) else None
         return lbh.get_libraries_info(user_id)
-    
-    @app.route("/api/library/like", methods=["POST"])
-    def like_library():
-        data = request.get_json()
-        return lbh.like_library(data.get('libraryId'))
     
     @app.route('/api/scores', methods=['GET'])
     def fetch_scores():
@@ -442,7 +457,6 @@ def init_library_routes(app):
                 "time": time
             })
         return jsonify(data), 200
-
 
     @app.route('/api/scores/library/<int:library_id>', methods=['GET'])
     def fetch_scores_for_library(library_id):

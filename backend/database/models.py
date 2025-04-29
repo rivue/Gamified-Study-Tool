@@ -237,8 +237,19 @@ class LibraryRoomState(db.Model): # maps users to states of rooms they are in
             "library_id": self.library_id,
             "room_name": self.room_name,
             "num_lessons": self.num_lessons,
-            "lesson_state": self.lesson_state
+            "lesson_state": self.lesson_state,
         }
+    
+class LibraryFavorites(db.Model): # map of users to libraries they have favorited
+    __tablename__ = "library_favorites"
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    library_id = db.Column(db.Integer, db.ForeignKey('library.id'), nullable=False)
+    is_favorited = db.Column(db.Boolean, default=False, nullable=False)
+
+    __table_args__ = (
+      db.UniqueConstraint("user_id", "library_id", name="uq_user_library_fav"),
+    )
 
 class LibraryCompletion(db.Model):
     id = db.Column(db.Integer, primary_key=True)

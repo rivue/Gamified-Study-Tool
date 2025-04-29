@@ -1,29 +1,38 @@
 <template>
-
     <div class="library-list p-16">
         <div class="list-header">
-
             <h1>My Courses</h1>
         </div>
         <Input
             class="mb-4 text-lg bg-transparent border-[1px] border-solid border-[var(--text-color)] rounded-[4px] placeholder-[var(--text-color)] text-[var(--text-color)]"
             type="text" v-model="searchQuery" @input="filterLibraries" @keydown="handleSearchKeydown"
             placeholder="Search courses..." />
-        <div class="missing-courses-notice p-4 mb-4 border-[1px] border-solid border-[var(--text-color)] rounded-[4px] bg-[var(--background-color-2t)]">
+        <div
+            class="missing-courses-notice p-4 mb-4 border-[1px] border-solid border-[var(--text-color)] rounded-[4px] bg-[var(--background-color-2t)]">
             <p class="text-[var(--text-color)]">
-                <strong>Missing courses?</strong> We're working fast to bring the best experience possible and might have broken some things. If you made a course before April 28th, 2025, you may not be able to see your course listed. We are still learning and will not do this again. Please feel free to generate another course, we sincerely apologize for any inconvenience and aim to not do this again.
+                <strong>Missing courses?</strong> We're working fast to bring the best experience possible and might
+                have broken some things. If you made a course before April 28th, 2025, you may not be able to see your
+                course listed. We are still learning and will not do this again. Please feel free to generate another
+                course, we sincerely apologize for any inconvenience and aim to not do this again.
             </p>
         </div>
         <!-- Conditional rendering based on library count -->
         <div v-if="libraries.length > 0" class="list-table">
-
             <Table>
                 <TableBody>
                     <template v-if="paginatedLibraries.length">
                         <TableRow v-for="library in paginatedLibraries" :key="library.id"
                             class="cursor-pointer text-[var(--text-color)] hover:text-white hover:bg-[var(--element-color-1)] border-[1px] border-solid border-[var(--text-color)]"
                             @click="goToLibrary(library.id)">
-
+                            <TableCell>
+                                <button
+                                    @click.stop="updateFavoritedStatus(library.id, libraryFavoritesMap[library.id])"
+                                    class="star-button flex items-center justify-center w-8 h-8 rounded-full hover:bg-[var(--background-color-2)]">
+                                    <StarIcon v-if="libraryFavoritesMap[library.id] === true"
+                                        class="text-yellow-500 hover:text-yellow-400" size="20" />
+                                    <StarIcon v-else class="text-white-500 hover:text-yellow-300" size="20" />
+                                </button>
+                            </TableCell>
                             <TableCell class="text-xl text-center p-4">{{ library.library_topic }}</TableCell>
                         </TableRow>
                     </template>
@@ -38,7 +47,7 @@
 
         <!-- Display this when there are no libraries -->
         <div v-else class="no-libraries">
-            <p>You don’t have any courses yet!</p>
+            <p>You don't have any courses yet!</p>
             <p>Use the form above to create your first course and start learning.</p>
         </div>
 
@@ -56,7 +65,6 @@
                         :class="{ 'active': currentPage === page }" @click="goToPage(page)">
                         {{ page }}
                     </button>
-
                 </div>
                 <button class="pagination-btn" :disabled="currentPage === totalPages" @click="nextPage">
                     Next <span class="pagination-icon">→</span>
@@ -69,11 +77,13 @@
 import { ref, computed, watch, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { Input } from "@/components/ui/input";
+import { StarIcon, PlusIcon } from "@heroicons/vue/24/solid";
 import { Table, TableRow, TableBody, TableCell } from "@/components/ui/table";
-
+import axios from "axios";
 // Props
 const props = defineProps<{
     libraries: Array<{ clicks: number; context: any; difficulty: string; guide: string; id: number; image_url: string, language: string; language_difficulty: string; likes: number; library_topic: string }>;
+    libraryFavoritesMap: Record<number, boolean>;
 }>();
 
 // State
@@ -82,17 +92,29 @@ const itemsPerPage = 5;
 const router = useRouter();
 const searchQuery = ref("");
 const filteredLibraries = ref<Array<any>>([]);
+// Create a reactive reference to libraryFavoritesMap
+const libraryFavoritesMap = computed(() => props.libraryFavoritesMap);
 
 // Filtering function
 function filterLibraries() {
+    let libraries = [...props.libraries];
+    
+    // First, sort libraries so favorited ones appear first
+    libraries.sort((a, b) => {
+        const aFavorited = props.libraryFavoritesMap[a.id] === true;
+        const bFavorited = props.libraryFavoritesMap[b.id] === true;
+        
+        if (aFavorited && !bFavorited) return -1;
+        if (!aFavorited && bFavorited) return 1;
+        return 0;
+    });
+    
     if (!searchQuery.value.trim()) {
-        filteredLibraries.value = [...props.libraries];
+        filteredLibraries.value = libraries;
     } else {
         const query = searchQuery.value.toLowerCase();
-        filteredLibraries.value = props.libraries.filter(library =>
-            library.library_topic.toLowerCase().includes(query) // ||
-            //   library.language.toLowerCase().includes(query) ||
-            //   library.difficulty.toLowerCase().includes(query)
+        filteredLibraries.value = libraries.filter(library =>
+            library.library_topic.toLowerCase().includes(query)
         );
     }
     // Reset to first page when filtering
@@ -102,6 +124,12 @@ function filterLibraries() {
 // Watch for changes to the libraries prop
 watch(() => props.libraries, (newLibraries) => {
     // Update filtered libraries when props change
+    filterLibraries();
+}, { deep: true });
+
+// Watch for changes to the favorites map to re-sort when favorites change
+watch(() => props.libraryFavoritesMap, () => {
+    // Re-sort libraries when favorites change
     filterLibraries();
 }, { deep: true });
 
@@ -149,6 +177,23 @@ const displayedPages = computed(() => {
 // Methods
 function goToLibrary(id: number) {
     router.push(`/lessons/${id}`);
+}
+
+function updateFavoritedStatus(libraryId: number, oldStatus: boolean) {
+    const newStatus = oldStatus === true ? false : true;
+    axios
+        .post(`/api/library/favorited_status/${libraryId}`, {
+            newStatus: newStatus,
+        })
+        .then((response) => {
+            if (response.status === 200) {
+                // Update the local favorites map
+                props.libraryFavoritesMap[libraryId] = newStatus;
+            }
+        })
+        .catch((error) => {
+            console.error("Error updating favorite status:", error);
+        });
 }
 
 function handleSearchKeydown(event: KeyboardEvent) {

@@ -562,7 +562,6 @@ const getNodeOffset = (index) => {
 }
 
 const startLesson = (sectionName, sectionId) => {
-    console.log(`${sectionName}+${sectionId}`);
     gameStore.setSectionId(sectionId);
     router.push({
         name: 'GamePage',
