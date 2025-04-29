@@ -27,12 +27,14 @@
                             class="cursor-pointer text-[var(--text-color)] hover:text-white hover:bg-[var(--element-color-1)] border-[1px] border-solid border-[var(--text-color)]"
                             @click="goToLibrary(library.id)">
 
-                            <TableCell><button
+                            <TableCell>
+                                <button
                                     class="star-button flex items-center justify-center w-8 h-8 rounded-full hover:bg-[var(--background-color-2)]">
-                                    <Star v-if="library.is_favorited"
+                                    <Star v-if="library_favorites_map[library.id] === false"
                                         class="text-[var(--text-color)] hover:text-yellow-500" size="20" />
                                     <StarFilled v-else class="text-yellow-500" size="20" />
-                                </button></TableCell>
+                                </button>
+                            </TableCell>
                             <TableCell class="text-xl text-center p-4">{{ library.library_topic }}</TableCell>
                         </TableRow>
                     </template>
@@ -82,7 +84,8 @@ import { Table, TableRow, TableBody, TableCell } from "@/components/ui/table";
 
 // Props
 const props = defineProps<{
-    libraries: Array<{ clicks: number; context: any; difficulty: string; guide: string; id: number; image_url: string, language: string; language_difficulty: string; likes: number; is_favorited: boolean, library_topic: string }>;
+    libraries: Array<{ clicks: number; context: any; difficulty: string; guide: string; id: number; image_url: string, language: string; language_difficulty: string; likes: number; library_topic: string }>;
+    library_favorites_map: Record<number, boolean>;
 }>();
 
 // State

@@ -6,7 +6,7 @@
         </div>
 
         <template v-else>
-            <LibraryCarousel v-if="loggedIn && browsingLibraries" :libraries="myLibraries" />
+            <LibraryCarousel v-if="loggedIn && browsingLibraries" :libraries="myLibraries" :library-favorites-map="favoritesMap"/>
         </template>
     </div>
 </template>
@@ -24,6 +24,7 @@ const router = useRouter();
 const route = useRoute();
 const isLoading = ref(true);
 const myLibraries = ref([]);
+const favoritesMap = ref({});
 
 onMounted(() => {
     fetchLibraries();
@@ -36,6 +37,7 @@ function fetchLibraries() {
             // console.log(response.data.mine);
             if (authStore.loggedIn) {
                 myLibraries.value = response.data.mine;
+                favoritesMap.value = response.data.favorites_map;
             }
         })
         .catch((error) => {
