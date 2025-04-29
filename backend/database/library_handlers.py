@@ -456,7 +456,7 @@ def increase_lesson_state(user_id, library_id, section_id):
     
     return state, False  # Lesson state already at maximum
 
-def get_library_favorited_status(library_id, user_id):
+def get_library_favorited_status(user_id, library_id):
     try:
         library_favorites = LibraryFavorites.query.filter_by(
             library_id=library_id,
@@ -480,9 +480,8 @@ def get_library_favorited_status(library_id, user_id):
     except Exception as e:
         return jsonify({"message": str(e)}), 400
 
-def update_library_favorited_status(library_id, user_id, status: bool):
+def update_library_favorited_status(user_id, library_id, status: bool):
     try:
-        print("lbh.start")
         if status not in [True, False]:
             return jsonify({"message": "Invalid status"}), 400
 
@@ -490,16 +489,12 @@ def update_library_favorited_status(library_id, user_id, status: bool):
             library_id=library_id,
             user_id=user_id
         ).first()
-        print("lbh.library_favorites")
-        print(user_id, library_id)
-        print(library_favorites)
         if not library_favorites:
             return jsonify({"error": "Library favorites not found"}), 404
         
         library = Library.query.get(library_id)
         if library is None:
             return jsonify({'error': 'Library not found'}), 404
-        print("lbh.lib")
         
         if library_favorites.is_favorited != status:
 
@@ -507,10 +502,8 @@ def update_library_favorited_status(library_id, user_id, status: bool):
             library_favorites.is_favorited = status
             print("lbh.update_library_fav_status")
             db.session.commit()
-        print("lbh.success")
         return jsonify({"message": "Library favorites status updated successfully"}), 200
     except Exception as e:
-        print("lbh.fail: ", str(e))
         db.session.rollback()
         return jsonify({"error": str(e)}), 400
     

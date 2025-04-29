@@ -71,6 +71,7 @@ TODO list:
 
         medium (chip away at when tired / mentally exhausted from hard ones):
         - ⭐️ ability to "star" / "favorite" a course
+            - before push, fill prod with already existing data, possibly only adding libraries that only have empty room_names lists
         - implement game "score" logic (if you get >80% #attemps:number of questions ratio) then you get more / less points or something, etc...
             - ⭐️ save for later, just do a basic fire streak thing for now, maybe with 5, 10, 20, 50, 100 day streak animations from Lottie Files and animations for streak loosing as well
         - ⭐️ Terms of use / Policy Page legal agreement thing
