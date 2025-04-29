@@ -45,8 +45,11 @@ TODO list:
             - ⭐️ Add ability to add a unit (later --> come back to, reminder to make it account for 1-n number of sections no matter how that looks)
             - ⭐️ Add ability for users to actually see the unit name
             - ✅ ⭐️ Add underlined text in the course screen that shows a small popup when clicked / hovered that says "course not here? --> if you made a course before March 15th, 2025 (or whatever date), we might have made broken changes. We are still learning and will not do this again. Please feel free to generate another course."
-        - ⭐️ (would like to implement visibility of different courses first) Delete sections / units / courses / libraries (requires entering the name of the unit / course just for accidental reasons)
-            - ⭐️ Remember to delete from both DB and pinecone as well, as well as respective child / parent courses / units / sections / libraries, etc...
+        - ⭐️ (would like to implement visibility of different courses first or at least a many:one for non-owners in library model)
+            - ⭐️ Delete sections requires entering the name of the unit / course just for accidental reasons)
+            - ⭐️ Delete Units( requires entering the name of the unit / course just for accidental reasons)
+            - ⭐️ Delete courses / libraries (whatever they're called) (requires entering the name of the unit / course just for accidental reasons)
+            - ⭐️ Remember to delete from both DB and pinecone as well, as well as respective child / parent courses / units / sections / libraries, roomNameState, LibraryFavorites etc...
         - ⭐️ leaderboard / game point tracking system
         - (might take at least a couple weeks) ⭐️ UI redesign / rehaul *** --> kinnu, duolingo, saved instagram design reels etc..
             - Note: 1) try to see what horizontal --> vertical learning path looks like, and possibly make a vertical bar on the side for settings, i-card, files list, adding a new stepping stone, etc... but maybe keep lesson name and current unit name at the top?

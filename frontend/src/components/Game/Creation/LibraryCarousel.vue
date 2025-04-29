@@ -31,7 +31,8 @@
                                 <button
                                     @click.stop="updateFavoritedStatus(library.id, libraryFavoritesMap[library.id] === false)"
                                     class="star-button flex items-center justify-center w-8 h-8 rounded-full hover:bg-[var(--background-color-2)]">
-                                    <StarIcon v-if="libraryFavoritesMap[library.id] === false"
+                                    <!-- {{  libraryFavoritesMap[library.id] }} -->
+                                    <StarIcon v-if="libraryFavoritesMap[library.id] === true"
                                         class="text-[var(--text-color)] hover:text-yellow-500" size="20" />
                                     <PlusIcon v-else class="text-yellow-500" size="20" />
                                 </button>
@@ -119,6 +120,11 @@ watch(() => props.libraries, (newLibraries) => {
     filterLibraries();
 }, { deep: true });
 
+watch(() => props.libraryFavoriteMap, (newLibraries) => {
+    // Update filtered libraries when props change
+    filterLibraries();
+}, { deep: true });
+
 // Initialize on component mount
 onMounted(() => {
     filteredLibraries.value = [...props.libraries];
@@ -166,7 +172,7 @@ function goToLibrary(id: number) {
 }
 
 function updateFavoritedStatus(libraryId: number, oldStatus: boolean) {
-    console.log("hi")
+    console.log(!!oldStatus);
     axios
         .post(`/api/library/favorited_status/${libraryId}`, {
             newStatus: !oldStatus,
