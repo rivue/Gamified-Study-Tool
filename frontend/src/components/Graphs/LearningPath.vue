@@ -13,14 +13,14 @@
         </button>
 
         <!-- Fixed Add Stepping Stone Button - Center Top -->
-        <div class="fixed top-48 left-1/2 -translate-x-1/2 z-10">
+        <!-- <div class="fixed top-48 left-1/2 -translate-x-1/2 z-10">
             <button @click="showAddNodeModal = true"
                 class="shadow-lg rounded-full p-4 flex items-center justify-center transition-colors"
                 style="background-color: var(--element-color-1); color: var(--light-text);">
                 <PlusIcon class="w-6 h-6" />
                 <span class="ml-2 font-medium">Add New Stepping Stones</span>
             </button>
-        </div>
+        </div> -->
 
         <div ref="scrollContainer"
             class="w-full h-full overflow-x-auto overflow-y-hidden cursor-grab active:cursor-grabbing"
@@ -31,67 +31,74 @@
                 <!-- Added left padding to ensure first nodes are visible -->
                 <div class="w-24 flex-shrink-0"></div>
 
-                <template v-for="(roomName, index) in nodes" :key="index">
-                    <div class="relative flex-shrink-0 group perspective" :style="{
-                        transform: `translateY(${getNodeOffset(index)}px)`
-                    }" @click="handleNodeClick(roomName)">
-                        <!-- Tooltip -->
-                        <div v-if="selectedRoom === roomName"
-                            class="absolute -top-32 left-1/2 -translate-x-1/2 w-64 z-50">
-                            <div class="relative">
-                                <!-- Red close button in top-right -->
-                                <div @click.stop="selectedRoom = null"
-                                    class="absolute -top-3 -right-3 w-8 h-8 rounded-full flex items-center justify-center cursor-pointer"
-                                    style="background-color: red;">
-                                    <XMarkIcon class="w-4 h-4" style="color: var(--light-text);" />
-                                </div>
+                <!-- Unit Headers -->
+                <template v-for="([unit], unitName, unitIndex) in rawUnitData" :key="unit.unit_id">
+                    <!-- Loop through units and their sections -->
+                    <template v-for="([sectionId, sectionName], sectionIndex) in rawUnitData[unitName]"
+                        :key="sectionIndex">
+                        <div class="relative flex-shrink-0 group perspective" :style="{
+                            transform: `translateY(${getNodeOffset(getGlobalSectionIndex(unitName, unitIndex, sectionIndex))}px)`
+                        }" @click="handleNodeClick(sectionId)">
 
-                                <!-- Main tooltip content -->
-                                <div class="rounded-2xl p-4 shadow-lg"
-                                    style="background-color: var(--element-color-1); color: var(--light-text);">
-                                    <div class="font-medium mb-3">{{ formatRoomName(roomName) }} <br>
-                                        <span
-                                            v-if="getRoomData(roomName) && getRoomData(roomName).lesson_state <= getRoomData(roomName).num_lessons">
-                                            lesson {{ getRoomData(roomName).lesson_state }} / {{
-                                                getRoomData(roomName).num_lessons }}
-                                        </span>
+                            <!-- Tooltip -->
+                            <div v-if="selectedRoomId && selectedRoomId === sectionId"
+                                class="absolute -top-32 left-1/2 -translate-x-1/2 w-64 z-50">
+                                <div class="relative">
+                                    <!-- Red close button in top-right -->
+                                    <div @click.stop="selectedRoomId = null"
+                                        class="absolute -top-3 -right-3 w-8 h-8 rounded-full flex items-center justify-center cursor-pointer"
+                                        style="background-color: red;">
+                                        <XMarkIcon class="w-4 h-4" style="color: var(--light-text);" />
                                     </div>
-                                    <button @click.stop="startLesson(roomName)"
-                                        class="w-full rounded-xl py-2 px-4 font-medium flex items-center justify-center gap-2 transition-colors"
-                                        style="background-color: var(--light-text); color: var(--element-color-1);">
-                                        <span
-                                            v-if="getRoomData(roomName) && getRoomData(roomName).lesson_state <= getRoomData(roomName).num_lessons">PLAY</span>
-                                        <span v-else>REVIEW</span>
-                                    </button>
-                                </div>
 
-                                <!-- Triangle pointer -->
-                                <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 transform rotate-45"
-                                    style="background-color: var(--element-color-1);" />
-                            </div>
-                        </div>
+                                    <!-- Main tooltip content -->
+                                    <div class="rounded-2xl p-4 shadow-lg"
+                                        style="background-color: var(--element-color-1); color: var(--light-text);">
+                                        <div class="font-medium mb-3">{{ formatRoomName(sectionName) }}
+                                            <br>
+                                            <span
+                                                v-if="getRoomData(sectionId) && getRoomData(sectionId).lesson_state <= getRoomData(sectionId).num_lessons">
+                                                lesson {{ getRoomData(sectionId).lesson_state }} / {{
+                                                    getRoomData(sectionId).num_lessons }}
+                                            </span>
+                                        </div>
+                                        <button @click.stop="startLesson(sectionName, sectionId)"
+                                            class="w-full rounded-xl py-2 px-4 font-medium flex items-center justify-center gap-2 transition-colors"
+                                            style="background-color: var(--light-text); color: var(--element-color-1);">
+                                            <span
+                                                v-if="getRoomData(sectionId) && getRoomData(sectionId).lesson_state <= getRoomData(sectionId).num_lessons">PLAY</span>
+                                                
+                                            <span v-else>REVIEW</span>
+                                        </button>
+                                    </div>
 
-                        <div
-                            class="relative transform-gpu transition-all duration-300 group-hover:scale-105 group-hover:-translate-y-2">
-                            <div class="absolute -bottom-4 left-1/2 -translate-x-1/2 w-40 h-8 rounded-full blur-xl transform-gpu transition-all duration-300 group-hover:w-44"
-                                style="background-color: var(--background-color-1t);"></div>
-
-                            <div class="relative w-48 h-48">
-                                <div class="absolute inset-0 rounded-full transform-gpu translate-y-2 blur-sm opacity-50"
-                                    style="background-color: var(--color-primary-darker);"></div>
-
-                                <div class="absolute inset-0 rounded-full transform-gpu translate-y-1"
-                                    style="background-color: var(--color-primary-dark);"></div>
-
-                                <div class="absolute inset-0 rounded-full flex items-center justify-center cursor-pointer shadow-lg transform-gpu transition-all duration-300"
-                                    style="background: var(--button-gradient);">
-                                    <component :is="getIconForIndex(index)"
-                                        class="w-24 h-24 transform-gpu transition-all duration-300 group-hover:scale-110"
-                                        style="color: var(--light-text);" />
+                                    <!-- Triangle pointer -->
+                                    <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 transform rotate-45"
+                                        style="background-color: var(--element-color-1);" />
                                 </div>
                             </div>
+
+                            <div
+                                class="relative transform-gpu transition-all duration-300 group-hover:scale-105 group-hover:-translate-y-2">
+                                <div class="absolute -bottom-4 left-1/2 -translate-x-1/2 w-40 h-8 rounded-full blur-xl transform-gpu transition-all duration-300 group-hover:w-44"
+                                    style="background-color: var(--background-color-1t);"></div>
+
+                                <div class="relative w-48 h-48">
+
+                                    <div class="absolute inset-0 rounded-full transform-gpu translate-y-1"
+                                        :style="{ backgroundColor: getUnitColor(unitIndex) }"></div>
+
+                                    <div class="absolute inset-0 rounded-full flex items-center justify-center cursor-pointer shadow-lg transform-gpu transition-all duration-300"
+                                        :style="{ background: getUnitGradient(unitIndex) }">
+                                        <component
+                                            :is="getIconForIndex(getGlobalSectionIndex(unitName, unitIndex, sectionIndex))"
+                                            class="w-24 h-24 transform-gpu transition-all duration-300 group-hover:scale-110"
+                                            style="color: var(--light-text);" />
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                    </div>
+                    </template>
                 </template>
 
                 <!-- Added right padding to ensure last nodes have space -->
@@ -106,7 +113,8 @@
                 <div class="rounded-2xl p-6 w-full max-w-md shadow-xl border"
                     style="background-color: var(--background-color); color: var(--light-text); border-color: var(--color-primary-dark);">
                     <div class="flex justify-between items-center mb-4">
-                        <h2 class="text-xl font-semibold" style="color: var(--light-text);">Add New Stepping Stones</h2>
+                        <h2 class="text-xl font-semibold" style="color: var(--light-text);">Add New Stepping
+                            Stones</h2>
                         <button @click="showAddNodeModal = false" style="color: var(--highlight-color);">
                             <XMarkIcon class="w-6 h-6" />
                         </button>
@@ -136,7 +144,8 @@
                             <p v-if="nodeNameErrors.length" class="mt-1 text-sm"
                                 style="color: var(--color-primary-light);">
                                 <!-- {{ nodeNameErrors }} -->
-                                <span v-for="(error, index) in nodeNameErrors" :key="index">{{ error }}<br></span>
+                                <span v-for="(error, index) in nodeNameErrors" :key="index">{{ error
+                                }}<br></span>
 
                             </p>
                         </div>
@@ -144,7 +153,8 @@
                         <div>
                             <label class="block text-sm font-medium mb-1" style="color: var(--highlight-color);">Upload
                                 Resource
-                                (optional)<br>Note: Stepping stone content is based on this resource and all previously
+                                (optional)<br>Note: Stepping stone content is based on this resource and all
+                                previously
                                 uploaded resources in this library </label>
                             <div class="border border-dashed rounded-lg p-4 text-center"
                                 style="background-color: var(--background-color-1t); border-color: var(--color-primary-light);">
@@ -153,10 +163,12 @@
                                 <div v-if="!selectedFile" @click="$refs.fileInput.click()" class="cursor-pointer">
                                     <DocumentPlusIcon class="w-12 h-12 mx-auto"
                                         style="color: var(--color-primary-light);" />
-                                    <p class="mt-2 text-sm" style="color: var(--highlight-color);">Click to upload (max
+                                    <p class="mt-2 text-sm" style="color: var(--highlight-color);">Click to
+                                        upload (max
                                         500KB)
                                     </p>
-                                    <p class="mt-1 text-xs" style="color: var(--color-primary-light);">PDF, DOC, DOCX,
+                                    <p class="mt-1 text-xs" style="color: var(--color-primary-light);">PDF, DOC,
+                                        DOCX,
                                         TXT</p>
                                 </div>
                                 <div v-else class="text-left">
@@ -201,7 +213,7 @@
     </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import {
     StarIcon,
@@ -221,12 +233,13 @@ import {
     DocumentIcon,
     XCircleIcon
 } from '@heroicons/vue/24/solid'
+import { useGameStore } from '@/store/gameStore'
 import { useRouter } from 'vue-router';
 import axios from 'axios';
 
 const props = defineProps({
     libraryId: {
-        type: Number,
+        type: String,
         required: true
     },
     roomNames: {
@@ -236,8 +249,22 @@ const props = defineProps({
     roomData: {
         type: Object,
         required: true
+    },
+    unitSectionMap: {
+        type: Array,
+        required: true
     }
 })
+
+// const isDataReady = computed(() => {
+//     return rawUnitData; //props.unitSectionMap && props.unitSectionMap.length > 0
+// })
+
+const rawUnitData = ref();
+
+watch(() => props.unitSectionMap, (newVal) => {
+    rawUnitData.value = newVal;
+}, { deep: true, immediate: true })
 
 // State for adding new nodes
 const showAddNodeModal = ref(false)
@@ -246,25 +273,44 @@ const selectedFile = ref(null)
 const nodeNameErrors = ref([])
 const fileError = ref('')
 const isAddingNode = ref(false)
-
-// Local copy of room names for reactivity
-const localRoomNames = ref([...props.roomNames])
-
-// Convert room names to nodes
-const nodes = computed(() => localRoomNames.value || [])
-
-// Update local copy when props change
-watch(() => props.roomNames, (newVal) => {
-    localRoomNames.value = [...newVal]
-})
+const gameStore = useGameStore()
 
 // Track selected room for tooltip
-const selectedRoom = ref(null)
+const selectedRoomId = ref(null)
 
 const library_id = props.libraryId;
 
 // File input handling
 const fileInput = ref(null)
+
+// Color schemes for units
+const unitColors = [
+    '#2ecc71', // green
+    '#f1c40f', // yellow
+    '#3498db', // blue
+    '#e74c3c', // red
+]
+
+// Get color for a unit based on its index
+const getUnitColor = (unitIndex) => {
+    const colorIndex = unitIndex % unitColors.length
+    return unitColors[colorIndex];
+}
+
+// Get gradient for a unit based on its index
+const getUnitGradient = (unitIndex) => {
+    const colorIndex = unitIndex % unitColors.length
+    return `linear-gradient(135deg, ${unitColors[colorIndex]}, ${unitColors[colorIndex]})`
+}
+
+// Get global section index (for offset and icon selection)
+const getGlobalSectionIndex = (unitName: any, unitIndex: number, sectionIndex: number) => {
+    let count = 0
+    for (let i = 0; i < unitIndex; i++) {
+        count += rawUnitData.value[unitName][unitIndex].length;
+    }
+    return count + sectionIndex;
+}
 
 const handleFileSelection = (event) => {
     const file = event.target.files[0]
@@ -310,14 +356,14 @@ const formatFileSize = (bytes) => {
 
 // Add a new node name field
 const addNodeNameField = () => {
-  newNodeNames.value.push('')
-  nodeNameErrors.value.push('')
+    newNodeNames.value.push('')
+    nodeNameErrors.value.push('')
 }
 
 // Remove a node name field
 const removeNodeName = (index) => {
-  newNodeNames.value.splice(index, 1)
-  nodeNameErrors.value.splice(index, 1)
+    newNodeNames.value.splice(index, 1)
+    nodeNameErrors.value.splice(index, 1)
 }
 
 // Function to add a new node
@@ -328,79 +374,68 @@ const addNewNodes = async () => {
 
     const trimmedNames = newNodeNames.value.map(name => name.trim())
     trimmedNames.forEach((name, index) => {
-    if (!name) {
-      nodeNameErrors.value[index] = 'Please enter a node name'
-      hasError = true
-    } else if (!/^[a-zA-Z ]+$/.test(name)) {
-      nodeNameErrors.value[index] = 'Node name can only contain letters and spaces'
-      hasError = true
-    } else if (name.length > 40) {
-      nodeNameErrors.value[index] = 'Node name must be 40 characters or less'
-      hasError = true
-    } else if (localRoomNames.value.includes(name)) {
-      nodeNameErrors.value[index] = 'This node name already exists'
-      hasError = true
-    } else if (trimmedNames.indexOf(name) !== index) {
-      nodeNameErrors.value[index] = 'Duplicate node name in this form'
-      hasError = true
-    }
-  })
-
-  if (hasError) return
-
-  isAddingNode.value = true
-  const currentAbortController = new AbortController();
-
-  try {
-    // Add each node
-    const formData = new FormData()
-    formData.append('libraryId', library_id)
-    // Append all room names with the same key name
-    // for (const name of trimmedNames) {
-        // formData.append('roomNames', name)
-    // }
-    trimmedNames.forEach(room => formData.append("roomNames", room));
-
-    // Add file if present (same file for all nodes)
-    if (selectedFile.value) {
-        console.debug(selectedFile.value)
-        formData.append('file', selectedFile.value)
-    }
-      
-    const response = await axios.post('/api/library/room', formData, {
-        signal: currentAbortController.signal,
-        headers: {
-          'Content-Type': 'multipart/form-data'
+        if (!name) {
+            nodeNameErrors.value[index] = 'Please enter a node name'
+            hasError = true
+        } else if (!/^[a-zA-Z ]+$/.test(name)) {
+            nodeNameErrors.value[index] = 'Node name can only contain letters and spaces'
+            hasError = true
+        } else if (name.length > 40) {
+            nodeNameErrors.value[index] = 'Node name must be 40 characters or less'
+            hasError = true
+        } else if (trimmedNames.indexOf(name) !== index) {
+            nodeNameErrors.value[index] = 'Duplicate node name in this form'
+            hasError = true
         }
     })
 
-    if (currentAbortController.signal.aborted) return; // Don't proceed if aborted
-      
-    if (response.data && response.data.status === "success") {
-        for (const name of trimmedNames) {
-            localRoomNames.value.push(name)
-        }
-    }
+    if (hasError) return
 
-    // Clear form
-    newNodeNames.value = [''] // Reset to one empty field
-    removeFile()
-    showAddNodeModal.value = false
-    window.location.reload(); // TODO for showing new nodes / stepping stones, but theres 
-    // probably a better way to do this
-  } catch (error) {
-    console.error('Error adding nodes:', error)
-    nodeNameErrors.value[0] = error.message || 'Failed to add nodes. Please try again.'
-  } finally {
-    isAddingNode.value = false
-  }
+    isAddingNode.value = true
+    const currentAbortController = new AbortController();
+
+    try {
+        // Add each node
+        const formData = new FormData()
+        formData.append('libraryId', library_id)
+
+        // Append all room names with the same key name
+        trimmedNames.forEach(room => formData.append("roomNames", room));
+
+        // Add file if present (same file for all nodes)
+        if (selectedFile.value) {
+            console.debug(selectedFile.value)
+            formData.append('file', selectedFile.value)
+        }
+
+        const response = await axios.post('/api/library/room', formData, {
+            signal: currentAbortController.signal,
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        })
+
+        if (currentAbortController.signal.aborted) return; // Don't proceed if aborted
+
+        if (response.data && response.data.status === "success") {
+            // Clear form and refresh to show new nodes
+            newNodeNames.value = [''] // Reset to one empty field
+            removeFile()
+            showAddNodeModal.value = false
+            window.location.reload();
+        }
+    } catch (error) {
+        console.error('Error adding nodes:', error)
+        nodeNameErrors.value[0] = error.message || 'Failed to add nodes. Please try again.'
+    } finally {
+        isAddingNode.value = false
+    }
 }
 
-// Function to get the corresponding room data by room name
-const getRoomData = (roomName) => {
-    // Find the room data where room_name matches roomName
+// Function to get the corresponding room data by section ID
+const getRoomData = (sectionId: Number) => {
     for (let i = 0; i < props.roomData.length; i++) {
-        if (props.roomData[i].room_name === roomName) {
+        if (props.roomData[i].section_id === sectionId) {
             return props.roomData[i];
         }
     }
@@ -428,6 +463,7 @@ const getIconForIndex = (index) => {
 
 // Format room name for display
 const formatRoomName = (name) => {
+    if (!name) return '';
     return name
         .split('_')
         .map(word => word.charAt(0).toUpperCase() + word.slice(1))
@@ -444,8 +480,7 @@ let scrollTimeoutId = null;
 // Scroll to center on first load
 onMounted(() => {
     // If there are nodes and the container exists, scroll to position
-    // some nodes may not be visible at first depending on the starting position
-    if (nodes.value.length > 0 && scrollContainer.value) {
+    if (rawUnitData.value.length > 0 && scrollContainer.value) {
         // Calculate an appropriate starting position based on available width
         scrollTimeoutId = setTimeout(() => {
             // This gives time for the layout to render before scrolling
@@ -465,7 +500,6 @@ onUnmounted(() => {
     }
 });
 
-
 // Add these variables
 const startY = ref(0)
 const hasMoved = ref(false)
@@ -475,7 +509,7 @@ const router = useRouter();
 const startDragging = (e) => {
     isDragging.value = true
     hasMoved.value = false
-    
+
     if (e.type.includes('touch')) {
         startX.value = e.touches[0].pageX - scrollContainer.value.offsetLeft
         startY.value = e.touches[0].pageY
@@ -483,13 +517,13 @@ const startDragging = (e) => {
         startX.value = e.pageX - scrollContainer.value.offsetLeft
         e.preventDefault() // Only prevent default for mouse events
     }
-    
+
     scrollLeft.value = scrollContainer.value.scrollLeft
 }
 
 const drag = (e) => {
     if (!isDragging.value) return
-    
+
     let x, y
     if (e.type.includes('touch')) {
         x = e.touches[0].pageX - scrollContainer.value.offsetLeft
@@ -498,11 +532,11 @@ const drag = (e) => {
         x = e.pageX - scrollContainer.value.offsetLeft
         e.preventDefault()
     }
-    
+
     // Calculate distance moved
     const diffX = Math.abs(x - startX.value)
     const diffY = Math.abs(y - startY.value)
-    
+
     // Only consider it a drag if moved more than threshold
     if (diffX > tapThreshold || diffY > tapThreshold) {
         hasMoved.value = true
@@ -515,20 +549,25 @@ const stopDragging = () => {
     isDragging.value = false
 }
 
-const handleNodeClick = (roomName) => {
+const handleNodeClick = (sectionId) => {
     if (!hasMoved.value) {
-        selectedRoom.value = selectedRoom.value === roomName ? null : roomName
+        selectedRoomId.value = selectedRoomId.value && selectedRoomId.value === sectionId ? null : sectionId
     }
 }
 
 const getNodeOffset = (index) => {
+    // const amplitude = Let's change this to code so it looks better
     const amplitude = 80
     return Math.sin(index * 0.7) * amplitude
 }
 
-const startLesson = (roomName) => {
-    console.debug(`Starting lesson for ${roomName}`)
-    router.push(`/lessons/${library_id}/${roomName}`)
+const startLesson = (sectionName, sectionId) => {
+    console.log(`${sectionName}+${sectionId}`);
+    gameStore.setSectionId(sectionId);
+    router.push({
+        name: 'GamePage',
+        params: { id: library_id, roomName: sectionName },
+    })
 }
 
 const scroll = (direction) => {
@@ -543,11 +582,10 @@ const scroll = (direction) => {
     })
 }
 
-// Handle scroll event (if needed)
+// Handle scroll event
 const handleScroll = () => {
     // Implement if needed
 }
-
 </script>
 
 <style scoped>

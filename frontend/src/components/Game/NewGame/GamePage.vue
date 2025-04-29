@@ -1,7 +1,7 @@
 <template>
     <div class="game-page">
         <game-toolbar />
-        <game-window />
+        <game-window/>
         <library-completion />
     </div>
 </template>

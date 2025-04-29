@@ -172,16 +172,63 @@ class Library(db.Model):
 
     room_names = db.Column(MutableList.as_mutable(JSON), nullable=False)
     image_url = db.Column(db.String(200), nullable=False, default=DEFAULT_IMAGE_URL)
+    
+    units = db.relationship('LibraryUnit', backref='library', cascade="all, delete-orphan", lazy=True)
 
     factoids = db.relationship('LibraryFactoid', backref='library')
+    
+    def attach_unit(self, unit: 'LibraryUnit'):
+        """Attach a unit to this library"""
+        
+        if not isinstance(unit, LibraryUnit):
+            raise ValueError("unit must be an instance of LibraryUnit")
+        
+        if unit.library_id == self.id:
+            return unit
+        
+        unit.library_id = self.id
+
+        db.session.flush()
+
+        return unit
+    
+class LibraryUnit(db.Model):
+    __tablename__ = "library_unit"
+    id = db.Column(db.Integer, primary_key=True)
+    library_id = db.Column(db.Integer, db.ForeignKey('library.id'), nullable=False)
+    unit_name = db.Column(db.String(200), nullable=False)
+        
+    sections = db.relationship('LibrarySection', backref='unit', cascade="all, delete-orphan", lazy=True)
+
+    def add_section(self, section_name):
+        """Add a new section to this unit"""
+        section = LibrarySection(unit_id=self.id, section_name=section_name)
+        db.session.add(section)
+        return section
+
+class LibrarySection(db.Model):
+    __tablename__ = "library_section"
+    id = db.Column(db.Integer, primary_key=True)
+    unit_id = db.Column(db.Integer, db.ForeignKey('library_unit.id'), nullable=False)
+    section_name = db.Column(db.String(200), nullable=False)
+    
+    # Link factoids to a section
+    factoids = db.relationship('LibraryFactoid', backref='section', cascade="all, delete-orphan", lazy=True)
 
 class LibraryRoomState(db.Model): # maps users to states of rooms they are in
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     library_id = db.Column(db.Integer, db.ForeignKey('library.id'), nullable=False)
+
     room_name = db.Column(db.String(200), nullable=False)
+    section_id = db.Column(db.Integer, db.ForeignKey('library_section.id'), nullable=True)
+
     num_lessons = db.Column(db.Integer, nullable=False)
     lesson_state = db.Column(db.Integer, nullable=False)  # 1-state 1, 2-state 2, 3-state 3, 4-state 4, etc...
+    
+    # __table_args__ = (
+    #     db.UniqueConstraint('user_id', 'factoid_id', name='uq_user_factoid'),
+    # )
 
     def as_dict(self):
         return {
@@ -208,8 +255,9 @@ class LibraryCompletion(db.Model):
 
 class LibraryFactoid(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    library_id = db.Column(db.Integer, db.ForeignKey('library.id'), nullable=False)
-    room_name = db.Column(db.String(200), nullable=False)
+    library_id = db.Column(db.Integer, db.ForeignKey('library.id'), nullable=True)
+    room_name = db.Column(db.String(200), nullable=True)
+    section_id = db.Column(db.Integer, db.ForeignKey('library_section.id'), nullable=True)
     lesson_name = db.Column(db.String(200), nullable=False)
     factoid_content = db.Column(db.Text, nullable=False)
 

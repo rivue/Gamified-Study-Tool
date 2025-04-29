@@ -18,7 +18,7 @@ def get_query_embedding(query):
         input=[query],
         model="text-embedding-3-small"
     ).data[0].embedding
-
+    
 def query_pinecone(query, library_id, top_k=5):
     """Query Pinecone for relevant sections"""
     query_embedding = get_query_embedding(query)

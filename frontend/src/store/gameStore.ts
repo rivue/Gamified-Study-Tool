@@ -42,8 +42,12 @@ export const useGameStore = defineStore("gameStore", {
         completion: 0,
         noGeneratedRooms: false,
         libraryError: false,
+        sectionId: '',
     }),
     actions: {
+        setSectionId(sectionId: string) {
+            this.sectionId = sectionId;
+        },
         setId(libraryId: string) {
             this.resetGameState();
             this.libraryId = libraryId;
@@ -84,7 +88,6 @@ export const useGameStore = defineStore("gameStore", {
                 this.multiplier += 1;
                 this.currentQuestion += 1;
                 if (this.currentQuestion === this.factoids.length) { // && this.finalTest) {
-                    console.debug("mark of success")
                     this.questionVisible = false;
                     this.factoidVisible = null;
                     this.endGame();
@@ -112,15 +115,24 @@ export const useGameStore = defineStore("gameStore", {
             return true;
         },
         async fetchLibraryDetails(libraryId: string, roomNameThing: string) {
-            
+
+            let sectionid = '';
+
+            if (this.sectionId) {
+                const sectionid = this.sectionId
+            }
+
             this.libraryError = false;
             this.setId(libraryId);
+
+            if (sectionid !== '') {
+                this.setSectionId(sectionid);
+            }
             
             try {
                 const response = await axios.get(`/api/library/${libraryId}`, {params: {library_topic: roomNameThing}});
 
                 // do loadName first in case factoid doesn't exist
-                console.debug("response: ", response);
                 if (response.data.status === "success") {
                     if (response.data.data === null && response.data.room_data === null) {
                         // if for some reason roomNameThing is null
@@ -128,10 +140,8 @@ export const useGameStore = defineStore("gameStore", {
                         console.error("Failed to fetch library details", response);
                         return;
                     }
-                    console.debug(response.data.room_data)
                     const data = response.data.data;
                     this.userStateData = response.data.room_data;
-                    console.debug(this.userStateData);
                     this.score = data.score || 0;
                     this.bestTime = data.best_time || 0;
                     this.completion = data.completion || 0;
@@ -160,23 +170,19 @@ export const useGameStore = defineStore("gameStore", {
                     
                 } else {
                     this.libraryError = true;
-                    console.error("Failed to fetch library details", response);
 
                 }
             } catch (error) {
                 if (axios.isCancel(error)) {
                     this.libraryError = true;
-                    console.error("Request canceled:", error.message);
                 } else {
                     this.libraryError = true;
-                    console.error("Error fetching library details:", error);
                 }
             }
         },
         async loadRoom(room_name: string) {
             try {
                 if (this.roomStates[room_name].state !== 1) {
-                    console.error(`Trying to load ${room_name} in state ${this.roomStates[room_name].state}.`);
                     return;
                 }
                 const formdata = new FormData();
@@ -189,12 +195,10 @@ export const useGameStore = defineStore("gameStore", {
                 //     subtopic: room_name
                 // });
 
-                console.debug("roomname: ", room_name, "library topic: " , this.libraryTopic)
                 if (response.data.status === "success") {
                     this.roomStates[room_name].state = 2;
                     this.roomStates[room_name].factoids = response.data.data.factoids;
                 } else {
-                    console.error(`Failed to unlock room ${room_name}: ${response.data.message}`);
                     this.roomStates[room_name].state = 0; // forgot what state means, I'm just trying to throw an error message in NextRoomscomponent
                     if (response.data.status === 403) {
                         const popupStore = usePopupStore();
@@ -204,7 +208,6 @@ export const useGameStore = defineStore("gameStore", {
                 }
             } catch (error) {
                 if (axios.isAxiosError(error) && error.response?.status === 403) {
-                    console.debug(error.response);
                     const popupStore = usePopupStore();
                     popupStore.showPopup("You have reached the limit.</br>Please login to continue.");
                     return false;
@@ -252,7 +255,7 @@ export const useGameStore = defineStore("gameStore", {
 
             let data = {
                 libraryId: this.libraryId,
-                roomName: this.libraryTopic,
+                sectionId: this.sectionId,
                 
                 // libraryId: this.libraryId,
                 // score: this.score,
@@ -264,6 +267,7 @@ export const useGameStore = defineStore("gameStore", {
                 .then(response => {
                     if (response.data.status === "success") {
                         this.completed = true;
+                        this.setSectionId('');
                     } else {
                         console.error("Failed to end game:", response.data.message);
                     }

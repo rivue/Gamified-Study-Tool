@@ -10,7 +10,7 @@ import concurrent.futures
 from io import BytesIO
 
 from openapi import moderate
-from utils import mask_email
+from utils import mask_email, parse_group_structure
 import database.library_handlers as lbh
 import knowledge_net.library_generator as lgn
 from images.library_imager import generate_images_task, save_image
@@ -81,7 +81,7 @@ def init_library_routes(app):
             extra_context = clean(extra_context)
             if len(extra_context) > 200:
                 return jsonify({"error": "Extra context is too long. Maximum 200 characters allowed."}), 400
-        print("test output library_routes")
+
         # Check for existing library
         if not extra_context:
             existing_library = lbh.get_library_id(topic, library_difficulty, language, language_difficulty, guide)
@@ -100,15 +100,14 @@ def init_library_routes(app):
                         return jsonify(status="success", library_id=existing_library)
                     except Exception as e:
                         return jsonify(status="error", message=f"Failed to generate room content {e}"), 500
-
         
-        room_names = request.form.getlist('roomNames')
-        if room_names:
-            print(room_names)
+        groups = parse_group_structure()
+        if groups:
+            print("Parsed Groups:", groups)
         else:
-            return jsonify({"error": f"Must specify room names for now, also we are in the process of breaking things"}), 400
-        
-        try :
+            print("No groups provided.")
+
+        try:
             selected_file = request.files.get("selectedFile").read()
             if not selected_file:
                 return jsonify({"error": "No file provided (request.json)"}), 400
@@ -133,7 +132,7 @@ def init_library_routes(app):
             return jsonify({"error": f"Message breaks our usage policy. Please check our guidelines.\n{message}"}), 400
 
         # Creates library database object
-        library_response, status_code = lbh.create_library(user_id, topic, room_names, library_difficulty, language, language_difficulty, guide)
+        library_response, status_code = lbh.create_library(user_id, topic, library_difficulty, language, language_difficulty, guide)
 
         if status_code == 201:
             
@@ -145,35 +144,65 @@ def init_library_routes(app):
 
         try:
 
+            form = request.form.to_dict(flat=False)
+
+            # Create a mapping of units to sections and collect all section names
+            section_unit_map = {}
+            section_names = []
+            unit_names = []  # New list to store unique unit names
+
+            # Parse the group structure from the form data
+            for key, values in form.items():
+                if key.startswith('groupSections[') and key.endswith('][]'):
+                    # Extract group index from the key (format: "groupSections[index][]")
+                    group_index = key[len('groupSections['):-3]  # Remove 'groupSections[' and '[]'
+                    
+                    # Get the corresponding group name if available
+                    group_name = form.get(f'groupNames[{group_index}]', ['Group ' + group_index])[0]
+                    
+                    # Add group name to unit_names if not already there
+                    if group_name and group_name not in unit_names:
+                        unit_names.append(group_name)
+                        section_unit_map[group_name] = []  # Initialize the list of sections for this unit
+                    
+                    # Add all section names to our list and map them to their group
+                    for section in values:
+                        if section:  # Skip empty section names
+                            section_names.append(section)
+                            section_unit_map[group_name].append(section)  # Add section to the unit's list
+
+            print(f"Section names: {section_names}")
+            print(f"Unit to sections mapping: {section_unit_map}")
+            print(f"Unit names: {unit_names}")
+
             futures_dict = {}
-            for room_name in room_names:
-                rag_context = query_and_respond_pinecone(room_name, library_id)
-                future = executor.submit(lgn.generate_room_content, user_id, room_name, library_difficulty, language, language_difficulty, extra_context, guide, rag_context)
-                futures_dict[future] = room_name
+            for section_name in section_names:
+                if section_name: # Skip empty section names
+                    print(f"Processing sections: {section_name}")
+                    rag_context = query_and_respond_pinecone(section_name, library_id)
+                    future = executor.submit(lgn.generate_room_content, user_id, section_name, library_difficulty, language, language_difficulty, extra_context, guide, rag_context)
+                    futures_dict[future] = section_name
 
             completed_rooms = {}
             for future in concurrent.futures.as_completed(futures_dict):
-                print("future")
                 
                 room_name = futures_dict[future]
-                
-                try:
-                    room_contents = future.result()
-                    # print(f"room_contents: {room_contents}")
-                    user_id = current_user.id if not isinstance(current_user, AnonymousUserMixin) else None
-                    # print("user_id in library_routes.py")
-                    print(f"room_contents library_routes 176: {room_contents}")
-                    lbh.save_library_room_contents(library_id, room_name, room_contents, user_id)
-                    completed_rooms[room_name] = True
-                    # print(f"Successfully generated and saved content for room: {room_name}")
-
-                except Exception as e:
-                    
-                    print(f"Error generating content for room {room_name}: {str(e)}")
-                    completed_rooms[room_name] = False
+                completed_rooms[room_name] = True
+                print(f"Successfully generated content for room: {room_name}")
 
             # Check if all rooms were successfully completed
             if all(completed_rooms.values()):
+                
+                try:
+
+                    room_contents = future.result()
+                    user_id = current_user.id if not isinstance(current_user, AnonymousUserMixin) else None
+                    lbh.save_library_room_contents(library_id, section_unit_map, room_contents, user_id)
+
+                except Exception as e:
+                    print(f"Error saving generated content: {str(e)}")
+                    completed_rooms[room_name] = False
+
                 library = lbh.get_library(library_id, user_id, False)
                 return jsonify(status="success", library_data=library.get_json())
             else:
@@ -193,64 +222,72 @@ def init_library_routes(app):
         
         library_topic = request.args.get("library_topic", None)
 
+        print(f"library_topic: {library_topic}")
+
         user_id = current_user.id if not isinstance(current_user, AnonymousUserMixin) else None
         library = lbh.get_library(library_id, user_id)
-        print("after get_library in lbh")
+
         if not library:
             return jsonify(status="error", message="Library not found"), 404
 
         # Check if the library has a default image and possibly trigger image generation
         response, status_code = lbh.has_default_image(library_id)
+
         if status_code != 200:
             return response
-
+        
         # If there's a default image and the click count is divisible by 4, queue up image generation
         if response.json['has_default_image'] and library.get_json().get("clicks") % 4 == 0:
             executor.submit(generate_images_task, library_id)
         
-        print("before library.get_json")
         # Retrieve library data
         library_data = library.get_json()
-        print("after library.get_json")
 
         # Attempt to retrieve existing room contents
         room_data = None
-        # print("library api")
-        # print(library_topic)
-        # library_topic = "science thing"
+
         if library_topic:
-            room_data = lbh.retrieve_library_room_contents(library_id, library_topic, user_id)
+
+            unit_id, section_id = library_data.get('section_to_unit_map').get(library_topic)
+            print(f"section_id: {section_id}")
+            room_data = lbh.retrieve_library_room_contents(library_id, section_id, user_id)
             print("after retrieve")
+            print(f"room_data: {room_data}")
+
             if not room_data:
-                if library_topic in library_data.get('room_names', []):
-                    try:
-                        # If no content exists, generate the room content
-                        room_contents = lgn.generate_libroom_content(
-                            user_id,
-                            library_topic,
-                            library_id
-                        )
-                        print(f"room_contents library_routes 240: {room_contents}")
-                        lbh.save_library_room_contents(library_id, library_topic, room_contents)
-                        room_data = room_contents
-                    except Exception as e:
-                        return jsonify(status="error", message="Failed to generate room content"), 500
+                if library_topic in library_data.get('room_names'):
+                    print("get_library if lt in ld")
+                    # try:
+                    #     # If no content exists, generate the room content
+                    #     room_contents = lgn.generate_libroom_content(
+                    #         user_id,
+                    #         library_topic,
+                    #         library_id
+                    #     )
+                    #     print(f"room_contents library_routes 240: {room_contents}")
+                    #     lbh.save_library_room_contents(library_id, library_topic, room_contents)
+                    #     room_data = room_contents
+                    # except Exception as e:
+                    #     return jsonify(status="error", message="Failed to generate room content"), 500
                 else:
                     return jsonify(status="error", message="Room not found"), 404
         else:
             room_data = lbh.get_library_room_state(user_id, library_id)
-            room_data = room_data
-
+            # return a map of room names --> unit 
+            # room_data = room_data
+        test = library_data.get("room_names")
+        print(f"library_data section names: {test}")
+        # print(f"room_data: {room_data}")
         return jsonify(status="success", data=library_data, room_data=room_data)
         
     @app.route('/api/library/room', methods=['POST'])
     def generate_room():
         user_id = current_user.id if not isinstance(current_user, AnonymousUserMixin) else None
-        subtopics = request.form.getlist("roomNames")  # Get list of subtopics
+        section_names = request.form.getlist("roomNames")  # Get list of section names
         library_id = request.form.get("libraryId")
 
         # Validate inputs
-        if not subtopics:
+        if not section_names:
             return jsonify(status="error", message="No subtopics provided"), 400
         if not library_id:
             return jsonify(status="error", message="No library ID provided"), 400
@@ -277,6 +314,8 @@ def init_library_routes(app):
             if not library_response or library_response.status_code == "error":
                 return jsonify(status="error", message="Can only generate library rooms for valid libraries"), 400
 
+            library = library_response.get_json()
+
             # Process each subtopic
             results = []
             rag_context = None
@@ -284,9 +323,10 @@ def init_library_routes(app):
                 process_document(selected_file, library_id)
 
             futures_dict = {}
-            for subtopic in subtopics:
+            for subtopic in section_names:
                 # Check for existing content
-                existing_content = lbh.retrieve_library_room_contents(library_id, subtopic, user_id)
+                unit_id, section_id = library.get('section_to_unit_map').get(subtopic)
+                existing_content = lbh.retrieve_library_room_contents(library_id, section_id, user_id)
                 if existing_content:
                     results.append({"subtopic": subtopic, "status": "success", "data": existing_content})
                     continue
@@ -313,7 +353,7 @@ def init_library_routes(app):
 
                     # Save the generated content
                     print(f" library_id: {library_id} subtopic: {subtopic} subtopic_contents: {subtopic_contents} user_id: {user_id}")
-                    lbh.save_library_room_contents(library_id, subtopic, subtopic_contents, user_id)
+                    lbh.save_library_room_contents(library_id, library.get('section_to_unit_map'), subtopic_contents, user_id)
                     results.append({"subtopic": subtopic, "status": "success", "data": subtopic_contents})
                     completed_subtopics[subtopic] = True
 
@@ -360,13 +400,15 @@ def init_library_routes(app):
     def end_game():
         data = request.get_json()
         library_id = data.get('libraryId')
-        room_name = data.get('roomName')
+        section_id = data.get('sectionId')
+        print(f"section_id: {section_id}")
 
         # score = data.get('score')
         # time = data.get('time')
         # completed_rooms = data.get('completed', []) 
         
         user_id = current_user.id if not isinstance(current_user, AnonymousUserMixin) else None
+
         if not user_id:
             return jsonify({'status': 'error', 'message': "Not logged in..."}), 401
         
@@ -374,7 +416,7 @@ def init_library_routes(app):
             return jsonify({'status': 'error', 'message': 'Missing libraryId or score'}), 400
 
         try:
-            response, status = lbh.update_game_end(user_id, library_id, room_name) # score, time, completed_rooms, True)
+            response, status = lbh.update_game_end(user_id, library_id, section_id) # score, time, completed_rooms, True)
             return response, status
         except Exception as e:
             return jsonify({'status': 'error', 'message': str(e)}), 500

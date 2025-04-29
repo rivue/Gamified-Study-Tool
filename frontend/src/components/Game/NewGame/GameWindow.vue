@@ -7,6 +7,7 @@
 </template>
 
 <script setup lang="ts">
+
 import { onMounted, onUnmounted, ref } from 'vue';
 // import GameStart from './GameStart.vue';
 import FactoidComponent from "./FactoidComponent.vue";
@@ -25,7 +26,7 @@ onMounted(async () => {
     const libraryId = route.params.id;
     const roomName = route.params.roomName;
     try {
-        await gameStore.fetchLibraryDetails(libraryId, roomName);
+        await gameStore.fetchLibraryDetails(libraryId.toString(), roomName.toString());
         if (!abortController.signal.aborted && !gameStore.libraryError) {
             gameStore.startGame();
         }

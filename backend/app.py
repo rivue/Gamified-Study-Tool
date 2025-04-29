@@ -35,7 +35,6 @@ database_local = os.getenv('DATABASE_LOCAL')
 user_local = os.getenv('USER_LOCAL')
 password_local = os.getenv('PASSWORD_LOCAL')
 
-
 print(f"flask_env: {app.config['FLASK_ENV']}")
 if host and port and database and user and password and app.config["FLASK_ENV"] == "production":
     uri = f'postgresql+psycopg2://{user}:{password}@{host}:{port}/{database}'

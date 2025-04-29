@@ -5,7 +5,9 @@
             <LearningPath 
             :libraryId="library.data.id"
             :room-names="library.data.room_names"
-            :room-data="library.room_data" />
+            :room-data="library.room_data"
+            :unit-section-map="library.data.unit_to_section_map" 
+            />
         </div>
         <div v-else-if="loading">
             <p>Loading...</p>
@@ -56,7 +58,9 @@ function capitalizeWords(str: string | null | undefined): string {
 
 // Fetch library data
 const fetchLibraryData = async (): Promise<void> => {
+    
     try {
+
         const response = await axios.get(`/api/library/${libraryId}`, {
             signal: abortController.signal
         });
@@ -69,11 +73,10 @@ const fetchLibraryData = async (): Promise<void> => {
                     library_topic: capitalizeWords(response.data.data.library_topic),
                 },
             };
-            
-            console.debug(library.value.data.room_names);
         } else {
             throw new Error("Invalid response data");
         }
+
     } catch (error: any) {
         // Handle the error
         const popupStore = usePopupStore();

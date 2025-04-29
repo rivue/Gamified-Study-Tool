@@ -59,3 +59,24 @@ def get_client_ip():
     if forwarded_ip:
         return forwarded_ip.split(",")[0].strip()  # Extract first real IP
     return request.remote_addr or "127.0.0.1"
+
+def parse_group_structure():
+    groups = []
+    form = request.form.to_dict(flat=False)  # get a dict where each value is a list
+    # Find all group names; keys look like "groupNames[0]", "groupNames[1]", etc.
+    group_name_pattern = re.compile(r'^groupNames\[(\d+)\]$')
+    for key, values in form.items():
+        match = group_name_pattern.match(key)
+        if match:
+            index = match.group(1)
+            group_name = values[0]  # expecting one value per group name
+            # Now extract sections for this group.
+            # They come with keys like "groupSections[<index>][]"
+            section_pattern = re.compile(r'^groupSections\[' + re.escape(index) + r'\]\[\]$')
+            sections = []
+            for k, v in form.items():
+                if section_pattern.match(k):
+                    # There might be multiple values if appended multiple times.
+                    sections.extend(v)
+            groups.append({'name': group_name, 'sections': sections})
+    return groups

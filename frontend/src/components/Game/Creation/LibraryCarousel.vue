@@ -1,17 +1,19 @@
 <template>
 
-    <div class="library-list">
+    <div class="library-list p-16">
         <div class="list-header">
 
             <h1>My Courses</h1>
         </div>
-        <Input class="max-w mb-4 text-lg border-[var(--element-color-1)] text-[var(--light-highlight)]" 
-            type="text" 
-            v-model="searchQuery" 
-            @input="filterLibraries"
-            @keydown="handleSearchKeydown" 
+        <Input
+            class="mb-4 text-lg bg-transparent border-[1px] border-solid border-[var(--text-color)] rounded-[4px] placeholder-[var(--text-color)] text-[var(--text-color)]"
+            type="text" v-model="searchQuery" @input="filterLibraries" @keydown="handleSearchKeydown"
             placeholder="Search courses..." />
-
+        <div class="missing-courses-notice p-4 mb-4 border-[1px] border-solid border-[var(--text-color)] rounded-[4px] bg-[var(--background-color-2t)]">
+            <p class="text-[var(--text-color)]">
+                <strong>Missing courses?</strong> We're working fast to bring the best experience possible and might have broken some things. If you made a course before April 28th, 2025, you may not be able to see your course listed. We are still learning and will not do this again. Please feel free to generate another course, we sincerely apologize for any inconvenience and aim to not do this again.
+            </p>
+        </div>
         <!-- Conditional rendering based on library count -->
         <div v-if="libraries.length > 0" class="list-table">
 
@@ -19,14 +21,10 @@
                 <TableBody>
                     <template v-if="paginatedLibraries.length">
                         <TableRow v-for="library in paginatedLibraries" :key="library.id"
-                            class="cursor-pointer text-[var(--light-highlight)] hover:text-white hover:bg-[var(--element-color-1)] border-[1px] border-solid" 
+                            class="cursor-pointer text-[var(--text-color)] hover:text-white hover:bg-[var(--element-color-1)] border-[1px] border-solid border-[var(--text-color)]"
                             @click="goToLibrary(library.id)">
+
                             <TableCell class="text-xl text-center p-4">{{ library.library_topic }}</TableCell>
-                            <!-- <TableCell class="text-right">
-                                <button class="rounded-full p-2 hover:bg-muted" @click.stop>
-                                    <span class="text-xl">...</span>
-                                </button>
-                            </TableCell> -->
                         </TableRow>
                     </template>
                     <TableRow v-else>
@@ -180,11 +178,12 @@ function goToPage(page: number) {
 
 <style scoped>
 .library-list {
-    margin-top: 100px;
-    padding: 16px;
-    background: var(--background-color-1);
-    border-radius: 12px;
+    margin-top: 50px;
+    background: var(--background-color-1t);
+    border: 1px solid var(--text-color);
+    border-radius: 5px;
 }
+
 
 .list-header {
     margin-bottom: 24px;

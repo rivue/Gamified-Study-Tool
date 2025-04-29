@@ -43,15 +43,19 @@ import axios from 'axios';
     const routes = [
         // Main routes
         {
+            name: 'GamePage',
             path: '/lessons/:id/:roomName',
             component: defineAsyncComponent(() => import('./components/Game/NewGame/GamePage.vue')),
             meta: { title: 'Rivue.ai | Explore Library', hideHeaderFooter: true },
             beforeEnter: async (to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext) => {
                 try {
+                    console.log(to.params);
                     const response = await axios.get(`/api/library/${to.params.id}`);
                     if (response.data?.status === "success") {
                         const roomList = response.data.data.room_names || [];
-                        roomList.includes(to.params.roomName) ? next() : next(`/lessons/${to.params.id}`);
+                        const roomNames = roomList.map((room: any[]) => room[0]); // Extract just the room names
+                        roomNames.includes(to.params.roomName) ? next() : next(`/lessons/${to.params.id}`);
+
                     } else {
                         next('/library');
                     }
@@ -119,17 +123,7 @@ router.beforeEach(async (to, from, next) => {
     const loading = useLoadingStore()
     if (!from.matched.length) loading.start()
     console.debug("idk")
-    // const gameStore = useGameStore();
 
-    // if (from.path.startsWith('/library/')) {
-    //     gameStore.resetGameState();
-    // }
-
-    // if (to.path.startsWith('/library/') && from.path.startsWith('/library/')) {
-    //     const toLibraryId = to.path.split('/')[2];
-    //     const toRoomName = to.path.split('/')[3];
-    //     gameStore.fetchLibraryDetails(toLibraryId, toRoomName);
-    // }
     const publicPaths = [
         '/',
         '/changelog',
@@ -169,6 +163,7 @@ router.beforeEach(async (to, from, next) => {
                 if (response.data && 
                     response.data.data && 
                     response.data.data.user_id == user) {
+                        console.log("User is the creator of the library");
                         // User is the creator, continues as per usual
                         return next();
                 } else { // invalid data 
