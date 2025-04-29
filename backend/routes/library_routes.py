@@ -222,6 +222,8 @@ def init_library_routes(app):
         
         library_topic = request.args.get("library_topic", None)
 
+        print(f"library_topic: {library_topic}")
+
         user_id = current_user.id if not isinstance(current_user, AnonymousUserMixin) else None
         library = lbh.get_library(library_id, user_id)
 

@@ -67,6 +67,7 @@
                                             style="background-color: var(--light-text); color: var(--element-color-1);">
                                             <span
                                                 v-if="getRoomData(sectionId) && getRoomData(sectionId).lesson_state <= getRoomData(sectionId).num_lessons">PLAY</span>
+                                                
                                             <span v-else>REVIEW</span>
                                         </button>
                                     </div>

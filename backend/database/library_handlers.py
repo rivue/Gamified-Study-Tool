@@ -321,7 +321,7 @@ def retrieve_library_room_contents(library_id, section_id, user_id):
     # query lesson room state map
     # map user id, library id, and room name in map to retrieve state
     # send state and factoids for that state back
-    curr_state = get_library_room_state(user_id, library_id, section_id) 
+    curr_state = get_library_room_state(user_id, library_id, section_id)
 
     print(f"curr_state: {curr_state}")
 

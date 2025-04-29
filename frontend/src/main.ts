@@ -49,10 +49,12 @@ import axios from 'axios';
             meta: { title: 'Rivue.ai | Explore Library', hideHeaderFooter: true },
             beforeEnter: async (to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext) => {
                 try {
+                    console.log(to.params);
                     const response = await axios.get(`/api/library/${to.params.id}`);
                     if (response.data?.status === "success") {
-                        const roomList = response.data.data.room_names[0] || [];
-                        roomList.includes(to.params.roomName) ? next() : next(`/lessons/${to.params.id}`);
+                        const roomList = response.data.data.room_names || [];
+                        const roomNames = roomList.map((room: any[]) => room[0]); // Extract just the room names
+                        roomNames.includes(to.params.roomName) ? next() : next(`/lessons/${to.params.id}`);
 
                     } else {
                         next('/library');
@@ -161,6 +163,7 @@ router.beforeEach(async (to, from, next) => {
                 if (response.data && 
                     response.data.data && 
                     response.data.data.user_id == user) {
+                        console.log("User is the creator of the library");
                         // User is the creator, continues as per usual
                         return next();
                 } else { // invalid data 
