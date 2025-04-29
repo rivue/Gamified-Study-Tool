@@ -251,21 +251,7 @@ def init_library_routes(app):
             room_data = lbh.retrieve_library_room_contents(library_id, section_id, user_id)
 
             if not room_data:
-                if library_topic in library_data.get('room_names'):
-                    # try:
-                    #     # If no content exists, generate the room content
-                    #     room_contents = lgn.generate_libroom_content(
-                    #         user_id,
-                    #         library_topic,
-                    #         library_id
-                    #     )
-                    #     print(f"room_contents library_routes 240: {room_contents}")
-                    #     lbh.save_library_room_contents(library_id, library_topic, room_contents)
-                    #     room_data = room_contents
-                    # except Exception as e:
-                    #     return jsonify(status="error", message="Failed to generate room content"), 500
-                else:
-                    return jsonify(status="error", message="Room not found"), 404
+                return jsonify(status="error", message="Room not found"), 404
         else:
             room_data = lbh.get_library_room_state(user_id, library_id)
             # return a map of room names --> unit 
