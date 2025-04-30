@@ -12,15 +12,24 @@
             <ChevronRightIcon class="w-12 h-12" />
         </button>
 
+        <!-- @click="showAddNodeModal = true" -->
         <!-- Fixed Add Stepping Stone Button - Center Top -->
-        <!-- <div class="fixed top-48 left-1/2 -translate-x-1/2 z-10">
-            <button @click="showAddNodeModal = true"
-                class="shadow-lg rounded-full p-4 flex items-center justify-center transition-colors"
-                style="background-color: var(--element-color-1); color: var(--light-text);">
-                <PlusIcon class="w-6 h-6" />
-                <span class="ml-2 font-medium">Add New Stepping Stones</span>
+        <!-- <div class="fixed top-24 right- z-10">
+            <button 
+            class="shadow-lg p-4 flex items-center justify-center transition-colors rounded-xl"
+            style="background-color: gray; color: gray;">
+            <CogIcon class="w-10 h-10" style="color: white;" />
             </button>
         </div> -->
+
+        <div class="fixed top-48 left-1/2 -translate-x-1/2 z-10">
+            <button @click="showAddNodeModal = true"
+            class="shadow-lg rounded-full p-4 flex items-center justify-center transition-colors"
+            style="background-color: var(--element-color-1); color: var(--light-text);">
+            <PlusIcon class="w-6 h-6" />
+            <span class="ml-2 font-medium">Add New Stepping Stones</span>
+            </button>
+        </div>
 
         <div ref="scrollContainer"
             class="w-full h-full overflow-x-auto overflow-y-hidden cursor-grab active:cursor-grabbing"
@@ -228,6 +237,7 @@ import {
     RocketLaunchIcon,
     SparklesIcon,
     PlusIcon,
+    CogIcon,
     XMarkIcon,
     DocumentPlusIcon,
     DocumentIcon,

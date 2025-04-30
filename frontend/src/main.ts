@@ -49,7 +49,6 @@ import axios from 'axios';
             meta: { title: 'Rivue.ai | Explore Library', hideHeaderFooter: true },
             beforeEnter: async (to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext) => {
                 try {
-                    console.log(to.params);
                     const response = await axios.get(`/api/library/${to.params.id}`);
                     if (response.data?.status === "success") {
                         const roomList = response.data.data.room_names || [];

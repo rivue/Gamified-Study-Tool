@@ -50,22 +50,25 @@ TODO list:
             - ⭐️ Delete Units( requires entering the name of the unit / course just for accidental reasons)
             - ⭐️ Delete courses / libraries (whatever they're called) (requires entering the name of the unit / course just for accidental reasons)
             - ⭐️ Remember to delete from both DB and pinecone as well, as well as respective child / parent courses / units / sections / libraries, roomNameState, LibraryFavorites etc...
-        - ⭐️ leaderboard / game point tracking system
+        - ⭐️ (needs multiple people first) leaderboard / game point tracking system
         - (might take at least a couple weeks) ⭐️ UI redesign / rehaul *** --> kinnu, duolingo, saved instagram design reels etc..
             - Note: 1) try to see what horizontal --> vertical learning path looks like, and possibly make a vertical bar on the side for settings, i-card, files list, adding a new stepping stone, etc... but maybe keep lesson name and current unit name at the top?
             - note: maybe change top navbar to be a constant hovering side menu on the side / bottom of the screen maybe similar to duolingo and possibly replace "my library", "settings", etc.. with actual icons
             - also note: ask gemini / grok / gpt / claude for some ui design tips like adding a menu bar, or ui tips / tricks / helpful websites / youtube videos, etc...
         - ⭐️ Stripe implementation
             - have to think abt what different payment levels mean / how I want to do it
-        - ⭐️ For course owner, add a “settings” gear button maybe to the left  / right of the course name
-                this would enable them to add people / delete people I think? or see users or something
+
+        - ⭐️ For course owner, add a “settings” gear button maybe to the left / right of the course name
+                this would enable them to add people / delete people, change visibility settings I think? or check different boxes for question types, or see users or something
                 for normal users there could be an i-card button used to see course files or something, maybe 
                 users could add a note for each unit or something
+        do vthisv right after ^this^
         - ⭐️ visibility of different courses? are they all public like quizlet or am I trying to form a tight knit group like turbolearn / clash of clans?
             - ⭐️ default public, creator can toggle private / public both in course creation and after course is created
             - ⭐️ add ability / a page for searching for public courses
             - ⭐️ for private, users would need some sort of short invite code, but maybe don't necessarily need to be friends for now, maybe it could be like kahoot or something where they don't have to be friends
-                    but I could add it later if I see demand based on data or something
+                but I could add it later if I see demand based on data or something
+
         - ⭐️ add google auth
         - ⭐️ let units / sections / courses have spacings / duplicate values as others in db / weird characters / numbers, #($^@{"?}*), etc...
             - ⭐️ add support for links / pdfs / other things and get rid of things like difficulty, tutor, etc... then actually start generating stuff to study
@@ -73,13 +76,13 @@ TODO list:
         - ⭐️ add ability to see uploaded files in library (list of their names) and maybe even file preview (would require nosql db or something maybe)
 
         medium (chip away at when tired / mentally exhausted from hard ones):
-        - ⭐️ ability to "star" / "favorite" a course
-            - before push, fill prod with already existing data, possibly only adding libraries that only have empty room_names lists
+        - ✅ ⭐️ ability to "star" / "favorite" a course
         - implement game "score" logic (if you get >80% #attemps:number of questions ratio) then you get more / less points or something, etc...
             - ⭐️ save for later, just do a basic fire streak thing for now, maybe with 5, 10, 20, 50, 100 day streak animations from Lottie Files and animations for streak loosing as well
         - ⭐️ Terms of use / Policy Page legal agreement thing
             - ⭐️ Look at websites and stuff for this
-        - ⭐️ In creating a new course, add checkboxes for different types of modes (fill-in-the-blank, t/f, mcq, etc…)
+        - ⭐️ In creating a new library, add checkboxes for different types of modes (fill-in-the-blank, t/f, mcq, etc…)
+            - maybe add it in settings for owner as well (enable / disable for future lesson content generation)
         - ⭐️ Syllabus to section / unit converter / parser thing
         - ⭐️ remove library difficulty, mentor, language, etc... from db course structure, backend, frontend course creation screen
             - note: easy to get rid of in the frontend, but have to remove lots of stuff in backend w/ various function calls and stuff
@@ -97,6 +100,7 @@ TODO list:
         - ⭐️ add page after you finish a game session, but make it have confetti or an animation or something
         - ⭐️ add default background if you scroll to far (like in main page if you scroll too far down)
         - ⭐️ make unit / chapters more clear (e.g. Exam 1, Exam 2, etc... and e.g. Mitosis, Cell Replication, etc... sections names must be relevant to the things they describe)
+        - ⭐️ center names of libraries and make white box extend down to bottom library as well
 
     OTHER PAGES:
         - terms and policies page
