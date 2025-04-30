@@ -22,14 +22,14 @@
             </button>
         </div> -->
 
-        <div class="fixed top-48 left-1/2 -translate-x-1/2 z-10">
+        <!-- <div class="fixed top-48 left-1/2 -translate-x-1/2 z-10">
             <button @click="showAddNodeModal = true"
             class="shadow-lg rounded-full p-4 flex items-center justify-center transition-colors"
             style="background-color: var(--element-color-1); color: var(--light-text);">
             <PlusIcon class="w-6 h-6" />
             <span class="ml-2 font-medium">Add New Stepping Stones</span>
             </button>
-        </div>
+        </div> -->
 
         <div ref="scrollContainer"
             class="w-full h-full overflow-x-auto overflow-y-hidden cursor-grab active:cursor-grabbing"
