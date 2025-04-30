@@ -18,7 +18,7 @@ export const useGameStore = defineStore("gameStore", {
         answeredQuestions: [],
         incorrectQuestionAnswers: [] as any[],
         questionVisible: false,
-        factoidVisible: null  as number | null,
+        factoidVisible: null as any,
         finalTest: false,
         score: 0,
         multiplier: 5,
@@ -198,6 +198,7 @@ export const useGameStore = defineStore("gameStore", {
                 if (response.data.status === "success") {
                     this.roomStates[room_name].state = 2;
                     this.roomStates[room_name].factoids = response.data.data.factoids;
+
                 } else {
                     this.roomStates[room_name].state = 0; // forgot what state means, I'm just trying to throw an error message in NextRoomscomponent
                     if (response.data.status === 403) {

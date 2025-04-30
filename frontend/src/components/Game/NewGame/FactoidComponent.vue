@@ -19,8 +19,8 @@ const gameStore = useGameStore();
 const factoidVisible = computed(() => gameStore.factoidVisible);
 
 const factoidText = computed(() => {
-    
-    if (!gameStore.factoidVisible) {
+
+    if (gameStore.factoidVisible == null) {
         return null;
     }
 
