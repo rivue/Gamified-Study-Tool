@@ -80,6 +80,7 @@ TODO list:
         - ⭐️ add ability to see uploaded files in library (list of their names) and maybe even file preview (would require nosql db or something maybe)
 
         medium (chip away at when tired / mentally exhausted from hard ones):
+        - ⭐️ ⭐️ ⭐️ fix weird library duplicate generation thing
         - ✅ ⭐️ ability to "star" / "favorite" a course
         - implement game "score" logic (if you get >80% #attemps:number of questions ratio) then you get more / less points or something, etc...
             - ⭐️ save for later, just do a basic fire streak thing for now, maybe with 5, 10, 20, 50, 100 day streak animations from Lottie Files and animations for streak loosing as well
@@ -92,6 +93,7 @@ TODO list:
             - note: easy to get rid of in the frontend, but have to remove lots of stuff in backend w/ various function calls and stuff
         - ⭐️ add some other types of games / questions (ex: true / false, very detailed / specific questions, sorting, compare / contrast, analigies, image based stuff (not sure how to implement) 6 options choose 1-6, etc... see list below)
         - ⭐️ all the other routes and stuff (terms & policies, buying subscription)
+        - ⭐️ add staging / pre-production environment that isn't localhost
         
         easy (same as medium): 
         - ⭐️ fix Aryan's problem with viewing it on his phone
@@ -114,6 +116,8 @@ TODO list:
 
     general:
     study tool additions / ideas:
+
+        - get student verification on Mobbin pro (UI library)
         - add ability to reset password for users who are logged in
         - change the name of all functions in library_handlers to use get, update, create, delete only
         - maybe ask users how knowledgeable they are with a unit / course / section before they start?
@@ -130,6 +134,7 @@ TODO list:
             2) other resources button where other youtube videos / articles are researched in relation to the topic (grab the resources based on content, not necessarily the name of the section)
 
         - make a constants file for discord links, twitter / x links, any backend urls, etc...
+            - make it available for both frontend and backend
         - for short answer, 1) make it one word (for now) and most importantly 2) make sure the exact word is in the other side of the card
         - look into adding a resizable area somewhere in your site (like how turbo learn has it) but like people can't change it
 
