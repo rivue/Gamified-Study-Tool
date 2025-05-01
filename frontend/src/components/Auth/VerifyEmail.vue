@@ -1,47 +1,41 @@
 <template>
     <div class="verification-container">
         <div v-if="loading" class="loading">
-            <p>Verifying your email...</p>
+            <p>Loading...</p>
         </div>
-        <div v-else-if="status === ''" class="success">
-            <h1>Send Verification Email</h1>
-            <form @submit.prevent="handleSendNewVerificationEmail">
-                <div class="form-field">
-                    <label for="email">Email:</label>
-                    <input type="text" id="email" name="email" v-model="email" autocomplete="email" required />
+        <div v-else>
+
+            <div v-if="status === 'success'" class="success">
+                <h1>Email Verified!</h1>
+                <p>Your email has been successfully verified.</p>
+                <p>You are now logged in and ready to use Rivue!</p>
+                <router-link to="/" class="button">Go to Dashboard</router-link>
+            </div>
+            <div v-else class="success">
+
+
+                <div v-if="token">
+                    <h1>Verification Failed</h1>
+                    <p> We couldn't verify your email. The link may be invalid or expired.</p>
                 </div>
-                <br />
-                <div v-if="completed" class="completed-message">
-                    If there is an account associated with this email, a reset link will be sent to it.
-                </div>
-                <div class="button-container">
-                    <input type="submit" id="submit" :value="buttonText" />
-                </div>
-            </form>
-        </div>
-        <div v-else-if="status === 'success'" class="success">
-            <h1>Email Verified!</h1>
-            <p>Your email has been successfully verified.</p>
-            <p>You are now logged in and ready to use Rivue!</p>
-            <router-link to="/" class="button">Go to Dashboard</router-link>
-        </div>
-        <div v-else-if="status === 'expired_registration_token'" class="error">
-            <h1>Verification Link Expired</h1>
-            <p>The verification link has expired. Please click the button below to resend an email.</p>
-            <p>Please click the button below to resend an email.</p>
-            <button @click="sendVerificationEmail" class="button">Resend verification email</button>
-        </div>
-        <div v-else-if="status === 'invalid_registration_token'" class="error">
-            <h1>Verification Link Invalid</h1>
-            <p>The verification link is invalid. </p>
-            <p>Please click the button below to resend an email.</p>
-            <button @click="sendVerificationEmail" class="button">Resend verification email</button>
-        </div>
-        <div v-else class="error">
-            <h1>Verification Failed</h1>
-            <p>We couldn't verify your email. The link may be invalid or expired. </p>
-            <p>Please click the button below to resend an email.</p>
-            <button @click="sendVerificationEmail" class="button">Resend verification email</button>
+
+                <h1 v-if="!token">Resend Verification Email</h1>
+
+                <form @submit.prevent="handleSendNewVerificationEmail">
+                    <div class="form-field">
+                        <label for="email">Email:</label>
+                        <input type="text" id="email" name="email" v-model="email" autocomplete="email" required />
+                    </div>
+                    <br />
+                    <div v-if="completed && status === ''" class="completed-message">
+                        If there is an unverified account associated with this email, a reset link was sent to it.
+                    </div>
+                    <div v-if="!completed" class="completed-message">Please enter your email and click the button below to resend a verification link.</div>
+                    <div class="button-containered">
+                        <input type="submit" id="submit" :value="buttonText" />
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </template>
@@ -56,15 +50,16 @@ const loading = ref(true);
 const status = ref('');
 const token = ref('');
 const email = ref('');
-const buttonText = ref('Send Reset Link');
+const buttonText = ref('Send Verify Link');
 const completed = ref(false);
 
 onMounted(() => {
+    loading.value = true;
     token.value = route.params.token as string;
-    sendVerificationEmail();
+    confirmEmail();
 });
 
-async function sendVerificationEmail() {
+async function confirmEmail() {
     if (!token.value) {
         status.value = '';
         loading.value = false;
@@ -79,7 +74,6 @@ async function sendVerificationEmail() {
             }
         })
         .catch(() => {
-            status.value = 'error';
         })
         .finally(() => {
             loading.value = false;
@@ -90,24 +84,18 @@ const handleSendNewVerificationEmail = () => {
     buttonText.value = 'Loading...';
     completed.value = true;
 
-    axios.post('api/send-reset-link', { email: email.value })
-        .then((response) => {
-            if (response.status === 200) {
-                buttonText.value = 'Reset Link Sent';
-                setTimeout(() => {
-                    buttonText.value = 'Send Reset Link Again';
-                }, 3000);
-            }
-        })
-        .catch(() => {
-            buttonText.value = 'Send Reset Link Again';
+    axios.post('api/send-verify-link', { email: email.value })
+        .finally(() => {
+            setTimeout(() => {
+                buttonText.value = 'Send Verify Link';
+            }, 750);
         });
 };
 
 </script>
 
 <style>
-.button-container {
+.button-containered {
     text-align: center;
     padding: 8px;
     border-radius: 6px;
@@ -188,10 +176,32 @@ form {
     padding: 10px 20px;
     margin-top: 20px;
     color: var(--text-color);
-    background-color: var(--text-color-2);
+    background-color: var(--element-color-1);
     text-decoration: none;
     border-radius: 5px;
     cursor: pointer;
 }
 
+.verification-container .error-message {
+    color: #ff4d4f;
+    /* Red color for error */
+    font-size: 1em;
+    margin: 10px 0;
+    text-align: center;
+    font-weight: bold;
+}
+
+/* Update the form-field label to align it to the left */
+.form-field label {
+    display: block;
+    /* Change to block for proper alignment */
+    font-size: 0.9em;
+    color: var(--text-color);
+    text-align: left;
+    /* Align text to the left */
+    width: 100%;
+    /* Ensure it spans the width of the form field */
+    margin-bottom: 5px;
+    /* Add some spacing below the label */
+}
 </style>

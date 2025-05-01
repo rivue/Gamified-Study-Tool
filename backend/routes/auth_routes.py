@@ -16,6 +16,23 @@ from email_provider.email_templates import Registration, PasswordReset
 
 # GOOGLE_CLIENT_ID = "529262341360-9sq10od3qkro19jaavhgachkpviugfv3.apps.googleusercontent.com"
 
+def generate_token_and_send_verification_email(user):
+        user.confirmation_token = generate_confirmation_token(user.id)
+        user.confirm_sent_at = datetime.utcnow()
+        db.session.commit()
+        
+        frontend_url = os.getenv('FRONTEND_URL', 'http://localhost:8080')
+        confirmation_link = f"{frontend_url}/verify/{user.confirmation_token}"
+        send_email(user.email, Registration, confirmation_link)
+
+def generate_token_and_send_password_reset_email(user):
+        user.password_reset_token = generate_confirmation_token(user.id)
+        user.password_reset_sent_at = datetime.utcnow()
+        db.session.commit()
+        frontend_url = os.getenv('FRONTEND_URL', 'http://localhost:8080')
+        reset_link = f"{frontend_url}/reset-password/{user.password_reset_token}"
+        send_email(user.email, PasswordReset, reset_link)
+
 def init_auth_routes(app):
 
     @app.route('/api/login', methods=['POST'])
@@ -24,25 +41,14 @@ def init_auth_routes(app):
         password = request.form['password']
         user = User.query.filter_by(email=email).first()
         if not user:
-            return jsonify({'status': 'fail', 'message': 'Email or User not found'}), 400
-        print(user)
-        print(os.getenv('SECRET_KEY'))
-        print(os.getenv('FLASK_SECRET_KEY'))
-        print(f"user confirmed:")
-        print(f"{user.confirmed}")
+            return jsonify({'status': 'fail', 'message': 'Account not found, signup to use our site!'}), 400
         
         if user and check_password_hash(user.password, password):
             # print(login_user(user, remember=True))
             # print(current_user.is_authenticated)
             if not user.confirmed:
-                return jsonify({'status': 'fail', 'message': 'Email not authenticated'}), 400
+                return jsonify({'status': 'fail', 'message': 'Email not authenticated. Check your email inbox for a verification email. (it might also be in the spam folder!)'}), 400
             login_result = login_user(user, remember=True)
-            print("Login result:", login_result)
-            print("User authenticated:", current_user.is_authenticated)
-            print("User ID in session:", session.get('_user_id'))
-            print("Session:", dict(session))
-            print(f"SECRET_KEY at login      : {app.config['SECRET_KEY']}")
-            # print(f"FLASK_SECRET_KEY at login: {app.config['FLASK_SECRET_KEY']}")
 
             return jsonify({'status': 'success'})
         else:
@@ -59,7 +65,7 @@ def init_auth_routes(app):
         if current_user and current_user.is_authenticated and current_user.confirmed:
             return jsonify({'loggedIn': True, 'userTier': get_user_tier(current_user.id), 'requestCount': get_daily_request_count(current_user.id), 'userId': current_user.id})
         else:
-            return jsonify({'loggedIn': False, 'userTier': None}), 400
+            return jsonify({'loggedIn': False, 'userTier': None})
 
     @app.route('/api/test-cookie', methods=['GET'])
     def test_cookie():
@@ -100,11 +106,13 @@ def init_auth_routes(app):
             'session': dict(session)
         })
 
+    # creates new user in database (signup) and sends email to verify account
     @app.route('/api/signup', methods=['POST'])
     def signup():
         try:
             email = request.form['new-email']
             user = User.query.filter_by(email=email).first()
+
             if user:
                 return jsonify({'message': 'An account with this email already exists.'}), 400
 
@@ -114,21 +122,42 @@ def init_auth_routes(app):
             db.session.add(new_user)
             db.session.commit()
 
-            new_user.confirmation_token = generate_confirmation_token(new_user.id)
-            new_user.confirm_sent_at = datetime.utcnow()
-            db.session.commit()
-            
-            if os.getenv('FLASK_ENV') == 'production':
-                frontend_url = "https://rivue.ai"
-            else:
-                # frontend_url = "http://localhost:8080"
-                frontend_url = "https://rivue.ai"
-            confirmation_link = f"{frontend_url}/verify/{new_user.confirmation_token}"
-            send_email(email, Registration, confirmation_link)
+            generate_token_and_send_verification_email(new_user)
+
             return jsonify({})
-        except IntegrityError as e:
+        except Exception as e:
             return jsonify({'message': 'An unexpected error occurred. Please try again later.'}), 500
 
+    # sends user an email to verify and confirm their email
+    @app.route('/api/send-verify-link', methods=['POST'])
+    def send_verify_link():
+        try:
+            data = request.get_json(silent=True) or {}
+            email = data.get('email')
+            
+            if not email:
+                return jsonify({'status': 'error', 'message': 'Email is required'}), 400
+            
+            user = User.query.filter_by(email=email).first()
+            
+            if not user:
+                return jsonify({'status': 'error', 'message': 'User not found'}), 404
+
+            if user.confirmed:
+                return jsonify({'status': 'error', 'message': 'No need to send an email, you\'re already verified!'})
+
+            generate_token_and_send_verification_email(user)
+                
+            return jsonify({'status': 'success', 'message': 'Password reset link sent successfully!'})
+        
+        except KeyError as e:
+            app.logger.error(f"KeyError: {e}")
+            return jsonify({'status': 'error', 'message': 'Invalid request data'}), 400
+        except Exception as e:
+            app.logger.error(f"Unexpected error: {e}")
+            return jsonify({'status': 'error', 'message': 'An unexpected error occurred'}), 500
+        
+    # takes user's token from email and confirms their account
     @app.route('/api/confirm', methods=['POST'])
     def confirm_email():
         try:
@@ -138,80 +167,94 @@ def init_auth_routes(app):
 
             if not token:
                 return jsonify({'status': 'error', 'message': 'No token provided'}), 400
-            print(f"token_to_use: {token}")
+            app.logger.info(f"token_to_use: {token}")
 
             user = User.query.filter_by(confirmation_token=token).first()
-            print(f"user: {user}, confirmed: {user.confirmed}")
+            if not user:
+                return jsonify({'status': 'error', 'message': 'invalid_registration_token'}), 400
 
-            if user and confirm(user.id, token):
-                print("confirm successfull")
+            app.logger.info(f"user: {user}, confirmed: {user.confirmed}")
+
+            if user.confirmed:
+                return jsonify({'status': 'success', 'message': 'Email already confirmed!'}), 200
+
+            if confirm(user.id, token):
+                app.logger.info("confirm successful")
                 login_user(user)
                 initialize_messages(user.id)
-                
+                user.confirmation_token = None
+                user.confirm_sent_at = None
+                db.session.commit()
                 return jsonify({'status': 'success', 'message': 'Email confirmed successfully!'})
-            
-            else:
-                
-                if user and not user.confirmed:
-                    print(f"user: {user}, confirmed: {user.confirmed}")
 
-                    user.confirmation_token = generate_confirmation_token(user.id)
-                    user.confirm_sent_at = datetime.utcnow()
-                    db.session.commit()
-                    
-                    if os.getenv('FLASK_ENV') == 'production':
-                        frontend_url = "https://rivue.ai"
-                    else:
-                        frontend_url = "http://localhost:8080"
-                    confirmation_link = f"{frontend_url}/verify/{token}"
-                    send_email(user.email, Registration, confirmation_link)
-                    return jsonify({'status': 'error', 'message': 'expired_registration_token'}), 500
-                return jsonify({'status': 'error', 'message': 'invalid_registration_token'}), 500
+            return jsonify({'status': 'error', 'message': 'invalid_registration_token'}), 400
+        except KeyError as e:
+            app.logger.error(f"KeyError: {e}")
+            return jsonify({'status': 'error', 'message': 'Invalid request data'}), 400
         except Exception as e:
+            app.logger.error(f"KeyError: {e}")
             return jsonify({'status': 'error', 'message': 'something failed'}), 500
-        
+
+    # sends user an email to reset their password
     @app.route('/api/send-reset-link', methods=['POST'])
     def send_reset_link():
-        data = request.get_json()
-        email = data.get('email')
-        
-        user = User.query.filter_by(email=email).first() # TODO add username and change this to username instead of email
-        
-        if user and user.confirmed:
+        try:
+            data = request.get_json(silent=True) or {}
+            email = data.get('email')
             
-            # Generate reset token and send email
-            user.password_reset_token = generate_confirmation_token(user.id)
-            user.password_reset_sent_at = datetime.utcnow()
-            db.session.commit()
+            if not email:
+                return jsonify({'status': 'error', 'message': 'Email is required'}), 400
+            
+            user = User.query.filter_by(email=email).first()
+            
+            if not user:
+                return jsonify({'status': 'error', 'message': 'User not found'}), 404
+            
+            if not user.confirmed:
+                return jsonify({'status': 'error', 'message': 'User account is not confirmed'}), 400
 
-            if os.getenv('FLASK_ENV') == 'production':
-                frontend_url = "https://rivue.ai"
-            else:
-                frontend_url = "http://localhost:8080"
-                reset_link = f"{frontend_url}/reset-password/{user.password_reset_token}"
-            send_email(email, PasswordReset, reset_link)
-            
-            return jsonify({'message': 'Reset link sent!'})
-        else:
-            return jsonify({'message': 'User not found'}), 400
+            generate_token_and_send_password_reset_email(user)
+                
+            return jsonify({'status': 'success', 'message': 'Password reset link sent successfully!'}), 200
         
+        except KeyError as e:
+            app.logger.error(f"KeyError: {e}")
+            return jsonify({'status': 'error', 'message': 'error occurred'}), 400
+        except Exception as e:
+            return jsonify({'status': 'error', 'message': 'error occurred'}), 400
+
+
+    # takes token from user to reset their password
     @app.route('/api/reset-password', methods=['POST'])
     def reset_password():
-        data = request.get_json()
-        token = data.get('token')
-        new_password = data.get('new_password')
-        user = User.query.filter_by(password_reset_token=token).first()
-        
-        if user:
+        try:
+            data = request.get_json(silent=True) or {}
+            token = data.get('token')
+            new_password = data.get('new_password')
+
+            if not token or not new_password:
+                return jsonify({'status': 'error', 'message': 'Token and new password are required'}), 400
+
+            user = User.query.filter_by(password_reset_token=token).first()
+
+            if not user:
+                return jsonify({'status': 'error', 'message': 'Invalid or expired token'}), 400
+
             user.password = generate_password_hash(new_password)
             user.password_reset_token = None
             user.password_reset_sent_at = None
             db.session.commit()
 
-            return jsonify({'status': 'success', 'message': 'Password reset successfully!'})
-        else:
-            return jsonify({'status': 'error', 'message': 'Invalid token'})
-    
+            return jsonify({'status': 'success', 'message': 'Password reset successfully!'}), 200
+
+        except KeyError as e:
+            app.logger.error(f"KeyError: {e}")
+            return jsonify({'status': 'error', 'message': 'Something unexpected happened'}), 400
+        except Exception as e:
+            app.logger.error(f"Unexpected error: {e}")
+            return jsonify({'status': 'error', 'message': 'An unexpected error occurred'}), 500
+        
+        
     # @app.route('/api/auth/google/callback', methods=['POST'])
     # def google_auth_callback():
     #     token = request.json.get('id_token')

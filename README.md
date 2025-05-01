@@ -36,6 +36,10 @@ TODO list:
 
     LAUNCH LIST: goal: July 6th, (note: once you are tired / exhausted from working on something big, chip away at easier things to keep motivated or whatever, maybe try to use claude 3.7 in the way anthropic uses it w/ git-branching / versioning?)
 
+
+        password thing
+            - test password with spaces at beginning / end
+
         hard probably (goal: 2 high level bullet points / wk):
         - ✅ ⭐️ Finish sections + units
             - ⭐️ Add ability to add each section to each unit (later --> come back to, reminder to make it account for 1-n number of sections no matter how that looks. add new stepping stones button is commented out for now)
@@ -110,6 +114,7 @@ TODO list:
 
     general:
     study tool additions / ideas:
+        - add ability to reset password for users who are logged in
         - change the name of all functions in library_handlers to use get, update, create, delete only
         - maybe ask users how knowledgeable they are with a unit / course / section before they start?
             not sure how many extra questions I would need to generate for this to work though...

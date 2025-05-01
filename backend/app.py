@@ -83,6 +83,9 @@ CORS(app, origins=origins, supports_credentials=True)
 @app.errorhandler(Exception)
 def handle_exception(e):
     app.logger.error(f"Unhandled exception: {str(e)}")
+    app.logger.error(f"Route: {request.path}")
+    app.logger.error(f"Method: {request.method}")
+    app.logger.error(f"Data: {request.get_json() if request.is_json else request.form.to_dict()}")
     return jsonify({
         "error": "An internal server error occurred",
         "message": str(e)

@@ -1,7 +1,7 @@
 # resend_api.py
 
 import resend
-
+    
 def send_email(email, template, link):
     custom_email_html = fill_info(template, link)
     email_data = {

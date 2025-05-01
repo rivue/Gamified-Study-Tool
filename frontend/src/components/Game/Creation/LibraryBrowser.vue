@@ -37,7 +37,6 @@ function fetchLibraries() {
             // console.log(response.data.mine);
             if (authStore.loggedIn) {
                 myLibraries.value = response.data.mine;
-                console.log("favorited_map: ", response.data.favorites_map);
                 favoritesMap.value = response.data.favorites_map;
 
             }
