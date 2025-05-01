@@ -21,7 +21,11 @@ def generate_token_and_send_verification_email(user):
         user.confirm_sent_at = datetime.utcnow()
         db.session.commit()
         
-        frontend_url = os.getenv('FRONTEND_URL', 'http://localhost:8080')
+        if os.getenv('FLASK_ENV') == 'production':
+            frontend_url = "https://rivue.ai"
+        else:
+            frontend_url = "http://localhost:8080"
+
         confirmation_link = f"{frontend_url}/verify/{user.confirmation_token}"
         send_email(user.email, Registration, confirmation_link)
 
@@ -29,7 +33,12 @@ def generate_token_and_send_password_reset_email(user):
         user.password_reset_token = generate_confirmation_token(user.id)
         user.password_reset_sent_at = datetime.utcnow()
         db.session.commit()
-        frontend_url = os.getenv('FRONTEND_URL', 'http://localhost:8080')
+
+        if os.getenv('FLASK_ENV') == 'production':
+            frontend_url = "https://rivue.ai"
+        else:
+            frontend_url = "http://localhost:8080"
+
         reset_link = f"{frontend_url}/reset-password/{user.password_reset_token}"
         send_email(user.email, PasswordReset, reset_link)
 
