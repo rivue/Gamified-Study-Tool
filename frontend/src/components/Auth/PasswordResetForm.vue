@@ -7,12 +7,12 @@
                 Password Reset
             </div>
             <div class="form-field">
-                <label for="new-password">Password:</label>
+                <label for="new-password">New Password:</label>
                 <input type="password" id="new-password" name="new-password" v-model="password"
                     autocomplete="new-password" required />
             </div>
             <div class="form-field">
-                <label for="confirm-password">Confirm Password:</label>
+                <label for="confirm-password">Confirm New Password:</label>
                 <input type="password" id="confirm-password" name="confirm-password" v-model="confirmPassword"
                     autocomplete="new-password" required />
             </div>
@@ -20,7 +20,7 @@
                 {{ passwordError }}
             </div>
             <div class="button-container">
-                <input type="submit" id="submit" :value="buttonText" />
+                <input class="wrap" type="submit" id="submit" :value="buttonText" style="white-space: normal; word-wrap: break-word; text-align: center;" />
             </div>
         </form>
     </div>
@@ -65,10 +65,16 @@ const handleSubmit = () => {
     })
     .then((response) => {
         if (response.status === 200) {
-            buttonText.value = "Reset Successful";
-            setTimeout(() => {
-                router.push('/login');
-            }, 2000);
+            let countdown = 5;
+            buttonText.value = `Reset Successful, redirecting to login page in ${countdown}...`;
+            const interval = setInterval(() => {
+                countdown--;
+                buttonText.value = `Reset Successful, redirecting to login page in ${countdown}...`;
+                if (countdown === 0) {
+                    clearInterval(interval);
+                    router.push('/login');
+                }
+            }, 1000);
         }
     })
     .catch((error) => {

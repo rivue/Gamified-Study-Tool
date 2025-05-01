@@ -31,7 +31,7 @@
                         If there is an unverified account associated with this email, a reset link was sent to it.
                     </div>
                     <div v-if="!completed" class="completed-message">Please enter your email and click the button below to resend a verification link.</div>
-                    <div class="button-container">
+                    <div class="button-containered">
                         <input type="submit" id="submit" :value="buttonText" />
                     </div>
                 </form>
@@ -50,7 +50,7 @@ const loading = ref(true);
 const status = ref('');
 const token = ref('');
 const email = ref('');
-const buttonText = ref('Send Reset Link');
+const buttonText = ref('Send Verify Link');
 const completed = ref(false);
 
 onMounted(() => {
@@ -85,23 +85,17 @@ const handleSendNewVerificationEmail = () => {
     completed.value = true;
 
     axios.post('api/send-verify-link', { email: email.value })
-        .then((response) => {
-            if (response.status === 200) {
-                buttonText.value = 'Reset Link Sent';
-                setTimeout(() => {
-                    buttonText.value = 'Send Reset Link';
-                }, 3000);
-            }
-        })
-        .catch(() => {
-            buttonText.value = 'Send Reset Link';
+        .finally(() => {
+            setTimeout(() => {
+                buttonText.value = 'Send Verify Link';
+            }, 750);
         });
 };
 
 </script>
 
 <style>
-.button-container {
+.button-containered {
     text-align: center;
     padding: 8px;
     border-radius: 6px;
@@ -182,7 +176,7 @@ form {
     padding: 10px 20px;
     margin-top: 20px;
     color: var(--text-color);
-    background-color: var(--text-color-2);
+    background-color: var(--element-color-1);
     text-decoration: none;
     border-radius: 5px;
     cursor: pointer;

@@ -27,13 +27,10 @@ def generate_token_and_send_verification_email(user):
 
 def generate_token_and_send_password_reset_email(user):
         user.password_reset_token = generate_confirmation_token(user.id)
-        print("hello there")
-        user.password_reset_token_sent_at = datetime.utcnow()
+        user.password_reset_sent_at = datetime.utcnow()
         db.session.commit()
-        print("hello there")
         frontend_url = os.getenv('FRONTEND_URL', 'http://localhost:8080')
-        print("hello there")
-        reset_link = f"{frontend_url}/password-reset/{user.user.password_reset_token}"
+        reset_link = f"{frontend_url}/reset-password/{user.password_reset_token}"
         send_email(user.email, PasswordReset, reset_link)
 
 def init_auth_routes(app):
@@ -115,6 +112,7 @@ def init_auth_routes(app):
         try:
             email = request.form['new-email']
             user = User.query.filter_by(email=email).first()
+
             if user:
                 return jsonify({'message': 'An account with this email already exists.'}), 400
 
@@ -124,8 +122,10 @@ def init_auth_routes(app):
             db.session.add(new_user)
             db.session.commit()
 
+            generate_token_and_send_verification_email(new_user)
+
             return jsonify({})
-        except IntegrityError as e:
+        except Exception as e:
             return jsonify({'message': 'An unexpected error occurred. Please try again later.'}), 500
 
     # sends user an email to verify and confirm their email
@@ -143,15 +143,15 @@ def init_auth_routes(app):
             if not user:
                 return jsonify({'status': 'error', 'message': 'User not found'}), 404
 
+            if user.confirmed:
+                return jsonify({'status': 'error', 'message': 'No need to send an email, you\'re already verified!'})
+
             generate_token_and_send_verification_email(user)
                 
-            return jsonify({'status': 'success', 'message': 'Password reset link sent successfully!'}), 200
+            return jsonify({'status': 'success', 'message': 'Password reset link sent successfully!'})
         
         except KeyError as e:
             app.logger.error(f"KeyError: {e}")
-            return jsonify({'status': 'error', 'message': 'Invalid request data'}), 400
-        except Exception as e:
-            app.logger.error(f"Unexpected error: {e}")
             return jsonify({'status': 'error', 'message': 'Invalid request data'}), 400
         except Exception as e:
             app.logger.error(f"Unexpected error: {e}")
@@ -182,7 +182,7 @@ def init_auth_routes(app):
                 app.logger.info("confirm successful")
                 login_user(user)
                 initialize_messages(user.id)
-                user.comfirmation_token = None
+                user.confirmation_token = None
                 user.confirm_sent_at = None
                 db.session.commit()
                 return jsonify({'status': 'success', 'message': 'Email confirmed successfully!'})
@@ -220,6 +220,8 @@ def init_auth_routes(app):
         except KeyError as e:
             app.logger.error(f"KeyError: {e}")
             return jsonify({'status': 'error', 'message': 'error occurred'}), 400
+        except Exception as e:
+            return jsonify({'status': 'error', 'message': 'error occurred'}), 400
 
 
     # takes token from user to reset their password
@@ -240,7 +242,7 @@ def init_auth_routes(app):
 
             user.password = generate_password_hash(new_password)
             user.password_reset_token = None
-            user.password_reset_token_sent_at = None
+            user.password_reset_sent_at = None
             db.session.commit()
 
             return jsonify({'status': 'success', 'message': 'Password reset successfully!'}), 200
