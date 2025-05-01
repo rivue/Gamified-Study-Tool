@@ -71,9 +71,9 @@ const handleSubmit = () => {
             }, 2000);
         }
     })
-    .catch(() => {
+    .catch((error) => {
         buttonText.value = "Reset Failed";
-        passwordError.value = "An error occurred. Please try again.";
+        passwordError.value = error.response?.data.message || "An error occurred. Please try again.";
     });
 };
 </script>

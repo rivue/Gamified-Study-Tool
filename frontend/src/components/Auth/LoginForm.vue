@@ -28,7 +28,7 @@
             />
         </div>
         <div class="button-container">
-            <input type="submit" id="submit" :value="buttonText" />
+            <input type="submit" id="submit" :disabled="isSubmitting" :value="buttonText" />
         </div>
     </form>
 </template>
@@ -45,9 +45,18 @@ const emit = defineEmits<{
 const email = ref("");
 const password = ref("");
 const buttonText = ref("Log in");
+const isSubmitting = ref(false);
 
 const handleSubmit = () => {
+    if (!email.value || !password.value) {
+        const popupStore = usePopupStore();
+        popupStore.showPopup("Email and password are required.");
+        return;
+    }
+    
     buttonText.value = "Loading...";
+    isSubmitting.value = true;
+
     const formData = new FormData();
     formData.append("email", email.value);
     formData.append("password", password.value);
@@ -61,7 +70,10 @@ const handleSubmit = () => {
         .catch(error => {
             const popupStore = usePopupStore();
             popupStore.showPopup(error.response?.data?.message || "Login failed, please try again");
+        })
+        .finally(() => {
             buttonText.value = "Log in";
+            isSubmitting.value = false;
         });
 };
 </script>
@@ -76,16 +88,15 @@ form {
 
 .button-container {
     text-align: center;
+    background-color: transparent;
+    border: none;
 }
+
 .inspirational-quote {
     text-align: center;
     font-style: italic;
     margin-bottom: 20px;
     color: #555;
-}
-
-.button-container {
-    text-align: center;
 }
 
 .form-field {

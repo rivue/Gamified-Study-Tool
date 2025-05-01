@@ -131,20 +131,19 @@ router.beforeEach(async (to, from, next) => {
         '/contact',
         '/plan',
         '/verify', // Explicitly add /verify as a public path
+        '/verify/', // Make /verify/ a public path
     ];
     console.debug(to.path);
     
     // Check if the path is a reset password path
     const isResetPasswordPath = to.path.startsWith('/reset-password/');
     
-    // Check if the path is /verify exactly (public) or starts with /verify/ (requires auth)
-    const isPublicVerifyPath = to.path === '/verify';
-    const isProtectedVerifyPath = to.path.startsWith('/verify/') && to.path !== '/verify';
+    // Check if the path is /verify exactly (public) or starts with /verify/ (now also public)
+    const isPublicVerifyPath = to.path === '/verify' || to.path.startsWith('/verify/');
     
     const requiresAuth = !publicPaths.includes(to.path) && 
                          !isResetPasswordPath && 
-                         !(isPublicVerifyPath) && 
-                         (isProtectedVerifyPath || !to.path.startsWith('/verify'));
+                         !isPublicVerifyPath;
 
     if (to.meta.requiresCreator && to.params.id) {
         // Only proceed with this check if the user is logged in

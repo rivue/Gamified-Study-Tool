@@ -11,7 +11,7 @@
         </div>
         <br />
         <div v-if="completed" class="completed-message">
-            If there is an account associated with this email, a reset link will be sent to it.
+            If there is an account associated with this email, a reset link was sent to it.
         </div>
         <div class="button-container">
             <input type="submit" id="submit" :value="buttonText" />
