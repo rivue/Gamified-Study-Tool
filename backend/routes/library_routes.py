@@ -25,9 +25,7 @@ def init_library_routes(app):
 
     @app.route("/api/library/generate", methods=["POST"])
     def generate_library():
-
         
-
         # User checks
         user_id = current_user.id if not isinstance(current_user, AnonymousUserMixin) else None
         if not user_id:

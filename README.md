@@ -116,7 +116,10 @@ TODO list:
 
     general:
     study tool additions / ideas:
-
+        - make a better loading screen / bar / wheel while the courses are being created
+        - improve prompt generation a great fold (make sure as many of the quesitons relate to the section name as possible)
+        - eventually combine library_question model with library_factoid model (why are they seperate to begin with?)
+        - when user flips factoid card, if they have typed something in the box, it doesn't reset
         - get student verification on Mobbin pro (UI library)
         - add ability to reset password for users who are logged in
         - change the name of all functions in library_handlers to use get, update, create, delete only
