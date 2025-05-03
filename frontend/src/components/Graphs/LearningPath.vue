@@ -1,16 +1,24 @@
 <template>
     <div class="fixed left-8 right-8 top-0 bottom-0 overflow-hidden">
         <button @click="scroll('left')"
-            class="fixed left-8 top-1/2 -translate-y-1/2 bg-black/30 backdrop-blur-sm shadow-lg rounded-full p-4 hover:bg-black/40 z-10"
+            class="fixed left-8 top-1/2 -translate-y-1/2 bg-black/30 backdrop-blur-sm shadow-md rounded-full p-4 hover:bg-black/40 z-10"
             style="color: var(--highlight-color);">
             <ChevronLeftIcon class="w-12 h-12" />
         </button>
 
         <button @click="scroll('right')"
-            class="fixed right-8 top-1/2 -translate-y-1/2 bg-black/30 backdrop-blur-sm shadow-lg rounded-full p-4 hover:bg-black/40 z-10"
+            class="fixed right-8 top-1/2 -translate-y-1/2 bg-black/30 backdrop-blur-sm shadow-md rounded-full p-4 hover:bg-black/40 z-10"
             style="color: var(--highlight-color);">
             <ChevronRightIcon class="w-12 h-12" />
         </button>
+
+        <!-- Settings Button: fixed top-right -->
+        <button @click="toggleSettings"
+            class="fixed top-20 right-6 bg-black/30 backdrop-blur-sm shadow-md rounded-full p-4 hover:bg-black/40 z-10"
+            style="color: var(--highlight-color);">
+            <CogIcon class="w-10 h-10" />
+        </button>
+
 
         <!-- @click="showAddNodeModal = true" -->
         <!-- Fixed Add Stepping Stone Button - Center Top -->
@@ -22,17 +30,17 @@
             </button>
         </div> -->
 
-        <div class="fixed top-48 left-1/2 -translate-x-1/2 z-10">
+        <!-- <div class="fixed top-48 left-1/2 -translate-x-1/2 z-10">
             <button @click="showAddNodeModal = true"
             class="shadow-lg rounded-full p-4 flex items-center justify-center transition-colors"
             style="background-color: var(--element-color-1); color: var(--light-text);">
             <PlusIcon class="w-6 h-6" />
             <span class="ml-2 font-medium">Add New Stepping Stones</span>
             </button>
-        </div>
+        </div> -->
 
         <div ref="scrollContainer"
-            class="w-full h-full overflow-x-auto overflow-y-hidden cursor-grab active:cursor-grabbing"
+            class="scrollContainer w-full h-full overflow-x-auto overflow-y-hidden cursor-grab active:cursor-grabbing"
             @mousedown="startDragging" @mousemove="drag" @mouseup="stopDragging" @mouseleave="stopDragging"
             @touchstart="startDragging" @touchmove="drag" @touchend="stopDragging" @scroll="handleScroll">
             <!-- Modified to ensure first node is visible -->
@@ -76,7 +84,7 @@
                                             style="background-color: var(--light-text); color: var(--element-color-1);">
                                             <span
                                                 v-if="getRoomData(sectionId) && getRoomData(sectionId).lesson_state <= getRoomData(sectionId).num_lessons">PLAY</span>
-                                                
+
                                             <span v-else>REVIEW</span>
                                         </button>
                                     </div>
@@ -219,6 +227,45 @@
             </div>
         </Transition>
 
+        <!-- Settings Modal -->
+        <Transition name="modal">
+            <div v-if="showSettingsModal" class="fixed inset-0 flex items-center justify-center z-50 p-4"
+                style="background-color: var(--background-haze);">
+                <div class="rounded-2xl p-6 w-full max-w-md shadow-xl border"
+                    style="background-color: var(--background-color); color: var(--light-text); border-color: var(--color-primary-dark);">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-semibold" style="color: var(--light-text);">
+                            Settings
+                        </h2>
+                        <button @click="toggleSettings" style="color: var(--highlight-color);">
+                            <XMarkIcon class="w-6 h-6" />
+                        </button>
+                    </div>
+
+                    <!-- 💡 Your settings controls go here: -->
+                    <div class="space-y-4">
+                        <!-- Example placeholder setting -->
+                        <div>
+                            <label class="block text-sm font-medium mb-1" style="color: var(--highlight-color);">
+                                Dark Mode
+                            </label>
+                            <input type="checkbox" /> Enable dark mode
+                        </div>
+
+                        <!-- Add more settings fields as you need -->
+                    </div>
+
+                    <div class="mt-6 flex justify-end">
+                        <button @click="toggleSettings" class="px-4 py-2 rounded-lg border"
+                            style="border-color: var(--color-primary); color: var(--highlight-color);">
+                            Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </Transition>
+
+
     </div>
 </template>
 
@@ -284,6 +331,7 @@ const nodeNameErrors = ref([])
 const fileError = ref('')
 const isAddingNode = ref(false)
 const gameStore = useGameStore()
+const showSettingsModal = ref(false)
 
 // Track selected room for tooltip
 const selectedRoomId = ref(null)
@@ -300,6 +348,11 @@ const unitColors = [
     '#3498db', // blue
     '#e74c3c', // red
 ]
+
+
+function toggleSettings() {
+    showSettingsModal.value = !showSettingsModal.value
+}
 
 // Get color for a unit based on its index
 const getUnitColor = (unitIndex) => {
@@ -630,4 +683,16 @@ const handleScroll = () => {
 .modal-leave-to {
     opacity: 0;
 }
+
+@media (max-width: 600px) {
+  .scrollContainer {
+    position: static !important;    /* let it flow in the document */
+    transform: none !important;     /* cancel any translateY() you had */
+    margin: 0.5rem auto 0;          /* just a little space under the title */
+    width: 100%;                    /* full width so it’s centered */
+    display: flex;                  /* keep your flex layout */
+    justify-content: center;        /* center the items horizontally */
+  }
+}
+
 </style>

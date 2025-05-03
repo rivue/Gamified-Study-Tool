@@ -34,7 +34,7 @@ IDEAS:
 
 TODO list:
 
-    LAUNCH LIST: goal: July 6th, (note: once you are tired / exhausted from working on something big, chip away at easier things to keep motivated or whatever, maybe try to use claude 3.7 in the way anthropic uses it w/ git-branching / versioning?)
+    LAUNCH LIST: goal: July 6th then start working on social media posts
 
         hard probably (goal: 2 high level bullet points / wk):
         - ✅ ⭐️ Finish sections + units
@@ -49,12 +49,15 @@ TODO list:
             - ⭐️ Delete sections requires entering the name of the unit / course just for accidental reasons)
             - ⭐️ Delete Units( requires entering the name of the unit / course just for accidental reasons)
             - ⭐️ Delete courses / libraries (whatever they're called) (requires entering the name of the unit / course just for accidental reasons)
-            - ⭐️ Remember to delete from both DB and pinecone as well, as well as respective child / parent courses / units / sections / libraries, roomNameState, LibraryFavorites etc...
-        - ⭐️ (needs multiple people first) leaderboard / game point tracking system
+            - ⭐️ Remember to delete from both DB and pinecone as well, as well as respective child / parent courses / units / sections / libraries, roomNameState, LibraryFavorites, question, question_choice, etc...
+        - ⭐️ (courses need ability to add multiple people first) leaderboard / game point tracking system
         - (might take at least a couple weeks) ⭐️ UI redesign / rehaul *** --> kinnu, duolingo, saved instagram design reels etc..
             - Note: 1) try to see what horizontal --> vertical learning path looks like, and possibly make a vertical bar on the side for settings, i-card, files list, adding a new stepping stone, etc... but maybe keep lesson name and current unit name at the top?
             - note: maybe change top navbar to be a constant hovering side menu on the side / bottom of the screen maybe similar to duolingo and possibly replace "my library", "settings", etc.. with actual icons
             - also note: ask gemini / grok / gpt / claude for some ui design tips like adding a menu bar, or ui tips / tricks / helpful websites / youtube videos, etc...
+            - note: for main page, add two / 3 simple boxes, class you want, school, and possibly professor, and it gives you classes close to you like quizlet / rate my professor along with option for creating your own
+                maybe it shows private ones with a "lock" icon and prompts you to enter a password. this way it would be like more of a network, which would differentiate us from a copy paste ai study tool (turbolearn) / NotebookLM
+            - ability to verify by school email which helps with filtering results?
         - ⭐️ Stripe implementation
             - have to think abt what different payment levels mean / how I want to do it
 
@@ -62,8 +65,9 @@ TODO list:
                 this would enable them to add people / delete people, change visibility settings I think? or check different boxes for question types, or see users or something
                 for normal users there could be an i-card button used to see course files or something, maybe 
                 users could add a note for each unit or something
+                - add an option on both the library carousel screen and in the actual library page itself
         do vthisv right after ^this^
-        - ⭐️ visibility of different courses? are they all public like quizlet or am I trying to form a tight knit group like turbolearn / clash of clans?
+        - ⭐️ visibility of different courses? are they all public like quizlet or am I trying to form a tight knit group like clash royale?
             - ⭐️ default public, creator can toggle private / public both in course creation and after course is created
             - ⭐️ add ability / a page for searching for public courses
             - ⭐️ for private, users would need some sort of short invite code, but maybe don't necessarily need to be friends for now, maybe it could be like kahoot or something where they don't have to be friends
@@ -92,7 +96,7 @@ TODO list:
         easy (same as medium): 
         - ⭐️ fix Aryan's problem with viewing it on his phone
         - ⭐️ should not be able to make duplicate unit and section names
-        - ⭐️ add a "scroll to front", "scroll to current", and "scroll to end" feature for map page
+        - ⭐️ add "scroll to front", "scroll to current", and "scroll to end" button for map page
             - also, maybe change it to vertical
         - ⭐️ add tips for making a new stepping stone (i.e. make sure it aligns with what you put, etc... )
         - ⭐️ add check for duplicate room name for the time being - maybe allow it later down the line?
@@ -110,6 +114,17 @@ TODO list:
 
     general:
     study tool additions / ideas:
+        - remove azure thing
+        - ability to rename libraries
+        - give estimations based on file input size (ex: 500kb --> 10 minutes, etc... make them highly conservative,)
+            - we could also section it off, like load part of it at a time, or load it in the background 
+                while the user it playing an already unlocked game or something
+        - make a better loading screen / bar / wheel while the courses are being created
+        - improve prompt generation a great fold (make sure as many of the quesitons relate to the section name as possible)
+        - eventually combine library_question model with library_factoid model (why are they seperate to begin with?)
+        - when user flips factoid card, if they have typed something in the box, it doesn't reset
+        - get student verification on Mobbin pro (UI library)
+        - add ability to reset password for users who are logged in
         - change the name of all functions in library_handlers to use get, update, create, delete only
         - maybe ask users how knowledgeable they are with a unit / course / section before they start?
             not sure how many extra questions I would need to generate for this to work though...
