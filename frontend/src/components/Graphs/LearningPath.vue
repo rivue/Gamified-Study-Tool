@@ -37,6 +37,7 @@
             @touchstart="startDragging" @touchmove="drag" @touchend="stopDragging" @scroll="handleScroll">
             <!-- Modified to ensure first node is visible -->
             <div class="flex items-center gap-24 min-h-screen py-24 relative">
+
                 <!-- Added left padding to ensure first nodes are visible -->
                 <div class="w-24 flex-shrink-0"></div>
 
@@ -45,8 +46,9 @@
                     <!-- Loop through units and their sections -->
                     <template v-for="([sectionId, sectionName], sectionIndex) in rawUnitData[unitName]"
                         :key="sectionIndex">
+
                         <div class="relative flex-shrink-0 group perspective" :style="{
-                            transform: `translateY(${getNodeOffset(getGlobalSectionIndex(unitName, unitIndex, sectionIndex))}px)`
+                            transform: `translateY(${getNodeOffset(getGlobalSectionIndex(unitIndex, sectionIndex))}px)`
                         }" @click="handleNodeClick(sectionId)">
 
                             <!-- Tooltip -->
@@ -76,7 +78,7 @@
                                             style="background-color: var(--light-text); color: var(--element-color-1);">
                                             <span
                                                 v-if="getRoomData(sectionId) && getRoomData(sectionId).lesson_state <= getRoomData(sectionId).num_lessons">PLAY</span>
-                                                
+
                                             <span v-else>REVIEW</span>
                                         </button>
                                     </div>
@@ -100,7 +102,7 @@
                                     <div class="absolute inset-0 rounded-full flex items-center justify-center cursor-pointer shadow-lg transform-gpu transition-all duration-300"
                                         :style="{ background: getUnitGradient(unitIndex) }">
                                         <component
-                                            :is="getIconForIndex(getGlobalSectionIndex(unitName, unitIndex, sectionIndex))"
+                                            :is="getIconForIndex(getGlobalSectionIndex(unitIndex, sectionIndex))"
                                             class="w-24 h-24 transform-gpu transition-all duration-300 group-hover:scale-110"
                                             style="color: var(--light-text);" />
                                     </div>
@@ -114,116 +116,110 @@
                 <div class="w-24 flex-shrink-0"></div>
             </div>
         </div>
+    </div>
 
-        <!-- Add Node Modal -->
-        <Transition name="modal">
-            <div v-if="showAddNodeModal" class="fixed inset-0 flex items-center justify-center z-50 p-4"
-                style="background-color: var(--background-haze);">
-                <div class="rounded-2xl p-6 w-full max-w-md shadow-xl border"
-                    style="background-color: var(--background-color); color: var(--light-text); border-color: var(--color-primary-dark);">
-                    <div class="flex justify-between items-center mb-4">
-                        <h2 class="text-xl font-semibold" style="color: var(--light-text);">Add New Stepping
-                            Stones</h2>
-                        <button @click="showAddNodeModal = false" style="color: var(--highlight-color);">
-                            <XMarkIcon class="w-6 h-6" />
+    <!-- Add Node Modal -->
+    <Transition name="modal">
+        <div v-if="showAddNodeModal" class="fixed inset-0 flex items-center justify-center z-50 p-4"
+            style="background-color: var(--background-haze);">
+            <div class="rounded-2xl p-6 w-full max-w-md shadow-xl border"
+                style="background-color: var(--background-color); color: var(--light-text); border-color: var(--color-primary-dark);">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-semibold" style="color: var(--light-text);">Add New Stepping
+                        Stones</h2>
+                    <button @click="showAddNodeModal = false" style="color: var(--highlight-color);">
+                        <XMarkIcon class="w-6 h-6" />
+                    </button>
+                </div>
+
+                <div class="space-y-4">
+                    <!-- Dynamic list of node names -->
+                    <div>
+                        <label class="block text-sm font-medium mb-1" style="color: var(--highlight-color);">Stepping Stone Names</label>
+                        <div v-for="(node, index) in newNodeNames" :key="index" class="flex items-center gap-2 mb-2">
+                            <input v-model="newNodeNames[index]" type="text" class="w-full p-2 border rounded-lg"
+                                style="background-color: var(--background-color-1t); color: var(--light-text); border-color: var(--color-primary-dark);"
+                                placeholder="Enter Stepping Stone name" maxlength="40" />
+                            <button v-if="newNodeNames.length > 1" @click="removeNodeName(index)"
+                                class="text-red-400 hover:text-red-300">
+                                <XCircleIcon class="w-6 h-6" />
+                            </button>
+                        </div>
+                        <button @click="addNodeNameField" class="mt-2 text-sm font-medium flex items-center gap-1"
+                            style="color: var(--highlight-color);">
+                            <PlusIcon class="w-4 h-4" />
+                            Add Another Node
                         </button>
+                        <p v-if="nodeNameErrors.length" class="mt-1 text-sm" style="color: var(--color-primary-light);">
+                            <!-- {{ nodeNameErrors }} -->
+                            <span v-for="(error, index) in nodeNameErrors" :key="index">{{ error }}<br></span>
+
+                        </p>
                     </div>
 
-                    <div class="space-y-4">
-                        <!-- Dynamic list of node names -->
-                        <div>
-                            <label class="block text-sm font-medium mb-1"
-                                style="color: var(--highlight-color);">Stepping Stone
-                                Names</label>
-                            <div v-for="(node, index) in newNodeNames" :key="index"
-                                class="flex items-center gap-2 mb-2">
-                                <input v-model="newNodeNames[index]" type="text" class="w-full p-2 border rounded-lg"
-                                    style="background-color: var(--background-color-1t); color: var(--light-text); border-color: var(--color-primary-dark);"
-                                    placeholder="Enter Stepping Stone name" maxlength="40" />
-                                <button v-if="newNodeNames.length > 1" @click="removeNodeName(index)"
-                                    class="text-red-400 hover:text-red-300">
-                                    <XCircleIcon class="w-6 h-6" />
-                                </button>
+                    <div>
+                        <label class="block text-sm font-medium mb-1" style="color: var(--highlight-color);">Upload
+                            Resource
+                            (optional)<br>Note: Stepping stone content is based on this resource and all
+                            previously
+                            uploaded resources in this library </label>
+                        <div class="border border-dashed rounded-lg p-4 text-center"
+                            style="background-color: var(--background-color-1t); border-color: var(--color-primary-light);">
+                            <input type="file" ref="fileInput" @change="handleFileSelection" class="hidden"
+                                accept=".pdf,.doc,.docx,.txt" />
+                            <div v-if="!selectedFile" @click="$refs.fileInput.click()" class="cursor-pointer">
+                                <DocumentPlusIcon class="w-12 h-12 mx-auto"
+                                    style="color: var(--color-primary-light);" />
+                                <p class="mt-2 text-sm" style="color: var(--highlight-color);">Click to
+                                    upload (max
+                                    500KB)
+                                </p>
+                                <p class="mt-1 text-xs" style="color: var(--color-primary-light);">PDF, DOC,
+                                    DOCX,
+                                    TXT</p>
                             </div>
-                            <button @click="addNodeNameField" class="mt-2 text-sm font-medium flex items-center gap-1"
-                                style="color: var(--highlight-color);">
-                                <PlusIcon class="w-4 h-4" />
-                                Add Another Node
-                            </button>
-                            <p v-if="nodeNameErrors.length" class="mt-1 text-sm"
-                                style="color: var(--color-primary-light);">
-                                <!-- {{ nodeNameErrors }} -->
-                                <span v-for="(error, index) in nodeNameErrors" :key="index">{{ error
-                                }}<br></span>
-
-                            </p>
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-medium mb-1" style="color: var(--highlight-color);">Upload
-                                Resource
-                                (optional)<br>Note: Stepping stone content is based on this resource and all
-                                previously
-                                uploaded resources in this library </label>
-                            <div class="border border-dashed rounded-lg p-4 text-center"
-                                style="background-color: var(--background-color-1t); border-color: var(--color-primary-light);">
-                                <input type="file" ref="fileInput" @change="handleFileSelection" class="hidden"
-                                    accept=".pdf,.doc,.docx,.txt" />
-                                <div v-if="!selectedFile" @click="$refs.fileInput.click()" class="cursor-pointer">
-                                    <DocumentPlusIcon class="w-12 h-12 mx-auto"
-                                        style="color: var(--color-primary-light);" />
-                                    <p class="mt-2 text-sm" style="color: var(--highlight-color);">Click to
-                                        upload (max
-                                        500KB)
-                                    </p>
-                                    <p class="mt-1 text-xs" style="color: var(--color-primary-light);">PDF, DOC,
-                                        DOCX,
-                                        TXT</p>
-                                </div>
-                                <div v-else class="text-left">
-                                    <div class="flex items-center justify-between">
-                                        <div class="flex items-center">
-                                            <DocumentIcon class="w-8 h-8 mr-2"
-                                                style="color: var(--color-primary-light);" />
-                                            <div>
-                                                <p class="text-sm font-medium truncate"
-                                                    style="color: var(--highlight-color);">
-                                                    {{ selectedFile.name }}</p>
-                                                <p class="text-xs" style="color: var(--color-primary-light);">{{
-                                                    formatFileSize(selectedFile.size) }}</p>
-                                            </div>
+                            <div v-else class="text-left">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <DocumentIcon class="w-8 h-8 mr-2" style="color: var(--color-primary-light);" />
+                                        <div>
+                                            <p class="text-sm font-medium truncate"
+                                                style="color: var(--highlight-color);">
+                                                {{ selectedFile.name }}</p>
+                                            <p class="text-xs" style="color: var(--color-primary-light);">{{
+                                                formatFileSize(selectedFile.size) }}</p>
                                         </div>
-                                        <button @click.prevent="removeFile" class="text-red-400 hover:text-red-300">
-                                            <XCircleIcon class="w-6 h-6" />
-                                        </button>
                                     </div>
+                                    <button @click.prevent="removeFile" class="text-red-400 hover:text-red-300">
+                                        <XCircleIcon class="w-6 h-6" />
+                                    </button>
                                 </div>
-                                <p v-if="fileError" class="mt-2 text-sm text-red-400">{{ fileError }}</p>
                             </div>
+                            <p v-if="fileError" class="mt-2 text-sm text-red-400">{{ fileError }}</p>
                         </div>
+                    </div>
 
-                        <div class="flex gap-3 justify-end mt-6">
-                            <button @click="showAddNodeModal = false" class="px-4 py-2 border rounded-lg"
-                                style="border-color: var(--color-primary); color: var(--highlight-color);">
-                                Cancel
-                            </button>
-                            <button @click="addNewNodes" class="px-4 py-2 rounded-lg focus:outline-none focus:ring-2"
-                                style="background: var(--button-gradient); color: var(--light-text);"
-                                :disabled="isAddingNode">
-                                <span v-if="isAddingNode">Adding...</span>
-                                <span v-else>Add Stepping Stone</span>
-                            </button>
-                        </div>
+                    <div class="flex gap-3 justify-end mt-6">
+                        <button @click="showAddNodeModal = false" class="px-4 py-2 border rounded-lg"
+                            style="border-color: var(--color-primary); color: var(--highlight-color);">
+                            Cancel
+                        </button>
+                        <button @click="addNewNodes" class="px-4 py-2 rounded-lg focus:outline-none focus:ring-2"
+                            style="background: var(--button-gradient); color: var(--light-text);"
+                            :disabled="isAddingNode">
+                            <span v-if="isAddingNode">Adding...</span>
+                            <span v-else>Add Stepping Stone</span>
+                        </button>
                     </div>
                 </div>
             </div>
-        </Transition>
+        </div>
+    </Transition>
 
-    </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
+import { ref, computed, watch, nextTick, onMounted, onUnmounted } from 'vue'
 import {
     StarIcon,
     BookOpenIcon,
@@ -265,14 +261,10 @@ const props = defineProps({
         required: true
     }
 })
-
-// const isDataReady = computed(() => {
-//     return rawUnitData; //props.unitSectionMap && props.unitSectionMap.length > 0
-// })
-
+0
 const rawUnitData = ref();
 
-watch(() => props.unitSectionMap, (newVal) => {
+watch(() => props.unitSectionMap, async (newVal) => {
     rawUnitData.value = newVal;
 }, { deep: true, immediate: true })
 
@@ -314,12 +306,19 @@ const getUnitGradient = (unitIndex) => {
 }
 
 // Get global section index (for offset and icon selection)
-const getGlobalSectionIndex = (unitName: any, unitIndex: number, sectionIndex: number) => {
-    let count = 0
+const getGlobalSectionIndex = (unitIndex: number, sectionIndex: number) => {
+
+    let count = 0;
+    // Sum the lengths of sections for all units before the current unitIndex
     for (let i = 0; i < unitIndex; i++) {
-        count += rawUnitData.value[unitName][unitIndex].length;
+        const unitKeys = Object.keys(rawUnitData.value);
+        const previousUnitName = unitKeys[i];
+        if (rawUnitData.value[previousUnitName]) {
+            count += rawUnitData.value[previousUnitName].length;
+        }
     }
     return count + sectionIndex;
+
 }
 
 const handleFileSelection = (event) => {

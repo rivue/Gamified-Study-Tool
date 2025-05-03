@@ -59,6 +59,8 @@ TODO list:
             - Note: 1) try to see what horizontal --> vertical learning path looks like, and possibly make a vertical bar on the side for settings, i-card, files list, adding a new stepping stone, etc... but maybe keep lesson name and current unit name at the top?
             - note: maybe change top navbar to be a constant hovering side menu on the side / bottom of the screen maybe similar to duolingo and possibly replace "my library", "settings", etc.. with actual icons
             - also note: ask gemini / grok / gpt / claude for some ui design tips like adding a menu bar, or ui tips / tricks / helpful websites / youtube videos, etc...
+            - note: for main page, add two / 3 simple boxes, class you want, school, and possibly professor, and it gives you classes close to you like quizlet / rate my professor along with option for creating your own
+                maybe it shows private ones with a "lock" icon and prompts you to enter a password. this way it would be like more of a network, which would differentiate us from a copy paste ai study tool (turbolearn) / NotebookLM
         - ⭐️ Stripe implementation
             - have to think abt what different payment levels mean / how I want to do it
 
@@ -80,7 +82,7 @@ TODO list:
         - ⭐️ add ability to see uploaded files in library (list of their names) and maybe even file preview (would require nosql db or something maybe)
 
         medium (chip away at when tired / mentally exhausted from hard ones):
-        - ⭐️ ⭐️ ⭐️ fix weird library duplicate generation thing
+        - ✅ ⭐️ ⭐️ ⭐️ fix weird library duplicate generation thing
         - ✅ ⭐️ ability to "star" / "favorite" a course
         - implement game "score" logic (if you get >80% #attemps:number of questions ratio) then you get more / less points or something, etc...
             - ⭐️ save for later, just do a basic fire streak thing for now, maybe with 5, 10, 20, 50, 100 day streak animations from Lottie Files and animations for streak loosing as well
@@ -116,6 +118,9 @@ TODO list:
 
     general:
     study tool additions / ideas:
+        - give estimations based on file input size (ex: 500kb --> 10 minutes, etc... make them highly conservative,)
+            - we could also section it off, like load part of it at a time, or load it in the background 
+                while the user it playing an already unlocked game or something
         - make a better loading screen / bar / wheel while the courses are being created
         - improve prompt generation a great fold (make sure as many of the quesitons relate to the section name as possible)
         - eventually combine library_question model with library_factoid model (why are they seperate to begin with?)
