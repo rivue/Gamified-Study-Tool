@@ -15,6 +15,7 @@ import database.library_handlers as lbh
 import knowledge_net.library_generator as lgn
 from images.library_imager import generate_images_task, save_image
 from database.user_handler import increment_violations, is_within_limit, check_generation_allowed, mark_generation_done
+from database.models import LibraryFactoid, LibraryQuestion, db
 from vector_processing.file_handler import process_document
 from vector_processing.retrieval import query_and_respond_pinecone
 
@@ -25,6 +26,8 @@ def init_library_routes(app):
     @app.route("/api/library/generate", methods=["POST"])
     def generate_library():
 
+        
+
         # User checks
         user_id = current_user.id if not isinstance(current_user, AnonymousUserMixin) else None
         if not user_id:
@@ -34,11 +37,13 @@ def init_library_routes(app):
         topic = request.form.get("topic")
         if not topic:
             return jsonify(status="error", message="No topic provided"), 400
+        
         topic = clean(topic)
-        if len(topic) > 200:
+
+        if len(topic) > 70:
             return jsonify({"error": "Topic is too long. Maximum 200 characters allowed."}), 400
-        if len(topic) < 1:
-            return jsonify({"error": "No message."}), 400
+        if len(topic) < 4:
+            return jsonify({"error": "Topic must be at least 4 characters."}), 400
 
         # Difficulty checks
         library_difficulty = request.form.get("libraryDifficulty")
@@ -162,18 +167,19 @@ def init_library_routes(app):
                 if key.startswith('groupSections[') and key.endswith('][]'):
                     # Extract group index from the key (format: "groupSections[index][]")
                     group_index = key[len('groupSections['):-3]  # Remove 'groupSections[' and '[]'
-                    
+                    print(f"group_index: {group_index}")
                     # Get the corresponding group name if available
                     group_name = form.get(f'groupNames[{group_index}]', ['Group ' + group_index])[0]
-                    
+                    print(f"group_name: {group_name}")
                     # Add group name to unit_names if not already there
                     if group_name and group_name not in unit_names:
                         unit_names.append(group_name)
                         section_unit_map[group_name] = []  # Initialize the list of sections for this unit
-                    
+                    # TODO COME BACK HERE
                     # Add all section names to our list and map them to their group
                     for section in values:
                         if section:  # Skip empty section names
+                            print(f" appending section named {section}")
                             section_names.append(section)
                             section_unit_map[group_name].append(section)  # Add section to the unit's list
 
@@ -181,30 +187,36 @@ def init_library_routes(app):
             for section_name in section_names:
                 if section_name: # Skip empty section names
                     rag_context = query_and_respond_pinecone(section_name, library_id)
+                    print(f" section_name: {section_name} rag_context: {rag_context}")
                     future = executor.submit(lgn.generate_room_content, user_id, section_name, library_difficulty, language, language_difficulty, extra_context, guide, rag_context)
                     futures_dict[future] = section_name
 
             completed_rooms = {}
+            section_contents_map = {}
             for future in concurrent.futures.as_completed(futures_dict):
-                
-                room_name = futures_dict[future]
-                completed_rooms[room_name] = True
+                section_name = futures_dict[future]
+                try:
+                    content = future.result()
+                    section_contents_map[section_name] = content
+                    completed_rooms[section_name] = True
+
+                except Exception as e:
+                    print(f"Error generating content for room {section_name}: {str(e)}")
+                    completed_rooms[section_name] = False
 
             # Check if all rooms were successfully completed
             if all(completed_rooms.values()):
                 
                 try:
-
-                    room_contents = future.result()
-                    user_id = current_user.id if not isinstance(current_user, AnonymousUserMixin) else None
-                    lbh.save_library_room_contents(library_id, section_unit_map, room_contents, user_id)
+                    print(section_contents_map)
+                    lbh.save_library_room_contents(library_id, section_unit_map, section_contents_map, user_id)
 
                 except Exception as e:
                     print(f"Error saving generated content: {str(e)}")
-                    completed_rooms[room_name] = False
 
                 library = lbh.get_library(library_id, user_id, False)
                 return jsonify(status="success", library_data=library.get_json())
+            
             else:
                 failed_rooms = [room for room, success in completed_rooms.items() if not success]
                 return jsonify(
