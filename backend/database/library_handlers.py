@@ -28,8 +28,9 @@ def db_transaction():
         raise e
 
 def create_library(
-    user_id, library_topic, difficulty, language, language_difficulty,guide
+    user_id, library_topic, difficulty, language, language_difficulty, guide
 ):
+    
     try:
         library = Library(
             user_id=user_id,
@@ -236,7 +237,7 @@ def get_library_room_state(user_id, library_id, section_id=None):
         ).first()
         return state.as_dict() if state else None
 
-def save_library_room_contents(library_id, section_unit_map, lessons, user_id):
+def save_library_room_contents(library_id, section_unit_map, section_contents_map, user_id):
 
     try:
         responses = []
@@ -256,7 +257,6 @@ def save_library_room_contents(library_id, section_unit_map, lessons, user_id):
                                 
                 unit_id = response_obj.get_json()["unit"]
 
-                print(unit_name + "unit_name #" + str(curr))
                 curr += 1
                 # print(f"sections: {sections}")
                 for section in sections:
@@ -275,18 +275,27 @@ def save_library_room_contents(library_id, section_unit_map, lessons, user_id):
                     
                     # 3) add room states
                     add_section_user_state(user_id, library_id, section_id, num_lessons)
+
+                    if "factoids" not in section_contents_map[section]:
+                        print(f"Warning: No factoids for section '{section}'")
+                        continue
+
+                    print(f"Processing section: {section}")
+                    print(f"Section content structure: {type(section_contents_map[section])}")
+                    print(f"Keys in section content: {section_contents_map[section].keys()}")
                     
                     # 4.1 + 4.2) create factoids and add to sections
+                    factoids = section_contents_map[section]["factoids"]
                     
                     # 4) add factoids to sections
-                    for index, item in enumerate(lessons["factoids"]):
-                        
+                    for index, item in enumerate(factoids):
                         lesson_name = "factoid_set_" + str(math.floor(index/9) + 1)
                         
                         factoid_content = item["factoid_text"]
                         question_data = item["question"]
                         
                         section = LibrarySection.query.get(section_id)
+                        
                         # Add factoid to library
                         factoid_response, status_code = add_factoid_to_section(
                             section_id, factoid_content, lesson_name

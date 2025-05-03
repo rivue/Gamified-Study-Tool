@@ -18,7 +18,7 @@
                             Please enter a topic.
                         </div>
                         <div v-if="topicTypingError" class="error-message">
-                            Topic can only have spaces or letters and must be at least 4 characters long.
+                            Topic can only have spaces or letters and must be between 4 and 70 characters long.
                         </div>
                         <div v-if="topicSpaceError" class="error-message">
                             Topic must not start or end with a space.
@@ -404,7 +404,7 @@ const hasErrors = (): boolean => {
 
     topicError.value = false;
 
-    topicTypingError.value = !/^[a-zA-Z ]+$/.test(topic.value) || topic.value.length < 4;
+    topicTypingError.value = !/^[a-zA-Z ]+$/.test(topic.value) || topic.value.length < 4 || topic.value.length > 70;
 
     if (topicTypingError.value) {
         return true;

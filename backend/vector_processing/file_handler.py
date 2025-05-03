@@ -39,6 +39,7 @@ def process_document(selected_files, library_id=None):
         
         sentences = split_into_sentences(extracted_text)
         sections = create_sections(sentences)
+        print(f"sections: {sections}")
         insert_sections_to_pinecone_parallel(sections, library_id)
     except Exception as e:
         print(f"Error processing document: {e}")
