@@ -4,8 +4,31 @@ Tool that allows users to input things like lecture recordings, lecture slides, 
 IDEAS:
 
     ideas for grand plan / future:
+        - Brain-Computer Interface (BCI) Integrations
+            For researchers with EEG headsets: detect attention lapses or cognitive overload and adapt content pacing in real time.
+
+        - Wearable Haptic Feedback
+            Study flashcards on your smartwatch; correct answers give a gentle vibration “ping,” wrong ones a soft double-tap—learn on the go without looking at a screen.
+
+        - Voice-First Study Mode
+            Hands-free “audio textbooks”: speak your answers, get immediate verbal feedback, and use simple voice commands (“Next question,” “Explain that again”).
+        - Mentor Matching Engine
+            Based on your goals, invite advanced peers or volunteer mentors (e.g. alumni, grad students) for scheduled office-hour chats—AI helps coordinate agendas and follow-ups.
+        - Automated Mind-Map Composer
+            Feed in your scattered notes or highlights; the AI weaves them into a dynamic mind-map with draggable nodes, auto-grouped by theme, and “chain reactions” that show how mastering one idea unlocks another.
+        - Embedded “Anywhere” Widgets
+            -Drop a small embed on any website (Wikipedia article, corporate wiki, Slack channel) that launches a context-aware mini-lesson or flashcard deck tied to that page’s topic.
+        -Plugin Marketplace & Open SDK
+            Let third-party devs create specialized modules—math equation solvers, language pronunciation bots, domain-specific mini-games—and distribute them through an “App Store” for your platform.
+            -Enterprise & University LMS Connectors
+            One-click import of campus syllabi, grade-book sync, auto-provisioned cohorts based on student enrollment lists.
         - create a community discord server (configure the current one)
         - create cheap vr cardboard cutouts of headsets where you can put your phone --> give to high schools possibly for free once you partner with them
+           - AR Annotations & Pop-Ups
+                Point your phone at a page of a textbook (or whiteboard) and see AI-generated overlays—diagrams that float in 3D, step-by-step solution hints, pronunciation guides for foreign-language vocab, and interactive “hotspots” you can tap for mini-quizzes.
+
+            - Virtual Lab Simulations
+            launch fully simulated physics, chemistry, or biology experiments in the browser or VR headset. Mix chemicals, wire circuits, dissect virtual frogs—all with real-time AI guidance and safety feedback.
             - have to think specifically of who / what to target for MVP, etc... so as little time as possibly gets wasted building something that either 1) is outside of my domain of expertise or 2) other people might build (repeat of unclear jupyterhub research)
             - not sure where to go from there, lots of places though
         - see google doc for more plans for resume (or just repomix this whole codebase into gpt / grok / gemini / claude, etc..)
@@ -66,8 +89,10 @@ TODO list:
                 for normal users there could be an i-card button used to see course files or something, maybe 
                 users could add a note for each unit or something
                 - add an option on both the library carousel screen and in the actual library page itself
+                - backfill true / false for is_public (true)
         do vthisv right after ^this^
         - ⭐️ visibility of different courses? are they all public like quizlet or am I trying to form a tight knit group like clash royale?
+            - Note: see grok for potential implementation, and ask grok abt enums for roles (creator, member, maintainer, etc...)
             - ⭐️ default public, creator can toggle private / public both in course creation and after course is created
             - ⭐️ add ability / a page for searching for public courses
             - ⭐️ for private, users would need some sort of short invite code, but maybe don't necessarily need to be friends for now, maybe it could be like kahoot or something where they don't have to be friends
@@ -114,6 +139,37 @@ TODO list:
 
     general:
     study tool additions / ideas:
+        - Skill Trees & Talent Builds
+            Visualize your mastery like a character in an RPG—choose to specialize (“speed-reader” vs. “deep-diver”) and unlock branching benefits (fast flash-review vs. deeper case studies).
+        - Hypothesis Playground
+            Sketch out your own mini-experiments or thought experiments, and the AI simulates outcomes (e.g. “What if temperature doubles in reaction X?”), giving you rapid feedback on plausibility.
+        - Total Accessibility Suite
+            Real-time audio narration, sign-language avatar translations, dyslexia-friendly fonts, high-contrast themes, and language-learner mode with instant look-up pop-ups.
+        - Mindfulness & Mental Fitness
+            Short, AI-led breathing exercises or “cognitive resets” before tough modules to reduce anxiety and boost retention.
+        - Sentiment & Engagement Signals
+            Analyze discussion-board posts, free-form answers and chat logs to surface concepts that trigger frustration, confusion, or boredom—and then automatically generate supportive hint-videos or alternative explanations.
+        - “Predict & Prescribe” Engine
+            Using aggregated, anonymized data, forecast which upcoming topics will trip up learners like you—and auto-prepare targeted readiness modules (“heads-up: many students struggle with substitution integrals next week!”).
+        - Real-Time Study “Rooms”
+            Join or host live co-study sessions: everyone works on the same module side-by-side, can chat or voice-call, swap spontaneous quizzes, and “ping” each other for help.
+
+        - Peer-Graded Projects & Code Review
+            For subjects like programming or writing, submit a project, get assigned 2–3 peers to review and grade, then earn badges for quality feedback.
+
+        - Challenge Tournaments & Hackathons
+            Weekly themed challenges (e.g. “Graph Theory Weekend”) where students compete individually or in teams to solve increasingly tough problems—complete with real-time leaderboards and “tournament brackets.”
+        - Dynamic Difficulty Tuning
+            As soon as the AI detects you’re breezing through one concept, it injects a harder “speed-run” sub-quiz or a real-world problem to keep you challenged. If you falter, it auto-spawns bite-sized remediation (“micro-lessons”) until mastery.
+        - tailor the prompt / library to that specific class (ex: thermodynamics = engineering style problems, chemist = real life examples, etc...)
+        - add a knowledge graph / knowledge map as one of the option on the vertical left side bar thing
+        - shared milestones as opposed to just single user milestones / leaderboards
+        - ability for voice enabled options
+        - study groups / peer quizzes - not sure how to approach this one
+        - ideas for multi-modal content: draggable vectors for physics, audio summaries / transcrips for learning on the go
+        - button at the bottom of the page for daily review (here is where we implement spaced repitition scheduling)
+        - generate a lot of different questions and if a student gets a lot of the correct, move on to the next one or like skip ones that the student finds easy or something
+        - do a quiz or something after every time a user completes a stepping stone (all 3 or whatever lessons, not just one)
         - remove azure thing
         - ability to rename libraries
         - give estimations based on file input size (ex: 500kb --> 10 minutes, etc... make them highly conservative,)

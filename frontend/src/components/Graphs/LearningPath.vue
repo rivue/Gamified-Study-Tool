@@ -19,7 +19,6 @@
             <CogIcon class="w-10 h-10" />
         </button>
 
-
         <!-- @click="showAddNodeModal = true" -->
         <!-- Fixed Add Stepping Stone Button - Center Top -->
         <!-- <div class="fixed top-24 right- z-10">
@@ -162,7 +161,7 @@
                                 style="color: var(--color-primary-light);">
                                 <!-- {{ nodeNameErrors }} -->
                                 <span v-for="(error, index) in nodeNameErrors" :key="index">{{ error
-                                }}<br></span>
+                                    }}<br></span>
 
                             </p>
                         </div>
@@ -241,18 +240,57 @@
                             <XMarkIcon class="w-6 h-6" />
                         </button>
                     </div>
+                    
+                    <!-- Info message about instant changes -->
+                    <div class="flex items-start gap-2 p-3 mb-4 rounded-lg" 
+                         style="background-color: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.2);">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0 mt-0.5" 
+                             viewBox="0 0 20 20" fill="currentColor" style="color: var(--color-primary-light);">
+                            <path fill-rule="evenodd" 
+                                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9z" 
+                                  clip-rule="evenodd" />
+                        </svg>
+                        <p class="text-sm" style="color: var(--color-primary-light);">
+                            Changes are applied automatically and take effect immediately.
+                        </p>
+                    </div>
 
                     <!-- 💡 Your settings controls go here: -->
                     <div class="space-y-4">
-                        <!-- Example placeholder setting -->
+                        <!-- Course Visibility Toggle -->
                         <div>
                             <label class="block text-sm font-medium mb-1" style="color: var(--highlight-color);">
-                                Dark Mode
+                                Course Visibility
                             </label>
-                            <input type="checkbox" /> Enable dark mode
+                            <div class="flex mt-2 p-2 rounded-lg" style="background-color: var(--background-color-1t);">
+                                <button @click="setLibraryIsPublicStatus(true)"
+                                    class="flex-1 py-2 px-3 rounded-lg transition-colors"
+                                    :disabled="isUpdatingVisibility" :style="{
+                                        backgroundColor: isPublic ? 'var(--element-color-1)' : 'transparent',
+                                        color: isPublic ? 'var(--light-text)' : 'var(--highlight-color)'
+                                    }">
+                                    <span v-if="isUpdatingVisibility && pendingStatus === true">
+                                        <!-- Loading spinner icon here -->
+                                    </span>
+                                    <span v-else>Public</span>
+                                </button>
+                                <button @click="setLibraryIsPublicStatus(false)"
+                                    class="flex-1 py-2 px-3 rounded-lg transition-colors" :style="{
+                                        backgroundColor: !isPublic ? 'var(--element-color-1)' : 'transparent',
+                                        color: !isPublic ? 'var(--light-text)' : 'var(--highlight-color)'
+                                    }">
+                                    <span v-if="isUpdatingVisibility && pendingStatus === true">
+                                        <!-- Loading spinner icon here -->
+                                    </span>
+                                    <span v-else>Private</span>
+                                </button>
+                            </div>
+                            <p class="text-xs mt-1" style="color: var(--color-primary-light);">
+                                {{ !!(isPublic) ? 'Anyone can view this course' : 'Only you can access this course' }}
+                            </p>
                         </div>
 
-                        <!-- Add more settings fields as you need -->
+                        <!-- Add more settings fields as needed -->
                     </div>
 
                     <div class="mt-6 flex justify-end">
@@ -270,7 +308,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
+import { ref, watch, onMounted, onUnmounted } from 'vue'
 import {
     StarIcon,
     BookOpenIcon,
@@ -310,18 +348,24 @@ const props = defineProps({
     unitSectionMap: {
         type: Array,
         required: true
+    },
+    libraryIsPublic: {
+        type: Boolean,
+        required: true
     }
 })
 
-// const isDataReady = computed(() => {
-//     return rawUnitData; //props.unitSectionMap && props.unitSectionMap.length > 0
-// })
-
 const rawUnitData = ref();
+const isPublic = ref(false);
 
 watch(() => props.unitSectionMap, (newVal) => {
     rawUnitData.value = newVal;
 }, { deep: true, immediate: true })
+
+// Initialize libraryIsPublic from props
+watch(() => props.libraryIsPublic, (newVal) => {
+    isPublic.value = newVal;
+}, { immediate: true });
 
 // State for adding new nodes
 const showAddNodeModal = ref(false)
@@ -332,6 +376,8 @@ const fileError = ref('')
 const isAddingNode = ref(false)
 const gameStore = useGameStore()
 const showSettingsModal = ref(false)
+const isUpdatingVisibility = ref(false);
+const pendingStatus = ref<boolean | null>(null);
 
 // Track selected room for tooltip
 const selectedRoomId = ref(null)
@@ -364,6 +410,28 @@ const getUnitColor = (unitIndex) => {
 const getUnitGradient = (unitIndex) => {
     const colorIndex = unitIndex % unitColors.length
     return `linear-gradient(135deg, ${unitColors[colorIndex]}, ${unitColors[colorIndex]})`
+}
+
+const setLibraryIsPublicStatus = (newStatus: boolean) => {
+
+    isUpdatingVisibility.value = true;
+    pendingStatus.value = newStatus;
+
+    axios.post(`/api/library/visibility_status/${library_id}`, {
+        libraryId: library_id,
+        newStatus: newStatus
+    })
+        .then(() => {
+            // console.log('Library visibility updated:', response.data);
+            isPublic.value = newStatus;
+        })
+        .catch(() => {
+            // console.error('Error updating library visibility:', error);
+        })
+        .finally(() => {
+            isUpdatingVisibility.value = false;
+            pendingStatus.value = null;
+        });
 }
 
 // Get global section index (for offset and icon selection)
@@ -685,14 +753,19 @@ const handleScroll = () => {
 }
 
 @media (max-width: 600px) {
-  .scrollContainer {
-    position: static !important;    /* let it flow in the document */
-    transform: none !important;     /* cancel any translateY() you had */
-    margin: 0.5rem auto 0;          /* just a little space under the title */
-    width: 100%;                    /* full width so it’s centered */
-    display: flex;                  /* keep your flex layout */
-    justify-content: center;        /* center the items horizontally */
-  }
+    .scrollContainer {
+        position: static !important;
+        /* let it flow in the document */
+        transform: none !important;
+        /* cancel any translateY() you had */
+        margin: 0.5rem auto 0;
+        /* just a little space under the title */
+        width: 100%;
+        /* full width so it’s centered */
+        display: flex;
+        /* keep your flex layout */
+        justify-content: center;
+        /* center the items horizontally */
+    }
 }
-
 </style>

@@ -7,6 +7,7 @@
             :room-names="library.data.room_names"
             :room-data="library.room_data"
             :unit-section-map="library.data.unit_to_section_map" 
+            :library-is-public="library.data.is_public"
             />
         </div>
         <div v-else-if="loading">
