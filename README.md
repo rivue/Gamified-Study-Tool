@@ -59,6 +59,10 @@ TODO list:
 
     LAUNCH LIST: goal: July 6th then start working on social media posts
 
+
+        password thing
+            - test password with spaces at beginning / end
+
         hard probably (goal: 2 high level bullet points / wk):
         - ✅ ⭐️ Finish sections + units
             - ⭐️ Add ability to add each section to each unit (later --> come back to, reminder to make it account for 1-n number of sections no matter how that looks. add new stepping stones button is commented out for now)
@@ -104,6 +108,7 @@ TODO list:
         - ⭐️ add ability to see uploaded files in library (list of their names) and maybe even file preview (would require nosql db or something maybe)
 
         medium (chip away at when tired / mentally exhausted from hard ones):
+        - ✅ ⭐️ ⭐️ ⭐️ fix weird library duplicate generation thing
         - ✅ ⭐️ ability to "star" / "favorite" a course
         - implement game "score" logic (if you get >80% #attemps:number of questions ratio) then you get more / less points or something, etc...
             - ⭐️ save for later, just do a basic fire streak thing for now, maybe with 5, 10, 20, 50, 100 day streak animations from Lottie Files and animations for streak loosing as well
@@ -119,6 +124,7 @@ TODO list:
         - ⭐️ add i-card for all users, maybe description about the library along with a preview of the files used in the library and maybe also users who are members of the library or something 
             - maybe this would be near leaderboard or something
             - this would be a tab / icon in one of the vertical menu bar thing I want to add
+        - ⭐️ add staging / pre-production environment that isn't localhost
         
         easy (same as medium): 
         - ⭐️ fix Aryan's problem with viewing it on his phone
@@ -199,6 +205,7 @@ TODO list:
             2) other resources button where other youtube videos / articles are researched in relation to the topic (grab the resources based on content, not necessarily the name of the section)
 
         - make a constants file for discord links, twitter / x links, any backend urls, etc...
+            - make it available for both frontend and backend
         - for short answer, 1) make it one word (for now) and most importantly 2) make sure the exact word is in the other side of the card
         - look into adding a resizable area somewhere in your site (like how turbo learn has it) but like people can't change it
 
