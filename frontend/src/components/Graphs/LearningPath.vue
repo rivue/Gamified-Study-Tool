@@ -270,7 +270,7 @@
                                         color: isPublic ? 'var(--light-text)' : 'var(--highlight-color)'
                                     }">
                                     <span v-if="isUpdatingVisibility && pendingStatus === true">
-                                        <!-- Loading spinner icon here -->
+                                        <CogIcon class="w-5 h-5 animate-spin inline" />
                                     </span>
                                     <span v-else>Public</span>
                                 </button>
@@ -280,7 +280,7 @@
                                         color: !isPublic ? 'var(--light-text)' : 'var(--highlight-color)'
                                     }">
                                     <span v-if="isUpdatingVisibility && pendingStatus === true">
-                                        <!-- Loading spinner icon here -->
+                                        <CogIcon class="w-5 h-5 animate-spin inline" />
                                     </span>
                                     <span v-else>Private</span>
                                 </button>

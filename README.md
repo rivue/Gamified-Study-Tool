@@ -86,10 +86,9 @@ TODO list:
 
         - ⭐️ For course owner, add a “settings” gear button maybe to the left / right of the course name
                 this would enable them to add people / delete people, change visibility settings I think? or check different boxes for question types, or see users or something
-                for normal users there could be an i-card button used to see course files or something, maybe 
                 users could add a note for each unit or something
                 - add an option on both the library carousel screen and in the actual library page itself
-                - backfill true / false for is_public (true)
+                - ⭐️ backfill true / false for is_public (true)
         do vthisv right after ^this^
         - ⭐️ visibility of different courses? are they all public like quizlet or am I trying to form a tight knit group like clash royale?
             - Note: see grok for potential implementation, and ask grok abt enums for roles (creator, member, maintainer, etc...)
@@ -117,6 +116,9 @@ TODO list:
             - note: easy to get rid of in the frontend, but have to remove lots of stuff in backend w/ various function calls and stuff
         - ⭐️ add some other types of games / questions (ex: true / false, very detailed / specific questions, sorting, compare / contrast, analigies, image based stuff (not sure how to implement) 6 options choose 1-6, etc... see list below)
         - ⭐️ all the other routes and stuff (terms & policies, buying subscription)
+        - ⭐️ add i-card for all users, maybe description about the library along with a preview of the files used in the library and maybe also users who are members of the library or something 
+            - maybe this would be near leaderboard or something
+            - this would be a tab / icon in one of the vertical menu bar thing I want to add
         
         easy (same as medium): 
         - ⭐️ fix Aryan's problem with viewing it on his phone
