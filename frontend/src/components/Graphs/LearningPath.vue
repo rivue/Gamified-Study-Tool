@@ -1,15 +1,22 @@
 <template>
     <div class="fixed left-8 right-8 top-0 bottom-0 overflow-hidden">
         <button @click="scroll('left')"
-            class="fixed left-8 top-1/2 -translate-y-1/2 bg-black/30 backdrop-blur-sm shadow-lg rounded-full p-4 hover:bg-black/40 z-10"
+            class="fixed left-8 top-1/2 -translate-y-1/2 bg-black/30 backdrop-blur-sm shadow-md rounded-full p-4 hover:bg-black/40 z-10"
             style="color: var(--highlight-color);">
             <ChevronLeftIcon class="w-12 h-12" />
         </button>
 
         <button @click="scroll('right')"
-            class="fixed right-8 top-1/2 -translate-y-1/2 bg-black/30 backdrop-blur-sm shadow-lg rounded-full p-4 hover:bg-black/40 z-10"
+            class="fixed right-8 top-1/2 -translate-y-1/2 bg-black/30 backdrop-blur-sm shadow-md rounded-full p-4 hover:bg-black/40 z-10"
             style="color: var(--highlight-color);">
             <ChevronRightIcon class="w-12 h-12" />
+        </button>
+
+        <!-- Settings Button: fixed top-right -->
+        <button @click="toggleSettings"
+            class="fixed top-20 right-6 bg-black/30 backdrop-blur-sm shadow-md rounded-full p-4 hover:bg-black/40 z-10"
+            style="color: var(--highlight-color);">
+            <CogIcon class="w-10 h-10" />
         </button>
 
         <!-- @click="showAddNodeModal = true" -->
@@ -32,7 +39,7 @@
         </div> -->
 
         <div ref="scrollContainer"
-            class="w-full h-full overflow-x-auto overflow-y-hidden cursor-grab active:cursor-grabbing"
+            class="scrollContainer w-full h-full overflow-x-auto overflow-y-hidden cursor-grab active:cursor-grabbing"
             @mousedown="startDragging" @mousemove="drag" @mouseup="stopDragging" @mouseleave="stopDragging"
             @touchstart="startDragging" @touchmove="drag" @touchend="stopDragging" @scroll="handleScroll">
             <!-- Modified to ensure first node is visible -->
@@ -144,6 +151,13 @@
                                 class="text-red-400 hover:text-red-300">
                                 <XCircleIcon class="w-6 h-6" />
                             </button>
+                            <p v-if="nodeNameErrors.length" class="mt-1 text-sm"
+                                style="color: var(--color-primary-light);">
+                                <!-- {{ nodeNameErrors }} -->
+                                <span v-for="(error, index) in nodeNameErrors" :key="index">{{ error
+                                    }}<br></span>
+
+                            </p>
                         </div>
                         <button @click="addNodeNameField" class="mt-2 text-sm font-medium flex items-center gap-1"
                             style="color: var(--highlight-color);">
@@ -216,6 +230,85 @@
         </div>
     </Transition>
 
+        <!-- Settings Modal -->
+        <Transition name="modal">
+            <div v-if="showSettingsModal" class="fixed inset-0 flex items-center justify-center z-50 p-4"
+                style="background-color: var(--background-haze);">
+                <div class="rounded-2xl p-6 w-full max-w-md shadow-xl border"
+                    style="background-color: var(--background-color); color: var(--light-text); border-color: var(--color-primary-dark);">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-semibold" style="color: var(--light-text);">
+                            Settings
+                        </h2>
+                        <button @click="toggleSettings" style="color: var(--highlight-color);">
+                            <XMarkIcon class="w-6 h-6" />
+                        </button>
+                    </div>
+                    
+                    <!-- Info message about instant changes -->
+                    <div class="flex items-start gap-2 p-3 mb-4 rounded-lg" 
+                         style="background-color: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.2);">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0 mt-0.5" 
+                             viewBox="0 0 20 20" fill="currentColor" style="color: var(--color-primary-light);">
+                            <path fill-rule="evenodd" 
+                                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9z" 
+                                  clip-rule="evenodd" />
+                        </svg>
+                        <p class="text-sm" style="color: var(--color-primary-light);">
+                            Changes are applied automatically and take effect immediately.
+                        </p>
+                    </div>
+
+                    <!-- 💡 Your settings controls go here: -->
+                    <div class="space-y-4">
+                        <!-- Course Visibility Toggle -->
+                        <div>
+                            <label class="block text-sm font-medium mb-1" style="color: var(--highlight-color);">
+                                Course Visibility
+                            </label>
+                            <div class="flex mt-2 p-2 rounded-lg" style="background-color: var(--background-color-1t);">
+                                <button @click="setLibraryIsPublicStatus(true)"
+                                    class="flex-1 py-2 px-3 rounded-lg transition-colors"
+                                    :disabled="isUpdatingVisibility" :style="{
+                                        backgroundColor: isPublic ? 'var(--element-color-1)' : 'transparent',
+                                        color: isPublic ? 'var(--light-text)' : 'var(--highlight-color)'
+                                    }">
+                                    <span v-if="isUpdatingVisibility && pendingStatus === true">
+                                        <CogIcon class="w-5 h-5 animate-spin inline" />
+                                    </span>
+                                    <span v-else>Public</span>
+                                </button>
+                                <button @click="setLibraryIsPublicStatus(false)"
+                                    class="flex-1 py-2 px-3 rounded-lg transition-colors" :style="{
+                                        backgroundColor: !isPublic ? 'var(--element-color-1)' : 'transparent',
+                                        color: !isPublic ? 'var(--light-text)' : 'var(--highlight-color)'
+                                    }">
+                                    <span v-if="isUpdatingVisibility && pendingStatus === true">
+                                        <CogIcon class="w-5 h-5 animate-spin inline" />
+                                    </span>
+                                    <span v-else>Private</span>
+                                </button>
+                            </div>
+                            <p class="text-xs mt-1" style="color: var(--color-primary-light);">
+                                {{ !!(isPublic) ? 'Anyone can view this course' : 'Only you can access this course' }}
+                            </p>
+                        </div>
+
+                        <!-- Add more settings fields as needed -->
+                    </div>
+
+                    <div class="mt-6 flex justify-end">
+                        <button @click="toggleSettings" class="px-4 py-2 rounded-lg border"
+                            style="border-color: var(--color-primary); color: var(--highlight-color);">
+                            Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </Transition>
+
+
+    </div>
 </template>
 
 <script setup lang="ts">
@@ -259,14 +352,23 @@ const props = defineProps({
     unitSectionMap: {
         type: Array,
         required: true
+    },
+    libraryIsPublic: {
+        type: Boolean,
+        required: true
     }
 })
-0
 const rawUnitData = ref();
+const isPublic = ref(false);
 
 watch(() => props.unitSectionMap, async (newVal) => {
     rawUnitData.value = newVal;
 }, { deep: true, immediate: true })
+
+// Initialize libraryIsPublic from props
+watch(() => props.libraryIsPublic, (newVal) => {
+    isPublic.value = newVal;
+}, { immediate: true });
 
 // State for adding new nodes
 const showAddNodeModal = ref(false)
@@ -276,6 +378,9 @@ const nodeNameErrors = ref([])
 const fileError = ref('')
 const isAddingNode = ref(false)
 const gameStore = useGameStore()
+const showSettingsModal = ref(false)
+const isUpdatingVisibility = ref(false);
+const pendingStatus = ref<boolean | null>(null);
 
 // Track selected room for tooltip
 const selectedRoomId = ref(null)
@@ -293,6 +398,11 @@ const unitColors = [
     '#e74c3c', // red
 ]
 
+
+function toggleSettings() {
+    showSettingsModal.value = !showSettingsModal.value
+}
+
 // Get color for a unit based on its index
 const getUnitColor = (unitIndex) => {
     const colorIndex = unitIndex % unitColors.length
@@ -303,6 +413,37 @@ const getUnitColor = (unitIndex) => {
 const getUnitGradient = (unitIndex) => {
     const colorIndex = unitIndex % unitColors.length
     return `linear-gradient(135deg, ${unitColors[colorIndex]}, ${unitColors[colorIndex]})`
+}
+
+const setLibraryIsPublicStatus = async (newStatus: boolean) => {
+
+    if (isPublic.value === newStatus) {
+        return; // No change needed
+    }
+
+    const prev = isPublic.value;
+
+    isPublic.value = newStatus;
+
+    isUpdatingVisibility.value = true;
+    // pendingStatus.value = newStatus;
+
+    axios.post(`/api/library/visibility_status/${library_id}`, {
+        libraryId: library_id,
+        newStatus: newStatus
+    })
+        .then(() => {
+            // console.log('Library visibility updated:', response.data);
+            isPublic.value = newStatus;
+        })
+        .catch(() => {
+            // console.error('Error updating library visibility:', error);
+            isPublic.value = prev; // Revert to previous state on error
+        })
+        .finally(() => {
+            isUpdatingVisibility.value = false;
+            // pendingStatus.value = null;
+        });
 }
 
 // Get global section index (for offset and icon selection)
@@ -628,5 +769,22 @@ const handleScroll = () => {
 .modal-enter-from,
 .modal-leave-to {
     opacity: 0;
+}
+
+@media (max-width: 600px) {
+    .scrollContainer {
+        position: static !important;
+        /* let it flow in the document */
+        transform: none !important;
+        /* cancel any translateY() you had */
+        margin: 0.5rem auto 0;
+        /* just a little space under the title */
+        width: 100%;
+        /* full width so it’s centered */
+        display: flex;
+        /* keep your flex layout */
+        justify-content: center;
+        /* center the items horizontally */
+    }
 }
 </style>

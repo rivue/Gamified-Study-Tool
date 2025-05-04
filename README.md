@@ -4,8 +4,31 @@ Tool that allows users to input things like lecture recordings, lecture slides, 
 IDEAS:
 
     ideas for grand plan / future:
+        - Brain-Computer Interface (BCI) Integrations
+            For researchers with EEG headsets: detect attention lapses or cognitive overload and adapt content pacing in real time.
+
+        - Wearable Haptic Feedback
+            Study flashcards on your smartwatch; correct answers give a gentle vibration “ping,” wrong ones a soft double-tap—learn on the go without looking at a screen.
+
+        - Voice-First Study Mode
+            Hands-free “audio textbooks”: speak your answers, get immediate verbal feedback, and use simple voice commands (“Next question,” “Explain that again”).
+        - Mentor Matching Engine
+            Based on your goals, invite advanced peers or volunteer mentors (e.g. alumni, grad students) for scheduled office-hour chats—AI helps coordinate agendas and follow-ups.
+        - Automated Mind-Map Composer
+            Feed in your scattered notes or highlights; the AI weaves them into a dynamic mind-map with draggable nodes, auto-grouped by theme, and “chain reactions” that show how mastering one idea unlocks another.
+        - Embedded “Anywhere” Widgets
+            -Drop a small embed on any website (Wikipedia article, corporate wiki, Slack channel) that launches a context-aware mini-lesson or flashcard deck tied to that page’s topic.
+        -Plugin Marketplace & Open SDK
+            Let third-party devs create specialized modules—math equation solvers, language pronunciation bots, domain-specific mini-games—and distribute them through an “App Store” for your platform.
+            -Enterprise & University LMS Connectors
+            One-click import of campus syllabi, grade-book sync, auto-provisioned cohorts based on student enrollment lists.
         - create a community discord server (configure the current one)
         - create cheap vr cardboard cutouts of headsets where you can put your phone --> give to high schools possibly for free once you partner with them
+           - AR Annotations & Pop-Ups
+                Point your phone at a page of a textbook (or whiteboard) and see AI-generated overlays—diagrams that float in 3D, step-by-step solution hints, pronunciation guides for foreign-language vocab, and interactive “hotspots” you can tap for mini-quizzes.
+
+            - Virtual Lab Simulations
+            launch fully simulated physics, chemistry, or biology experiments in the browser or VR headset. Mix chemicals, wire circuits, dissect virtual frogs—all with real-time AI guidance and safety feedback.
             - have to think specifically of who / what to target for MVP, etc... so as little time as possibly gets wasted building something that either 1) is outside of my domain of expertise or 2) other people might build (repeat of unclear jupyterhub research)
             - not sure where to go from there, lots of places though
         - see google doc for more plans for resume (or just repomix this whole codebase into gpt / grok / gemini / claude, etc..)
@@ -34,7 +57,7 @@ IDEAS:
 
 TODO list:
 
-    LAUNCH LIST: goal: July 6th, (note: once you are tired / exhausted from working on something big, chip away at easier things to keep motivated or whatever, maybe try to use claude 3.7 in the way anthropic uses it w/ git-branching / versioning?)
+    LAUNCH LIST: goal: July 6th then start working on social media posts
 
 
         password thing
@@ -53,23 +76,26 @@ TODO list:
             - ⭐️ Delete sections requires entering the name of the unit / course just for accidental reasons)
             - ⭐️ Delete Units( requires entering the name of the unit / course just for accidental reasons)
             - ⭐️ Delete courses / libraries (whatever they're called) (requires entering the name of the unit / course just for accidental reasons)
-            - ⭐️ Remember to delete from both DB and pinecone as well, as well as respective child / parent courses / units / sections / libraries, roomNameState, LibraryFavorites etc...
-        - ⭐️ (needs multiple people first) leaderboard / game point tracking system
+            - ⭐️ Remember to delete from both DB and pinecone as well, as well as respective child / parent courses / units / sections / libraries, roomNameState, LibraryFavorites, question, question_choice, etc...
+        - ⭐️ (courses need ability to add multiple people first) leaderboard / game point tracking system
         - (might take at least a couple weeks) ⭐️ UI redesign / rehaul *** --> kinnu, duolingo, saved instagram design reels etc..
             - Note: 1) try to see what horizontal --> vertical learning path looks like, and possibly make a vertical bar on the side for settings, i-card, files list, adding a new stepping stone, etc... but maybe keep lesson name and current unit name at the top?
             - note: maybe change top navbar to be a constant hovering side menu on the side / bottom of the screen maybe similar to duolingo and possibly replace "my library", "settings", etc.. with actual icons
             - also note: ask gemini / grok / gpt / claude for some ui design tips like adding a menu bar, or ui tips / tricks / helpful websites / youtube videos, etc...
             - note: for main page, add two / 3 simple boxes, class you want, school, and possibly professor, and it gives you classes close to you like quizlet / rate my professor along with option for creating your own
                 maybe it shows private ones with a "lock" icon and prompts you to enter a password. this way it would be like more of a network, which would differentiate us from a copy paste ai study tool (turbolearn) / NotebookLM
+            - ability to verify by school email which helps with filtering results?
         - ⭐️ Stripe implementation
             - have to think abt what different payment levels mean / how I want to do it
 
         - ⭐️ For course owner, add a “settings” gear button maybe to the left / right of the course name
                 this would enable them to add people / delete people, change visibility settings I think? or check different boxes for question types, or see users or something
-                for normal users there could be an i-card button used to see course files or something, maybe 
                 users could add a note for each unit or something
+                - add an option on both the library carousel screen and in the actual library page itself
+                - ✅ ⭐️ backfill true / false for is_public (true)
         do vthisv right after ^this^
-        - ⭐️ visibility of different courses? are they all public like quizlet or am I trying to form a tight knit group like turbolearn / clash of clans?
+        - ⭐️ visibility of different courses? are they all public like quizlet or am I trying to form a tight knit group like clash royale?
+            - Note: see grok for potential implementation, and ask grok abt enums for roles (creator, member, maintainer, etc...)
             - ⭐️ default public, creator can toggle private / public both in course creation and after course is created
             - ⭐️ add ability / a page for searching for public courses
             - ⭐️ for private, users would need some sort of short invite code, but maybe don't necessarily need to be friends for now, maybe it could be like kahoot or something where they don't have to be friends
@@ -95,12 +121,15 @@ TODO list:
             - note: easy to get rid of in the frontend, but have to remove lots of stuff in backend w/ various function calls and stuff
         - ⭐️ add some other types of games / questions (ex: true / false, very detailed / specific questions, sorting, compare / contrast, analigies, image based stuff (not sure how to implement) 6 options choose 1-6, etc... see list below)
         - ⭐️ all the other routes and stuff (terms & policies, buying subscription)
+        - ⭐️ add i-card for all users, maybe description about the library along with a preview of the files used in the library and maybe also users who are members of the library or something 
+            - maybe this would be near leaderboard or something
+            - this would be a tab / icon in one of the vertical menu bar thing I want to add
         - ⭐️ add staging / pre-production environment that isn't localhost
         
         easy (same as medium): 
         - ⭐️ fix Aryan's problem with viewing it on his phone
         - ⭐️ should not be able to make duplicate unit and section names
-        - ⭐️ add a "scroll to front", "scroll to current", and "scroll to end" feature for map page
+        - ⭐️ add "scroll to front", "scroll to current", and "scroll to end" button for map page
             - also, maybe change it to vertical
         - ⭐️ add tips for making a new stepping stone (i.e. make sure it aligns with what you put, etc... )
         - ⭐️ add check for duplicate room name for the time being - maybe allow it later down the line?
@@ -118,6 +147,40 @@ TODO list:
 
     general:
     study tool additions / ideas:
+        - Skill Trees & Talent Builds
+            Visualize your mastery like a character in an RPG—choose to specialize (“speed-reader” vs. “deep-diver”) and unlock branching benefits (fast flash-review vs. deeper case studies).
+        - Hypothesis Playground
+            Sketch out your own mini-experiments or thought experiments, and the AI simulates outcomes (e.g. “What if temperature doubles in reaction X?”), giving you rapid feedback on plausibility.
+        - Total Accessibility Suite
+            Real-time audio narration, sign-language avatar translations, dyslexia-friendly fonts, high-contrast themes, and language-learner mode with instant look-up pop-ups.
+        - Mindfulness & Mental Fitness
+            Short, AI-led breathing exercises or “cognitive resets” before tough modules to reduce anxiety and boost retention.
+        - Sentiment & Engagement Signals
+            Analyze discussion-board posts, free-form answers and chat logs to surface concepts that trigger frustration, confusion, or boredom—and then automatically generate supportive hint-videos or alternative explanations.
+        - “Predict & Prescribe” Engine
+            Using aggregated, anonymized data, forecast which upcoming topics will trip up learners like you—and auto-prepare targeted readiness modules (“heads-up: many students struggle with substitution integrals next week!”).
+        - Real-Time Study “Rooms”
+            Join or host live co-study sessions: everyone works on the same module side-by-side, can chat or voice-call, swap spontaneous quizzes, and “ping” each other for help.
+
+        - Peer-Graded Projects & Code Review
+            For subjects like programming or writing, submit a project, get assigned 2–3 peers to review and grade, then earn badges for quality feedback.
+
+        - Challenge Tournaments & Hackathons
+            Weekly themed challenges (e.g. “Graph Theory Weekend”) where students compete individually or in teams to solve increasingly tough problems—complete with real-time leaderboards and “tournament brackets.”
+        - Dynamic Difficulty Tuning
+            As soon as the AI detects you’re breezing through one concept, it injects a harder “speed-run” sub-quiz or a real-world problem to keep you challenged. If you falter, it auto-spawns bite-sized remediation (“micro-lessons”) until mastery.
+        - tailor the prompt / library to that specific class (ex: thermodynamics = engineering style problems, chemist = real life examples, etc...)
+        - add a knowledge graph / knowledge map as one of the option on the vertical left side bar thing
+        - shared milestones as opposed to just single user milestones / leaderboards
+        - ability for voice enabled options
+        - study groups / peer quizzes - not sure how to approach this one
+        - ideas for multi-modal content: draggable vectors for physics, audio summaries / transcrips for learning on the go
+        - button at the bottom of the page for daily review (here is where we implement spaced repitition scheduling)
+        - generate a lot of different questions and if a student gets a lot of the correct, move on to the next one or like skip ones that the student finds easy or something
+        - ⭐️ ⭐️ do a quiz or something at the end of a user completing a stepping stone for the first time (all 3 or whatever lessons, not just one)
+                reinforce the quiz with questions from tests from that school's test bank, and could get users to take pictures of their tests or something to popularize test banks in general
+        - remove azure thing
+        - ability to rename libraries
         - give estimations based on file input size (ex: 500kb --> 10 minutes, etc... make them highly conservative,)
             - we could also section it off, like load part of it at a time, or load it in the background 
                 while the user it playing an already unlocked game or something

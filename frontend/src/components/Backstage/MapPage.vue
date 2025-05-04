@@ -6,6 +6,7 @@
             :libraryId="library.data.id"
             :room-names="library.data.room_names"
             :room-data="library.room_data"
+            :library-is-public="library.data.is_public"
             :unit-section-map="processedUnitSectionMap" 
             />
         </div>

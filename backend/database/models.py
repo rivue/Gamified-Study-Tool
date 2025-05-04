@@ -166,6 +166,7 @@ class Library(db.Model):
     language = db.Column(db.String(50), nullable=False)
     language_difficulty = db.Column(db.String(50), nullable=False)
     context = db.Column(db.String(200), nullable=True)
+    is_public = db.Column(db.Boolean, default=True, nullable=True)
 
     clicks = db.Column(db.Integer, default=0)
     likes = db.Column(db.Integer, default=0)

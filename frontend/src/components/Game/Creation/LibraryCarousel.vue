@@ -77,7 +77,7 @@
 import { ref, computed, watch, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { Input } from "@/components/ui/input";
-import { StarIcon, PlusIcon } from "@heroicons/vue/24/solid";
+import { StarIcon } from "@heroicons/vue/24/solid";
 import { Table, TableRow, TableBody, TableCell } from "@/components/ui/table";
 import axios from "axios";
 // Props

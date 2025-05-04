@@ -232,7 +232,6 @@ def init_library_routes(app):
         
         library_topic = request.args.get("library_topic", None)
 
-
         user_id = current_user.id if not isinstance(current_user, AnonymousUserMixin) else None
         library = lbh.get_library(library_id, user_id)
 
@@ -437,6 +436,40 @@ def init_library_routes(app):
         except Exception as e:
             return jsonify(status="error", message=f"Failed to update library favorited status: {str(e)}"), 500
         
+    @app.route("/api/library/visibility_status/<int:library_id>", methods=["GET", "POST"])
+    def library_visibility_status(library_id):
+        try:
+            if request.method == "GET":
+                
+                user_id = current_user.id if not isinstance(current_user, AnonymousUserMixin) else None
+                if not user_id:
+                    return jsonify(status="error", message="Must be logged in to check library visibility status."), 403
+                
+                visibility_status = lbh.get_library_visibility_status(user_id, library_id)
+            
+                if visibility_status is None:
+                    return jsonify(status="error", message="Library not found."), 404
+                
+                return jsonify({'is_public': visibility_status}), 200
+            
+            elif request.method == "POST":
+                data = request.get_json()
+                new_status = data.get('newStatus')
+                user_id = current_user.id if not isinstance(current_user, AnonymousUserMixin) else None
+                if not user_id:
+                    return jsonify(status="error", message="Must be logged in to update library visibility status."), 403
+                
+                _, response_status = lbh.update_library_visibility_status(user_id, library_id, new_status)
+                
+                if response_status != 200:
+                    return jsonify(status="error", message="Failed to update library visibility status."), 500
+                
+                return jsonify({'message': 'Library visibility status updated successfully.'}), 200
+            else:
+                return jsonify(status="error", message="Method not allowed"), 405
+        except Exception as e:
+            return jsonify(status="error", message=f"Failed to update library visibility status: {str(e)}"), 500
+    
     @app.route("/api/libraries", methods=["GET"])
     def get_libraries():
         user_id = current_user.id if not isinstance(current_user, AnonymousUserMixin) else None

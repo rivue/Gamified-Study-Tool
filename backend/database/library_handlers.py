@@ -158,6 +158,7 @@ def get_library(library_id, user_id=None, click=True):
         
     library_data = library.as_dict()
     library_data["tutorial"] = True # default
+    library_data["is_public"] = library.is_public
 
     section_to_unit_map = {}
     unit_to_section_map = {}
@@ -504,7 +505,33 @@ def update_library_favorited_status(user_id, library_id, status: bool):
         db.session.rollback()
         return jsonify({"error": str(e)}), 400
     
-def update_library_likes(library_id, status):
+def get_library_visibility_status(library_id):
+    try:
+        library = Library.query.get(library_id)
+        if library is None:
+            return jsonify({'error': 'Library not found'}), 404
+        visibility_status = library.is_public
+        return jsonify({"is_public": visibility_status}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    
+def update_library_visibility_status(user_id, library_id, status: bool):
+    try:
+        user = User.query.get(user_id)
+        library = Library.query.get(library_id)
+        # TODO add a check that user is the creator of library here
+        if library is None:
+            return jsonify({'error': 'Library not found'}), 404
+        if status not in [True, False]:
+            return jsonify({"message": "Invalid status"}), 400
+        library.is_public = status
+        db.session.commit()
+        return jsonify({"message": "Library visibility status updated successfully"}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 400
+    
+def update_library_likes(library_id, status: bool):
     try:
         library = Library.query.get(library_id)
         if library is None:
