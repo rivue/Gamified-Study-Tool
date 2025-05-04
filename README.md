@@ -169,7 +169,8 @@ TODO list:
         - ideas for multi-modal content: draggable vectors for physics, audio summaries / transcrips for learning on the go
         - button at the bottom of the page for daily review (here is where we implement spaced repitition scheduling)
         - generate a lot of different questions and if a student gets a lot of the correct, move on to the next one or like skip ones that the student finds easy or something
-        - do a quiz or something after every time a user completes a stepping stone (all 3 or whatever lessons, not just one)
+        - ⭐️ ⭐️ do a quiz or something at the end of a user completing a stepping stone for the first time (all 3 or whatever lessons, not just one)
+                reinforce the quiz with questions from tests from that school's test bank, and could get users to take pictures of their tests or something to popularize test banks in general
         - remove azure thing
         - ability to rename libraries
         - give estimations based on file input size (ex: 500kb --> 10 minutes, etc... make them highly conservative,)
