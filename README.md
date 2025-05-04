@@ -96,6 +96,13 @@ TODO list:
         - do vthisv right after ^this^
         - ⭐️ visibility of different courses? are they all public like quizlet or am I trying to form a tight knit group like clash royale?
             - ⭐️ for private, users would need some sort of short invite code
+            # then make sure create_libraries uses the join table when it creates a library --> TODO check when you come back from feeding dog
+            # then add functions for swapping public / private to regenerate codes / set them to null
+            # then on generation of libraries that are private, make sure they have join_codes
+            # then add ui ability to join private libraries / public libraries that you didn't create
+
+    # basically in library browser, see all libraries
+    # then add ability to leave libraries (later)
 
         - ⭐️ add google auth
         - ⭐️ let units / sections / courses have spacings / duplicate values as others in db / weird characters / numbers, #($^@{"?}*), etc...

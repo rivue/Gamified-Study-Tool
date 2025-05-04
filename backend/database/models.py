@@ -7,6 +7,7 @@ from datetime import datetime
 import secrets, string
 import hashlib
 import random
+import time
 
 db = SQLAlchemy()
 
@@ -23,13 +24,12 @@ class User(db.Model, UserMixin):
     current_content = db.Column(db.String(500), nullable=True)
     
     experience_points = db.Column(db.Integer, default=0)
-    achievements = db.relationship('UserAchievement', backref='user')
+    achievements = db.relationship('UserAchievement', backref='user', cascade="all, delete-orphan")
 
-    actions = db.relationship('UserAction', backref='user')
+    actions = db.relationship('UserAction', backref='user', cascade="all, delete-orphan")
 
-    chats = db.relationship('ChatHistory', backref='user')
-    lessons = db.relationship('Lesson', backref='user')
-    libraries = db.relationship('LibraryCompletion', backref='user')
+    chats = db.relationship('ChatHistory', backref='user', cascade="all, delete-orphan")
+    lessons = db.relationship('Lesson', backref='user', cascade="all, delete-orphan")
 
     tier = db.Column(db.String(50), default='free')  # 'free', 'paid', 'pro'
     daily_request_count = db.Column(db.Integer, default=0)
@@ -43,6 +43,14 @@ class User(db.Model, UserMixin):
 
     password_reset_token = db.Column(db.String(100), nullable=True)
     password_reset_sent_at = db.Column(db.DateTime, nullable=True)
+    
+    owned_libraries = db.relationship('Library', foreign_keys='Library.owner_id', # Specify the foreign key column in Library
+        back_populates='owner', lazy='dynamic', cascade="all, delete-orphan") # If user deleted, delete their libraries too
+
+    # 2. Library Memberships (Many-to-Many via Association Object)
+    # 'library_memberships' will be a list of LibraryMembership objects
+    library_memberships = db.relationship('LibraryMembership', back_populates='user', cascade="all, delete-orphan", # If user deleted, remove their memberships
+        lazy='dynamic')
 
     def as_dict(self):
         active_lessons = [lesson.lesson_name for lesson in sorted(
@@ -72,7 +80,17 @@ class User(db.Model, UserMixin):
             # "active_libraries": active_libraries,
             # "completed_libraries": completed_libraries
         }
+        
+        user_data["owned_libraries"] = [lib.library_topic for lib in self.owned_libraries]
+        user_data["joined_libraries_topics"] = [lib.library_topic for lib in self.joined_libraries] # Use the convenience property
+        
         return user_data
+    
+    @property
+    def joined_libraries(self):
+        """Returns a list of Library objects the user is a member of."""
+        # This queries through the LibraryMembership association objects
+        return [membership.library for membership in self.library_memberships]
     
 class IPTracking(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -161,14 +179,21 @@ class Library(db.Model):
     DEFAULT_IMAGE_URL = "https://csb10032002fc59a9f5.blob.core.windows.net/library-images/background.png"
 
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id', name='fk_libary_user_id'), nullable=True)
+    owner_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    owner = db.relationship('User', foreign_keys=[owner_id],
+        back_populates='owned_libraries')
+    
+    memberships = db.relationship('LibraryMembership', back_populates='library', cascade="all, delete-orphan", # If library deleted, remove memberships
+        lazy='dynamic')
+
     library_topic = db.Column(db.String(200), nullable=False)
     difficulty = db.Column(db.String(50), nullable=False)
     guide = db.Column(db.String(50), nullable=False, default=lambda: random.choice(["Azalea", "Irona", "Bubbles", "Sterling"]))
     language = db.Column(db.String(50), nullable=False)
     language_difficulty = db.Column(db.String(50), nullable=False)
     context = db.Column(db.String(200), nullable=True)
-    is_public = db.Column(db.Boolean, default=True, nullable=True)
+    is_public = db.Column(db.Boolean, default=True, nullable=False)
     join_code = db.Column(db.String(8), unique=True, nullable=True, default=lambda: Library._generate_unique_code())
 
     clicks = db.Column(db.Integer, default=0)
@@ -179,16 +204,32 @@ class Library(db.Model):
     
     units = db.relationship('LibraryUnit', backref='library', cascade="all, delete-orphan", lazy=True)
 
-    factoids = db.relationship('LibraryFactoid', backref='library')
+    factoids = db.relationship('LibraryFactoid', backref='library', cascade="all, delete-orphan")
     
     @classmethod
     def _generate_unique_code():
+        code_length = 8
         alphabet = string.ascii_uppercase + string.digits
         while True:
-            code = ''.join(secrets.choice(alphabet) for _ in range(length))
+            code = ''.join(secrets.choice(alphabet) for _ in range(code_length))
             # quick in‑memory test; the UNIQUE constraint is the final guard
             if not db.session.query(cls.id).filter_by(join_code=code).first():
                 return code
+            time.sleep(0.01)
+
+    def set_privacy(self, public: bool):
+        """Sets the library's privacy and manages the join code."""
+        if public == self.is_public:
+            return # No change needed
+
+        self.is_public = public
+        if not public:
+            # Make private: Generate a code if it doesn't have one
+            if not self.join_code:
+                self.join_code = self._generate_unique_code()
+        else:
+            # Make public: Remove the code
+            self.join_code = None
 
     def attach_unit(self, unit: 'LibraryUnit'):
         """Attach a unit to this library"""
@@ -263,6 +304,23 @@ class LibraryFavorites(db.Model): # map of users to libraries they have favorite
     __table_args__ = (
       db.UniqueConstraint("user_id", "library_id", name="uq_user_library_fav"),
     )
+
+# Add this model definition with your other models
+class LibraryMembership(db.Model):
+    __tablename__ = 'library_membership' # Explicit table name is good practice
+
+    # Composite primary key ensures a user can only be a member of a library once
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
+    library_id = db.Column(db.Integer, db.ForeignKey('library.id'), primary_key=True)
+
+    # extra information (just joined_at for now)
+    joined_at = db.Column(db.DateTime, default=datetime.utcnow, server_default=db.func.now())
+
+    user = db.relationship('User', back_populates='library_memberships')
+    library = db.relationship('Library', back_populates='memberships')
+
+    def __repr__(self):
+        return f'<LibraryMembership User {self.user_id} in Library {self.library_id}>'
 
 class LibraryCompletion(db.Model):
     id = db.Column(db.Integer, primary_key=True)

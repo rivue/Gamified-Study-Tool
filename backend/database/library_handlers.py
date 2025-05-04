@@ -14,6 +14,7 @@ from database.models import (
     LibraryQuestion,
     LibraryQuestionChoice,
     LibraryRoomState,
+    LibraryMembership,
     LibraryFavorites,
     LibraryCompletion
 )
@@ -32,17 +33,27 @@ def create_library(
 ):
     
     try:
+        user = User.query.get(user_id)
+        if not user:
+            return jsonify({"message": "User not found"}), 404
+        
         library = Library(
-            user_id=user_id,
+            owner_id=user_id,
+            owner=user,
             library_topic=library_topic,
             room_names=[],
             difficulty=difficulty,
             language=language,
             language_difficulty=language_difficulty,
             guide=guide,
+            join_code=None,
+            is_public=True,
         )
         db.session.add(library)
         db.session.commit()
+        membership, status = create_library_membership(user_id, library.id)
+        if status != 200:
+            return jsonify({"message": f"Library error creating: + {membership}"}), status
         return (
             jsonify(
                 {"message": "Library created successfully", "library_id": library.id}
@@ -531,6 +542,28 @@ def update_library_visibility_status(user_id, library_id, status: bool):
         db.session.rollback()
         return jsonify({"error": str(e)}), 400
     
+def create_library_membership(user_id, library_id):
+    try:
+        library = Library.query.get(library_id)
+        if library is None:
+            return jsonify({'error': 'Library not found'}), 404
+        
+        user = User.query.get(user_id)
+        if user is None:
+            return jsonify({'error': 'User not found'}), 404
+
+        membership = LibraryMembership(
+            user_id=user_id,
+            library_id=library_id,
+            joined_at=datetime.utcnow()
+        )
+        db.session.add(membership)
+        db.session.commit()
+        return jsonify({"message": "Library membership added successfully"}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"message": str(e)}), 400
+    
 def update_library_likes(library_id, status: bool):
     try:
         library = Library.query.get(library_id)
@@ -565,7 +598,6 @@ def add_factoid_to_section(section_id, factoid_content, lesson_name):
     except Exception as e:
         db.session.rollback()
         return jsonify({"message": str(e)}), 400
-
 
 def add_question_to_factoid(factoid_id, question_text, correct_choice, wrong_choices, question_type):
     try:
