@@ -48,7 +48,7 @@ else:
     uri = 'sqlite:///app.db'
 
 # os.makedirs("instance", exist_ok=True)
-app.config['SQLALCHEMY_DATABASE_URI'] = uri
+app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql+psycopg2://postgres.lubdvjbtcknmyycjqyve:rivuetothemoon@aws-0-us-east-1.pooler.supabase.com:5432/postgres"
 print(f"SQLALCHEMY_DATABASE_URI: {app.config['SQLALCHEMY_DATABASE_URI']}")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['REMEMBER_COOKIE_DURATION'] = timedelta(days=7)

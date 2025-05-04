@@ -95,7 +95,7 @@ TODO list:
                 - ✅ ⭐️ backfill true / false for is_public (true)
         - do vthisv right after ^this^
         - ⭐️ visibility of different courses? are they all public like quizlet or am I trying to form a tight knit group like clash royale?
-            - ⭐️ for private, users would need some sort of short invite code, 
+            - ⭐️ for private, users would need some sort of short invite code
 
         - ⭐️ add google auth
         - ⭐️ let units / sections / courses have spacings / duplicate values as others in db / weird characters / numbers, #($^@{"?}*), etc...
