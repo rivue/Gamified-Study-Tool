@@ -2,7 +2,9 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
 from sqlalchemy import JSON
 from sqlalchemy.ext.mutable import MutableList
+from sqlalchemy.exc import IntegrityError
 from datetime import datetime
+import secrets, string
 import hashlib
 import random
 
@@ -167,6 +169,7 @@ class Library(db.Model):
     language_difficulty = db.Column(db.String(50), nullable=False)
     context = db.Column(db.String(200), nullable=True)
     is_public = db.Column(db.Boolean, default=True, nullable=True)
+    join_code = db.Column(db.String(8), unique=True, nullable=True, default=lambda: Library._generate_unique_code())
 
     clicks = db.Column(db.Integer, default=0)
     likes = db.Column(db.Integer, default=0)
@@ -178,6 +181,15 @@ class Library(db.Model):
 
     factoids = db.relationship('LibraryFactoid', backref='library')
     
+    @classmethod
+    def _generate_unique_code():
+        alphabet = string.ascii_uppercase + string.digits
+        while True:
+            code = ''.join(secrets.choice(alphabet) for _ in range(length))
+            # quick in‑memory test; the UNIQUE constraint is the final guard
+            if not db.session.query(cls.id).filter_by(join_code=code).first():
+                return code
+
     def attach_unit(self, unit: 'LibraryUnit'):
         """Attach a unit to this library"""
         

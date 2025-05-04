@@ -88,18 +88,14 @@ TODO list:
         - ⭐️ Stripe implementation
             - have to think abt what different payment levels mean / how I want to do it
 
-        - ⭐️ For course owner, add a “settings” gear button maybe to the left / right of the course name
-                this would enable them to add people / delete people, change visibility settings I think? or check different boxes for question types, or see users or something
+        - ✅ ⭐️ For course owner, add a “settings” gear button maybe to the left / right of the course name
+                - this would enable them to add people / delete people, change visibility settings I think? or check different boxes for question types, or see users or something
                 users could add a note for each unit or something
-                - add an option on both the library carousel screen and in the actual library page itself
+                - add an option on both the library carousel screen and in the actual library page itself like with a little pencil edit icon (maybe later)
                 - ✅ ⭐️ backfill true / false for is_public (true)
-        do vthisv right after ^this^
+        - do vthisv right after ^this^
         - ⭐️ visibility of different courses? are they all public like quizlet or am I trying to form a tight knit group like clash royale?
-            - Note: see grok for potential implementation, and ask grok abt enums for roles (creator, member, maintainer, etc...)
-            - ⭐️ default public, creator can toggle private / public both in course creation and after course is created
-            - ⭐️ add ability / a page for searching for public courses
-            - ⭐️ for private, users would need some sort of short invite code, but maybe don't necessarily need to be friends for now, maybe it could be like kahoot or something where they don't have to be friends
-                but I could add it later if I see demand based on data or something
+            - ⭐️ for private, users would need some sort of short invite code, 
 
         - ⭐️ add google auth
         - ⭐️ let units / sections / courses have spacings / duplicate values as others in db / weird characters / numbers, #($^@{"?}*), etc...
@@ -119,7 +115,7 @@ TODO list:
         - ⭐️ Syllabus to section / unit converter / parser thing
         - ⭐️ remove library difficulty, mentor, language, etc... from db course structure, backend, frontend course creation screen
             - note: easy to get rid of in the frontend, but have to remove lots of stuff in backend w/ various function calls and stuff
-        - ⭐️ add some other types of games / questions (ex: true / false, very detailed / specific questions, sorting, compare / contrast, analigies, image based stuff (not sure how to implement) 6 options choose 1-6, etc... see list below)
+        - ⭐️ add some other types of games / questions (ex: true / false, very detailed / specific questions, sorting, compare / contrast, analogies, image based stuff (not sure how to implement) 6 options choose 1-6, etc... see list below)
         - ⭐️ all the other routes and stuff (terms & policies, buying subscription)
         - ⭐️ add i-card for all users, maybe description about the library along with a preview of the files used in the library and maybe also users who are members of the library or something 
             - maybe this would be near leaderboard or something
