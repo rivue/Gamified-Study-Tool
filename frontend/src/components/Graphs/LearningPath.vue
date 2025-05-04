@@ -306,13 +306,10 @@
                 </div>
             </div>
         </Transition>
-
-
-    </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, nextTick, onMounted, onUnmounted } from 'vue'
+import { ref, watch, onMounted, onUnmounted } from 'vue'
 import {
     StarIcon,
     BookOpenIcon,
