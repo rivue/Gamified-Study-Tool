@@ -412,10 +412,18 @@ const getUnitGradient = (unitIndex) => {
     return `linear-gradient(135deg, ${unitColors[colorIndex]}, ${unitColors[colorIndex]})`
 }
 
-const setLibraryIsPublicStatus = (newStatus: boolean) => {
+const setLibraryIsPublicStatus = async (newStatus: boolean) => {
+
+    if (isPublic.value === newStatus) {
+        return; // No change needed
+    }
+
+    const prev = isPublic.value;
+
+    isPublic.value = newStatus;
 
     isUpdatingVisibility.value = true;
-    pendingStatus.value = newStatus;
+    // pendingStatus.value = newStatus;
 
     axios.post(`/api/library/visibility_status/${library_id}`, {
         libraryId: library_id,
@@ -427,10 +435,11 @@ const setLibraryIsPublicStatus = (newStatus: boolean) => {
         })
         .catch(() => {
             // console.error('Error updating library visibility:', error);
+            isPublic.value = prev; // Revert to previous state on error
         })
         .finally(() => {
             isUpdatingVisibility.value = false;
-            pendingStatus.value = null;
+            // pendingStatus.value = null;
         });
 }
 
