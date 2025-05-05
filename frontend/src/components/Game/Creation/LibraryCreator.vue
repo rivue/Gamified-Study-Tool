@@ -26,25 +26,6 @@
                     </div>
                 </div>
 
-                <!-- Public/Private Toggle -->
-                <div class="libgen-section">
-                    <div class="form-group visibility-toggle">
-                        <div class="libgen-title">Visibility</div>
-                        <Switch />
-                        TODO - NOT WORKING PROPERLY, PICK BACK UP AFTER RESEARCH MEETING / BETTING APP THING
-                        <div class="toggle-container">
-                            <label class="switch">
-                                <input type="checkbox" v-model="isPublic" :disabled="disableExtras">
-                                <span class="slider round"></span>
-                            </label>
-                            <span class="toggle-label">{{ isPublic ? 'Public - Anyone can view this course' : 'Private - Only you can view this course' }}</span>
-                        </div>
-                        <div class="helper-text">
-                            🐙 Public courses will appear in the course library for all users to explore.
-                        </div>
-                    </div>
-                </div>
-
                 <div class="libgen-section">
                     <div class="libgen-section">
 
@@ -53,7 +34,7 @@
                             <div class="libgen-title">Upload File</div>
                             <div class="file-input-container text-[var(--text-color)] border-[var(--text-color)]">
                                 <input type="file" id="fileInput" ref="fileInput" @change="handleFileUpload"
-                                    :disabled="disableExtras" :class="{'input-error': noFileError}" accept=".pdf" />
+                                    :disabled="disableExtras" :class="{ 'input-error': noFileError }" accept=".pdf" />
                                 <div v-if="selectedFile" class="selected-file">
                                     Selected: {{ selectedFile.name }}
                                     <button class="remove-file-btn" @click="removeFile">×</button>
@@ -135,7 +116,8 @@
                                                 Every Unit must have at least one section
                                             </div>
                                             <div v-if="groupSectionNamingErrors[groupIndex]" class="error-message">
-                                                Section names must only have letters or spaces and must be at least 4 characters long.
+                                                Section names must only have letters or spaces and must be at least 4
+                                                characters long.
                                             </div>
                                         </div>
                                     </div>
@@ -156,6 +138,34 @@
                     </div>
                 </div>
 
+                <!-- Public/Private Toggle -->
+                <div class="libgen-section">
+                    <div class="form-group visibility-toggle p-4">
+                        <div class="libgen-title mb-2">Visibility</div>
+                        <div class="flex items-center justify-center w-full mb-3">
+                            <Tabs default-value="public" class="w-full max-w-[400px]" @update:value="value => isPublic = value === 'public'">
+                                <TabsList class="grid w-full grid-cols-2" style="background-color: blue">
+                                    <TabsTrigger 
+                                        value="private" 
+                                        class="option py-2 text-center flex justify-center items-center"
+                                    >
+                                        Private
+                                    </TabsTrigger>
+                                    <TabsTrigger 
+                                        value="public" 
+                                        class="option py-2 text-center flex justify-center items-center"
+                                    >
+                                        Public
+                                    </TabsTrigger>
+                                </TabsList>
+                            </Tabs>
+                        </div>
+                        <div class="helper-text mt-2 text-center">
+                            🐙 Public courses will appear in the course library for all users to explore.
+                        </div>
+                    </div>
+                </div>
+
                 <!-- CTA Button -->
                 <div class="cta-container">
                     <CtaButton :buttonText="submitButtonText" @click="handleSubmit"
@@ -169,7 +179,7 @@
 
 
 <script setup lang="ts">
-import { ref, reactive, watch, computed, onMounted, onUnmounted } from 'vue';
+import { ref, watch, computed, onMounted, onUnmounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import axios from "axios";
 import { storeToRefs } from "pinia";
@@ -183,9 +193,7 @@ import { usePopupStore } from "@/store/popupStore";
 import { useAuthStore } from "@/store/authStore";
 import CtaButton from "../../Footer/LandingPageComponents/CtaButton.vue";
 import LibraryBrowser from "./LibraryBrowser.vue";
-import { Label } from '@/components/ui/label'
-import { Switch } from '@/components/ui/switch'
-
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 // New or modified data for groups
 interface Group {
@@ -194,7 +202,6 @@ interface Group {
     newSectionName: string;
     sectionError: boolean;
 }
-
 
 const route = useRoute();
 const router = useRouter();
@@ -222,12 +229,12 @@ watch(
 )
 
 watch(
-  () => groups.value.length,
-  (len) => {
-    groupNoSectionErrors.value      = Array(len).fill(false);
-    groupSectionNamingErrors.value  = Array(len).fill(false);
-  },
-  { immediate: true }
+    () => groups.value.length,
+    (len) => {
+        groupNoSectionErrors.value = Array(len).fill(false);
+        groupSectionNamingErrors.value = Array(len).fill(false);
+    },
+    { immediate: true }
 );
 
 const typingEffectStop = ref(() => { });
@@ -249,6 +256,7 @@ const buttonDisabled = ref({
 const selectedFile = ref<File | null>(null);
 const topicInput = ref<HTMLInputElement | null>(null);
 const fileInput = ref<HTMLInputElement | null>(null);
+const isPublic = ref(false);
 
 
 // Computed properties
@@ -280,20 +288,20 @@ const disableExtras = computed(() => {
 
 // Methods for group management
 const addGroup = () => {
-    
+
     const trimmedName = newGroupName.value.trim();
-    
+
     if (trimmedName && groups.value.length < 10) {
-        
+
         groupError.value = false;
         groupTypingError.value = !/^[a-zA-Z ]+$/.test(trimmedName) || trimmedName.length < 4;
-        
+
         if (groupTypingError.value) {
             return;
         }
-        
+
         groupSpaceError.value = trimmedName[0] === " " || trimmedName[trimmedName.length - 1] === " ";
-        
+
         if (groupSpaceError.value) {
             return;
         }
@@ -338,12 +346,12 @@ const addSection = (groupIndex: number) => {
         if (typingError || spaceError) {
             groupSectionNamingErrors.value[groupIndex] = true;
             return;
-    }
-    
-    groupNoSectionErrors.value[groupIndex] = false;
-    group.sections.push(trimmedName);
-    group.newSectionName = "";
-    buttonDisabled.value.noRooms = false;
+        }
+
+        groupNoSectionErrors.value[groupIndex] = false;
+        group.sections.push(trimmedName);
+        group.newSectionName = "";
+        buttonDisabled.value.noRooms = false;
     }
 };
 
