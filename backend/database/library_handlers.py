@@ -241,8 +241,6 @@ def get_library_details(library_id):
 
 def get_library_room_state(user_id, library_id, section_id=None):
 
-    print(f" user_id: {user_id}, library_id: {library_id}, section_id: {section_id}")
-
     if not section_id: # for all rooms (ex: map page)
         room_states = LibraryRoomState.query.filter_by(
             user_id=user_id,
@@ -274,16 +272,13 @@ def save_library_room_contents(library_id, section_unit_map, section_contents_ma
                 response_obj, status_code = create_unit_and_add(library_id, unit_name)
                                 
                 if status_code != 201:
-                    # print(response_obj.get_json()['message'])
                     message = response_obj.get_json()['message']
                     return jsonify(status="error", message=message.to_str()), 200
                                 
                 unit_id = response_obj.get_json()["unit"]
 
                 curr += 1
-                # print(f"sections: {sections}")
                 for section in sections:
-                    # print(section + "section")
 
                     # 2.1 + 2.2) create sections and add to unit
                     response_obj, status_code = create_section_and_add(unit_id, section)
@@ -520,7 +515,6 @@ def update_library_favorited_status(user_id, library_id, status: bool):
 
             update_library_likes(library_id, status)        
             library_favorites.is_favorited = status
-            print("lbh.update_library_fav_status")
             db.session.commit()
         return jsonify({"message": "Library favorites status updated successfully"}), 200
     except Exception as e:
@@ -552,8 +546,6 @@ def update_library_visibility_status(user_id, library_id, status: bool):
         
         join_code = library.set_privacy(status)
         
-        print("made it after set privacy")
-        print(join_code)
         db.session.commit()
         return jsonify({"join_code": join_code, "message": "Library visibility status updated successfully"}), 200
     except Exception as e:

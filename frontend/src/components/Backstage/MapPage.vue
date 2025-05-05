@@ -8,7 +8,7 @@
             :room-data="library.room_data"
             :library-is-public="library.data.is_public"
             :unit-section-map="processedUnitSectionMap"
-            :join-code="library.data.join_code"
+            :library-join-code="library.data.join_code"
             />
         </div>
         <div v-else-if="loading">
@@ -116,8 +116,9 @@ const fetchLibraryData = async (): Promise<void> => {
         const response = await axios.get(`/api/library/${libraryId}`, {
             signal: abortController.signal
         });
-
+        
         if (response.data && response.data.data && response.data.room_data) {
+            
             // Check for unit_to_section_map existence
             if (!response.data.data.unit_to_section_map) {
                 console.error("Missing unit_to_section_map in response data");
@@ -133,12 +134,7 @@ const fetchLibraryData = async (): Promise<void> => {
             };
             
             // Log data structure for debugging in production if needed
-            console.debug("Initialized library data structure:", 
-                          JSON.stringify({
-                              hasRoomData: response.data.room_data.length > 0,
-                              unitMapKeys: Object.keys(response.data.data.unit_to_section_map)
-                          })
-                         );
+            console.debug("Initialized library data structure:", JSON.stringify({ hasRoomData: response.data.room_data.length > 0, unitMapKeys: Object.keys(response.data.data.unit_to_section_map)}));
         } else {
             throw new Error("Invalid response data");
         }

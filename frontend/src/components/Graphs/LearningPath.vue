@@ -289,7 +289,7 @@
                                     <span v-else>Private</span>
                                 </button>
                             </div>
-                            <p class="text-xs mt-1" style="color: var(--color-primary-light);">
+                            <p class="text-xs mt-1" style="color: var(--color-primary-light); font-weight: bold;">
                                 {{ !!(isPublic) ? 'Anyone can view this course' : `Only this code can access this course: ${joinCode}` }}
                             </p>
                         </div>
@@ -361,7 +361,7 @@ const props = defineProps({
 })
 const rawUnitData = ref();
 const isPublic = ref(false);
-const joinCode = ref<string | null>(null); // Initialize with null
+const joinCode = ref<string | null>(null);
 
 watch(() => props.unitSectionMap, async (newVal) => {
     rawUnitData.value = newVal;
@@ -439,9 +439,8 @@ const setLibraryIsPublicStatus = async (newStatus: boolean) => {
         newStatus: newStatus
     })
         .then((response) => {
-            // console.log('Library visibility updated:', response.data);
             isPublic.value = newStatus;
-            joinCode.value = response.data.joinCode; // Update join code if needed
+            joinCode.value = response.data.join_code; // Update join code if needed
         })
         .catch(() => {
             // console.error('Error updating library visibility:', error);
@@ -636,6 +635,7 @@ let scrollTimeoutId = null;
 
 // Scroll to center on first load
 onMounted(() => {
+    joinCode.value = props.libraryJoinCode;
     // If there are nodes and the container exists, scroll to position
     if (rawUnitData.value.length > 0 && scrollContainer.value) {
         // Calculate an appropriate starting position based on available width

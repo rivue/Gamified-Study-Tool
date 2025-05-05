@@ -96,7 +96,6 @@ TODO list:
         - do vthisv right after ^this^
         - ⭐️ visibility of different courses? are they all public like quizlet or am I trying to form a tight knit group like clash royale?
             - ⭐️ for private, users would need some sort of short invite code
-            # make invite code appear on frontend
             # make sure starred libraries appear first in library carousel on fresh visit
             # add ability to specify public / private in library creator and of course make sure        private ones have join_codes
             # then add ui ability to "join" private libraries / public libraries that you didn't create maybe in like a seperate page or list or code box or something

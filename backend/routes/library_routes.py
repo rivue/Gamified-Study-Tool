@@ -145,7 +145,6 @@ def init_library_routes(app):
             if library_favorites_status_code == 201:
                 process_document(selected_file, library_id) # extract embeddings + and upload to pinecone
             else:
-                print(library_response)
                 return jsonify(status="error", message="Failed to create library favorites"), 500
 
         else:
@@ -172,8 +171,7 @@ def init_library_routes(app):
                     if group_name and group_name not in unit_names:
                         unit_names.append(group_name)
                         section_unit_map[group_name] = []  # Initialize the list of sections for this unit
-                    # TODO COME BACK HERE
-                    # Add all section names to our list and map them to their group
+                        
                     for section in values:
                         if section:  # Skip empty section names
                             print(f" appending section named {section}")
@@ -267,7 +265,6 @@ def init_library_routes(app):
                 # room_data = room_data
             test = library_data.get("room_names")
             # print(f"room_data: {room_data}")
-            print("hello there")
 
             return jsonify(status="success", data=library_data, room_data=room_data)
         except: 
@@ -457,18 +454,21 @@ def init_library_routes(app):
                 return jsonify({'is_public': visibility_status}), 200
             
             elif request.method == "POST":
+                
                 data = request.get_json()
                 new_status = data.get('newStatus')
                 user_id = current_user.id if not isinstance(current_user, AnonymousUserMixin) else None
+                
                 if not user_id:
                     return jsonify(status="error", message="Must be logged in to update library visibility status."), 403
                 
                 visibility_response, visibility_response_status = lbh.update_library_visibility_status(user_id, library_id, new_status)
+
                 visibility_response_value = visibility_response.get_json()
-                print(visibility_response_value.join_code)
+                
                 if visibility_response_status != 200:
                     return jsonify(status="error", message="Failed to update library visibility status."), 500
-                return jsonify(join_code=visibility_response_value.join_code, message='Library visibility status updated successfully.'), 200
+                return jsonify(join_code=visibility_response_value["join_code"], message='Library visibility status updated successfully.'), 200
             else:
                 return jsonify(status="error", message="Method not allowed"), 405
         except Exception as e:
