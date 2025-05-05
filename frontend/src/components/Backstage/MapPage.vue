@@ -7,7 +7,8 @@
             :room-names="library.data.room_names"
             :room-data="library.room_data"
             :library-is-public="library.data.is_public"
-            :unit-section-map="processedUnitSectionMap" 
+            :unit-section-map="processedUnitSectionMap"
+            :join-code="library.data.join_code"
             />
         </div>
         <div v-else-if="loading">

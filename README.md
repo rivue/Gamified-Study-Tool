@@ -96,11 +96,10 @@ TODO list:
         - do vthisv right after ^this^
         - ⭐️ visibility of different courses? are they all public like quizlet or am I trying to form a tight knit group like clash royale?
             - ⭐️ for private, users would need some sort of short invite code
-            # then make sure create_libraries uses the join table when it creates a library --> TODO check when you come back from feeding dog
-            # make sure starred libraries appear first in library carousel
-            # then add functions for swapping public / private to regenerate codes / set them to null
-            # then on generation of libraries that are private, make sure they have join_codes
-            # then add ui ability to join private libraries / public libraries that you didn't create
+            # make invite code appear on frontend
+            # make sure starred libraries appear first in library carousel on fresh visit
+            # add ability to specify public / private in library creator and of course make sure        private ones have join_codes
+            # then add ui ability to "join" private libraries / public libraries that you didn't create maybe in like a seperate page or list or code box or something
 
     # basically in library browser, see all libraries
     # then add ability to leave libraries (later)
@@ -137,7 +136,7 @@ TODO list:
             - also, maybe change it to vertical
         - ⭐️ add tips for making a new stepping stone (i.e. make sure it aligns with what you put, etc... )
         - ⭐️ add check for duplicate room name for the time being - maybe allow it later down the line?
-        - ⭐️ after user submits something and is waiting, display a loading bar or wheel or something letting the user know that it is generating
+        - ⭐️ after user submits something and is waiting, display a loading bar or wheel or different rotating facts (maybe relevant to the library?) letting the user know that it is generating
         - ⭐️ add page after you finish a game session, but make it have confetti or an animation or something
         - ⭐️ add default background if you scroll to far (like in main page if you scroll too far down)
         - ⭐️ make unit / chapters more clear (e.g. Exam 1, Exam 2, etc... and e.g. Mitosis, Cell Replication, etc... sections names must be relevant to the things they describe)
@@ -151,6 +150,9 @@ TODO list:
 
     general:
     study tool additions / ideas:
+        - use the ai to generate a course
+            - tell it to generate reasonable courses that are like 2-3 times a week or every day or something.
+            - below the section name, it could tell what resources it used to create the course in smaller / gray text
         - Skill Trees & Talent Builds
             Visualize your mastery like a character in an RPG—choose to specialize (“speed-reader” vs. “deep-diver”) and unlock branching benefits (fast flash-review vs. deeper case studies).
         - Hypothesis Playground

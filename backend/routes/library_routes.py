@@ -134,10 +134,8 @@ def init_library_routes(app):
                 increment_violations(user_id)
             return jsonify({"error": f"Message breaks our usage policy. Please check our guidelines.\n{message}"}), 400
 
-        print("before lbh.create_library")
         # Creates library database object
         library_response, library_response_status_code = lbh.create_library(user_id, topic, library_difficulty, language, language_difficulty, guide)
-        print("after lbh.create_library")
         if library_response_status_code == 201:
             
             library_id = library_response.get_json().get("library_id")
@@ -465,12 +463,12 @@ def init_library_routes(app):
                 if not user_id:
                     return jsonify(status="error", message="Must be logged in to update library visibility status."), 403
                 
-                _, response_status = lbh.update_library_visibility_status(user_id, library_id, new_status)
-                
-                if response_status != 200:
+                visibility_response, visibility_response_status = lbh.update_library_visibility_status(user_id, library_id, new_status)
+                visibility_response_value = visibility_response.get_json()
+                print(visibility_response_value.join_code)
+                if visibility_response_status != 200:
                     return jsonify(status="error", message="Failed to update library visibility status."), 500
-                
-                return jsonify({'message': 'Library visibility status updated successfully.'}), 200
+                return jsonify(join_code=visibility_response_value.join_code, message='Library visibility status updated successfully.'), 200
             else:
                 return jsonify(status="error", message="Method not allowed"), 405
         except Exception as e:

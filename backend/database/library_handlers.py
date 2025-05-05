@@ -47,11 +47,8 @@ def create_library(
             # quick in‑memory test; the UNIQUE constraint is the final guard
             if not db.session.query(Library.id).filter_by(join_code=code).first():
                 break
-            print("makes it this far")
             time.sleep(0.01)
 
-        print("before library")
-        print(user)
         library = Library(
             owner_id=user_id,
             owner=user,
@@ -64,8 +61,6 @@ def create_library(
             join_code=code,
             is_public=True,
         )
-        print("after library")
-        print(library.id)
         db.session.add(library)
         db.session.commit()
         membership, status = create_library_membership(user_id, library.id)
@@ -544,16 +539,23 @@ def get_library_visibility_status(library_id):
     
 def update_library_visibility_status(user_id, library_id, status: bool):
     try:
+        
         user = User.query.get(user_id)
-        library = Library.query.get(library_id)
-        # TODO add a check that user is the creator of library here
+        library = Library.query.get(library_id)        
+        
+        if not user.owned_libraries.filter_by(id=library.id).first():
+            return jsonify({'error': 'You are not the owner!'}), 400
         if library is None:
             return jsonify({'error': 'Library not found'}), 404
         if status not in [True, False]:
-            return jsonify({"message": "Invalid status"}), 400
-        library.is_public = status
+            return jsonify({"error": "Invalid status"}), 400
+        
+        join_code = library.set_privacy(status)
+        
+        print("made it after set privacy")
+        print(join_code)
         db.session.commit()
-        return jsonify({"message": "Library visibility status updated successfully"}), 200
+        return jsonify({"join_code": join_code, "message": "Library visibility status updated successfully"}), 200
     except Exception as e:
         db.session.rollback()
         return jsonify({"error": str(e)}), 400

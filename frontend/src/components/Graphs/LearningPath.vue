@@ -290,7 +290,7 @@
                                 </button>
                             </div>
                             <p class="text-xs mt-1" style="color: var(--color-primary-light);">
-                                {{ !!(isPublic) ? 'Anyone can view this course' : 'Only you can access this course' }}
+                                {{ !!(isPublic) ? 'Anyone can view this course' : `Only this code can access this course: ${joinCode}` }}
                             </p>
                         </div>
 
@@ -353,10 +353,15 @@ const props = defineProps({
     libraryIsPublic: {
         type: Boolean,
         required: true
+    },
+    libraryJoinCode: {
+        type: [String, null],
+        required: true
     }
 })
 const rawUnitData = ref();
 const isPublic = ref(false);
+const joinCode = ref<string | null>(null); // Initialize with null
 
 watch(() => props.unitSectionMap, async (newVal) => {
     rawUnitData.value = newVal;
@@ -365,6 +370,10 @@ watch(() => props.unitSectionMap, async (newVal) => {
 // Initialize libraryIsPublic from props
 watch(() => props.libraryIsPublic, (newVal) => {
     isPublic.value = newVal;
+}, { immediate: true });
+
+watch(() => props.libraryJoinCode, (newVal) => {
+    joinCode.value = newVal;
 }, { immediate: true });
 
 // State for adding new nodes
@@ -429,9 +438,10 @@ const setLibraryIsPublicStatus = async (newStatus: boolean) => {
         libraryId: library_id,
         newStatus: newStatus
     })
-        .then(() => {
+        .then((response) => {
             // console.log('Library visibility updated:', response.data);
             isPublic.value = newStatus;
+            joinCode.value = response.data.joinCode; // Update join code if needed
         })
         .catch(() => {
             // console.error('Error updating library visibility:', error);

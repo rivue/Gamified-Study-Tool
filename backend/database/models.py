@@ -206,7 +206,7 @@ class Library(db.Model):
     factoids = db.relationship('LibraryFactoid', backref='library', cascade="all, delete-orphan")
     
     @classmethod
-    def _generate_unique_code():
+    def _generate_unique_code(cls):
         code_length = 8
         alphabet = string.ascii_uppercase + string.digits
         while True:
@@ -216,19 +216,21 @@ class Library(db.Model):
                 return code
             time.sleep(0.01)
 
-    def set_privacy(self, public: bool):
+    def set_privacy(self, new_status: bool):
         """Sets the library's privacy and manages the join code."""
-        if public == self.is_public:
+        if new_status == self.is_public:
             return # No change needed
-
-        self.is_public = public
-        if not public:
+        print("made it in set_privacy")
+        self.is_public = new_status
+        if not new_status:
             # Make private: Generate a code if it doesn't have one
             if not self.join_code:
+                print("here")
                 self.join_code = self._generate_unique_code()
         else:
             # Make public: Remove the code
             self.join_code = None
+        return self.join_code
 
     def attach_unit(self, unit: 'LibraryUnit'):
         """Attach a unit to this library"""
