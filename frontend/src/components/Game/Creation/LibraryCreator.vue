@@ -147,7 +147,7 @@
                                 <TabsList class="grid w-full grid-cols-2 p-1 py-0.5" style="background-color: var(--background-color-1t)">
                                     <TabsTrigger 
                                         value="private"
-                                        class="border-0 data-[state=active]:text-[var(--text-color)]"
+                                        class="border-0 active:text-[var(--text-color)]"
                                         style="background-color: var(--background-haze)"
                                     >
                                         Private
