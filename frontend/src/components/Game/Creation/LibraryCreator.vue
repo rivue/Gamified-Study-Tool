@@ -144,16 +144,17 @@
                         <div class="libgen-title mb-2">Visibility</div>
                         <div class="flex items-center justify-center w-full mb-3">
                             <Tabs default-value="public" class="w-full max-w-[400px]" @update:value="value => isPublic = value === 'public'">
-                                <TabsList class="grid w-full grid-cols-2 p-2" style="background-color: var(--background-color-1t)">
+                                <TabsList class="grid w-full grid-cols-2 p-1 py-0.5" style="background-color: var(--background-color-1t)">
                                     <TabsTrigger 
-                                        value="private" 
-                                        class="option py-2 text-center flex justify-center items-center"
+                                        value="private"
+                                        class="border-0 data-[state=active]:text-[var(--text-color)]"
+                                        style="background-color: var(--background-haze)"
                                     >
                                         Private
                                     </TabsTrigger>
                                     <TabsTrigger 
                                         value="public" 
-                                        class="option py-2 text-center flex justify-center items-center"
+                                        class="border-0"
                                         style="background-color: green"
                                     >
                                         Public
