@@ -97,6 +97,7 @@ TODO list:
         - ⭐️ visibility of different courses? are they all public like quizlet or am I trying to form a tight knit group like clash royale?
             - ⭐️ for private, users would need some sort of short invite code
             # then make sure create_libraries uses the join table when it creates a library --> TODO check when you come back from feeding dog
+            # make sure starred libraries appear first in library carousel
             # then add functions for swapping public / private to regenerate codes / set them to null
             # then on generation of libraries that are private, make sure they have join_codes
             # then add ui ability to join private libraries / public libraries that you didn't create

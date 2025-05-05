@@ -115,8 +115,6 @@ const fetchLibraryData = async (): Promise<void> => {
         const response = await axios.get(`/api/library/${libraryId}`, {
             signal: abortController.signal
         });
-        
-        console.debug("response: ", response);
 
         if (response.data && response.data.data && response.data.room_data) {
             // Check for unit_to_section_map existence

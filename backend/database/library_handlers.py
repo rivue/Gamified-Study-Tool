@@ -174,7 +174,6 @@ def get_library(library_id, user_id=None, click=True):
     section_to_unit_map = {}
     unit_to_section_map = {}
 
-    print("before if user_id")
     if user_id:
         unit_list = []
         room_names = []
@@ -768,6 +767,7 @@ def update_game_end(user_id, library_id, room_name):
 
 def get_libraries_info(user_id=None):
     top_liked_libraries = Library.query.order_by(Library.likes.desc()).limit(40).all()
+
     latest_libraries = Library.query.order_by(Library.id.desc()).limit(40).all()
 
     top_liked_dicts = [model_to_dict(library, exclude=['room_names', 'factoids']) for library in top_liked_libraries]
@@ -779,8 +779,9 @@ def get_libraries_info(user_id=None):
     }
 
     if user_id is not None:
-        my_libraries = Library.query.filter_by(user_id=user_id).order_by(Library.id.desc()).all()
         
+        my_libraries = Library.query.filter_by(owner_id=user_id).order_by(Library.id.desc()).all()
+
         favorited_map = {fav.library_id: fav.is_favorited for fav in LibraryFavorites.query.filter_by(user_id=user_id).all()}
         my_libraries = [lib for lib in my_libraries if len(lib.room_names) == 0]  # Filter for empty room_names
         my_libraries = my_libraries[:40]

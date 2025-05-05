@@ -70,7 +70,9 @@ import axios from 'axios';
             meta: { title: 'Rivue.ai | Explore Library', requiresCreator: true },
             beforeEnter: async (to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext) => {
                 try {
+                    console.log("hello");
                     const response = await axios.get(`/api/library/${to.params.id}`);
+                    console.log("there");
                     response.data?.status === "success" ? next() : next('/library');
                 } catch (error) {
                     console.error("Failed to validate library:", error);
@@ -160,7 +162,7 @@ router.beforeEach(async (to, from, next) => {
                 const response = await axios.get(`/api/library/${to.params.id}`);
                 if (response.data && 
                     response.data.data && 
-                    response.data.data.user_id == user) {
+                    response.data.data.owner_id == user) {
                         console.log("User is the creator of the library");
                         // User is the creator, continues as per usual
                         return next();

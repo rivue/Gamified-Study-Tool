@@ -179,7 +179,6 @@ class Library(db.Model):
     DEFAULT_IMAGE_URL = "https://csb10032002fc59a9f5.blob.core.windows.net/library-images/background.png"
 
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id', name='fk_libary_user_id'), nullable=True)
     owner_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     owner = db.relationship('User', foreign_keys=[owner_id],
         back_populates='owned_libraries')
