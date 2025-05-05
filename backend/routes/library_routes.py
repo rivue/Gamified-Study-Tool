@@ -134,9 +134,10 @@ def init_library_routes(app):
                 increment_violations(user_id)
             return jsonify({"error": f"Message breaks our usage policy. Please check our guidelines.\n{message}"}), 400
 
+        print("before lbh.create_library")
         # Creates library database object
         library_response, library_response_status_code = lbh.create_library(user_id, topic, library_difficulty, language, language_difficulty, guide)
-
+        print("after lbh.create_library")
         if library_response_status_code == 201:
             
             library_id = library_response.get_json().get("library_id")
@@ -146,11 +147,11 @@ def init_library_routes(app):
             if library_favorites_status_code == 201:
                 process_document(selected_file, library_id) # extract embeddings + and upload to pinecone
             else:
+                print(library_response)
                 return jsonify(status="error", message="Failed to create library favorites"), 500
 
         else:
             return jsonify(status="error", message="Failed to create library"), 500
-
         try:
 
             form = request.form.to_dict(flat=False)
@@ -269,7 +270,7 @@ def init_library_routes(app):
             test = library_data.get("room_names")
             # print(f"room_data: {room_data}")
             print("hello there")
-            
+
             return jsonify(status="success", data=library_data, room_data=room_data)
         except: 
             return jsonify(status="error", message="Failed to retrieve library data"), 500

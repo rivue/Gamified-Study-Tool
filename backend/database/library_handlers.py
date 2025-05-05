@@ -4,6 +4,9 @@ from sqlalchemy import func, distinct
 from contextlib import contextmanager
 import random
 import math
+import string
+import time
+import secrets
 from database.models import (
     db,
     User,
@@ -37,6 +40,18 @@ def create_library(
         if not user:
             return jsonify({"message": "User not found"}), 404
         
+        code_length = 8
+        alphabet = string.ascii_uppercase + string.digits
+        while True:
+            code = ''.join(secrets.choice(alphabet) for _ in range(code_length))
+            # quick in‑memory test; the UNIQUE constraint is the final guard
+            if not db.session.query(Library.id).filter_by(join_code=code).first():
+                break
+            print("makes it this far")
+            time.sleep(0.01)
+
+        print("before library")
+        print(user)
         library = Library(
             owner_id=user_id,
             owner=user,
@@ -46,9 +61,11 @@ def create_library(
             language=language,
             language_difficulty=language_difficulty,
             guide=guide,
-            join_code=None,
+            join_code=code,
             is_public=True,
         )
+        print("after library")
+        print(library.id)
         db.session.add(library)
         db.session.commit()
         membership, status = create_library_membership(user_id, library.id)
