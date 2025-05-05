@@ -143,23 +143,23 @@
                     <div class="form-group visibility-toggle p-4">
                         <div class="libgen-title mb-2">Visibility</div>
                         <div class="flex items-center justify-center w-full mb-3">
-                            <Tabs default-value="public" class="w-full max-w-[400px]" @update:value="value => isPublic = value === 'public'">
-                                <TabsList class="grid w-full grid-cols-2 p-1 py-0.5" style="background-color: var(--background-color-1t)">
+                            <Tabs default-value="public" class="w-full max-w-[400px]" @update:value="value => isPublic.value = value === 'public'">
+                                <TabsList class="grid w-full grid-cols-2 p-1 py-0.5" style="background-color: rgba(var(--element-color-1-rgb), 0.5);">
                                     <TabsTrigger 
                                         value="private"
-                                        class="border-0 active:text-[var(--text-color)]"
-                                        style="background-color: var(--background-haze)"
+                                        class="border-0 text-[rgba(var(--text-color-rgb), 1.0) data-[state=inactive]:text-opacity-20 data-[state=active]:bg-[var(--element-color-1)] data-[state=active]:text-[var(--text-color)]"
                                     >
                                         Private
                                     </TabsTrigger>
+
                                     <TabsTrigger 
-                                        value="public" 
-                                        class="border-0"
-                                        style="background-color: green"
+                                        value="public"
+                                        class="border-0 data-[state=active]:bg-[var(--element-color-1)] data-[state=inactive]:text-gray-300 data-[state=active]:text-[var(--text-color)]"
                                     >
                                         Public
                                     </TabsTrigger>
-                                </TabsList>
+                                </TabsList>{{ isPublic }}
+
                             </Tabs>
                         </div>
                         <div class="helper-text mt-2 text-center">
@@ -258,7 +258,7 @@ const buttonDisabled = ref({
 const selectedFile = ref<File | null>(null);
 const topicInput = ref<HTMLInputElement | null>(null);
 const fileInput = ref<HTMLInputElement | null>(null);
-const isPublic = ref(false);
+const isPublic = ref(true);
 
 
 // Computed properties
@@ -840,11 +840,9 @@ input[type="text"] {
     gap: 0.5em;
 }
 
-
 .group-input-wrapper input {
     flex-grow: 1;
 }
-
 
 .add-btn {
     padding: 8px 16px;
