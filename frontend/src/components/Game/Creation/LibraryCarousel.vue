@@ -135,7 +135,7 @@ watch(() => props.libraryFavoritesMap, () => {
 
 // Initialize on component mount
 onMounted(() => {
-    filteredLibraries.value = [...props.libraries];
+    filterLibraries(); // Use the filterLibraries function which already sorts favorited items first
 });
 
 // Computed values

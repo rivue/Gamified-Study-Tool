@@ -91,13 +91,11 @@ TODO list:
         - ✅ ⭐️ For course owner, add a “settings” gear button maybe to the left / right of the course name
                 - this would enable them to add people / delete people, change visibility settings I think? or check different boxes for question types, or see users or something
                 users could add a note for each unit or something
-                - add an option on both the library carousel screen and in the actual library page itself like with a little pencil edit icon (maybe later)
                 - ✅ ⭐️ backfill true / false for is_public (true)
         - do vthisv right after ^this^
         - ⭐️ visibility of different courses? are they all public like quizlet or am I trying to form a tight knit group like clash royale?
             - ⭐️ for private, users would need some sort of short invite code
-            # make sure starred libraries appear first in library carousel on fresh visit
-            # add ability to specify public / private in library creator and of course make sure        private ones have join_codes
+            # add ability to specify public / private in library creator and of course make sure private ones have join_codes
             # then add ui ability to "join" private libraries / public libraries that you didn't create maybe in like a seperate page or list or code box or something
 
     # basically in library browser, see all libraries

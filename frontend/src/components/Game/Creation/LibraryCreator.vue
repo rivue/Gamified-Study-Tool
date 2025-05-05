@@ -26,6 +26,24 @@
                     </div>
                 </div>
 
+                <!-- Public/Private Toggle -->
+                <div class="libgen-section">
+                    <div class="form-group visibility-toggle">
+                        <div class="libgen-title">Visibility</div>
+                        <Switch />
+                        TODO - NOT WORKING PROPERLY, PICK BACK UP AFTER RESEARCH MEETING / BETTING APP THING
+                        <div class="toggle-container">
+                            <label class="switch">
+                                <input type="checkbox" v-model="isPublic" :disabled="disableExtras">
+                                <span class="slider round"></span>
+                            </label>
+                            <span class="toggle-label">{{ isPublic ? 'Public - Anyone can view this course' : 'Private - Only you can view this course' }}</span>
+                        </div>
+                        <div class="helper-text">
+                            🐙 Public courses will appear in the course library for all users to explore.
+                        </div>
+                    </div>
+                </div>
 
                 <div class="libgen-section">
                     <div class="libgen-section">
@@ -165,6 +183,8 @@ import { usePopupStore } from "@/store/popupStore";
 import { useAuthStore } from "@/store/authStore";
 import CtaButton from "../../Footer/LandingPageComponents/CtaButton.vue";
 import LibraryBrowser from "./LibraryBrowser.vue";
+import { Label } from '@/components/ui/label'
+import { Switch } from '@/components/ui/switch'
 
 
 // New or modified data for groups
