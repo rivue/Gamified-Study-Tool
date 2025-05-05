@@ -137,14 +137,14 @@
                         </div>
                     </div>
                 </div>
-
+               
                 <!-- Public/Private Toggle -->
                 <div class="libgen-section">
                     <div class="form-group visibility-toggle p-4">
                         <div class="libgen-title mb-2">Visibility</div>
                         <div class="flex items-center justify-center w-full mb-3">
                             <Tabs default-value="public" class="w-full max-w-[400px]" @update:value="value => isPublic = value === 'public'">
-                                <TabsList class="grid w-full grid-cols-2" style="background-color: blue">
+                                <TabsList class="grid w-full grid-cols-2 p-2" style="background-color: var(--background-color-1t)">
                                     <TabsTrigger 
                                         value="private" 
                                         class="option py-2 text-center flex justify-center items-center"
@@ -154,6 +154,7 @@
                                     <TabsTrigger 
                                         value="public" 
                                         class="option py-2 text-center flex justify-center items-center"
+                                        style="background-color: green"
                                     >
                                         Public
                                     </TabsTrigger>
