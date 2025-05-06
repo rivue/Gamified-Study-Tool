@@ -3,28 +3,35 @@
 
         <!-- Double‐left chevron: hide once we’ve scrolled past a bit -->
         <button v-if="scrollPosition > 300" @click="scrollToStart(); $nextTick(() => handleScroll())"
-            class="fixed left-8 bottom-1/4 -translate-y-1/4 bg-black/30 backdrop-blur-sm shadow-md rounded-full p-4 hover:bg-black/40 z-10"
+            class="fixed left-8 bottom-1/4 -translate-y-1/4 bg-black/30 backdrop-blur-sm shadow-md rounded-full p-4 hover:bg-black/40 z-10
+                         flex items-center gap-2"
             style="color: var(--highlight-color);">
             <ChevronDoubleLeftIcon class="w-12 h-12" />
+            <span>To Start</span>
         </button>
 
         <!-- Double‐right chevron -->
-        <button v-if="scrollPosition < (maxLeft - 300)" @click="scrollToEnd(); $nextTick(() => handleScroll())"
-            class="fixed right-8 top-1/4 -translate-y-1/2 bg-black/30 backdrop-blur-sm shadow-md rounded-full p-4 hover:bg-black/40 z-10"
-            style="color: var(--highlight-color);">
+        <button
+            v-if="scrollPosition < (maxLeft - 300)"
+            @click="scrollToEnd(); $nextTick(() => handleScroll())"
+            class="fixed right-8 bottom-1/4 -translate-y-1/4 bg-black/30 backdrop-blur-sm shadow-md rounded-full p-4 hover:bg-black/40 z-10
+                         flex items-center gap-2"
+            style="color: var(--highlight-color);"
+        >
+            <span>To End</span>
             <ChevronDoubleRightIcon class="w-12 h-12" />
         </button>
 
         <!-- Single‐left chevron -->
         <button v-if="scrollPosition > 300" @click="scroll('left'); $nextTick(() => handleScroll())"
-            class="fixed left-8 top-1/4 translate-y-1/2 bg-black/30 backdrop-blur-sm shadow-md rounded-full p-4 hover:bg-black/40 z-10"
+            class="fixed left-8 top-1/4 translate-y-1/3 bg-black/30 backdrop-blur-sm shadow-md rounded-full p-4 hover:bg-black/40 z-10"
             style="color: var(--highlight-color);">
             <ChevronLeftIcon class="w-12 h-12" />
         </button>
 
         <!-- Single‐right chevron -->
         <button v-if="scrollPosition < (maxLeft - 300)" @click="scroll('right'); $nextTick(() => handleScroll())"
-            class="fixed right-8 bottom-1/4 -translate-y-1/2 bg-black/30 backdrop-blur-sm shadow-md rounded-full p-4 hover:bg-black/40 z-10"
+            class="fixed right-8 top-1/4 translate-y-1/3 bg-black/30 backdrop-blur-sm shadow-md rounded-full p-4 hover:bg-black/40 z-10"
             style="color: var(--highlight-color);">
             <ChevronRightIcon class="w-12 h-12" />
         </button>
