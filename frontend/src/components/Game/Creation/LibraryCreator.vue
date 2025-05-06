@@ -58,7 +58,8 @@
                             <div class="group-controls">
 
                                 <div class="group-input-wrapper">
-                                    <input type="text" v-model="newGroupName" placeholder="Enter unit/chapter name"
+                                    <input type="text" v-model="newGroupName" placeholder="Enter Unit Name (Exam 1, Exam 2, etc...)"
+                                    <!-- TODO: make text grayed out a little bit - for all input / placeholder text on this page -->
                                         :class="{ 'input-error': groupError || groupTypingError || groupSpaceError || groupEmptyError }"
                                         maxlength="40" :disabled="disableExtras" @keyup.enter="addGroup" />
                                     <button class="add-btn" @click="addGroup"
@@ -102,7 +103,7 @@
                                         <!-- Section input for this group -->
                                         <div class="section-input-wrapper">
                                             <input type="text" v-model="group.newSectionName"
-                                                placeholder="Enter section name"
+                                                placeholder="Mitosis, Photosynthesis, Pavlovian Conditioning, etc..."
                                                 :class="{ 'input-error': groupNoSectionErrors[groupIndex] || groupSectionNamingErrors[groupIndex] }"
                                                 maxlength="40" :disabled="group.sections.length >= 15 || disableExtras"
                                                 @keyup.enter="addSection(groupIndex)" />
@@ -199,6 +200,8 @@ import { useAuthStore } from "@/store/authStore";
 import CtaButton from "../../Footer/LandingPageComponents/CtaButton.vue";
 import LibraryBrowser from "./LibraryBrowser.vue";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { GalleryHorizontal } from 'lucide-vue-next';
+import { watchImmediate } from '@vueuse/core';
 
 // New or modified data for groups
 interface Group {
