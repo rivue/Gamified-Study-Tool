@@ -5,7 +5,7 @@
             <div class="libgen-create p-16 br-4" style="border: 1px solid var(--text-color); border-radius: 5px;">
                 <h1 v-if="libgenRoute">Create a Course to Explore</h1>
                 <div class="libgen-section">
-                    <div class="form-group topic-selection">
+                    <div class="form-group topic-selection">  <div class="absolute inset-0 border-[1px] border-solid border-[var(--text-color)] rounded-md pointer-events-none"></div>
                         <div class="libgen-title">Course name</div>
                         <div class="title-bar">
                             <input type="text" id="topicInput" ref="topicInput" v-model="topic"

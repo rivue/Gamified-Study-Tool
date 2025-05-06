@@ -76,8 +76,6 @@ TODO list:
                 - one idea) add lines in between the nodes and when the course owner mouses over them, it hovers a small node with a "plus" icon
                 - third idea) for course owner, add an "edit" button and "delete / trash can" button when you hover over the course or click it or something, maybe add an "edit mode" in the main bar thing I'm going to add?
             - ⭐️ Add ability to add a unit (later --> come back to, reminder to make it account for 1-n number of sections no matter how that looks)
-            - ✅ ⭐️ Add ability for users to actually see the unit name
-            - ✅ ⭐️ Add underlined text in the course screen that shows a small popup when clicked / hovered that says "course not here? --> if you made a course before March 15th, 2025 (or whatever date), we might have made broken changes. We are still learning and will not do this again. Please feel free to generate another course."
         - ⭐️ (would like to implement visibility of different courses first or at least a many:one for non-owners in library model)
             - ⭐️ Delete sections requires entering the name of the unit / course just for accidental reasons)
             - ⭐️ Delete Units( requires entering the name of the unit / course just for accidental reasons)
@@ -91,6 +89,8 @@ TODO list:
             - note: maybe change top navbar to be a constant hovering side menu on the side / bottom of the screen maybe similar to duolingo and possibly replace "my library", "settings", etc.. with actual icons
                 - potential new menu: "my libraries" "browse libraries" (would link from search?) "notifications" (like error messages or who joined a library or something), create / + (or maybe it would be a tab at the top next to search)
                 - menu for library would have members list, settings for course owner, potentially a list of files to see, potentially a screen to see library statistics like # likes, # people, etc... 
+                -  settings button would enable course owners to remove people, change visibility settings I think? or check different boxes for question types, or see users or something
+                users could add a note for each unit or something
             - add ui ability to "join" private libraries / public libraries that you didn't create maybe in like a seperate page or list or maybe I could add a box for putting in library codes or something
             - ⭐️ after user submits something and is waiting, display a loading bar or wheel or different rotating facts (maybe relevant to the library?) letting the user know that it is generating
             - also note: ask gemini / grok / gpt / claude for some ui design tips like adding a menu bar, or ui tips / tricks / helpful websites / youtube videos, etc...
@@ -100,15 +100,6 @@ TODO list:
         - ability to verify by school email which helps with filtering results?
         - ⭐️ Stripe implementation
             - have to think abt what different payment levels mean / how I want to do it
-
-        - ✅ ⭐️ For course owner, add a “settings” gear button maybe to the left / right of the course name
-                - this would enable them to add people / delete people, change visibility settings I think? or check different boxes for question types, or see users or something
-                users could add a note for each unit or something
-                - ✅ ⭐️ backfill true / false for is_public (true)
-        - do vthisv right after ^this^
-        - ✅ ⭐️ visibility of different courses? are they all public like quizlet or am I trying to form a tight knit group like clash royale?
-            - ✅ ⭐️ for private, users would need some sort of short invite code
-            - change 
 
     # basically in library browser, see all libraries
     # then add ability to leave libraries (later)
@@ -120,8 +111,6 @@ TODO list:
         - ⭐️ add ability to see uploaded files in library (list of their names) and maybe even file preview (would require nosql db or something maybe)
 
         medium (chip away at when tired / mentally exhausted from hard ones):
-        - ✅ ⭐️ ⭐️ ⭐️ fix weird library duplicate generation thing
-        - ✅ ⭐️ ability to "star" / "favorite" a course
         - implement game "score" logic (if you get >80% #attemps:number of questions ratio) then you get more / less points or something, etc...
             - ⭐️ save for later, just do a basic fire streak thing for now, maybe with 5, 10, 20, 50, 100 day streak animations from Lottie Files and animations for streak loosing as well
         - ⭐️ Terms of use / Policy Page legal agreement thing
@@ -149,9 +138,8 @@ TODO list:
         - ⭐️ add page after you finish a game session, but make it have confetti / small animation or something
         - ⭐️ make sure the background of the site is the color you want if you scroll to far (like in main page if you scroll too far down) (right now its white which is not good)
         - ⭐️ make unit / chapter description text more clear (e.g. Exam 1, Exam 2, etc... and e.g. Mitosis, Cell Replication, etc... sections names must be relevant to the things they describe)
-        - ⭐️ center names of libraries and make white box extend down to bottom library as well
-        - ✅ ⭐️ fix thing that makes nodes hover when you hover your mouse over the node popup box
-        - ✅ ⭐️ add a small hover animation when "Play" / "Review" button is hovered
+        - ⭐️ make white box in library course list  extend down to bottom library as well
+        - when user flips factoid card, if they have typed something in the box, it doesn't reset
 
     OTHER PAGES:
         - terms and policies page
@@ -211,7 +199,6 @@ TODO list:
         - make a better loading screen / bar / wheel while the courses are being created
         - improve prompt generation a great fold (make sure as many of the quesitons relate to the section name as possible)
         - eventually combine library_question model with library_factoid model (why are they seperate to begin with?)
-        - when user flips factoid card, if they have typed something in the box, it doesn't reset
         - get student verification on Mobbin pro (UI library)
         - add ability to reset password for users who are logged in
         - change the name of all functions in library_handlers to use get, update, create, delete only
@@ -354,83 +341,6 @@ TODO list:
         - decorate the map eventually
         - figure out a way to break up room names into sections either by user request or something else
         - explore play button displaying mastery of topics in the course as well (course name could be just the topics for now)
-
-COMPLETED:
-    ✅ get frontend to work
-    ✅ get backend to work
-
-    ✅ get title from library to knowledge (practice) page and make sure you ask ChatGPT for best way to do it (data() vs mounted() vs actions vs computed)
-    ✅ create a course, but all it displays is the name on a card. when you click on the card (course), you are taken to the previous knowledge graph screen, and it just says the course name. Nothing too fancy just yet
-    ✅ make every room_name in a library associated with a stepping stone possibly
-    ✅ going off of ^^^ basically finding something to fill list of stepping stones in db
-    ✅ change room names text to a good color
-    ✅ add a small pop-up menu when you click on it that currently displays nothing but will display the course name possibly and the play button 
-    ✅ link clicking on the "play" button link to the actual game
-    ✅ USER HAS TO BE LOGGED IN TO GENERATE A LIBRARY
-        - add both in frontend and backend
-    ✅ change from giving questions from lots and lots of "rooms" to questions from one specific room
-        - almost done, but need to make library room names have underscores instead so it will redirect and it will
-    ✅ figure out how to make it so that it generates {inputed} number of rooms
-    ✅ hide header / footer from game when user is playing a game
-    ✅ remove timer, likes, clouds, and diamonds from game screen 
-    ✅ add X button to exit out of game and navigate back to game / course map
-    ✅ figured out why a room name of the name of the library kept generating and fixed it
-    ✅ remove description and game image popup upon initial game page load
-    ✅ page / route reorganization
-    ✅ gray out the explore button until someone adds at least one room name
-    ✅ switch "room names" to "lectures" in create library page
-    ✅ add ability to create rooms / "lectures" once you create a library, and mention that in the "add rooms" page (ex: "*lectures can be added within the library*")
-    ✅ fix the issue where anywhere on a card exits the lesson as opposed to just the red x
-    ✅ maybe do something that caps length of vector embedding response, like chops off anything after 1k tokens / characters or something (limited response to 10 questions)
-    
-    rag stuff:
-    1) give whole textbook to gpt to "split up" ✅
-    2) store embeddings in pinecone (every paragraph) ✅
-        2.1) build a small ai rag chatbot to test out that everything I did so far works (it does) ✅
-    3) generate questions per every subchapter / lecture given syllabus (stored in database) ✅
-        3.1) integrate rag stuff with backend ✅
-        3.3) enable modification of rooms based on user input of rooms ✅
-        3.4) add rag retrieval to rooms ✅
-
-    MVP CLEANUP LIST:
-    ✅ redirects / url stuff + 404 page (ex: 
-            "/knowledge/:id/:anythingHereShouldRedirect"
-            "/library/:id/:roomName/:anythingHereShouldRedirect"
-            etc...
-        )
-    ✅ fix low / moderate / high vulnerabilities for npm packages in frontend (down to 8 from 26 so yay)
-            - anything in dev dependencies are probably fine (vue-cli-... or vue/component...)
-    ✅ make sure "Knowledge Map", "Lessons", and other dashboard things either actually link somewhere or are handled properly
-    ✅ loading bars / wheels possibly (at least look into) (for course creation and for other stuff as well)
-        ✅ added loading component to every frontend route, no matter if valid or invalid, in case routes take too long to fetch,
-        which covers cases where you have to fetch from api
-    ✅ weird redirect for when user is logged in and try to navigate to a library which doesn't exist or no permissions (102 in main.js) ex: /lessons/234234
-            fix w/ a loading state or something, prob pretty easy
-    ✅ create email
-
-    ✅ ideas for name:
-        - name something stone related for the actual lessons (bc you are SOLIDIFYING your knowledge (hahahahahah ok im done))
-        - rivue (ReInvent VirtUal Education --> go public w/ the acronym when I start the cardboard thing)
-    ✅ implement "feedback" tab (note: requires email oath, and email domain and possibly twitter and stuff as well)
-    ✅ change CORS(origins="*") to the actual frontend url in app.py
-    ✅ add auto deploy for github ci/cd
-    ✅ add light / dark mode switcher to settings (it already exists)
-    ✅ ascendence --> rivue (everywhere on the site and in the file system)
-            - pretty much done, and modify email_templates
-    ✅ go through TODOs (again once emails are taken care of)
-    ✅ figure out prod building and gcp and possibly nginx / rabbit / zeromq or whatever  
-    ✅ error handling, and lots of it (how to handle failed document generation, other errors, etc...)
-    ✅ error handling for not finding any context when loading stone names in library?
-    ✅ put x / discord links in main page, probably along with something like "join us" or "hear our updates" or something
-    ✅ continue with adding X / Discord link to main page (LibraryCreator.vue)
-    ✅ make it so you have to be confirmed to access pages
-    ✅ add ability to add multiple room names from Add New Stepping Stone part
-    ✅ ADD SHAD-CN
-    ✅ eventually add footer back (note: requires light mode, discord link, everything in contact page, terms page, copyright(?), and possibly twitter link if we decide to do that)
-    ✅ improve ui with libraries / courses in library creation screen
-    ✅ add password reset
-
-
 
 RESOURCES:
     - node components: https://vueflow.dev/
