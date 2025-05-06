@@ -32,7 +32,7 @@ def db_transaction():
         raise e
 
 def create_library(
-    user_id, library_topic, difficulty, language, language_difficulty, guide
+    user_id, library_topic, difficulty, language, language_difficulty, guide, is_public
 ):
     
     try:
@@ -59,7 +59,7 @@ def create_library(
             language_difficulty=language_difficulty,
             guide=guide,
             join_code=code,
-            is_public=True,
+            is_public=is_public,
         )
         db.session.add(library)
         db.session.commit()

@@ -1,6 +1,9 @@
 # Gamefied-Study-Tool
 Tool that allows users to input things like lecture recordings, lecture slides, professor notes, etc... and output Doulingo-like course based on those inputs.
 
+
+Note: use npm audit --only=prod for this, 0 vulnerabilities = good
+
 IDEAS:
 
     ideas for grand plan / future:
@@ -23,13 +26,14 @@ IDEAS:
             -Enterprise & University LMS Connectors
             One-click import of campus syllabi, grade-book sync, auto-provisioned cohorts based on student enrollment lists.
         - create a community discord server (configure the current one)
-        - create cheap vr cardboard cutouts of headsets where you can put your phone --> give to high schools possibly for free once you partner with them
+
+        - create cheap vr cardboard cutouts of headsets where you can put your phone --> give to high schools possibly for free once you partner with them and possibly include neural monitoring hard ware so we can take in their brain data and do something with it
            - AR Annotations & Pop-Ups
                 Point your phone at a page of a textbook (or whiteboard) and see AI-generated overlays—diagrams that float in 3D, step-by-step solution hints, pronunciation guides for foreign-language vocab, and interactive “hotspots” you can tap for mini-quizzes.
 
             - Virtual Lab Simulations
-            launch fully simulated physics, chemistry, or biology experiments in the browser or VR headset. Mix chemicals, wire circuits, dissect virtual frogs—all with real-time AI guidance and safety feedback.
-            - have to think specifically of who / what to target for MVP, etc... so as little time as possibly gets wasted building something that either 1) is outside of my domain of expertise or 2) other people might build (repeat of unclear jupyterhub research)
+                launch fully simulated physics, chemistry, or biology experiments in the browser or VR headset. Mix chemicals, wire circuits, dissect virtual frogs—all with real-time AI guidance and safety feedback.
+            - have to think specifically of who / what to target for MVP, etc... so as little time as possibly gets wasted building something  that either 1) is outside of my domain of expertise or 2) other people might build (repeat of unclear jupyterhub research)
             - not sure where to go from there, lots of places though
         - see google doc for more plans for resume (or just repomix this whole codebase into gpt / grok / gemini / claude, etc..)
             - Built a custom text extraction pipeline using Optical Character Recognition to extract text from pdf textbooks with 97% accuracy
@@ -80,8 +84,10 @@ TODO list:
         - ⭐️ (courses need ability to add multiple people first) leaderboard / game point tracking system
         - (might take at least a couple weeks) ⭐️ UI redesign / rehaul *** --> kinnu, duolingo, saved instagram design reels etc..
             - Note: 1) try to see what horizontal --> vertical learning path looks like, and possibly make a vertical bar on the side for settings, i-card, files list, adding a new stepping stone, etc... but maybe keep lesson name and current unit name at the top?
+            - COPY QUIZLET???
             - note: maybe change top navbar to be a constant hovering side menu on the side / bottom of the screen maybe similar to duolingo and possibly replace "my library", "settings", etc.. with actual icons
             - also note: ask gemini / grok / gpt / claude for some ui design tips like adding a menu bar, or ui tips / tricks / helpful websites / youtube videos, etc...
+            use this maybe: https://www.shadcn-vue.com/docs/components/stepper.html
             - note: for main page, add two / 3 simple boxes, class you want, school, and possibly professor, and it gives you classes close to you like quizlet / rate my professor along with option for creating your own
                 maybe it shows private ones with a "lock" icon and prompts you to enter a password. this way it would be like more of a network, which would differentiate us from a copy paste ai study tool (turbolearn) / NotebookLM
             - ability to verify by school email which helps with filtering results?
@@ -91,13 +97,12 @@ TODO list:
         - ✅ ⭐️ For course owner, add a “settings” gear button maybe to the left / right of the course name
                 - this would enable them to add people / delete people, change visibility settings I think? or check different boxes for question types, or see users or something
                 users could add a note for each unit or something
-                - add an option on both the library carousel screen and in the actual library page itself like with a little pencil edit icon (maybe later)
                 - ✅ ⭐️ backfill true / false for is_public (true)
         - do vthisv right after ^this^
-        - ⭐️ visibility of different courses? are they all public like quizlet or am I trying to form a tight knit group like clash royale?
-            - ⭐️ for private, users would need some sort of short invite code
-            # make sure starred libraries appear first in library carousel on fresh visit
-            # add ability to specify public / private in library creator and of course make sure        private ones have join_codes
+        - ✅ ⭐️ visibility of different courses? are they all public like quizlet or am I trying to form a tight knit group like clash royale?
+            - ✅ ⭐️ for private, users would need some sort of short invite code
+            - change 
+            - add ability to specify public / private in library creator and of course make sure private ones have join_codes
             # then add ui ability to "join" private libraries / public libraries that you didn't create maybe in like a seperate page or list or code box or something
 
     # basically in library browser, see all libraries
@@ -149,6 +154,11 @@ TODO list:
 
     general:
     study tool additions / ideas:
+        - when users first sign up, give them a medium / long survey to make them think long and hard about their study habits / why they want to get high grades, then when they hit the paywall, they are more likely to join
+                - free users get like 10 free uploads / month, and can only join libraries up to like 5 sections or up to 5 libraries or something
+                - first paid tier get unlimited uploads / month, but only have like 2 large textbooks uploaded / month
+                - second paid tier get 10 textbook uploads / month maybe
+        - have a notifivations / dashboard page - errors for generating libraries / units / sections (like for content moderation errors, etc...) and notifications about someone liked your course or someone joined your course or something, etc... (maybe maybe not on this one - I just want a place to tell users without them having to wait 30 minutes for their course to load)
         - use the ai to generate a course
             - tell it to generate reasonable courses that are like 2-3 times a week or every day or something.
             - below the section name, it could tell what resources it used to create the course in smaller / gray text
@@ -180,7 +190,7 @@ TODO list:
         - ability for voice enabled options
         - study groups / peer quizzes - not sure how to approach this one
         - ideas for multi-modal content: draggable vectors for physics, audio summaries / transcrips for learning on the go
-        - button at the bottom of the page for daily review (here is where we implement spaced repitition scheduling)
+        - button at the bottom of the page for daily review and maybe another one for review most missed questions (here is where we implement spaced repitition scheduling)
         - generate a lot of different questions and if a student gets a lot of the correct, move on to the next one or like skip ones that the student finds easy or something
         - ⭐️ ⭐️ do a quiz or something at the end of a user completing a stepping stone for the first time (all 3 or whatever lessons, not just one)
                 reinforce the quiz with questions from tests from that school's test bank, and could get users to take pictures of their tests or something to popularize test banks in general
@@ -384,7 +394,6 @@ COMPLETED:
         )
     ✅ fix low / moderate / high vulnerabilities for npm packages in frontend (down to 8 from 26 so yay)
             - anything in dev dependencies are probably fine (vue-cli-... or vue/component...)
-            TODO USE npm audit --only=prod for this, 0 vulnerabilities = good
     ✅ make sure "Knowledge Map", "Lessons", and other dashboard things either actually link somewhere or are handled properly
     ✅ loading bars / wheels possibly (at least look into) (for course creation and for other stuff as well)
         ✅ added loading component to every frontend route, no matter if valid or invalid, in case routes take too long to fetch,

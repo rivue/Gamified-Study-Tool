@@ -26,7 +26,6 @@
                     </div>
                 </div>
 
-
                 <div class="libgen-section">
                     <div class="libgen-section">
 
@@ -35,7 +34,7 @@
                             <div class="libgen-title">Upload File</div>
                             <div class="file-input-container text-[var(--text-color)] border-[var(--text-color)]">
                                 <input type="file" id="fileInput" ref="fileInput" @change="handleFileUpload"
-                                    :disabled="disableExtras" :class="{'input-error': noFileError}" accept=".pdf" />
+                                    :disabled="disableExtras" :class="{ 'input-error': noFileError }" accept=".pdf" />
                                 <div v-if="selectedFile" class="selected-file">
                                     Selected: {{ selectedFile.name }}
                                     <button class="remove-file-btn" @click="removeFile">×</button>
@@ -117,7 +116,8 @@
                                                 Every Unit must have at least one section
                                             </div>
                                             <div v-if="groupSectionNamingErrors[groupIndex]" class="error-message">
-                                                Section names must only have letters or spaces and must be at least 4 characters long.
+                                                Section names must only have letters or spaces and must be at least 4
+                                                characters long.
                                             </div>
                                         </div>
                                     </div>
@@ -137,6 +137,39 @@
                         </div>
                     </div>
                 </div>
+               
+                <!-- Public/Private Toggle -->
+                <div class="libgen-section">
+                    <div class="form-group visibility-toggle p-4">
+                        <div style="font-size:0.8em; opacity:0.7; display:flex; justify-content:center; align-items:center;" class="mb-2">Visibility</div>
+                        <div class="flex items-center justify-center w-full mb-3">
+                            <Tabs v-model="visibilityTab" class="w-full max-w-[400px]">
+                                <TabsList class="grid w-full grid-cols-2 p-1 py-0.5" style="background-color: rgba(var(--element-color-1-rgb), 0.5);">
+                                    <TabsTrigger 
+                                        value="private"
+                                        class="border-0 data-[state=inactive]:opacity-50 data-[state=active]:bg-[var(--element-color-1)] data-[state=active]:text-[var(--text-color)]"
+                                    >
+                                        Private
+                                    </TabsTrigger>
+
+                                    <TabsTrigger 
+                                        value="public"
+                                        class="border-0 data-[state=inactive]:opacity-50 data-[state=active]:bg-[var(--element-color-1)] data-[state=active]:text-[var(--text-color)]"
+                                        >
+                                        Public
+                                    </TabsTrigger>
+                                </TabsList>
+
+                            </Tabs>
+                        </div>
+                        <div class="helper-text">
+                            🐙 Public courses will appear in the course library for all users to explore.
+                        </div>
+                        <div class="helper-text">
+                            🐙 Private courses need a code to join.
+                        </div>
+                    </div>
+                </div>
 
                 <!-- CTA Button -->
                 <div class="cta-container">
@@ -151,7 +184,7 @@
 
 
 <script setup lang="ts">
-import { ref, reactive, watch, computed, onMounted, onUnmounted } from 'vue';
+import { ref, watch, computed, onMounted, onUnmounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import axios from "axios";
 import { storeToRefs } from "pinia";
@@ -165,7 +198,7 @@ import { usePopupStore } from "@/store/popupStore";
 import { useAuthStore } from "@/store/authStore";
 import CtaButton from "../../Footer/LandingPageComponents/CtaButton.vue";
 import LibraryBrowser from "./LibraryBrowser.vue";
-
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 // New or modified data for groups
 interface Group {
@@ -174,7 +207,6 @@ interface Group {
     newSectionName: string;
     sectionError: boolean;
 }
-
 
 const route = useRoute();
 const router = useRouter();
@@ -202,12 +234,12 @@ watch(
 )
 
 watch(
-  () => groups.value.length,
-  (len) => {
-    groupNoSectionErrors.value      = Array(len).fill(false);
-    groupSectionNamingErrors.value  = Array(len).fill(false);
-  },
-  { immediate: true }
+    () => groups.value.length,
+    (len) => {
+        groupNoSectionErrors.value = Array(len).fill(false);
+        groupSectionNamingErrors.value = Array(len).fill(false);
+    },
+    { immediate: true }
 );
 
 const typingEffectStop = ref(() => { });
@@ -229,7 +261,8 @@ const buttonDisabled = ref({
 const selectedFile = ref<File | null>(null);
 const topicInput = ref<HTMLInputElement | null>(null);
 const fileInput = ref<HTMLInputElement | null>(null);
-
+const visibilityTab = ref<'public' | 'private'>('public');
+const isPublic = computed<boolean>(() => visibilityTab.value === 'public');
 
 // Computed properties
 const computedTopics = computed(() => {
@@ -260,20 +293,20 @@ const disableExtras = computed(() => {
 
 // Methods for group management
 const addGroup = () => {
-    
+
     const trimmedName = newGroupName.value.trim();
-    
+
     if (trimmedName && groups.value.length < 10) {
-        
+
         groupError.value = false;
         groupTypingError.value = !/^[a-zA-Z ]+$/.test(trimmedName) || trimmedName.length < 4;
-        
+
         if (groupTypingError.value) {
             return;
         }
-        
+
         groupSpaceError.value = trimmedName[0] === " " || trimmedName[trimmedName.length - 1] === " ";
-        
+
         if (groupSpaceError.value) {
             return;
         }
@@ -318,12 +351,12 @@ const addSection = (groupIndex: number) => {
         if (typingError || spaceError) {
             groupSectionNamingErrors.value[groupIndex] = true;
             return;
-    }
-    
-    groupNoSectionErrors.value[groupIndex] = false;
-    group.sections.push(trimmedName);
-    group.newSectionName = "";
-    buttonDisabled.value.noRooms = false;
+        }
+
+        groupNoSectionErrors.value[groupIndex] = false;
+        group.sections.push(trimmedName);
+        group.newSectionName = "";
+        buttonDisabled.value.noRooms = false;
     }
 };
 
@@ -379,6 +412,14 @@ const getTotalSectionCount = () => {
 };
 
 const hasErrors = (): boolean => {
+
+    if (!(isPublic.value || !isPublic.value)) {
+        console.log(isPublic.value)
+        popupStore.showPopup(
+            "Please select a visibility option."
+        );
+        return true;
+    }
 
     if (!authStore.loggedIn) {
         // must login to submit
@@ -494,6 +535,7 @@ const handleSubmit = () => {
     formData.append("languageDifficulty", "Normal"); // TODO delete later (from backend and library model)
     formData.append("libraryDifficulty", libraryDifficulty.value);
     formData.append("guide", "Azalea"); // TODO delete later (from backend and library model)
+    formData.append("visibility", isPublic.value.toString());
     if (selectedFile.value) {
         formData.append("selectedFile", selectedFile.value);
     }
@@ -810,11 +852,9 @@ input[type="text"] {
     gap: 0.5em;
 }
 
-
 .group-input-wrapper input {
     flex-grow: 1;
 }
-
 
 .add-btn {
     padding: 8px 16px;
