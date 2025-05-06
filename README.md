@@ -10,6 +10,8 @@ IDEAS:
         - break up different files to make them smaller and more modular:
         - library_routes
         - library_handlers
+        - Learning Path 
+            - specifically settings and add node buttons
         - etc... (keep working on this list)
 
     ideas for grand plan / future:
@@ -133,7 +135,7 @@ TODO list:
         - ⭐️ fix Aryan's problem with viewing it on his phone
         - ⭐️ should not be able to make duplicate unit and section names within a library, so check before they create it
         - ⭐️ users SHOULD be able to create libraries with duplicate names because of how generic some courses can be (philosophy, biology, math, calculus, etc...)
-        
+        - ⭐️ library create messages look bad
         - ⭐️ add page after you finish a game session, but make it have confetti / small animation or something
         - ⭐️ make sure the background of the site is the color you want if you scroll to far (like in main page if you scroll too far down) (right now its white which is not good)
 
