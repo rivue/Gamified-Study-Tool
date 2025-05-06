@@ -122,8 +122,10 @@ function resetState() {
 }
 
 function flipQuestion() {
-  store.toggleFactoid();
-  resetState();
+    store.toggleFactoid();
+    answerState.value.wrong = null;
+    answerState.value.correct = null;
+    isShaking.value = false;
 }
 
 function closeQuestion() {

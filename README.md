@@ -138,7 +138,6 @@ TODO list:
         - ⭐️ make sure the background of the site is the color you want if you scroll to far (like in main page if you scroll too far down) (right now its white which is not good)
         - ⭐️ make unit / chapter description text more clear (e.g. Exam 1, Exam 2, etc... and e.g. Mitosis, Cell Replication, etc... sections names must be relevant to the things they describe)
             - ⭐️ add tips for making a new stepping stone (i.e. make sure it aligns with what you put, etc... )
-        - ⭐️ when user flips factoid card, if they have typed something in the box, it doesn't reset
 
     OTHER PAGES:
         - terms and policies page
