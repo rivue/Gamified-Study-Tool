@@ -76,7 +76,7 @@ TODO list:
                 - one idea) add lines in between the nodes and when the course owner mouses over them, it hovers a small node with a "plus" icon
                 - third idea) for course owner, add an "edit" button and "delete / trash can" button when you hover over the course or click it or something, maybe add an "edit mode" in the main bar thing I'm going to add?
             - ⭐️ Add ability to add a unit (later --> come back to, reminder to make it account for 1-n number of sections no matter how that looks)
-            - ⭐️ Add ability for users to actually see the unit name
+            - ✅ ⭐️ Add ability for users to actually see the unit name
             - ✅ ⭐️ Add underlined text in the course screen that shows a small popup when clicked / hovered that says "course not here? --> if you made a course before March 15th, 2025 (or whatever date), we might have made broken changes. We are still learning and will not do this again. Please feel free to generate another course."
         - ⭐️ (would like to implement visibility of different courses first or at least a many:one for non-owners in library model)
             - ⭐️ Delete sections requires entering the name of the unit / course just for accidental reasons)
@@ -84,7 +84,7 @@ TODO list:
             - ⭐️ Delete courses / libraries (whatever they're called) (requires entering the name of the unit / course just for accidental reasons)
             - ⭐️ Remember to delete from both DB and pinecone as well, as well as respective child / parent courses / units / sections / libraries, roomNameState, LibraryFavorites, question, question_choice, LibraryMembership, etc...
         - ⭐️ (courses need ability to add multiple people first) leaderboard / game point tracking system
-        - ⭐️ ⭐️ ⭐️  (might take at least a couple weeks) UI redesign / rehaul *** --> kinnu, duolingo, saved instagram design reels etc..
+        - ⭐️ ⭐️ ⭐️ (might take at least a couple weeks) UI redesign / rehaul *** --> kinnu, duolingo, saved instagram design reels etc..
             - Note: 1) try to see what horizontal --> vertical learning path looks like, and possibly make a vertical bar on the side for settings, i-card, files list, adding a new stepping stone, etc... but maybe keep lesson name and current unit name at the top?
             - COPY QUIZLET???
             - change popups --> toast, possibly with bar that displays when it will leave
@@ -92,11 +92,12 @@ TODO list:
                 - potential new menu: "my libraries" "browse libraries" (would link from search?) "notifications" (like error messages or who joined a library or something), create / + (or maybe it would be a tab at the top next to search)
                 - menu for library would have members list, settings for course owner, potentially a list of files to see, potentially a screen to see library statistics like # likes, # people, etc... 
             - add ui ability to "join" private libraries / public libraries that you didn't create maybe in like a seperate page or list or maybe I could add a box for putting in library codes or something
+            - ⭐️ after user submits something and is waiting, display a loading bar or wheel or different rotating facts (maybe relevant to the library?) letting the user know that it is generating
             - also note: ask gemini / grok / gpt / claude for some ui design tips like adding a menu bar, or ui tips / tricks / helpful websites / youtube videos, etc...
             use this maybe: https://www.shadcn-vue.com/docs/components/stepper.html
             - note: for main page, add two / 3 simple boxes, class you want, school, and possibly professor, and it gives you classes close to you like quizlet / rate my professor along with option for creating your own
                 maybe it shows private ones with a "lock" icon and prompts you to enter a password. this way it would be like more of a network, which would differentiate us from a copy paste ai study tool (turbolearn) / NotebookLM
-            - ability to verify by school email which helps with filtering results?
+        - ability to verify by school email which helps with filtering results?
         - ⭐️ Stripe implementation
             - have to think abt what different payment levels mean / how I want to do it
 
@@ -144,13 +145,14 @@ TODO list:
         - ⭐️ add "scroll to front", "scroll to current", and "scroll to end" button for map page
             - also, maybe change it to vertical
         - ⭐️ add tips for making a new stepping stone (i.e. make sure it aligns with what you put, etc... )
-        - ⭐️ after user submits something and is waiting, display a loading bar or wheel or different rotating facts (maybe relevant to the library?) letting the user know that it is generating
+        
         - ⭐️ add page after you finish a game session, but make it have confetti or an animation or something
                 (right now its white which is not good)
         - ⭐️ make sure the background of the site is the color you want if you scroll to far (like in main page if you scroll too far down)
         - ⭐️ make unit / chapter description text more clear (e.g. Exam 1, Exam 2, etc... and e.g. Mitosis, Cell Replication, etc... sections names must be relevant to the things they describe)
         - ⭐️ center names of libraries and make white box extend down to bottom library as well
         - ⭐️ fix thing that makes nodes hover when you hover your mouse over the node popup box
+        - add a small hover animation when "Play" / "Review" button is hovered
 
     OTHER PAGES:
         - terms and policies page

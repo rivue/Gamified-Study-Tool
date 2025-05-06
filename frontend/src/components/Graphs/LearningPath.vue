@@ -16,23 +16,6 @@
             style="color: var(--highlight-color);">
             <CogIcon class="w-10 h-10" />
         </button>
-        <!-- @click="showAddNodeModal = true" -->
-        <!-- Fixed Add Stepping Stone Button - Center Top -->
-        <!-- <div class="fixed top-24 right- z-10">
-            <button
-            class="shadow-lg p-4 flex items-center justify-center transition-colors rounded-xl"
-            style="background-color: gray; color: gray;">
-            <CogIcon class="w-10 h-10" style="color: white;" />
-            </button>
-        </div> -->
-        <!-- <div class="fixed top-48 left-1/2 -translate-x-1/2 z-10">
-            <button @click="showAddNodeModal = true"
-            class="shadow-lg rounded-full p-4 flex items-center justify-center transition-colors"
-            style="background-color: var(--element-color-1); color: var(--light-text);">
-            <PlusIcon class="w-6 h-6" />
-            <span class="ml-2 font-medium">Add New Stepping Stones</span>
-            </button>
-        </div> -->
         <div ref="scrollContainer"
             class="scrollContainer w-full h-full overflow-x-auto overflow-y-hidden cursor-grab active:cursor-grabbing"
             @mousedown="startDragging" @mousemove="drag" @mouseup="stopDragging" @mouseleave="stopDragging"
@@ -44,19 +27,16 @@
                 <!-- Unit Headers -->
                 <template v-for="([unit], unitName, unitIndex) in rawUnitData" :key="unit.unit_id">
                     <!-- Unit container with border and styling -->
-                    <div class="relative -mx-12 my-8 px-12 pt-12 pb-36 border-t-2 border-b-2 flex-shrink-0"
-                        :style="{
-                            borderColor: getUnitColor(unitIndex),
-                            backgroundColor: 'var(--background-color-1t)',
-                            borderLeft: unitIndex === 0 ? `2px solid ${getUnitColor(unitIndex)}` : 'none',
-                            borderRight: unitIndex === Object.keys(rawUnitData).length - 1 ? `2px solid ${getUnitColor(unitIndex)}` : 'none',
-                            borderTopLeftRadius: unitIndex === 0 ? `0.625rem` : 'none',
-                            borderBottomLeftRadius: unitIndex === 0 ? `0.625rem` : 'none',
- 
- 
-                            borderTopRightRadius: unitIndex === Object.keys(rawUnitData).length - 1  ? `0.625rem` : 'none',
-                            borderBottomRightRadius: unitIndex === Object.keys(rawUnitData).length - 1 ? `0.625rem` : 'none',
-                        }">
+                    <div class="relative -mx-12 my-8 px-12 pt-12 pb-36 border-t-2 border-b-2 flex-shrink-0" :style="{
+                        borderColor: getUnitColor(unitIndex),
+                        backgroundColor: 'var(--background-color-1t)',
+                        borderLeft: unitIndex === 0 ? `2px solid ${getUnitColor(unitIndex)}` : 'none',
+                        borderRight: unitIndex === Object.keys(rawUnitData).length - 1 ? `2px solid ${getUnitColor(unitIndex)}` : 'none',
+                        borderTopLeftRadius: unitIndex === 0 ? `0.625rem` : 'none',
+                        borderBottomLeftRadius: unitIndex === 0 ? `0.625rem` : 'none',
+                        borderTopRightRadius: unitIndex === Object.keys(rawUnitData).length - 1 ? `0.625rem` : 'none',
+                        borderBottomRightRadius: unitIndex === Object.keys(rawUnitData).length - 1 ? `0.625rem` : 'none',
+                    }">
                         <!-- Unit name header -->
                         <div class="absolute -top-5 left-1/2 transform -translate-x-1/2 px-6 py-2 rounded-lg font-bold text-xl whitespace-nowrap shadow-md"
                             :style="{ backgroundColor: getUnitColor(unitIndex), color: 'var(--light-text)' }">
@@ -66,13 +46,15 @@
                         <div class="flex items-center gap-24">
                             <template v-for="([sectionId, sectionName], sectionIndex) in rawUnitData[unitName]"
                                 :key="sectionIndex">
-                                <div class="relative flex-shrink-0 group perspective" :style="{
+                                <div class="relative flex-shrink-0" :style="{
                                     transform: `translateY(${getNodeOffset(getGlobalSectionIndex(unitIndex, sectionIndex))}px)`
                                 }" @click="handleNodeClick(sectionId)">
+                                    <!-- THIS IS THE KEY CHANGE: Moved the tooltip outside the group element that controls hovering -->
                                     <!-- Tooltip -->
                                     <div v-if="selectedRoomId && selectedRoomId === sectionId"
-                                        class="absolute -top-32 left-1/2 -translate-x-1/2 w-64 z-50">
-                                        <div class="relative">
+                                        class="absolute -top-32 left-1/2 -translate-x-1/2 w-64 z-50" @mouseenter.stop
+                                        @mouseover.stop>
+                                        <div class="relative" style="pointer-events: auto;">
                                             <!-- Red close button in top-right -->
                                             <div @click.stop="selectedRoomId = null"
                                                 class="absolute -top-3 -right-3 w-8 h-8 rounded-full flex items-center justify-center cursor-pointer"
@@ -103,19 +85,21 @@
                                                 style="background-color: var(--element-color-1);" />
                                         </div>
                                     </div>
-                                    <div
-                                        class="relative transform-gpu transition-all duration-300 group-hover:scale-105 group-hover:-translate-y-2">
-                                        <div class="absolute -bottom-4 left-1/2 -translate-x-1/2 w-40 h-8 rounded-full blur-xl transform-gpu transition-all duration-300 group-hover:w-44"
-                                            style="background-color: var(--background-color-1t);"></div>
-                                        <div class="relative w-48 h-48">
-                                            <div class="absolute inset-0 rounded-full transform-gpu translate-y-1"
-                                                :style="{ backgroundColor: getUnitColor(unitIndex) }"></div>
-                                            <div class="absolute inset-0 rounded-full flex items-center justify-center cursor-pointer shadow-lg transform-gpu transition-all duration-300"
-                                                :style="{ background: getUnitGradient(unitIndex) }">
-                                                <component
-                                                    :is="getIconForIndex(getGlobalSectionIndex(unitIndex, sectionIndex))"
-                                                    class="w-24 h-24 transform-gpu transition-all duration-300 group-hover:scale-110"
-                                                    style="color: var(--light-text);" />
+
+                                    <!-- Icon button with hover group -->
+                                    <div class="group perspective">
+                                        <div
+                                            class="relative transform-gpu transition-all duration-300 group-hover:scale-105 group-hover:-translate-y-2">
+                                            <div class="relative w-48 h-48">
+                                                <div class="absolute inset-0 rounded-full transform-gpu translate-y-1"
+                                                    :style="{ backgroundColor: getUnitColor(unitIndex) }"></div>
+                                                <div class="absolute inset-0 rounded-full flex items-center justify-center cursor-pointer shadow-lg transform-gpu transition-all duration-300"
+                                                    :style="{ background: getUnitGradient(unitIndex) }">
+                                                    <component
+                                                        :is="getIconForIndex(getGlobalSectionIndex(unitIndex, sectionIndex))"
+                                                        class="w-24 h-24 transform-gpu transition-all duration-300 group-hover:scale-105 group-hover:-translate-y-2"
+                                                        style="color: var(--light-text);" />
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -303,10 +287,10 @@
             </div>
         </div>
     </Transition>
- </template>
- <script setup lang="ts">
- import { ref, watch, onMounted, onUnmounted } from 'vue'
- import {
+</template>
+<script setup lang="ts">
+import { ref, watch, onMounted, onUnmounted } from 'vue'
+import {
     StarIcon,
     BookOpenIcon,
     TrophyIcon,
@@ -324,11 +308,11 @@
     DocumentPlusIcon,
     DocumentIcon,
     XCircleIcon
- } from '@heroicons/vue/24/solid'
- import { useGameStore } from '@/store/gameStore'
- import { useRouter } from 'vue-router';
- import axios from 'axios';
- const props = defineProps({
+} from '@heroicons/vue/24/solid'
+import { useGameStore } from '@/store/gameStore'
+import { useRouter } from 'vue-router';
+import axios from 'axios';
+const props = defineProps({
     libraryId: {
         type: String,
         required: true
@@ -353,57 +337,57 @@
         type: [String, null],
         required: true
     }
- })
- const rawUnitData = ref();
- const isPublic = ref(false);
- const joinCode = ref<string | null>(null);
- watch(() => props.unitSectionMap, async (newVal) => {
+})
+const rawUnitData = ref();
+const isPublic = ref(false);
+const joinCode = ref<string | null>(null);
+watch(() => props.unitSectionMap, async (newVal) => {
     rawUnitData.value = newVal;
- }, { deep: true, immediate: true })
- // Initialize libraryIsPublic from props
- watch(() => props.libraryIsPublic, (newVal) => {
+}, { deep: true, immediate: true })
+// Initialize libraryIsPublic from props
+watch(() => props.libraryIsPublic, (newVal) => {
     isPublic.value = newVal;
- }, { immediate: true });
- watch(() => props.libraryJoinCode, (newVal) => {
+}, { immediate: true });
+watch(() => props.libraryJoinCode, (newVal) => {
     joinCode.value = newVal;
- }, { immediate: true });
- // State for adding new nodes
- const showAddNodeModal = ref(false)
- const newNodeNames = ref([''])
- const selectedFile = ref(null)
- const nodeNameErrors = ref([])
- const fileError = ref('')
- const isAddingNode = ref(false)
- const gameStore = useGameStore()
- const showSettingsModal = ref(false)
- const isUpdatingVisibility = ref(false);
- const pendingStatus = ref<boolean | null>(null);
- // Track selected room for tooltip
- const selectedRoomId = ref(null)
- const library_id = props.libraryId;
- // File input handling
- const fileInput = ref(null)
- // Color schemes for units
- const unitColors = [
+}, { immediate: true });
+// State for adding new nodes
+const showAddNodeModal = ref(false)
+const newNodeNames = ref([''])
+const selectedFile = ref(null)
+const nodeNameErrors = ref([])
+const fileError = ref('')
+const isAddingNode = ref(false)
+const gameStore = useGameStore()
+const showSettingsModal = ref(false)
+const isUpdatingVisibility = ref(false);
+const pendingStatus = ref<boolean | null>(null);
+// Track selected room for tooltip
+const selectedRoomId = ref(null)
+const library_id = props.libraryId;
+// File input handling
+const fileInput = ref(null)
+// Color schemes for units
+const unitColors = [
     '#2ecc71', // green
     '#f1c40f', // yellow
     '#3498db', // blue
     '#e74c3c', // red
- ]
- function toggleSettings() {
+]
+function toggleSettings() {
     showSettingsModal.value = !showSettingsModal.value
- }
- // Get color for a unit based on its index
- const getUnitColor = (unitIndex) => {
+}
+// Get color for a unit based on its index
+const getUnitColor = (unitIndex) => {
     const colorIndex = unitIndex % unitColors.length
     return unitColors[colorIndex];
- }
- // Get gradient for a unit based on its index
- const getUnitGradient = (unitIndex) => {
+}
+// Get gradient for a unit based on its index
+const getUnitGradient = (unitIndex) => {
     const colorIndex = unitIndex % unitColors.length
     return `linear-gradient(135deg, ${unitColors[colorIndex]}, ${unitColors[colorIndex]})`
- }
- const setLibraryIsPublicStatus = async (newStatus: boolean) => {
+}
+const setLibraryIsPublicStatus = async (newStatus: boolean) => {
     if (isPublic.value === newStatus) {
         return; // No change needed
     }
@@ -427,9 +411,9 @@
             isUpdatingVisibility.value = false;
             // pendingStatus.value = null;
         });
- }
- // Get global section index (for offset and icon selection)
- const getGlobalSectionIndex = (unitIndex: number, sectionIndex: number) => {
+}
+// Get global section index (for offset and icon selection)
+const getGlobalSectionIndex = (unitIndex: number, sectionIndex: number) => {
     let count = 0;
     // Sum the lengths of sections for all units before the current unitIndex
     for (let i = 0; i < unitIndex; i++) {
@@ -440,8 +424,8 @@
         }
     }
     return count + sectionIndex;
- }
- const handleFileSelection = (event) => {
+}
+const handleFileSelection = (event) => {
     const file = event.target.files[0]
     if (!file) return
     fileError.value = ''
@@ -462,31 +446,31 @@
         return
     }
     selectedFile.value = file
- }
- const removeFile = () => {
+}
+const removeFile = () => {
     selectedFile.value = null
     fileError.value = ''
     if (fileInput.value) {
         fileInput.value.value = ''
     }
- }
- const formatFileSize = (bytes) => {
+}
+const formatFileSize = (bytes) => {
     if (bytes < 1024) return bytes + ' B'
     if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB'
     return (bytes / 1048576).toFixed(1) + ' MB'
- }
- // Add a new node name field
- const addNodeNameField = () => {
+}
+// Add a new node name field
+const addNodeNameField = () => {
     newNodeNames.value.push('')
     nodeNameErrors.value.push('')
- }
- // Remove a node name field
- const removeNodeName = (index) => {
+}
+// Remove a node name field
+const removeNodeName = (index) => {
     newNodeNames.value.splice(index, 1)
     nodeNameErrors.value.splice(index, 1)
- }
- // Function to add a new node
- const addNewNodes = async () => {
+}
+// Function to add a new node
+const addNewNodes = async () => {
     // Validate node name
     nodeNameErrors.value = new Array(newNodeNames.value.length).fill('')
     let hasError = false
@@ -540,9 +524,9 @@
     } finally {
         isAddingNode.value = false
     }
- }
- // Function to get the corresponding room data by section ID
- const getRoomData = (sectionId: Number) => {
+}
+// Function to get the corresponding room data by section ID
+const getRoomData = (sectionId: Number) => {
     for (let i = 0; i < props.roomData.length; i++) {
         if (props.roomData[i].section_id === sectionId) {
             return props.roomData[i];
@@ -550,9 +534,9 @@
     }
     // Return null if not found
     return null;
- }
- // Array of icons to cycle through
- const icons = [
+}
+// Array of icons to cycle through
+const icons = [
     StarIcon,
     ChatBubbleBottomCenterTextIcon,
     BookOpenIcon,
@@ -562,26 +546,26 @@
     BeakerIcon,
     SparklesIcon,
     RocketLaunchIcon
- ]
- // Get icon based on index
- const getIconForIndex = (index) => {
+]
+// Get icon based on index
+const getIconForIndex = (index) => {
     return icons[index % icons.length]
- }
- // Format room name for display
- const formatRoomName = (name) => {
+}
+// Format room name for display
+const formatRoomName = (name) => {
     if (!name) return '';
     return name
         .split('_')
         .map(word => word.charAt(0).toUpperCase() + word.slice(1))
         .join(' ')
- }
- const scrollContainer = ref(null)
- const isDragging = ref(false)
- const startX = ref(0)
- const scrollLeft = ref(0)
- let scrollTimeoutId = null;
- // Scroll to center on first load
- onMounted(() => {
+}
+const scrollContainer = ref(null)
+const isDragging = ref(false)
+const startX = ref(0)
+const scrollLeft = ref(0)
+let scrollTimeoutId = null;
+// Scroll to center on first load
+onMounted(() => {
     joinCode.value = props.libraryJoinCode;
     // If there are nodes and the container exists, scroll to position
     if (rawUnitData.value.length > 0 && scrollContainer.value) {
@@ -595,19 +579,19 @@
             scrollTimeoutId = null; // Clear the timeout ID
         }, 100);
     }
- });
- onUnmounted(() => {
+});
+onUnmounted(() => {
     if (scrollTimeoutId) {
         clearTimeout(scrollTimeoutId); // Clear the timeout if it hasn't run yet
         console.debug("LearningPath unmounting, cleared initial scroll timeout.");
     }
- });
- // Add these variables
- const startY = ref(0)
- const hasMoved = ref(false)
- const tapThreshold = 10 // pixels to consider as a tap vs drag
- const router = useRouter();
- const startDragging = (e) => {
+});
+// Add these variables
+const startY = ref(0)
+const hasMoved = ref(false)
+const tapThreshold = 10 // pixels to consider as a tap vs drag
+const router = useRouter();
+const startDragging = (e) => {
     isDragging.value = true
     hasMoved.value = false
     if (e.type.includes('touch')) {
@@ -618,8 +602,8 @@
         e.preventDefault() // Only prevent default for mouse events
     }
     scrollLeft.value = scrollContainer.value.scrollLeft
- }
- const drag = (e) => {
+}
+const drag = (e) => {
     if (!isDragging.value) return
     let x, y
     if (e.type.includes('touch')) {
@@ -638,28 +622,28 @@
         const walk = (x - startX.value) * 2
         scrollContainer.value.scrollLeft = scrollLeft.value - walk
     }
- }
- const stopDragging = () => {
+}
+const stopDragging = () => {
     isDragging.value = false
- }
- const handleNodeClick = (sectionId) => {
+}
+const handleNodeClick = (sectionId) => {
     if (!hasMoved.value) {
         selectedRoomId.value = selectedRoomId.value && selectedRoomId.value === sectionId ? null : sectionId
     }
- }
- const getNodeOffset = (index) => {
+}
+const getNodeOffset = (index) => {
     // const amplitude = Let's change this to code so it looks better
     const amplitude = 80
     return Math.sin(index * 0.7) * amplitude
- }
- const startLesson = (sectionName, sectionId) => {
+}
+const startLesson = (sectionName, sectionId) => {
     gameStore.setSectionId(sectionId);
     router.push({
         name: 'GamePage',
         params: { id: library_id, roomName: sectionName },
     })
- }
- const scroll = (direction) => {
+}
+const scroll = (direction) => {
     if (!scrollContainer.value) return
     const scrollAmount = 600
     const currentScroll = scrollContainer.value.scrollLeft
@@ -667,41 +651,47 @@
         left: direction === 'left' ? currentScroll - scrollAmount : currentScroll + scrollAmount,
         behavior: 'smooth'
     })
- }
- // Handle scroll event
- const handleScroll = () => {
+}
+// Handle scroll event
+const handleScroll = () => {
     // Implement if needed
- }
- </script>
- <style scoped>
- .overflow-x-auto {
+}
+</script>
+<style scoped>
+.overflow-x-auto {
     -webkit-overflow-scrolling: touch;
     scroll-behavior: smooth;
     user-select: none;
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
- }
- .overflow-x-auto::-webkit-scrollbar {
+}
+
+.overflow-x-auto::-webkit-scrollbar {
     display: none;
- }
- .overflow-x-auto {
+}
+
+.overflow-x-auto {
     -ms-overflow-style: none;
     scrollbar-width: none;
- }
- .perspective {
+}
+
+.perspective {
     perspective: 1000px;
- }
- /* Modal transitions */
- .modal-enter-active,
- .modal-leave-active {
+}
+
+/* Modal transitions */
+.modal-enter-active,
+.modal-leave-active {
     transition: opacity 0.3s ease;
- }
- .modal-enter-from,
- .modal-leave-to {
+}
+
+.modal-enter-from,
+.modal-leave-to {
     opacity: 0;
- }
- @media (max-width: 600px) {
+}
+
+@media (max-width: 600px) {
     .scrollContainer {
         position: static !important;
         /* let it flow in the document */
@@ -716,7 +706,5 @@
         justify-content: center;
         /* center the items horizontally */
     }
- }
- </style>
- 
- 
+}
+</style>
