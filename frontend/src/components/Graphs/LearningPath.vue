@@ -2,7 +2,7 @@
     <div class="fixed left-8 right-8 top-0 bottom-0 overflow-hidden">
 
         <!-- Double‐left chevron: hide once we’ve scrolled past a bit -->
-        <button v-if="scrollPosition > 500" @click="scrollToStart(); $nextTick(() => handleScroll())"
+        <button v-if="scrollPosition > 400" @click="scrollToStart(); $nextTick(() => handleScroll())"
             class="fixed left-8 top-1/3 -translate-y-1/2 bg-black/30 backdrop-blur-sm shadow-md rounded-full p-4 hover:bg-black/40 z-10"
             style="color: var(--highlight-color);">
             <ChevronDoubleLeftIcon class="w-12 h-12" />
@@ -23,7 +23,7 @@
         </button>
 
         <!-- Double‐right chevron -->
-        <button v-if="scrollPosition < (scrollContainer.scrollWidth - scrollContainer.clientWidth - 400)" @click="scrollToEnd(); $nextTick(() => handleScroll())"
+        <button v-if="scrollPosition < (maxLeft - 400)" @click="scrollToEnd(); $nextTick(() => handleScroll())"
             class="fixed right-8 top-1/3 -translate-y-1/2 bg-black/30 backdrop-blur-sm shadow-md rounded-full p-4 hover:bg-black/40 z-10"
             style="color: var(--highlight-color);">
             <ChevronDoubleRightIcon class="w-12 h-12" />
@@ -487,6 +487,8 @@ const unitColors = [
     '#e74c3c', // red
 ]
 
+const maxLeft = ref(0)
+
 // snap back to the first node (same 200 px offset you use on mount)
 const scrollToStart = () => {
     if (!scrollContainer.value) return
@@ -496,12 +498,9 @@ const scrollToStart = () => {
 // snap back to the first node (same 200 px offset you use on mount)
 const scrollToEnd = () => {
     if (!scrollContainer.value) return
-    const sc = scrollContainer.value
-    if (!sc) return
 
     /* how far we can scroll = total content width – visible width */
-    const maxLeft = sc.scrollWidth - sc.clientWidth
-    scrollContainer.value.scrollTo({ left: maxLeft, behavior: 'smooth' })
+    scrollContainer.value.scrollTo({ left: maxLeft.value, behavior: 'smooth' })
 }
 
 function toggleSettings() {
@@ -735,6 +734,9 @@ onMounted(() => {
             scrollTimeoutId = null; // Clear the timeout ID
         }, 100);
     }
+    const sc = scrollContainer.value
+    if (!sc) return
+    maxLeft.value = sc.scrollWidth - sc.clientWidth
 });
 onUnmounted(() => {
     if (scrollTimeoutId) {

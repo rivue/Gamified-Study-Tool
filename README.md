@@ -91,6 +91,8 @@ TODO list:
                 - menu for library would have members list, settings for course owner, potentially a list of files to see, potentially a screen to see library statistics like # likes, # people, etc... 
                 -  settings button would enable course owners to remove people, change visibility settings I think? or check different boxes for question types, or see users or something
                 users could add a note for each unit or something
+                - ⭐️ explore adding "scroll to current" on map page (last unlocked node)
+                - also, maybe change it to vertical
             - add ui ability to "join" private libraries / public libraries that you didn't create maybe in like a seperate page or list or maybe I could add a box for putting in library codes or something
             - ⭐️ after user submits something and is waiting, display a loading bar or wheel or different rotating facts (maybe relevant to the library?) letting the user know that it is generating
             - also note: ask gemini / grok / gpt / claude for some ui design tips like adding a menu bar, or ui tips / tricks / helpful websites / youtube videos, etc...
@@ -131,12 +133,10 @@ TODO list:
         - ⭐️ fix Aryan's problem with viewing it on his phone
         - ⭐️ should not be able to make duplicate unit and section names within a library, so check before they create it
         - ⭐️ users SHOULD be able to create libraries with duplicate names because of how generic some courses can be (philosophy, biology, math, calculus, etc...)
-        - ⭐️ add "scroll to front", "scroll to current", and "scroll to end" button for map page
-            - also, maybe change it to vertical
         
         - ⭐️ add page after you finish a game session, but make it have confetti / small animation or something
         - ⭐️ make sure the background of the site is the color you want if you scroll to far (like in main page if you scroll too far down) (right now its white which is not good)
-        - ⭐️ make sure the unit name box extends to sections to top of the arc as well
+        - ⭐️ ⭐️ make sure the unit name box extends to sections to top of the arc as well
 
     OTHER PAGES:
         - terms and policies page
