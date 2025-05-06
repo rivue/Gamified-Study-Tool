@@ -146,13 +146,12 @@ TODO list:
             - also, maybe change it to vertical
         - ⭐️ add tips for making a new stepping stone (i.e. make sure it aligns with what you put, etc... )
         
-        - ⭐️ add page after you finish a game session, but make it have confetti or an animation or something
-                (right now its white which is not good)
-        - ⭐️ make sure the background of the site is the color you want if you scroll to far (like in main page if you scroll too far down)
+        - ⭐️ add page after you finish a game session, but make it have confetti / small animation or something
+        - ⭐️ make sure the background of the site is the color you want if you scroll to far (like in main page if you scroll too far down) (right now its white which is not good)
         - ⭐️ make unit / chapter description text more clear (e.g. Exam 1, Exam 2, etc... and e.g. Mitosis, Cell Replication, etc... sections names must be relevant to the things they describe)
         - ⭐️ center names of libraries and make white box extend down to bottom library as well
-        - ⭐️ fix thing that makes nodes hover when you hover your mouse over the node popup box
-        - add a small hover animation when "Play" / "Review" button is hovered
+        - ✅ ⭐️ fix thing that makes nodes hover when you hover your mouse over the node popup box
+        - ✅ ⭐️ add a small hover animation when "Play" / "Review" button is hovered
 
     OTHER PAGES:
         - terms and policies page

@@ -72,13 +72,24 @@
                                                             getRoomData(sectionId).num_lessons }}
                                                     </span>
                                                 </div>
-                                                <button @click.stop="startLesson(sectionName, sectionId)"
-                                                    class="w-full rounded-xl py-2 px-4 font-medium flex items-center justify-center gap-2 transition-colors"
-                                                    style="background-color: var(--light-text); color: var(--element-color-1);">
-                                                    <span
-                                                        v-if="getRoomData(sectionId) && getRoomData(sectionId).lesson_state <= getRoomData(sectionId).num_lessons">PLAY</span>
-                                                    <span v-else>REVIEW</span>
-                                                </button>
+                                                <div class="relative">
+                                                    <!-- Shadow element (bottom layer) -->
+                                                    <div class="absolute inset-0 rounded-xl" 
+                                                        style="background-color: rgba(0,0,0,0.2); transform: translateY(4px);"></div>
+                                                    
+                                                    <!-- Button element (top layer) -->
+                                                    <button @click.stop="startLesson(sectionName, sectionId)"
+                                                        class="relative w-full rounded-xl py-2 px-4 font-medium flex items-center justify-center gap-2 transition-transform duration-200 hover:translate-y-1"
+                                                        style="background-color: var(--light-text); color: var(--element-color-1);">
+                                                        <span
+                                                            v-if="getRoomData(sectionId) && getRoomData(sectionId).lesson_state <= getRoomData(sectionId).num_lessons">
+                                                            PLAY
+                                                        </span>
+                                                        <span v-else>
+                                                            REVIEW
+                                                        </span>
+                                                    </button>
+                                                </div>
                                             </div>
                                             <!-- Triangle pointer -->
                                             <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 transform rotate-45"
@@ -144,7 +155,7 @@
                                 style="color: var(--color-primary-light);">
                                 <!-- {{ nodeNameErrors }} -->
                                 <span v-for="(error, index) in nodeNameErrors" :key="index">{{ error
-                                }}<br></span>
+                                    }}<br></span>
                             </p>
                         </div>
                         <button @click="addNodeNameField" class="mt-2 text-sm font-medium flex items-center gap-1"
