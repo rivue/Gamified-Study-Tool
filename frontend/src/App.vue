@@ -20,7 +20,6 @@
                 <AdPopup />
             </div>
         </div>
-        <BottomBar v-if="( !loggedIn || !shouldShowChat) && !hideHeaderFooter" />
     </div>
 </template>
 
@@ -29,7 +28,6 @@ import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import TopBar from "./components/Header/TopBar.vue";
 import SideMenu from "./components/Header/SideMenu.vue";
-import BottomBar from "./components/Footer/BottomBar.vue";
 import SubHeader from "./components/Header/SubHeader.vue";
 import InfoPopup from "./components/Menus/InfoPopup.vue";
 import AdPopup from "./components/Monetization/AdPopup.vue";

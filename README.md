@@ -6,6 +6,12 @@ Note: use npm audit --only=prod for this, 0 vulnerabilities = good
 
 IDEAS:
 
+    cleanup / maintenence:
+        - break up different files to make them smaller and more modular:
+        - library_routes
+        - library_handlers
+        - etc... (keep working on this list)
+
     ideas for grand plan / future:
         - Brain-Computer Interface (BCI) Integrations
             For researchers with EEG headsets: detect attention lapses or cognitive overload and adapt content pacing in real time.
@@ -28,12 +34,12 @@ IDEAS:
         - create a community discord server (configure the current one)
 
         - create cheap vr cardboard cutouts of headsets where you can put your phone --> give to high schools possibly for free once you partner with them and possibly include neural monitoring hard ware so we can take in their brain data and do something with it
-           - AR Annotations & Pop-Ups
-                Point your phone at a page of a textbook (or whiteboard) and see AI-generated overlays—diagrams that float in 3D, step-by-step solution hints, pronunciation guides for foreign-language vocab, and interactive “hotspots” you can tap for mini-quizzes.
 
+           - AR Annotations & Pop-Ups
+                Point your phone at a page of a textbook (or whiteboard) and see AI-generated overlays—diagrams that float in 3D, step-by-step solution hints, pronunciation guides for foreign-language vocab, and interactive “hotspots” you can tap for mini-quizzes
             - Virtual Lab Simulations
                 launch fully simulated physics, chemistry, or biology experiments in the browser or VR headset. Mix chemicals, wire circuits, dissect virtual frogs—all with real-time AI guidance and safety feedback.
-            - have to think specifically of who / what to target for MVP, etc... so as little time as possibly gets wasted building something  that either 1) is outside of my domain of expertise or 2) other people might build (repeat of unclear jupyterhub research)
+            - have to think specifically of who / what to target for MVP, etc... so as little time as possible gets wasted building something that either 1) is outside of my domain of expertise or 2) other people might build (repeat of unclear jupyterhub research)
             - not sure where to go from there, lots of places though
         - see google doc for more plans for resume (or just repomix this whole codebase into gpt / grok / gemini / claude, etc..)
             - Built a custom text extraction pipeline using Optical Character Recognition to extract text from pdf textbooks with 97% accuracy
@@ -63,15 +69,11 @@ TODO list:
 
     LAUNCH LIST: goal: July 6th then start working on social media posts
 
-
-        password thing
-            - test password with spaces at beginning / end
-
         hard probably (goal: 2 high level bullet points / wk):
+        - Add "edit mode" for library creator - would allow them to delete sections / units / courses and also add sections / units and would keep editing isolated from actually playing the course
         - ✅ ⭐️ Finish sections + units
             - ⭐️ Add ability to add each section to each unit (later --> come back to, reminder to make it account for 1-n number of sections no matter how that looks. add new stepping stones button is commented out for now)
                 - one idea) add lines in between the nodes and when the course owner mouses over them, it hovers a small node with a "plus" icon
-                - second idea) adds a node at the end of all the nodes (I don't like this one though)
                 - third idea) for course owner, add an "edit" button and "delete / trash can" button when you hover over the course or click it or something, maybe add an "edit mode" in the main bar thing I'm going to add?
             - ⭐️ Add ability to add a unit (later --> come back to, reminder to make it account for 1-n number of sections no matter how that looks)
             - ⭐️ Add ability for users to actually see the unit name
@@ -80,12 +82,16 @@ TODO list:
             - ⭐️ Delete sections requires entering the name of the unit / course just for accidental reasons)
             - ⭐️ Delete Units( requires entering the name of the unit / course just for accidental reasons)
             - ⭐️ Delete courses / libraries (whatever they're called) (requires entering the name of the unit / course just for accidental reasons)
-            - ⭐️ Remember to delete from both DB and pinecone as well, as well as respective child / parent courses / units / sections / libraries, roomNameState, LibraryFavorites, question, question_choice, etc...
+            - ⭐️ Remember to delete from both DB and pinecone as well, as well as respective child / parent courses / units / sections / libraries, roomNameState, LibraryFavorites, question, question_choice, LibraryMembership, etc...
         - ⭐️ (courses need ability to add multiple people first) leaderboard / game point tracking system
-        - (might take at least a couple weeks) ⭐️ UI redesign / rehaul *** --> kinnu, duolingo, saved instagram design reels etc..
+        - ⭐️ ⭐️ ⭐️  (might take at least a couple weeks) UI redesign / rehaul *** --> kinnu, duolingo, saved instagram design reels etc..
             - Note: 1) try to see what horizontal --> vertical learning path looks like, and possibly make a vertical bar on the side for settings, i-card, files list, adding a new stepping stone, etc... but maybe keep lesson name and current unit name at the top?
             - COPY QUIZLET???
+            - change popups --> toast, possibly with bar that displays when it will leave
             - note: maybe change top navbar to be a constant hovering side menu on the side / bottom of the screen maybe similar to duolingo and possibly replace "my library", "settings", etc.. with actual icons
+                - potential new menu: "my libraries" "browse libraries" (would link from search?) "notifications" (like error messages or who joined a library or something), create / + (or maybe it would be a tab at the top next to search)
+                - menu for library would have members list, settings for course owner, potentially a list of files to see, potentially a screen to see library statistics like # likes, # people, etc... 
+            - add ui ability to "join" private libraries / public libraries that you didn't create maybe in like a seperate page or list or maybe I could add a box for putting in library codes or something
             - also note: ask gemini / grok / gpt / claude for some ui design tips like adding a menu bar, or ui tips / tricks / helpful websites / youtube videos, etc...
             use this maybe: https://www.shadcn-vue.com/docs/components/stepper.html
             - note: for main page, add two / 3 simple boxes, class you want, school, and possibly professor, and it gives you classes close to you like quizlet / rate my professor along with option for creating your own
@@ -102,8 +108,6 @@ TODO list:
         - ✅ ⭐️ visibility of different courses? are they all public like quizlet or am I trying to form a tight knit group like clash royale?
             - ✅ ⭐️ for private, users would need some sort of short invite code
             - change 
-            - add ability to specify public / private in library creator and of course make sure private ones have join_codes
-            # then add ui ability to "join" private libraries / public libraries that you didn't create maybe in like a seperate page or list or code box or something
 
     # basically in library browser, see all libraries
     # then add ability to leave libraries (later)
@@ -123,28 +127,30 @@ TODO list:
             - ⭐️ Look at websites and stuff for this
         - ⭐️ In creating a new library, add checkboxes for different types of modes (fill-in-the-blank, t/f, mcq, etc…)
             - maybe add it in settings for owner as well (enable / disable for future lesson content generation)
-        - ⭐️ Syllabus to section / unit converter / parser thing
         - ⭐️ remove library difficulty, mentor, language, etc... from db course structure, backend, frontend course creation screen
             - note: easy to get rid of in the frontend, but have to remove lots of stuff in backend w/ various function calls and stuff
         - ⭐️ add some other types of games / questions (ex: true / false, very detailed / specific questions, sorting, compare / contrast, analogies, image based stuff (not sure how to implement) 6 options choose 1-6, etc... see list below)
         - ⭐️ all the other routes and stuff (terms & policies, buying subscription)
         - ⭐️ add i-card for all users, maybe description about the library along with a preview of the files used in the library and maybe also users who are members of the library or something 
+            - should I replace the proposed "i-card" with some icon that links to library details like discord has with their profile page where I would put files, members, and everything else in the menu, or should I keep it as is?
             - maybe this would be near leaderboard or something
             - this would be a tab / icon in one of the vertical menu bar thing I want to add
         - ⭐️ add staging / pre-production environment that isn't localhost
         
         easy (same as medium): 
         - ⭐️ fix Aryan's problem with viewing it on his phone
-        - ⭐️ should not be able to make duplicate unit and section names
+        - ⭐️ should not be able to make duplicate unit and section names within a library, so check before they create it
+        - ⭐️ users SHOULD be able to create libraries with duplicate names because of how generic some courses can be (philosophy, biology, math, calculus, etc...)
         - ⭐️ add "scroll to front", "scroll to current", and "scroll to end" button for map page
             - also, maybe change it to vertical
         - ⭐️ add tips for making a new stepping stone (i.e. make sure it aligns with what you put, etc... )
-        - ⭐️ add check for duplicate room name for the time being - maybe allow it later down the line?
         - ⭐️ after user submits something and is waiting, display a loading bar or wheel or different rotating facts (maybe relevant to the library?) letting the user know that it is generating
         - ⭐️ add page after you finish a game session, but make it have confetti or an animation or something
-        - ⭐️ add default background if you scroll to far (like in main page if you scroll too far down)
-        - ⭐️ make unit / chapters more clear (e.g. Exam 1, Exam 2, etc... and e.g. Mitosis, Cell Replication, etc... sections names must be relevant to the things they describe)
+                (right now its white which is not good)
+        - ⭐️ make sure the background of the site is the color you want if you scroll to far (like in main page if you scroll too far down)
+        - ⭐️ make unit / chapter description text more clear (e.g. Exam 1, Exam 2, etc... and e.g. Mitosis, Cell Replication, etc... sections names must be relevant to the things they describe)
         - ⭐️ center names of libraries and make white box extend down to bottom library as well
+        - ⭐️ fix thing that makes nodes hover when you hover your mouse over the node popup box
 
     OTHER PAGES:
         - terms and policies page
@@ -154,6 +160,8 @@ TODO list:
 
     general:
     study tool additions / ideas:
+        - ⭐️ Syllabus to section / unit converter / parser thing
+        - look in to using vueFlow for the nodes
         - when users first sign up, give them a medium / long survey to make them think long and hard about their study habits / why they want to get high grades, then when they hit the paywall, they are more likely to join
                 - free users get like 10 free uploads / month, and can only join libraries up to like 5 sections or up to 5 libraries or something
                 - first paid tier get unlimited uploads / month, but only have like 2 large textbooks uploaded / month
@@ -223,8 +231,6 @@ TODO list:
             - make it available for both frontend and backend
         - for short answer, 1) make it one word (for now) and most importantly 2) make sure the exact word is in the other side of the card
         - look into adding a resizable area somewhere in your site (like how turbo learn has it) but like people can't change it
-
-        - when you mouse over the popup for the lesson that has the # of lessons / x button, it should not cause the button to hover
         - ??? remove lesson ids, lesson names, password reset tokens and confirmation tokens from urls and communicate them somewhere else
             - make it like duolingo where doing the actual lesson is /learn or something
         - should email / pwd reset tokens be visible via the url or should they be more secret?
@@ -244,7 +250,6 @@ TODO list:
         - change gpt 4o-mini to deepseek (deepseek once I test reliable function calling or parsing) or other model for cost
         - eventually look into custom api / llm specifically designed for education or review or whatever
         - *possibly* add a slider to each course based on how lenient the course creator wants the fuzzy string matcher to be (for misspelled words)
-        - clean up minor ui thing with learning nodes (when you click on the popup to play the games, for some reason it still highlights the node)
         - only fetch most 30 recent factoids, or summary of factoids or something when doing room generation
 
     game page:
