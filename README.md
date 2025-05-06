@@ -136,8 +136,7 @@ TODO list:
         
         - ⭐️ add page after you finish a game session, but make it have confetti / small animation or something
         - ⭐️ make sure the background of the site is the color you want if you scroll to far (like in main page if you scroll too far down) (right now its white which is not good)
-        - ⭐️ make unit / chapter description text more clear (e.g. Exam 1, Exam 2, etc... and e.g. Mitosis, Cell Replication, etc... sections names must be relevant to the things they describe)
-            - ⭐️ add tips for making a new stepping stone (i.e. make sure it aligns with what you put, etc... )
+        - ⭐️ make sure the unit name box extends to sections to top of the arc as well
 
     OTHER PAGES:
         - terms and policies page
@@ -195,6 +194,7 @@ TODO list:
             - we could also section it off, like load part of it at a time, or load it in the background 
                 while the user it playing an already unlocked game or something
         - make a better loading screen / bar / wheel while the courses are being created
+            - maybe even tell users not to navigate away from the page or something
         - improve prompt generation a great fold (make sure as many of the quesitons relate to the section name as possible)
         - eventually combine library_question model with library_factoid model (why are they seperate to begin with?)
         - get student verification on Mobbin pro (UI library)

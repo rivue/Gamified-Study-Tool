@@ -11,14 +11,15 @@
             </div>
         </div>
 
-        <div class="profile-section">
+        <!-- TODO: maybe add later, but also maybe not -->
+        <!-- <div class="profile-section">
             <h2 class="section-title">Current Theme</h2>
             <div class="half-n-half">
                 <p v-if="currentTheme" class="profile-info">Note: Dark Mode is recommended</p>
                 <p class="profile-info"> {{ currentTheme ? 'Light Mode' : 'Dark Mode'}} </p>
                 <MenuButton label="Change Theme" @click="changeTheme" />
             </div>
-        </div>
+        </div> -->
 
         <!-- Commented sections omitted for brevity -->
     </div>

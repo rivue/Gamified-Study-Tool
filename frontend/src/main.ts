@@ -10,23 +10,22 @@ import './assets/styles.css';
 import './assets/themes.css';
 import axios from 'axios';
 
-    // basically main home page
-    // { path: '/changelog', component: defineAsyncComponent(() => import('./components/Footer/MainPage.vue')), meta: { title: Rivue.ai | Learn Anything!' } },
-    // { path: '/', component: defineAsyncComponent(() => import('./components/Footer/MainPage.vue')), meta: { title: Rivue.ai | Learn Anything!' } },
+// basically main home page
+// { path: '/', component: defineAsyncComponent(() => import('./components/Footer/MainPage.vue')), meta: { title: Rivue.ai | Learn Anything!' } },
 
-    // { 
-    //     path: '/:pathMatch(.*)*', 
-    //     component: defineAsyncComponent(() => import('./components/Footer/HomePage.vue')),
-    //     meta: { title: Rivue.ai | Page Not Found' } 
-    // }
-    // llm chatbot = not necessary for me
-    //   { path: '/lessons', component: defineAsyncComponent(() => import('./components/Chat/ChatComponent.vue')), meta: { title: Rivue.ai | Lessons' } }, 
-    //   { path: '/lesson/:id', component: defineAsyncComponent(() => import('./components/Chat/ChatComponent.vue')), meta: { title: Rivue.ai | Learning' } },
+// { 
+//     path: '/:pathMatch(.*)*', 
+//     component: defineAsyncComponent(() => import('./components/Footer/HomePage.vue')),
+//     meta: { title: Rivue.ai | Page Not Found' } 
+// }
+// llm chatbot = not necessary for me
+//   { path: '/lessons', component: defineAsyncComponent(() => import('./components/Chat/ChatComponent.vue')), meta: { title: Rivue.ai | Lessons' } }, 
+//   { path: '/lesson/:id', component: defineAsyncComponent(() => import('./components/Chat/ChatComponent.vue')), meta: { title: Rivue.ai | Learning' } },
 
 
-    // actual games - come back to later, try to access whole game
-    //   { path: '/library/:id', component: defineAsyncComponent(() => import('./components/Game/NewGame/GamePage.vue')), meta: { title: Rivue.ai | Explore Library' } },
-    //   { path: '/library/:id/:roomName', component: defineAsyncComponent(() => import('./components/Game/NewGame/GamePage.vue')), meta: { title: Rivue.ai | Explore Library', hideHeaderFooter: true } },
+// actual games - come back to later, try to access whole game
+//   { path: '/library/:id', component: defineAsyncComponent(() => import('./components/Game/NewGame/GamePage.vue')), meta: { title: Rivue.ai | Explore Library' } },
+//   { path: '/library/:id/:roomName', component: defineAsyncComponent(() => import('./components/Game/NewGame/GamePage.vue')), meta: { title: Rivue.ai | Explore Library', hideHeaderFooter: true } },
 // knowledge map (probably not going to include yet)
 //   { path: '/knowledge', component: defineAsyncComponent(() => import('./components/Backstage/MapPage.vue')), meta: { title: Rivue.ai | Knowledge Map' } },
 
@@ -40,6 +39,7 @@ import axios from 'axios';
 //     component: defineAsyncComponent(() => import('./components/Footer/HomePage.vue')),
 //     meta: { title: 'Rivue.ai | Page Not Found' } 
 // }
+
     const routes = [
         // Main routes
         {
@@ -82,7 +82,6 @@ import axios from 'axios';
         },
         
         // Simple routes
-        { path: '/changelog', component: defineAsyncComponent(() => import('./components/Backstage/ChangelogPage.vue')), meta: { title: 'Rivue.ai | Learn Anything!' } },
         { path: '/library', component: defineAsyncComponent(() => import('./components/Game/Creation/LibraryCreator.vue')), meta: { title: 'Rivue.ai | Create Library' } },
         // { path: '/progress', component: defineAsyncComponent(() => import('./components/Backstage/ProgressPage.vue')), meta: { title: 'Rivue.ai | Progress' } },
         { path: '/contact', component: defineAsyncComponent(() => import('./components/Footer/ContactPage.vue')), meta: { title: 'Rivue.ai | Contact Us' } },
@@ -98,7 +97,6 @@ import axios from 'axios';
         // Redirects
         // { path: '/lessons', redirect: '/' },
         { path: '/lessons/:pathMatch(.*)*', redirect: '/' },
-        { path: '/changelog/:pathMatch(.*)*', redirect: '/' },
         { path: '/library/:pathMatch(.*)*', redirect: '/library' },
         // { path: '/progress/:pathMatch(.*)*', redirect: '/progress' },
         { path: '/contact/:pathMatch(.*)*', redirect: '/contact' },
@@ -127,7 +125,6 @@ router.beforeEach(async (to, from, next) => {
 
     const publicPaths = [
         '/',
-        '/changelog',
         '/login',
         '/terms',
         '/contact',

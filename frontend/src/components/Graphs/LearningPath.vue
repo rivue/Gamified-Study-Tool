@@ -1,41 +1,65 @@
 <template>
     <div class="fixed left-8 right-8 top-0 bottom-0 overflow-hidden">
-        <button @click="scroll('left')"
+
+        <!-- Double‐left chevron: hide once we’ve scrolled past a bit -->
+        <button v-if="scrollPosition > 500" @click="scrollToStart(); $nextTick(() => handleScroll())"
+            class="fixed left-8 top-1/3 -translate-y-1/2 bg-black/30 backdrop-blur-sm shadow-md rounded-full p-4 hover:bg-black/40 z-10"
+            style="color: var(--highlight-color);">
+            <ChevronDoubleLeftIcon class="w-12 h-12" />
+        </button>
+
+        <!-- Single‐left chevron -->
+        <button @click="scroll('left'); $nextTick(() => handleScroll())"
             class="fixed left-8 top-1/2 -translate-y-1/2 bg-black/30 backdrop-blur-sm shadow-md rounded-full p-4 hover:bg-black/40 z-10"
             style="color: var(--highlight-color);">
             <ChevronLeftIcon class="w-12 h-12" />
         </button>
-        <button @click="scroll('right')"
+
+        <!-- Single‐right chevron -->
+        <button @click="scroll('right'); $nextTick(() => handleScroll())"
             class="fixed right-8 top-1/2 -translate-y-1/2 bg-black/30 backdrop-blur-sm shadow-md rounded-full p-4 hover:bg-black/40 z-10"
             style="color: var(--highlight-color);">
             <ChevronRightIcon class="w-12 h-12" />
         </button>
-        <!-- Settings Button: fixed top-right -->
+
+        <!-- Double‐right chevron -->
+        <button v-if="scrollPosition < (scrollContainer.scrollWidth - scrollContainer.clientWidth - 400)" @click="scrollToEnd(); $nextTick(() => handleScroll())"
+            class="fixed right-8 top-1/3 -translate-y-1/2 bg-black/30 backdrop-blur-sm shadow-md rounded-full p-4 hover:bg-black/40 z-10"
+            style="color: var(--highlight-color);">
+            <ChevronDoubleRightIcon class="w-12 h-12" />
+        </button>
+
+        <!-- Settings Button -->
         <button @click="toggleSettings"
             class="fixed top-20 right-6 bg-black/30 backdrop-blur-sm shadow-md rounded-full p-4 hover:bg-black/40 z-10"
             style="color: var(--highlight-color);">
             <CogIcon class="w-10 h-10" />
         </button>
+
         <div ref="scrollContainer"
             class="scrollContainer w-full h-full overflow-x-auto overflow-y-hidden cursor-grab active:cursor-grabbing"
             @mousedown="startDragging" @mousemove="drag" @mouseup="stopDragging" @mouseleave="stopDragging"
             @touchstart="startDragging" @touchmove="drag" @touchend="stopDragging" @scroll="handleScroll">
-            <!-- Modified to ensure first node is visible -->
             <div class="flex items-center gap-24 min-h-screen py-24 relative">
-                <!-- Added left padding to ensure first nodes are visible -->
+                <!-- Left padding so first node is visible -->
                 <div class="w-24 flex-shrink-0"></div>
+
                 <!-- Unit Headers -->
                 <template v-for="([unit], unitName, unitIndex) in rawUnitData" :key="unit.unit_id">
-                    <!-- Unit container with border and styling -->
                     <div class="relative -mx-12 my-8 px-12 pt-12 pb-36 border-t-2 border-b-2 flex-shrink-0" :style="{
                         borderColor: getUnitColor(unitIndex),
                         backgroundColor: 'var(--background-color-1t)',
                         borderLeft: unitIndex === 0 ? `2px solid ${getUnitColor(unitIndex)}` : 'none',
-                        borderRight: unitIndex === Object.keys(rawUnitData).length - 1 ? `2px solid ${getUnitColor(unitIndex)}` : 'none',
+                        borderRight:
+                            unitIndex === Object.keys(rawUnitData).length - 1
+                                ? `2px solid ${getUnitColor(unitIndex)}`
+                                : 'none',
                         borderTopLeftRadius: unitIndex === 0 ? `0.625rem` : 'none',
                         borderBottomLeftRadius: unitIndex === 0 ? `0.625rem` : 'none',
-                        borderTopRightRadius: unitIndex === Object.keys(rawUnitData).length - 1 ? `0.625rem` : 'none',
-                        borderBottomRightRadius: unitIndex === Object.keys(rawUnitData).length - 1 ? `0.625rem` : 'none',
+                        borderTopRightRadius:
+                            unitIndex === Object.keys(rawUnitData).length - 1 ? `0.625rem` : 'none',
+                        borderBottomRightRadius:
+                            unitIndex === Object.keys(rawUnitData).length - 1 ? `0.625rem` : 'none'
                     }">
                         <!-- Unit name header -->
                         <div class="absolute -top-5 left-1/2 transform -translate-x-1/2 px-6 py-2 rounded-lg font-bold text-xl whitespace-nowrap shadow-md"
@@ -166,8 +190,8 @@
               group-hover:shadow-xl
               overflow-hidden
               " :style="{
-                  background: getUnitGradient(unitIndex)
-                }">
+                background: getUnitGradient(unitIndex)
+            }">
 
                                                     <!-- Icon with enhanced transitions -->
                                                     <component
@@ -388,7 +412,9 @@ import {
     XMarkIcon,
     DocumentPlusIcon,
     DocumentIcon,
-    XCircleIcon
+    XCircleIcon,
+    ChevronDoubleLeftIcon,
+    ChevronDoubleRightIcon
 } from '@heroicons/vue/24/solid'
 import { useGameStore } from '@/store/gameStore'
 import { useRouter } from 'vue-router';
@@ -422,16 +448,20 @@ const props = defineProps({
 const rawUnitData = ref();
 const isPublic = ref(false);
 const joinCode = ref<string | null>(null);
+
 watch(() => props.unitSectionMap, async (newVal) => {
     rawUnitData.value = newVal;
 }, { deep: true, immediate: true })
+
 // Initialize libraryIsPublic from props
 watch(() => props.libraryIsPublic, (newVal) => {
     isPublic.value = newVal;
 }, { immediate: true });
+
 watch(() => props.libraryJoinCode, (newVal) => {
     joinCode.value = newVal;
 }, { immediate: true });
+
 // State for adding new nodes
 const showAddNodeModal = ref(false)
 const newNodeNames = ref([''])
@@ -448,6 +478,7 @@ const selectedRoomId = ref(null)
 const library_id = props.libraryId;
 // File input handling
 const fileInput = ref(null)
+const scrollPosition = ref(0)
 // Color schemes for units
 const unitColors = [
     '#2ecc71', // green
@@ -455,6 +486,24 @@ const unitColors = [
     '#3498db', // blue
     '#e74c3c', // red
 ]
+
+// snap back to the first node (same 200 px offset you use on mount)
+const scrollToStart = () => {
+    if (!scrollContainer.value) return
+    scrollContainer.value.scrollTo({ left: 0, behavior: 'smooth' })
+}
+
+// snap back to the first node (same 200 px offset you use on mount)
+const scrollToEnd = () => {
+    if (!scrollContainer.value) return
+    const sc = scrollContainer.value
+    if (!sc) return
+
+    /* how far we can scroll = total content width – visible width */
+    const maxLeft = sc.scrollWidth - sc.clientWidth
+    scrollContainer.value.scrollTo({ left: maxLeft, behavior: 'smooth' })
+}
+
 function toggleSettings() {
     showSettingsModal.value = !showSettingsModal.value
 }
@@ -739,9 +788,9 @@ const handleNodeClick = (sectionId) => {
     }
 }
 const getNodeOffset = (index) => {
-    const amplitude = 80;
+    const amplitude = 75;
     // Add a slight phase shift for more natural movement
-    return Math.sin(index * 0.7 + 0.2) * amplitude;
+    return Math.sin(index * 0.6 + 0.2) * amplitude;
 }
 const startLesson = (sectionName, sectionId) => {
     gameStore.setSectionId(sectionId);
@@ -759,10 +808,15 @@ const scroll = (direction) => {
         behavior: 'smooth'
     })
 }
-// Handle scroll event
 const handleScroll = () => {
-    // Implement if needed
+    // guard against nulls during mount/unmount
+    const sc = scrollContainer.value
+    if (!sc) return
+
+    // copy the browser‑reported scrollLeft into the ref
+    scrollPosition.value = sc.scrollLeft
 }
+
 </script>
 <style scoped>
 .overflow-x-auto {

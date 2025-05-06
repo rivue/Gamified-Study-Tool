@@ -5,7 +5,10 @@
             <div class="libgen-create p-16 br-4" style="border: 1px solid var(--text-color); border-radius: 5px;">
                 <h1 v-if="libgenRoute">Create a Course to Explore</h1>
                 <div class="libgen-section">
-                    <div class="form-group topic-selection">  <div class="absolute inset-0 border-[1px] border-solid border-[var(--text-color)] rounded-md pointer-events-none"></div>
+                    <div class="form-group topic-selection">
+                        <div
+                            class="absolute inset-0 border-[1px] border-solid border-[var(--text-color)] rounded-md pointer-events-none">
+                        </div>
                         <div class="libgen-title">Course name</div>
                         <div class="title-bar">
                             <input type="text" id="topicInput" ref="topicInput" v-model="topic"
@@ -58,8 +61,7 @@
                             <div class="group-controls">
 
                                 <div class="group-input-wrapper">
-                                    <input type="text" v-model="newGroupName" placeholder="Enter Unit Name (Exam 1, Exam 2, etc...)"
-                                    <!-- TODO: make text grayed out a little bit - for all input / placeholder text on this page -->
+                                    <input type="text" v-model="newGroupName" placeholder="Exam 1, Exam 2, etc..."
                                         :class="{ 'input-error': groupError || groupTypingError || groupSpaceError || groupEmptyError }"
                                         maxlength="40" :disabled="disableExtras" @keyup.enter="addGroup" />
                                     <button class="add-btn" @click="addGroup"
@@ -103,7 +105,7 @@
                                         <!-- Section input for this group -->
                                         <div class="section-input-wrapper">
                                             <input type="text" v-model="group.newSectionName"
-                                                placeholder="Mitosis, Photosynthesis, Pavlovian Conditioning, etc..."
+                                                placeholder="Mitosis, Derivative Rule, etc..."
                                                 :class="{ 'input-error': groupNoSectionErrors[groupIndex] || groupSectionNamingErrors[groupIndex] }"
                                                 maxlength="40" :disabled="group.sections.length >= 15 || disableExtras"
                                                 @keyup.enter="addSection(groupIndex)" />
@@ -125,10 +127,6 @@
                                 </div>
                             </div>
 
-
-                            <div class="helper-text">
-                                🐙 Structure your course with units/chapters and sections for better organization.
-                            </div>
                             <div class="helper-text">
                                 🐙 You can create up to 10 units, with up to 15 sections each.
                             </div>
@@ -138,25 +136,23 @@
                         </div>
                     </div>
                 </div>
-               
+
                 <!-- Public/Private Toggle -->
                 <div class="libgen-section">
                     <div class="form-group visibility-toggle p-4">
-                        <div style="font-size:0.8em; opacity:0.7; display:flex; justify-content:center; align-items:center;" class="mb-2">Visibility</div>
+                        <div style="font-size:0.8em; opacity:0.7; display:flex; justify-content:center; align-items:center;"
+                            class="mb-2">Visibility</div>
                         <div class="flex items-center justify-center w-full mb-3">
                             <Tabs v-model="visibilityTab" class="w-full max-w-[400px]">
-                                <TabsList class="grid w-full grid-cols-2 p-1 py-0.5" style="background-color: rgba(var(--element-color-1-rgb), 0.5);">
-                                    <TabsTrigger 
-                                        value="private"
-                                        class="border-0 data-[state=inactive]:opacity-50 data-[state=active]:bg-[var(--element-color-1)] data-[state=active]:text-[var(--text-color)]"
-                                    >
+                                <TabsList class="grid w-full grid-cols-2 p-1 py-0.5"
+                                    style="background-color: rgba(var(--element-color-1-rgb), 0.5);">
+                                    <TabsTrigger value="private"
+                                        class="border-0 data-[state=inactive]:opacity-50 data-[state=active]:bg-[var(--element-color-1)] data-[state=active]:text-[var(--text-color)]">
                                         Private
                                     </TabsTrigger>
 
-                                    <TabsTrigger 
-                                        value="public"
-                                        class="border-0 data-[state=inactive]:opacity-50 data-[state=active]:bg-[var(--element-color-1)] data-[state=active]:text-[var(--text-color)]"
-                                        >
+                                    <TabsTrigger value="public"
+                                        class="border-0 data-[state=inactive]:opacity-50 data-[state=active]:bg-[var(--element-color-1)] data-[state=active]:text-[var(--text-color)]">
                                         Public
                                     </TabsTrigger>
                                 </TabsList>
@@ -194,14 +190,11 @@ import {
 } from "@/scripts/placeholderTyping";
 
 
-import { useLibGenStore } from "@/store/libGenStore";
 import { usePopupStore } from "@/store/popupStore";
 import { useAuthStore } from "@/store/authStore";
 import CtaButton from "../../Footer/LandingPageComponents/CtaButton.vue";
 import LibraryBrowser from "./LibraryBrowser.vue";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { GalleryHorizontal } from 'lucide-vue-next';
-import { watchImmediate } from '@vueuse/core';
 
 // New or modified data for groups
 interface Group {
@@ -213,7 +206,6 @@ interface Group {
 
 const route = useRoute();
 const router = useRouter();
-const libGenStore = useLibGenStore();
 const authStore = useAuthStore();
 const popupStore = usePopupStore();
 // New refs for groups
@@ -225,8 +217,6 @@ const groupError = ref(false);
 const groupTypingError = ref(false);
 const groupSpaceError = ref(false);
 const groupEmptyError = ref(false);
-
-const { topics } = storeToRefs(libGenStore);
 
 watch(
     () => groups.value.length,
@@ -267,10 +257,6 @@ const fileInput = ref<HTMLInputElement | null>(null);
 const visibilityTab = ref<'public' | 'private'>('public');
 const isPublic = computed<boolean>(() => visibilityTab.value === 'public');
 
-// Computed properties
-const computedTopics = computed(() => {
-    return topics.value.length > 0 ? topics.value : safeTopics.value;
-});
 
 const libgenRoute = computed(() => {
     return route.path === "/library";
@@ -580,13 +566,6 @@ const handleSubmit = () => {
 // Lifecycle hooks
 onMounted(() => {
     libraryDifficulty.value = "Normal";
-    if (computedTopics.value.length > 0 && topicInput.value) {
-        const { start, stop } = useTypingEffect(topicInput.value, computedTopics.value);
-        typingEffectStop.value = stop; // Store the stop function
-        start();
-    } else {
-        //console.log("never started");
-    }
 });
 
 
@@ -677,7 +656,7 @@ onUnmounted(() => {
 
 input[type="text"]::placeholder {
     color: var(--text-color);
-
+    opacity: 0.65;
 }
 
 

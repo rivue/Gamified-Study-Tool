@@ -42,12 +42,6 @@
     >
       <template v-slot:icon>&#128200;</template>
     </SideMenuButton> -->
-    <SideMenuButton
-      label="Changelog"
-      :isSelected="isRouteActive('/changelog')"
-      @click="openRoute('/changelog')"
-    > 
-    </SideMenuButton>
 
     <SideMenuButton
       label="Contact"
