@@ -59,7 +59,17 @@
                 <template v-for="([unit], unitName, unitIndex) in rawUnitData" :key="unit.unit_id">
                     <!-- Unit container with border and styling -->
                     <div class="relative -mx-12 my-8 px-12 pt-12 pb-36 border-t-2 border-b-2 flex-shrink-0"
-                        :style="{ borderColor: getUnitColor(unitIndex), backgroundColor: 'var(--background-color-1t)' }">
+                        :style="{ 
+                            borderColor: getUnitColor(unitIndex), 
+                            backgroundColor: 'var(--background-color-1t)', 
+                            borderLeft: unitIndex === 0 ? `2px solid ${getUnitColor(unitIndex)}` : 'none',
+                            borderRight: unitIndex === Object.keys(rawUnitData).length - 1 ? `2px solid ${getUnitColor(unitIndex)}` : 'none',
+                            borderTopLeftRadius: unitIndex === 0 ? `0.625rem` : 'none',
+                            borderBottomLeftRadius: unitIndex === 0 ? `0.625rem` : 'none',
+
+                            borderTopRightRadius: unitIndex === Object.keys(rawUnitData).length - 1  ? `0.625rem` : 'none',
+                            borderBottomRightRadius: unitIndex === Object.keys(rawUnitData).length - 1 ? `0.625rem` : 'none',
+                        }">
  
  
                         <!-- Unit name header -->
