@@ -161,7 +161,7 @@ TODO list:
     general:
     study tool additions / ideas:
         - ⭐️ Syllabus to section / unit converter / parser thing
-        - look in to using vueFlow for the nodes
+        - look in to using vueFlow for the nodes --> maybe one day I make it super interactive and colorful with people dragging and creating ornate graphs for their friends or something, or maybe not
         - when users first sign up, give them a medium / long survey to make them think long and hard about their study habits / why they want to get high grades, then when they hit the paywall, they are more likely to join
                 - free users get like 10 free uploads / month, and can only join libraries up to like 5 sections or up to 5 libraries or something
                 - first paid tier get unlimited uploads / month, but only have like 2 large textbooks uploaded / month
