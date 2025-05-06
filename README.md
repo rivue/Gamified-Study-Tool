@@ -136,7 +136,6 @@ TODO list:
         
         - ⭐️ add page after you finish a game session, but make it have confetti / small animation or something
         - ⭐️ make sure the background of the site is the color you want if you scroll to far (like in main page if you scroll too far down) (right now its white which is not good)
-        - ⭐️ ⭐️ make sure the unit name box extends to sections to top of the arc as well
 
     OTHER PAGES:
         - terms and policies page
