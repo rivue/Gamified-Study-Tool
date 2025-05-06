@@ -5,23 +5,17 @@
             style="color: var(--highlight-color);">
             <ChevronLeftIcon class="w-12 h-12" />
         </button>
- 
- 
         <button @click="scroll('right')"
             class="fixed right-8 top-1/2 -translate-y-1/2 bg-black/30 backdrop-blur-sm shadow-md rounded-full p-4 hover:bg-black/40 z-10"
             style="color: var(--highlight-color);">
             <ChevronRightIcon class="w-12 h-12" />
         </button>
- 
- 
         <!-- Settings Button: fixed top-right -->
         <button @click="toggleSettings"
             class="fixed top-20 right-6 bg-black/30 backdrop-blur-sm shadow-md rounded-full p-4 hover:bg-black/40 z-10"
             style="color: var(--highlight-color);">
             <CogIcon class="w-10 h-10" />
         </button>
- 
- 
         <!-- @click="showAddNodeModal = true" -->
         <!-- Fixed Add Stepping Stone Button - Center Top -->
         <!-- <div class="fixed top-24 right- z-10">
@@ -31,8 +25,6 @@
             <CogIcon class="w-10 h-10" style="color: white;" />
             </button>
         </div> -->
- 
- 
         <!-- <div class="fixed top-48 left-1/2 -translate-x-1/2 z-10">
             <button @click="showAddNodeModal = true"
             class="shadow-lg rounded-full p-4 flex items-center justify-center transition-colors"
@@ -41,55 +33,42 @@
             <span class="ml-2 font-medium">Add New Stepping Stones</span>
             </button>
         </div> -->
- 
- 
         <div ref="scrollContainer"
             class="scrollContainer w-full h-full overflow-x-auto overflow-y-hidden cursor-grab active:cursor-grabbing"
             @mousedown="startDragging" @mousemove="drag" @mouseup="stopDragging" @mouseleave="stopDragging"
             @touchstart="startDragging" @touchmove="drag" @touchend="stopDragging" @scroll="handleScroll">
             <!-- Modified to ensure first node is visible -->
             <div class="flex items-center gap-24 min-h-screen py-24 relative">
- 
- 
                 <!-- Added left padding to ensure first nodes are visible -->
                 <div class="w-24 flex-shrink-0"></div>
- 
- 
                 <!-- Unit Headers -->
                 <template v-for="([unit], unitName, unitIndex) in rawUnitData" :key="unit.unit_id">
                     <!-- Unit container with border and styling -->
                     <div class="relative -mx-12 my-8 px-12 pt-12 pb-36 border-t-2 border-b-2 flex-shrink-0"
-                        :style="{ 
-                            borderColor: getUnitColor(unitIndex), 
-                            backgroundColor: 'var(--background-color-1t)', 
+                        :style="{
+                            borderColor: getUnitColor(unitIndex),
+                            backgroundColor: 'var(--background-color-1t)',
                             borderLeft: unitIndex === 0 ? `2px solid ${getUnitColor(unitIndex)}` : 'none',
                             borderRight: unitIndex === Object.keys(rawUnitData).length - 1 ? `2px solid ${getUnitColor(unitIndex)}` : 'none',
                             borderTopLeftRadius: unitIndex === 0 ? `0.625rem` : 'none',
                             borderBottomLeftRadius: unitIndex === 0 ? `0.625rem` : 'none',
-
+ 
+ 
                             borderTopRightRadius: unitIndex === Object.keys(rawUnitData).length - 1  ? `0.625rem` : 'none',
                             borderBottomRightRadius: unitIndex === Object.keys(rawUnitData).length - 1 ? `0.625rem` : 'none',
                         }">
- 
- 
                         <!-- Unit name header -->
                         <div class="absolute -top-5 left-1/2 transform -translate-x-1/2 px-6 py-2 rounded-lg font-bold text-xl whitespace-nowrap shadow-md"
                             :style="{ backgroundColor: getUnitColor(unitIndex), color: 'var(--light-text)' }">
                             {{ formatRoomName(unitName) }}
                         </div>
- 
- 
                         <!-- Sections container -->
                         <div class="flex items-center gap-24">
                             <template v-for="([sectionId, sectionName], sectionIndex) in rawUnitData[unitName]"
                                 :key="sectionIndex">
- 
- 
                                 <div class="relative flex-shrink-0 group perspective" :style="{
                                     transform: `translateY(${getNodeOffset(getGlobalSectionIndex(unitIndex, sectionIndex))}px)`
                                 }" @click="handleNodeClick(sectionId)">
- 
- 
                                     <!-- Tooltip -->
                                     <div v-if="selectedRoomId && selectedRoomId === sectionId"
                                         class="absolute -top-32 left-1/2 -translate-x-1/2 w-64 z-50">
@@ -100,8 +79,6 @@
                                                 style="background-color: red;">
                                                 <XMarkIcon class="w-4 h-4" style="color: var(--light-text);" />
                                             </div>
- 
- 
                                             <!-- Main tooltip content -->
                                             <div class="rounded-2xl p-4 shadow-lg"
                                                 style="background-color: var(--element-color-1); color: var(--light-text);">
@@ -118,33 +95,21 @@
                                                     style="background-color: var(--light-text); color: var(--element-color-1);">
                                                     <span
                                                         v-if="getRoomData(sectionId) && getRoomData(sectionId).lesson_state <= getRoomData(sectionId).num_lessons">PLAY</span>
- 
- 
                                                     <span v-else>REVIEW</span>
                                                 </button>
                                             </div>
- 
- 
                                             <!-- Triangle pointer -->
                                             <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 transform rotate-45"
                                                 style="background-color: var(--element-color-1);" />
                                         </div>
                                     </div>
- 
- 
                                     <div
                                         class="relative transform-gpu transition-all duration-300 group-hover:scale-105 group-hover:-translate-y-2">
                                         <div class="absolute -bottom-4 left-1/2 -translate-x-1/2 w-40 h-8 rounded-full blur-xl transform-gpu transition-all duration-300 group-hover:w-44"
                                             style="background-color: var(--background-color-1t);"></div>
- 
- 
                                         <div class="relative w-48 h-48">
- 
- 
                                             <div class="absolute inset-0 rounded-full transform-gpu translate-y-1"
                                                 :style="{ backgroundColor: getUnitColor(unitIndex) }"></div>
- 
- 
                                             <div class="absolute inset-0 rounded-full flex items-center justify-center cursor-pointer shadow-lg transform-gpu transition-all duration-300"
                                                 :style="{ background: getUnitGradient(unitIndex) }">
                                                 <component
@@ -159,15 +124,11 @@
                         </div>
                     </div>
                 </template>
- 
- 
                 <!-- Added right padding to ensure last nodes have space -->
                 <div class="w-24 flex-shrink-0"></div>
             </div>
         </div>
     </div>
- 
- 
     <!-- Add Node Modal -->
     <Transition name="modal">
         <div v-if="showAddNodeModal" class="fixed inset-0 flex items-center justify-center z-50 p-4"
@@ -181,8 +142,6 @@
                         <XMarkIcon class="w-6 h-6" />
                     </button>
                 </div>
- 
- 
                 <div class="space-y-4">
                     <!-- Dynamic list of node names -->
                     <div>
@@ -202,8 +161,6 @@
                                 <!-- {{ nodeNameErrors }} -->
                                 <span v-for="(error, index) in nodeNameErrors" :key="index">{{ error
                                 }}<br></span>
- 
- 
                             </p>
                         </div>
                         <button @click="addNodeNameField" class="mt-2 text-sm font-medium flex items-center gap-1"
@@ -214,12 +171,8 @@
                         <p v-if="nodeNameErrors.length" class="mt-1 text-sm" style="color: var(--color-primary-light);">
                             <!-- {{ nodeNameErrors }} -->
                             <span v-for="(error, index) in nodeNameErrors" :key="index">{{ error }}<br></span>
- 
- 
                         </p>
                     </div>
- 
- 
                     <div>
                         <label class="block text-sm font-medium mb-1" style="color: var(--highlight-color);">Upload
                             Resource
@@ -261,8 +214,6 @@
                             <p v-if="fileError" class="mt-2 text-sm text-red-400">{{ fileError }}</p>
                         </div>
                     </div>
- 
- 
                     <div class="flex gap-3 justify-end mt-6">
                         <button @click="showAddNodeModal = false" class="px-4 py-2 border rounded-lg"
                             style="border-color: var(--color-primary); color: var(--highlight-color);">
@@ -279,8 +230,6 @@
             </div>
         </div>
     </Transition>
- 
- 
     <!-- Settings Modal -->
     <Transition name="modal">
         <div v-if="showSettingsModal" class="fixed inset-0 flex items-center justify-center z-50 p-4"
@@ -295,8 +244,6 @@
                         <XMarkIcon class="w-6 h-6" />
                     </button>
                 </div>
- 
- 
                 <!-- Info message about instant changes -->
                 <div class="flex items-start gap-2 p-3 mb-4 rounded-lg"
                     style="background-color: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.2);">
@@ -310,8 +257,6 @@
                         Changes are applied automatically and take effect immediately.
                     </p>
                 </div>
- 
- 
                 <!-- 💡 Your settings controls go here: -->
                 <div class="space-y-4">
                     <!-- Course Visibility Toggle -->
@@ -347,12 +292,8 @@
                             ${joinCode}` }}
                         </p>
                     </div>
- 
- 
                     <!-- Add more settings fields as needed -->
                 </div>
- 
- 
                 <div class="mt-6 flex justify-end">
                     <button @click="toggleSettings" class="px-4 py-2 rounded-lg border"
                         style="border-color: var(--color-primary); color: var(--highlight-color);">
@@ -363,8 +304,6 @@
         </div>
     </Transition>
  </template>
- 
- 
  <script setup lang="ts">
  import { ref, watch, onMounted, onUnmounted } from 'vue'
  import {
@@ -389,8 +328,6 @@
  import { useGameStore } from '@/store/gameStore'
  import { useRouter } from 'vue-router';
  import axios from 'axios';
- 
- 
  const props = defineProps({
     libraryId: {
         type: String,
@@ -420,24 +357,16 @@
  const rawUnitData = ref();
  const isPublic = ref(false);
  const joinCode = ref<string | null>(null);
- 
- 
  watch(() => props.unitSectionMap, async (newVal) => {
     rawUnitData.value = newVal;
  }, { deep: true, immediate: true })
- 
- 
  // Initialize libraryIsPublic from props
  watch(() => props.libraryIsPublic, (newVal) => {
     isPublic.value = newVal;
  }, { immediate: true });
- 
- 
  watch(() => props.libraryJoinCode, (newVal) => {
     joinCode.value = newVal;
  }, { immediate: true });
- 
- 
  // State for adding new nodes
  const showAddNodeModal = ref(false)
  const newNodeNames = ref([''])
@@ -449,19 +378,11 @@
  const showSettingsModal = ref(false)
  const isUpdatingVisibility = ref(false);
  const pendingStatus = ref<boolean | null>(null);
- 
- 
  // Track selected room for tooltip
  const selectedRoomId = ref(null)
- 
- 
  const library_id = props.libraryId;
- 
- 
  // File input handling
  const fileInput = ref(null)
- 
- 
  // Color schemes for units
  const unitColors = [
     '#2ecc71', // green
@@ -469,47 +390,27 @@
     '#3498db', // blue
     '#e74c3c', // red
  ]
- 
- 
- 
- 
  function toggleSettings() {
     showSettingsModal.value = !showSettingsModal.value
  }
- 
- 
  // Get color for a unit based on its index
  const getUnitColor = (unitIndex) => {
     const colorIndex = unitIndex % unitColors.length
     return unitColors[colorIndex];
  }
- 
- 
  // Get gradient for a unit based on its index
  const getUnitGradient = (unitIndex) => {
     const colorIndex = unitIndex % unitColors.length
     return `linear-gradient(135deg, ${unitColors[colorIndex]}, ${unitColors[colorIndex]})`
  }
- 
- 
  const setLibraryIsPublicStatus = async (newStatus: boolean) => {
- 
- 
     if (isPublic.value === newStatus) {
         return; // No change needed
     }
- 
- 
     const prev = isPublic.value;
- 
- 
     isPublic.value = newStatus;
- 
- 
     isUpdatingVisibility.value = true;
     // pendingStatus.value = newStatus;
- 
- 
     axios.post(`/api/library/visibility_status/${library_id}`, {
         libraryId: library_id,
         newStatus: newStatus
@@ -527,12 +428,8 @@
             // pendingStatus.value = null;
         });
  }
- 
- 
  // Get global section index (for offset and icon selection)
  const getGlobalSectionIndex = (unitIndex: number, sectionIndex: number) => {
- 
- 
     let count = 0;
     // Sum the lengths of sections for all units before the current unitIndex
     for (let i = 0; i < unitIndex; i++) {
@@ -543,26 +440,16 @@
         }
     }
     return count + sectionIndex;
- 
- 
  }
- 
- 
  const handleFileSelection = (event) => {
     const file = event.target.files[0]
     if (!file) return
- 
- 
     fileError.value = ''
- 
- 
     // Check file size (500KB limit)
     if (file.size > 512000) {
         fileError.value = 'File size exceeds 500KB limit'
         return
     }
- 
- 
     // Check file type
     const allowedTypes = [
         'application/pdf',
@@ -570,18 +457,12 @@
         'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
         'text/plain'
     ]
- 
- 
     if (!allowedTypes.includes(file.type)) {
         fileError.value = 'Only PDF, DOC, DOCX, and TXT files are allowed'
         return
     }
- 
- 
     selectedFile.value = file
  }
- 
- 
  const removeFile = () => {
     selectedFile.value = null
     fileError.value = ''
@@ -589,36 +470,26 @@
         fileInput.value.value = ''
     }
  }
- 
- 
  const formatFileSize = (bytes) => {
     if (bytes < 1024) return bytes + ' B'
     if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB'
     return (bytes / 1048576).toFixed(1) + ' MB'
  }
- 
- 
  // Add a new node name field
  const addNodeNameField = () => {
     newNodeNames.value.push('')
     nodeNameErrors.value.push('')
  }
- 
- 
  // Remove a node name field
  const removeNodeName = (index) => {
     newNodeNames.value.splice(index, 1)
     nodeNameErrors.value.splice(index, 1)
  }
- 
- 
  // Function to add a new node
  const addNewNodes = async () => {
     // Validate node name
     nodeNameErrors.value = new Array(newNodeNames.value.length).fill('')
     let hasError = false
- 
- 
     const trimmedNames = newNodeNames.value.map(name => name.trim())
     trimmedNames.forEach((name, index) => {
         if (!name) {
@@ -635,43 +506,27 @@
             hasError = true
         }
     })
- 
- 
     if (hasError) return
- 
- 
     isAddingNode.value = true
     const currentAbortController = new AbortController();
- 
- 
     try {
         // Add each node
         const formData = new FormData()
         formData.append('libraryId', library_id)
- 
- 
         // Append all room names with the same key name
         trimmedNames.forEach(room => formData.append("roomNames", room));
- 
- 
         // Add file if present (same file for all nodes)
         if (selectedFile.value) {
             console.debug(selectedFile.value)
             formData.append('file', selectedFile.value)
         }
- 
- 
         const response = await axios.post('/api/library/room', formData, {
             signal: currentAbortController.signal,
             headers: {
                 'Content-Type': 'multipart/form-data'
             }
         })
- 
- 
         if (currentAbortController.signal.aborted) return; // Don't proceed if aborted
- 
- 
         if (response.data && response.data.status === "success") {
             // Clear form and refresh to show new nodes
             newNodeNames.value = [''] // Reset to one empty field
@@ -686,8 +541,6 @@
         isAddingNode.value = false
     }
  }
- 
- 
  // Function to get the corresponding room data by section ID
  const getRoomData = (sectionId: Number) => {
     for (let i = 0; i < props.roomData.length; i++) {
@@ -698,8 +551,6 @@
     // Return null if not found
     return null;
  }
- 
- 
  // Array of icons to cycle through
  const icons = [
     StarIcon,
@@ -712,14 +563,10 @@
     SparklesIcon,
     RocketLaunchIcon
  ]
- 
- 
  // Get icon based on index
  const getIconForIndex = (index) => {
     return icons[index % icons.length]
  }
- 
- 
  // Format room name for display
  const formatRoomName = (name) => {
     if (!name) return '';
@@ -728,17 +575,11 @@
         .map(word => word.charAt(0).toUpperCase() + word.slice(1))
         .join(' ')
  }
- 
- 
  const scrollContainer = ref(null)
  const isDragging = ref(false)
  const startX = ref(0)
  const scrollLeft = ref(0)
- 
- 
  let scrollTimeoutId = null;
- 
- 
  // Scroll to center on first load
  onMounted(() => {
     joinCode.value = props.libraryJoinCode;
@@ -755,28 +596,20 @@
         }, 100);
     }
  });
- 
- 
  onUnmounted(() => {
     if (scrollTimeoutId) {
         clearTimeout(scrollTimeoutId); // Clear the timeout if it hasn't run yet
         console.debug("LearningPath unmounting, cleared initial scroll timeout.");
     }
  });
- 
- 
  // Add these variables
  const startY = ref(0)
  const hasMoved = ref(false)
  const tapThreshold = 10 // pixels to consider as a tap vs drag
  const router = useRouter();
- 
- 
  const startDragging = (e) => {
     isDragging.value = true
     hasMoved.value = false
- 
- 
     if (e.type.includes('touch')) {
         startX.value = e.touches[0].pageX - scrollContainer.value.offsetLeft
         startY.value = e.touches[0].pageY
@@ -784,16 +617,10 @@
         startX.value = e.pageX - scrollContainer.value.offsetLeft
         e.preventDefault() // Only prevent default for mouse events
     }
- 
- 
     scrollLeft.value = scrollContainer.value.scrollLeft
  }
- 
- 
  const drag = (e) => {
     if (!isDragging.value) return
- 
- 
     let x, y
     if (e.type.includes('touch')) {
         x = e.touches[0].pageX - scrollContainer.value.offsetLeft
@@ -802,13 +629,9 @@
         x = e.pageX - scrollContainer.value.offsetLeft
         e.preventDefault()
     }
- 
- 
     // Calculate distance moved
     const diffX = Math.abs(x - startX.value)
     const diffY = Math.abs(y - startY.value)
- 
- 
     // Only consider it a drag if moved more than threshold
     if (diffX > tapThreshold || diffY > tapThreshold) {
         hasMoved.value = true
@@ -816,27 +639,19 @@
         scrollContainer.value.scrollLeft = scrollLeft.value - walk
     }
  }
- 
- 
  const stopDragging = () => {
     isDragging.value = false
  }
- 
- 
  const handleNodeClick = (sectionId) => {
     if (!hasMoved.value) {
         selectedRoomId.value = selectedRoomId.value && selectedRoomId.value === sectionId ? null : sectionId
     }
  }
- 
- 
  const getNodeOffset = (index) => {
     // const amplitude = Let's change this to code so it looks better
     const amplitude = 80
     return Math.sin(index * 0.7) * amplitude
  }
- 
- 
  const startLesson = (sectionName, sectionId) => {
     gameStore.setSectionId(sectionId);
     router.push({
@@ -844,30 +659,20 @@
         params: { id: library_id, roomName: sectionName },
     })
  }
- 
- 
  const scroll = (direction) => {
     if (!scrollContainer.value) return
- 
- 
     const scrollAmount = 600
     const currentScroll = scrollContainer.value.scrollLeft
- 
- 
     scrollContainer.value.scrollTo({
         left: direction === 'left' ? currentScroll - scrollAmount : currentScroll + scrollAmount,
         behavior: 'smooth'
     })
  }
- 
- 
  // Handle scroll event
  const handleScroll = () => {
     // Implement if needed
  }
  </script>
- 
- 
  <style scoped>
  .overflow-x-auto {
     -webkit-overflow-scrolling: touch;
@@ -877,37 +682,25 @@
     -moz-user-select: none;
     -ms-user-select: none;
  }
- 
- 
  .overflow-x-auto::-webkit-scrollbar {
     display: none;
  }
- 
- 
  .overflow-x-auto {
     -ms-overflow-style: none;
     scrollbar-width: none;
  }
- 
- 
  .perspective {
     perspective: 1000px;
  }
- 
- 
  /* Modal transitions */
  .modal-enter-active,
  .modal-leave-active {
     transition: opacity 0.3s ease;
  }
- 
- 
  .modal-enter-from,
  .modal-leave-to {
     opacity: 0;
  }
- 
- 
  @media (max-width: 600px) {
     .scrollContainer {
         position: static !important;
@@ -925,3 +718,5 @@
     }
  }
  </style>
+ 
+ 
