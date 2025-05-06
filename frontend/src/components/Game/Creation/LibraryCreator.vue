@@ -141,29 +141,32 @@
                 <!-- Public/Private Toggle -->
                 <div class="libgen-section">
                     <div class="form-group visibility-toggle p-4">
-                        <div class="libgen-title mb-2">Visibility</div>
+                        <div style="font-size:0.8em; opacity:0.7; display:flex; justify-content:center; align-items:center;" class="mb-2">Visibility</div>
                         <div class="flex items-center justify-center w-full mb-3">
-                            <Tabs default-value="public" class="w-full max-w-[400px]" @update:value="value => isPublic.value = value === 'public'">
+                            <Tabs v-model="visibilityTab" class="w-full max-w-[400px]">
                                 <TabsList class="grid w-full grid-cols-2 p-1 py-0.5" style="background-color: rgba(var(--element-color-1-rgb), 0.5);">
                                     <TabsTrigger 
                                         value="private"
-                                        class="border-0 text-[rgba(var(--text-color-rgb), 1.0) data-[state=inactive]:text-opacity-20 data-[state=active]:bg-[var(--element-color-1)] data-[state=active]:text-[var(--text-color)]"
+                                        class="border-0 data-[state=inactive]:opacity-50 data-[state=active]:bg-[var(--element-color-1)] data-[state=active]:text-[var(--text-color)]"
                                     >
                                         Private
                                     </TabsTrigger>
 
                                     <TabsTrigger 
                                         value="public"
-                                        class="border-0 data-[state=active]:bg-[var(--element-color-1)] data-[state=inactive]:text-gray-300 data-[state=active]:text-[var(--text-color)]"
-                                    >
+                                        class="border-0 data-[state=inactive]:opacity-50 data-[state=active]:bg-[var(--element-color-1)] data-[state=active]:text-[var(--text-color)]"
+                                        >
                                         Public
                                     </TabsTrigger>
-                                </TabsList>{{ isPublic }}
+                                </TabsList>
 
                             </Tabs>
                         </div>
-                        <div class="helper-text mt-2 text-center">
+                        <div class="helper-text">
                             🐙 Public courses will appear in the course library for all users to explore.
+                        </div>
+                        <div class="helper-text">
+                            🐙 Private courses need a code to join.
                         </div>
                     </div>
                 </div>
@@ -258,8 +261,8 @@ const buttonDisabled = ref({
 const selectedFile = ref<File | null>(null);
 const topicInput = ref<HTMLInputElement | null>(null);
 const fileInput = ref<HTMLInputElement | null>(null);
-const isPublic = ref(true);
-
+const visibilityTab = ref<'public' | 'private'>('public');
+const isPublic = computed(() => visibilityTab.value === 'public');
 
 // Computed properties
 const computedTopics = computed(() => {
