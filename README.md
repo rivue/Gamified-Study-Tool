@@ -84,6 +84,7 @@ TODO list:
         - ⭐️ (courses need ability to add multiple people first) leaderboard / game point tracking system
         - (might take at least a couple weeks) ⭐️ UI redesign / rehaul *** --> kinnu, duolingo, saved instagram design reels etc..
             - Note: 1) try to see what horizontal --> vertical learning path looks like, and possibly make a vertical bar on the side for settings, i-card, files list, adding a new stepping stone, etc... but maybe keep lesson name and current unit name at the top?
+            - COPY QUIZLET???
             - note: maybe change top navbar to be a constant hovering side menu on the side / bottom of the screen maybe similar to duolingo and possibly replace "my library", "settings", etc.. with actual icons
             - also note: ask gemini / grok / gpt / claude for some ui design tips like adding a menu bar, or ui tips / tricks / helpful websites / youtube videos, etc...
             use this maybe: https://www.shadcn-vue.com/docs/components/stepper.html
@@ -98,9 +99,10 @@ TODO list:
                 users could add a note for each unit or something
                 - ✅ ⭐️ backfill true / false for is_public (true)
         - do vthisv right after ^this^
-        - ⭐️ visibility of different courses? are they all public like quizlet or am I trying to form a tight knit group like clash royale?
-            - ⭐️ for private, users would need some sort of short invite code
-            # add ability to specify public / private in library creator and of course make sure private ones have join_codes
+        - ✅ ⭐️ visibility of different courses? are they all public like quizlet or am I trying to form a tight knit group like clash royale?
+            - ✅ ⭐️ for private, users would need some sort of short invite code
+            - change 
+            - add ability to specify public / private in library creator and of course make sure private ones have join_codes
             # then add ui ability to "join" private libraries / public libraries that you didn't create maybe in like a seperate page or list or code box or something
 
     # basically in library browser, see all libraries
@@ -152,6 +154,11 @@ TODO list:
 
     general:
     study tool additions / ideas:
+        - when users first sign up, give them a medium / long survey to make them think long and hard about their study habits / why they want to get high grades, then when they hit the paywall, they are more likely to join
+                - free users get like 10 free uploads / month, and can only join libraries up to like 5 sections or up to 5 libraries or something
+                - first paid tier get unlimited uploads / month, but only have like 2 large textbooks uploaded / month
+                - second paid tier get 10 textbook uploads / month maybe
+        - have a notifivations / dashboard page - errors for generating libraries / units / sections (like for content moderation errors, etc...) and notifications about someone liked your course or someone joined your course or something, etc... (maybe maybe not on this one - I just want a place to tell users without them having to wait 30 minutes for their course to load)
         - use the ai to generate a course
             - tell it to generate reasonable courses that are like 2-3 times a week or every day or something.
             - below the section name, it could tell what resources it used to create the course in smaller / gray text

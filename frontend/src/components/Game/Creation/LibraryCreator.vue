@@ -262,7 +262,7 @@ const selectedFile = ref<File | null>(null);
 const topicInput = ref<HTMLInputElement | null>(null);
 const fileInput = ref<HTMLInputElement | null>(null);
 const visibilityTab = ref<'public' | 'private'>('public');
-const isPublic = computed(() => visibilityTab.value === 'public');
+const isPublic = computed<boolean>(() => visibilityTab.value === 'public');
 
 // Computed properties
 const computedTopics = computed(() => {
@@ -413,6 +413,14 @@ const getTotalSectionCount = () => {
 
 const hasErrors = (): boolean => {
 
+    if (!(isPublic.value || !isPublic.value)) {
+        console.log(isPublic.value)
+        popupStore.showPopup(
+            "Please select a visibility option."
+        );
+        return true;
+    }
+
     if (!authStore.loggedIn) {
         // must login to submit
         popupStore.showPopup(
@@ -527,6 +535,7 @@ const handleSubmit = () => {
     formData.append("languageDifficulty", "Normal"); // TODO delete later (from backend and library model)
     formData.append("libraryDifficulty", libraryDifficulty.value);
     formData.append("guide", "Azalea"); // TODO delete later (from backend and library model)
+    formData.append("visibility", isPublic.value.toString());
     if (selectedFile.value) {
         formData.append("selectedFile", selectedFile.value);
     }
