@@ -74,9 +74,10 @@
                                                 </div>
                                                 <div class="relative">
                                                     <!-- Shadow element (bottom layer) -->
-                                                    <div class="absolute inset-0 rounded-xl" 
-                                                        style="background-color: rgba(0,0,0,0.2); transform: translateY(4px);"></div>
-                                                    
+                                                    <div class="absolute inset-0 rounded-xl"
+                                                        style="background-color: rgba(0,0,0,0.2); transform: translateY(4px);">
+                                                    </div>
+
                                                     <!-- Button element (top layer) -->
                                                     <button @click.stop="startLesson(sectionName, sectionId)"
                                                         class="relative w-full rounded-xl py-2 px-4 font-medium flex items-center justify-center gap-2 transition-transform duration-200 hover:translate-y-1"
@@ -98,19 +99,88 @@
                                     </div>
 
                                     <!-- Icon button with hover group -->
-                                    <div class="group perspective">
-                                        <div
-                                            class="relative transform-gpu transition-all duration-300 group-hover:scale-105 group-hover:-translate-y-2">
+                                    <div class="group perspective-1000">
+                                        <!-- Main button container with enhanced 3D transforms -->
+                                        <div class="
+        relative 
+        transform-gpu 
+        transition-all 
+        duration-300 
+        group-hover:scale-110
+        group-hover:-translate-y-3
+        group-hover:rotate-y-5
+        group-active:scale-95
+        group-active:translate-y-1
+      ">
+                                            <!-- Enhanced shadow with depth -->
+                                            <div class="
+            absolute 
+            inset-0 
+            rounded-full 
+            transform-gpu 
+            transition-all 
+            duration-300
+            opacity-70
+            blur-md
+            group-hover:blur-lg
+            group-hover:scale-110
+            group-hover:opacity-80
+            group-active:scale-90
+            group-active:blur-sm
+            group-active:opacity-50
+          " :style="{
+            backgroundColor: getUnitColor(unitIndex),
+            transform: 'translateY(10px) scale(0.85)'
+        }">
+                                            </div>
+
+                                            <!-- Base and background elements -->
                                             <div class="relative w-48 h-48">
-                                                <div class="absolute inset-0 rounded-full transform-gpu translate-y-1"
-                                                    :style="{ backgroundColor: getUnitColor(unitIndex) }"></div>
-                                                <div class="absolute inset-0 rounded-full flex items-center justify-center cursor-pointer shadow-lg transform-gpu transition-all duration-300"
-                                                    :style="{ background: getUnitGradient(unitIndex) }">
+                                                <!-- Bottom layer for 3D effect (shadow/base) -->
+                                                <div class="
+              absolute 
+              inset-0 
+              rounded-full 
+              transform-gpu 
+              translate-y-2
+              transition-all
+              duration-300
+              group-hover:translate-y-4
+              group-active:translate-y-1
+            " :style="{ backgroundColor: getUnitColor(unitIndex) }">
+                                                </div>
+
+                                                <!-- Main button background with subtle gradient -->
+                                                <div class="
+              absolute 
+              inset-0 
+              rounded-full 
+              flex 
+              items-center 
+              justify-center 
+              cursor-pointer 
+              shadow-lg 
+              transition-all 
+              duration-300
+              group-active:shadow-inner
+              group-hover:shadow-xl
+              overflow-hidden
+              " :style="{
+                  background: getUnitGradient(unitIndex)
+                }">
+
+                                                    <!-- Icon with enhanced transitions -->
                                                     <component
                                                         :is="getIconForIndex(getGlobalSectionIndex(unitIndex, sectionIndex))"
-                                                        class="w-24 h-24 transform-gpu transition-all duration-300 group-hover:scale-105 group-hover:-translate-y-2"
-                                                        style="color: var(--light-text);" />
+                                                        class="
+                relative
+                w-24 
+                h-24 
+                duration-300 
+                drop-shadow-lg
+              " style="color: var(--light-text);" />
                                                 </div>
+
                                             </div>
                                         </div>
                                     </div>
@@ -155,7 +225,7 @@
                                 style="color: var(--color-primary-light);">
                                 <!-- {{ nodeNameErrors }} -->
                                 <span v-for="(error, index) in nodeNameErrors" :key="index">{{ error
-                                    }}<br></span>
+                                }}<br></span>
                             </p>
                         </div>
                         <button @click="addNodeNameField" class="mt-2 text-sm font-medium flex items-center gap-1"
@@ -395,8 +465,34 @@ const getUnitColor = (unitIndex) => {
 }
 // Get gradient for a unit based on its index
 const getUnitGradient = (unitIndex) => {
-    const colorIndex = unitIndex % unitColors.length
-    return `linear-gradient(135deg, ${unitColors[colorIndex]}, ${unitColors[colorIndex]})`
+    const colorIndex = unitIndex % unitColors.length;
+    const baseColor = unitColors[colorIndex];
+
+    // Create a more pronounced gradient with highlights
+    return `linear-gradient(135deg, 
+    ${adjustColor(baseColor, 20)} 0%, 
+    ${baseColor} 50%, 
+    ${adjustColor(baseColor, -20)} 100%)`;
+}
+
+// Helper function to lighten/darken colors
+function adjustColor(color, percent) {
+    // Convert hex to RGB
+    let R = parseInt(color.substring(1, 3), 16);
+    let G = parseInt(color.substring(3, 5), 16);
+    let B = parseInt(color.substring(5, 7), 16);
+
+    // Adjust brightness
+    R = Math.min(255, Math.max(0, R + percent));
+    G = Math.min(255, Math.max(0, G + percent));
+    B = Math.min(255, Math.max(0, B + percent));
+
+    // Convert back to hex
+    const RR = R.toString(16).padStart(2, '0');
+    const GG = G.toString(16).padStart(2, '0');
+    const BB = B.toString(16).padStart(2, '0');
+
+    return `#${RR}${GG}${BB}`;
 }
 const setLibraryIsPublicStatus = async (newStatus: boolean) => {
     if (isPublic.value === newStatus) {
@@ -643,9 +739,9 @@ const handleNodeClick = (sectionId) => {
     }
 }
 const getNodeOffset = (index) => {
-    // const amplitude = Let's change this to code so it looks better
-    const amplitude = 80
-    return Math.sin(index * 0.7) * amplitude
+    const amplitude = 80;
+    // Add a slight phase shift for more natural movement
+    return Math.sin(index * 0.7 + 0.2) * amplitude;
 }
 const startLesson = (sectionName, sectionId) => {
     gameStore.setSectionId(sectionId);
@@ -700,6 +796,32 @@ const handleScroll = () => {
 .modal-enter-from,
 .modal-leave-to {
     opacity: 0;
+}
+
+.perspective-1000 {
+    perspective: 1000px;
+}
+
+.rotate-y-5 {
+    transform: rotateY(5deg);
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 0.4;
+        transform: scale(0.98);
+    }
+
+    50% {
+        opacity: 0.8;
+        transform: scale(1.02);
+    }
+}
+
+.animate-pulse-slow {
+    animation: pulse 3s ease-in-out infinite;
 }
 
 @media (max-width: 600px) {
