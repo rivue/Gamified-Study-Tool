@@ -58,14 +58,14 @@
                 <!-- Unit Headers -->
                 <template v-for="([unit], unitName, unitIndex) in rawUnitData" :key="unit.unit_id">
                     <!-- Unit container with border and styling -->
-                    <div class="relative mx-8 my-12 px-8 pt-8 pb-12 rounded-xl border-2 flex-shrink-0"
+                    <div class="relative -mx-12 my-8 px-12 pt-12 pb-36 border-t-2 border-b-2 flex-shrink-0"
                         :style="{ borderColor: getUnitColor(unitIndex), backgroundColor: 'var(--background-color-1t)' }">
  
  
                         <!-- Unit name header -->
                         <div class="absolute -top-5 left-1/2 transform -translate-x-1/2 px-6 py-2 rounded-lg font-bold text-xl whitespace-nowrap shadow-md"
                             :style="{ backgroundColor: getUnitColor(unitIndex), color: 'var(--light-text)' }">
-                            {{ unitName }}
+                            {{ formatRoomName(unitName) }}
                         </div>
  
  
