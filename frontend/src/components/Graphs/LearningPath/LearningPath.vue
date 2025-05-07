@@ -233,13 +233,6 @@
 
                 </template>
 
-                <AddUnit 
-                :library-id="libraryId" 
-                position="start" 
-                :existing-units="Object.keys(rawUnitData)" 
-                @unit-added="handleUnitAdded" 
-                />
-
                 <!-- Added right padding to ensure last nodes have space -->
                 <div class="w-24 flex-shrink-0"></div>
             </div>
