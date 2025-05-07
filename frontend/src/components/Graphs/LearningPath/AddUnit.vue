@@ -46,6 +46,27 @@
       </div>
     </Transition>
   </template>
+
+
+
+
+
+
+
+
+
+
+
+
+TODO: CONTINUE WITH ADD  UNIT, TRY TO GET PLUS ICON TO WORK THEN CONTINUE TO STYLE IT AND ADD CALL TO BACKEND
+
+
+
+
+
+
+
+
   
   <script setup>
   import { ref } from 'vue'
