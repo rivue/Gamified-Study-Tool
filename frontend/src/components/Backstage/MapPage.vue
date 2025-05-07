@@ -24,7 +24,7 @@
 import { useRoute } from "vue-router";
 import { onMounted, onUnmounted, ref, computed } from 'vue';
 import { usePopupStore } from "@/store/popupStore";
-import LearningPath from "../Graphs/LearningPath.vue";
+import LearningPath from "../Graphs/LearningPath/LearningPath.vue";
 import axios from 'axios';
 
 // Define component name

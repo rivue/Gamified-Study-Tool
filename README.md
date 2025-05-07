@@ -95,7 +95,8 @@ TODO list:
                 - potential new menu: "my libraries" "browse libraries" (would link from search?) "notifications" (like error messages or who joined a library or something), create / + (or maybe it would be a tab at the top next to search)
                 - menu for library would have members list, settings for course owner, potentially a list of files to see, potentially a screen to see library statistics like # likes, # people, etc... 
                 -  settings button would enable course owners to remove people, change visibility settings I think? or check different boxes for question types, or see users or something
-                users could add a note for each unit or something
+                - users could add a note for each unit / library or something
+                - instead of making path a long rectangle shape, make it follow the curve of the nodes
                 - ⭐️ explore adding "scroll to current" on map page (last unlocked node)
                 - also, maybe change it to vertical
             - add ui ability to "join" private libraries / public libraries that you didn't create maybe in like a seperate page or list or maybe I could add a box for putting in library codes or something
@@ -134,7 +135,8 @@ TODO list:
             - this would be a tab / icon in one of the vertical menu bar thing I want to add
         - ⭐️ add staging / pre-production environment that isn't localhost
         
-        easy (same as medium): 
+        easy (same as medium):
+        - ⭐️ add library description (editable by owner)
         - ⭐️ fix Aryan's problem with viewing it on his phone
         - ⭐️ should not be able to make duplicate unit and section names within a library, so check before they create it
         - ⭐️ users SHOULD be able to create libraries with duplicate names because of how generic some courses can be (philosophy, biology, math, calculus, etc...)

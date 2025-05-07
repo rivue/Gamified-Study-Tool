@@ -328,6 +328,7 @@
         </div>
     </Transition>
     <!-- Settings Modal -->
+     TODO: FACTOR OUT SETTINGS AND ADD NODE TO SEPERATE COMPONENTS THEN DO ADD UNIT THEN ADD SECTION
     <Transition name="modal">
         <div v-if="showSettingsModal" class="fixed inset-0 flex items-center justify-center z-50 p-4"
             style="background-color: var(--background-haze);">
