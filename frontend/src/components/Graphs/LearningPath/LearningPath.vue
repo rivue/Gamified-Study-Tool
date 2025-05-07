@@ -2,22 +2,15 @@
     <div class="fixed left-8 right-8 top-0 bottom-0 overflow-hidden">
 
         <!-- Double‐left chevron: hide once we’ve scrolled past a bit -->
-        <button v-if="scrollPosition > 300" @click="scrollToStart(); $nextTick(() => handleScroll())"
-            class="fixed left-8 bottom-1/4 -translate-y-1/4 bg-black/30 backdrop-blur-sm shadow-md rounded-full p-4 hover:bg-black/40 z-10
-                         flex items-center gap-2"
-            style="color: var(--highlight-color);">
+        <button v-if="scrollPosition > 300" @click="scrollToStart(); $nextTick(() => handleScroll())" class="fixed left-8 bottom-1/4 -translate-y-1/4 bg-black/30 backdrop-blur-sm shadow-md rounded-full p-4 hover:bg-black/40 z-10
+                         flex items-center gap-2" style="color: var(--highlight-color);">
             <ChevronDoubleLeftIcon class="w-12 h-12" />
             <span>To Start</span>
         </button>
 
         <!-- Double‐right chevron -->
-        <button
-            v-if="scrollPosition < (maxLeft - 300)"
-            @click="scrollToEnd(); $nextTick(() => handleScroll())"
-            class="fixed right-8 bottom-1/4 -translate-y-1/4 bg-black/30 backdrop-blur-sm shadow-md rounded-full p-4 hover:bg-black/40 z-10
-                         flex items-center gap-2"
-            style="color: var(--highlight-color);"
-        >
+        <button v-if="scrollPosition < (maxLeft - 300)" @click="scrollToEnd(); $nextTick(() => handleScroll())" class="fixed right-8 bottom-1/4 -translate-y-1/4 bg-black/30 backdrop-blur-sm shadow-md rounded-full p-4 hover:bg-black/40 z-10
+                         flex items-center gap-2" style="color: var(--highlight-color);">
             <span>To End</span>
             <ChevronDoubleRightIcon class="w-12 h-12" />
         </button>
@@ -54,7 +47,7 @@
                 <!-- Unit Headers -->
                 <template v-for="([unit], unitName, unitIndex) in rawUnitData" :key="unit.unit_id">
                     <div class="relative -mx-12 my-12 px-12 pt-40 pb-36 border-t-2 border-b-2 flex-shrink-0" :style="{
-                         
+
                         borderColor: getUnitColor(unitIndex),
                         backgroundColor: 'var(--background-color-1t)',
                         borderLeft: unitIndex === 0 ? `2px solid ${getUnitColor(unitIndex)}` : 'none',
@@ -134,83 +127,83 @@
                                     <div class="group perspective-1000">
                                         <!-- Main button container with enhanced 3D transforms -->
                                         <div class="
-        relative 
-        transform-gpu 
-        transition-all 
-        duration-300 
-        group-hover:scale-110
-        group-hover:-translate-y-3
-        group-hover:rotate-y-5
-        group-active:scale-95
-        group-active:translate-y-1
-      ">
+                                            relative 
+                                            transform-gpu 
+                                            transition-all 
+                                            duration-300 
+                                            group-hover:scale-110
+                                            group-hover:-translate-y-3
+                                            group-hover:rotate-y-5
+                                            group-active:scale-95
+                                            group-active:translate-y-1
+                                        ">
                                             <!-- Enhanced shadow with depth -->
                                             <div class="
-            absolute 
-            inset-0 
-            rounded-full 
-            transform-gpu 
-            transition-all 
-            duration-300
-            opacity-70
-            blur-md
-            group-hover:blur-lg
-            group-hover:scale-110
-            group-hover:opacity-80
-            group-active:scale-90
-            group-active:blur-sm
-            group-active:opacity-50
-          " :style="{
-            backgroundColor: getUnitColor(unitIndex),
-            transform: 'translateY(10px) scale(0.85)'
-        }">
+                                                    absolute 
+                                                    inset-0 
+                                                    rounded-full 
+                                                    transform-gpu 
+                                                    transition-all 
+                                                    duration-300
+                                                    opacity-70
+                                                    blur-md
+                                                    group-hover:blur-lg
+                                                    group-hover:scale-110
+                                                    group-hover:opacity-80
+                                                    group-active:scale-90
+                                                    group-active:blur-sm
+                                                    group-active:opacity-50
+                                                " :style="{
+                                                    backgroundColor: getUnitColor(unitIndex),
+                                                    transform: 'translateY(10px) scale(0.85)'
+                                                }">
                                             </div>
 
                                             <!-- Base and background elements -->
                                             <div class="relative w-48 h-48">
                                                 <!-- Bottom layer for 3D effect (shadow/base) -->
                                                 <div class="
-              absolute 
-              inset-0 
-              rounded-full 
-              transform-gpu 
-              translate-y-2
-              transition-all
-              duration-300
-              group-hover:translate-y-4
-              group-active:translate-y-1
-            " :style="{ backgroundColor: getUnitColor(unitIndex) }">
+                                                absolute 
+                                                inset-0 
+                                                rounded-full 
+                                                transform-gpu 
+                                                translate-y-2
+                                                transition-all
+                                                duration-300
+                                                group-hover:translate-y-4
+                                                group-active:translate-y-1
+                                                " :style="{ backgroundColor: getUnitColor(unitIndex) }">
                                                 </div>
 
                                                 <!-- Main button background with subtle gradient -->
                                                 <div class="
-              absolute 
-              inset-0 
-              rounded-full 
-              flex 
-              items-center 
-              justify-center 
-              cursor-pointer 
-              shadow-lg 
-              transition-all 
-              duration-300
-              group-active:shadow-inner
-              group-hover:shadow-xl
-              overflow-hidden
-              " :style="{
-                background: getUnitGradient(unitIndex)
-            }">
+                                                        absolute 
+                                                        inset-0 
+                                                        rounded-full 
+                                                        flex 
+                                                        items-center 
+                                                        justify-center 
+                                                        cursor-pointer 
+                                                        shadow-lg 
+                                                        transition-all 
+                                                        duration-300
+                                                        group-active:shadow-inner
+                                                        group-hover:shadow-xl
+                                                        overflow-hidden
+                                                        " :style="{
+                                                            background: getUnitGradient(unitIndex)
+                                                        }">
 
                                                     <!-- Icon with enhanced transitions -->
                                                     <component
                                                         :is="getIconForIndex(getGlobalSectionIndex(unitIndex, sectionIndex))"
                                                         class="
-                relative
-                w-24 
-                h-24 
-                duration-300 
-                drop-shadow-lg
-              " style="color: var(--light-text);" />
+                                                            relative
+                                                            w-24 
+                                                            h-24 
+                                                            duration-300 
+                                                            drop-shadow-lg
+                                                        " style="color: var(--light-text);" />
                                                 </div>
 
                                             </div>
@@ -226,6 +219,7 @@
             </div>
         </div>
     </div>
+
     <!-- Add Node Modal -->
     <Transition name="modal">
         <div v-if="showAddNodeModal" class="fixed inset-0 flex items-center justify-center z-50 p-4"
@@ -327,80 +321,8 @@
             </div>
         </div>
     </Transition>
-    <!-- Settings Modal -->
-     TODO: FACTOR OUT SETTINGS AND ADD NODE TO SEPERATE COMPONENTS THEN DO ADD UNIT THEN ADD SECTION
-    <Transition name="modal">
-        <div v-if="showSettingsModal" class="fixed inset-0 flex items-center justify-center z-50 p-4"
-            style="background-color: var(--background-haze);">
-            <div class="rounded-2xl p-6 w-full max-w-md shadow-xl border"
-                style="background-color: var(--background-color); color: var(--light-text); border-color: var(--color-primary-dark);">
-                <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-xl font-semibold" style="color: var(--light-text);">
-                        Settings
-                    </h2>
-                    <button @click="toggleSettings" style="color: var(--highlight-color);">
-                        <XMarkIcon class="w-6 h-6" />
-                    </button>
-                </div>
-                <!-- Info message about instant changes -->
-                <div class="flex items-start gap-2 p-3 mb-4 rounded-lg"
-                    style="background-color: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.2);">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0 mt-0.5" viewBox="0 0 20 20"
-                        fill="currentColor" style="color: var(--color-primary-light);">
-                        <path fill-rule="evenodd"
-                            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9z"
-                            clip-rule="evenodd" />
-                    </svg>
-                    <p class="text-sm" style="color: var(--color-primary-light);">
-                        Changes are applied automatically and take effect immediately.
-                    </p>
-                </div>
-                <!-- 💡 Your settings controls go here: -->
-                <div class="space-y-4">
-                    <!-- Course Visibility Toggle -->
-                    <div>
-                        <label class="block text-sm font-medium mb-1" style="color: var(--highlight-color);">
-                            Course Visibility
-                        </label>
-                        <div class="flex mt-2 p-2 rounded-lg" style="background-color: var(--background-color-1t);">
-                            <button @click="setLibraryIsPublicStatus(true)"
-                                class="flex-1 py-2 px-3 rounded-lg transition-colors" :disabled="isUpdatingVisibility"
-                                :style="{
-                                    backgroundColor: isPublic ? 'var(--element-color-1)' : 'transparent',
-                                    color: isPublic ? 'var(--light-text)' : 'var(--highlight-color)'
-                                }">
-                                <span v-if="isUpdatingVisibility && pendingStatus === true">
-                                    <CogIcon class="w-5 h-5 animate-spin inline" />
-                                </span>
-                                <span v-else>Public</span>
-                            </button>
-                            <button @click="setLibraryIsPublicStatus(false)"
-                                class="flex-1 py-2 px-3 rounded-lg transition-colors" :style="{
-                                    backgroundColor: !isPublic ? 'var(--element-color-1)' : 'transparent',
-                                    color: !isPublic ? 'var(--light-text)' : 'var(--highlight-color)'
-                                }">
-                                <span v-if="isUpdatingVisibility && pendingStatus === true">
-                                    <CogIcon class="w-5 h-5 animate-spin inline" />
-                                </span>
-                                <span v-else>Private</span>
-                            </button>
-                        </div>
-                        <p class="text-xs mt-1" style="color: var(--color-primary-light); font-weight: bold;">
-                            {{ !!(isPublic) ? 'Anyone can view this course' : `Only this code can access this course:
-                            ${joinCode}` }}
-                        </p>
-                    </div>
-                    <!-- Add more settings fields as needed -->
-                </div>
-                <div class="mt-6 flex justify-end">
-                    <button @click="toggleSettings" class="px-4 py-2 rounded-lg border"
-                        style="border-color: var(--color-primary); color: var(--highlight-color);">
-                        Close
-                    </button>
-                </div>
-            </div>
-        </div>
-    </Transition>
+    <LibrarySettings v-model:showSettingsModal="showSettingsModal" :library-id="libraryId"
+        :library-is-public="libraryIsPublic" :library-join-code="libraryJoinCode" />
 </template>
 <script setup lang="ts">
 import { ref, watch, onMounted, onUnmounted } from 'vue'
@@ -428,6 +350,8 @@ import {
 import { useGameStore } from '@/store/gameStore'
 import { useRouter } from 'vue-router';
 import axios from 'axios';
+import LibrarySettings from "./LibrarySettings.vue";
+
 const props = defineProps({
     libraryId: {
         type: String,
@@ -454,22 +378,12 @@ const props = defineProps({
         required: true
     }
 })
+
 const rawUnitData = ref();
-const isPublic = ref(false);
-const joinCode = ref<string | null>(null);
 
 watch(() => props.unitSectionMap, async (newVal) => {
     rawUnitData.value = newVal;
 }, { deep: true, immediate: true })
-
-// Initialize libraryIsPublic from props
-watch(() => props.libraryIsPublic, (newVal) => {
-    isPublic.value = newVal;
-}, { immediate: true });
-
-watch(() => props.libraryJoinCode, (newVal) => {
-    joinCode.value = newVal;
-}, { immediate: true });
 
 // State for adding new nodes
 const showAddNodeModal = ref(false)
@@ -480,8 +394,7 @@ const fileError = ref('')
 const isAddingNode = ref(false)
 const gameStore = useGameStore()
 const showSettingsModal = ref(false)
-const isUpdatingVisibility = ref(false);
-const pendingStatus = ref<boolean | null>(null);
+
 // Track selected room for tooltip
 const selectedRoomId = ref(null)
 const library_id = props.libraryId;
@@ -551,31 +464,7 @@ function adjustColor(color, percent) {
 
     return `#${RR}${GG}${BB}`;
 }
-const setLibraryIsPublicStatus = async (newStatus: boolean) => {
-    if (isPublic.value === newStatus) {
-        return; // No change needed
-    }
-    const prev = isPublic.value;
-    isPublic.value = newStatus;
-    isUpdatingVisibility.value = true;
-    // pendingStatus.value = newStatus;
-    axios.post(`/api/library/visibility_status/${library_id}`, {
-        libraryId: library_id,
-        newStatus: newStatus
-    })
-        .then((response) => {
-            isPublic.value = newStatus;
-            joinCode.value = response.data.join_code; // Update join code if needed
-        })
-        .catch(() => {
-            // console.error('Error updating library visibility:', error);
-            isPublic.value = prev; // Revert to previous state on error
-        })
-        .finally(() => {
-            isUpdatingVisibility.value = false;
-            // pendingStatus.value = null;
-        });
-}
+
 // Get global section index (for offset and icon selection)
 const getGlobalSectionIndex = (unitIndex: number, sectionIndex: number) => {
     let count = 0;
@@ -728,9 +617,9 @@ const isDragging = ref(false)
 const startX = ref(0)
 const scrollLeft = ref(0)
 let scrollTimeoutId = null;
+
 // Scroll to center on first load
 onMounted(() => {
-    joinCode.value = props.libraryJoinCode;
     // If there are nodes and the container exists, scroll to position
     if (rawUnitData.value.length > 0 && scrollContainer.value) {
         // Calculate an appropriate starting position based on available width
@@ -747,12 +636,14 @@ onMounted(() => {
     if (!sc) return
     maxLeft.value = sc.scrollWidth - sc.clientWidth
 });
+
 onUnmounted(() => {
     if (scrollTimeoutId) {
         clearTimeout(scrollTimeoutId); // Clear the timeout if it hasn't run yet
         console.debug("LearningPath unmounting, cleared initial scroll timeout.");
     }
 });
+
 // Add these variables
 const startY = ref(0)
 const hasMoved = ref(false)
@@ -807,7 +698,7 @@ const startLesson = (sectionName, sectionId) => {
     gameStore.setSectionId(sectionId);
     router.push({
         name: 'GamePage',
-        params: { id: library_id, roomName: sectionName},
+        params: { id: library_id, roomName: sectionName },
     })
 }
 const scroll = (direction) => {
@@ -850,17 +741,6 @@ const handleScroll = () => {
 
 .perspective {
     perspective: 1000px;
-}
-
-/* Modal transitions */
-.modal-enter-active,
-.modal-leave-active {
-    transition: opacity 0.3s ease;
-}
-
-.modal-enter-from,
-.modal-leave-to {
-    opacity: 0;
 }
 
 .perspective-1000 {
