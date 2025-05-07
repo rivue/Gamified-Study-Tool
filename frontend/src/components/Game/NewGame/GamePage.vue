@@ -18,7 +18,6 @@ import { onBeforeRouteLeave } from "vue-router";
 const gameStore = useGameStore();
 
 onBeforeRouteLeave((to, from, next) => {
-    console.log("successfully unmounted");
     gameStore.resetGameState();
     next();
 });

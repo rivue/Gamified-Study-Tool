@@ -806,7 +806,7 @@ const startLesson = (sectionName, sectionId) => {
     gameStore.setSectionId(sectionId);
     router.push({
         name: 'GamePage',
-        params: { id: library_id, roomName: encodeURIComponent(sectionName) },
+        params: { id: library_id, roomName: sectionName},
     })
 }
 const scroll = (direction) => {

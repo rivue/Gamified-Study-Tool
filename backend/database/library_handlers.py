@@ -733,14 +733,14 @@ def is_center_room(library_id, room_name):
         return jsonify({"message": "Library not found"}), 404
     return room_name == library.library_topic
 
-def update_game_end(user_id, library_id, room_name):
+def update_game_end(user_id, library_id, section_id):
     try:
         user = User.query.get(user_id)
 
         if not user:
             return jsonify({'status': 'error', 'message': 'User not found'}), 404
          
-        increase_lesson_state(user_id, library_id, room_name)
+        increase_lesson_state(user_id, library_id, section_id)
 
         # existing_completion = LibraryCompletion.query.filter_by(library_id=library_id, user_id=user_id).first()
         # if existing_completion:

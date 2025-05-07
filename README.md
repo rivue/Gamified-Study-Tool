@@ -72,6 +72,9 @@ TODO list:
     LAUNCH LIST: goal: July 6th then start working on social media posts
 
         hard probably (goal: 2 high level bullet points / wk):
+        - integrate with teacher / school list from rate my professors 
+            - would probably be pretty easy: https://classic.yarnpkg.com/en/package/ratemyprofessor-api
+            - https://github.com/tisuela/ratemyprof-api
         - Add "edit mode" for library creator - would allow them to delete sections / units / courses and also add sections / units and would keep editing isolated from actually playing the course
         - ✅ ⭐️ Finish sections + units
             - ⭐️ Add ability to add each section to each unit (later --> come back to, reminder to make it account for 1-n number of sections no matter how that looks. add new stepping stones button is commented out for now)
@@ -109,7 +112,7 @@ TODO list:
     # then add ability to leave libraries (later)
 
         - ⭐️ add google auth
-        - ⭐️ let units / sections / courses have spacings / duplicate values as others in db / weird characters / numbers, #($^@{"?}*), etc...
+        - ⭐️ let units / sections / courses have spacings / duplicate values as others in db
             - ⭐️ add support for links / pdfs / other things and get rid of things like difficulty, tutor, etc... then actually start generating stuff to study
             - ⭐️ add support for multiple file upload as well
         - ⭐️ add ability to see uploaded files in library (list of their names) and maybe even file preview (would require nosql db or something maybe)
@@ -135,7 +138,7 @@ TODO list:
         - ⭐️ fix Aryan's problem with viewing it on his phone
         - ⭐️ should not be able to make duplicate unit and section names within a library, so check before they create it
         - ⭐️ users SHOULD be able to create libraries with duplicate names because of how generic some courses can be (philosophy, biology, math, calculus, etc...)
-        - ⭐️ library create messages look bad
+        - ⭐️ library create error messages look bad
         - ⭐️ add page after you finish a game session, but make it have confetti / small animation or something
         - ⭐️ make sure the background of the site is the color you want if you scroll to far (like in main page if you scroll too far down) (right now its white which is not good)
 

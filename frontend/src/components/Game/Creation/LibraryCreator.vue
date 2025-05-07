@@ -13,7 +13,7 @@
                         <div class="title-bar">
                             <input type="text" id="topicInput" ref="topicInput" v-model="topic"
                                 :class="{ 'input-error': topicError || topicTypingError || topicSpaceError }"
-                                placeholder="What to learn about" maxlength="100" @focus="selectInputText"
+                                placeholder="Mrs. Frizzle's science class, Biology 272, etc..." maxlength="100" @focus="selectInputText"
                                 @paste="handlePaste" />
                         </div>
                         <!-- Error Message -->
@@ -21,7 +21,7 @@
                             Please enter a topic.
                         </div>
                         <div v-if="topicTypingError" class="error-message">
-                            Topic can only have spaces or letters and must be between 4 and 70 characters long.
+                            Topic can only have spaces or letters and must be between 4 and 25 characters long.
                         </div>
                         <div v-if="topicSpaceError" class="error-message">
                             Topic must not start or end with a space.
@@ -71,10 +71,8 @@
                                 </div>
                                 <div class="error-container">
                                     <div v-if="groupError" class="error-message">Please enter a valid unit name.</div>
-                                    <div v-if="groupTypingError" class="error-message">Unit name can only have spaces or
-                                        letters and must be at least 4 characters long.</div>
-                                    <div v-if="groupSpaceError" class="error-message">Unit name must not start or end
-                                        with a space.</div>
+                                    <div v-if="groupTypingError" class="error-message">Unit name must be between 4 and 25 characters long.</div>
+                                    <div v-if="groupSpaceError" class="error-message">Unit name must not start or end with a space.</div>
                                     <div v-if="groupEmptyError" class="error-message">Must have at least one Unit</div>
 
                                 </div>
@@ -119,7 +117,7 @@
                                                 Every Unit must have at least one section
                                             </div>
                                             <div v-if="groupSectionNamingErrors[groupIndex]" class="error-message">
-                                                Section names must only have letters or spaces and must be at least 4
+                                                Section names must only have letters or spaces and must be between 4 and 25
                                                 characters long.
                                             </div>
                                         </div>
@@ -288,7 +286,8 @@ const addGroup = () => {
     if (trimmedName && groups.value.length < 10) {
 
         groupError.value = false;
-        groupTypingError.value = !/^[a-zA-Z ]+$/.test(trimmedName) || trimmedName.length < 4;
+        groupTypingError.value =
+          trimmedName.length < 4 || trimmedName.length > 25;
 
         if (groupTypingError.value) {
             return;
@@ -334,7 +333,7 @@ const addSection = (groupIndex: number) => {
 
 
         // Validate section name
-        const typingError = !/^[a-zA-Z ]+$/.test(trimmedName) || trimmedName.length < 4;
+        const typingError =  trimmedName.length < 4 || trimmedName.length > 25;
         const spaceError = trimmedName[0] === " " || trimmedName[trimmedName.length - 1] === " ";
 
         if (typingError || spaceError) {
@@ -434,7 +433,8 @@ const hasErrors = (): boolean => {
 
     topicError.value = false;
 
-    topicTypingError.value = !/^[a-zA-Z ]+$/.test(topic.value) || topic.value.length < 4 || topic.value.length > 70;
+    topicTypingError.value = 
+    topic.value.length < 4 || topic.value.length > 25;
 
     if (topicTypingError.value) {
         return true;
@@ -449,7 +449,7 @@ const hasErrors = (): boolean => {
         /^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)$/;
     if (urlPattern.test(topic.value)) {
         popupStore.showPopup(
-            "We do not currently support links.</br>Try entering the topic of the website instead.</br>Note: This app can teach you about anything, but will not do your homework!"
+            "We do not currently support links as are currently still in development. If you would like this to be added, please contact us through the contact page or discord."
         );
         return true;
     }
@@ -481,7 +481,7 @@ const hasErrors = (): boolean => {
 
 
         for (const section of group.sections) {
-            if (section.trim() === "" || !/^[a-zA-Z ]+$/.test(section) ||
+            if (section.trim() === "" || 
                 section[0] === " " || section[section.length - 1] === " ") {
                 return true;
             }
