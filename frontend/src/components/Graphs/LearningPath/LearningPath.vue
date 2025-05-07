@@ -44,7 +44,17 @@
             <div class="flex items-center gap-24 min-h-screen py-24 relative">
                 <!-- Left padding so first node is visible -->
                 <div class="w-24 flex-shrink-0"></div>
+
+                <!-- Add Unit at the beginning -->
+                <AddUnit 
+                :library-id="libraryId" 
+                position="start" 
+                :existing-units="Object.keys(rawUnitData)" 
+                @unit-added="handleUnitAdded" 
+                />
+
                 <!-- Unit Headers -->
+                
                 <template v-for="([unit], unitName, unitIndex) in rawUnitData" :key="unit.unit_id">
                     <div class="relative -mx-12 my-12 px-12 pt-40 pb-36 border-t-2 border-b-2 flex-shrink-0" :style="{
 
@@ -61,7 +71,7 @@
                             unitIndex === Object.keys(rawUnitData).length - 1 ? `0.625rem` : 'none',
                         borderBottomRightRadius:
                             unitIndex === Object.keys(rawUnitData).length - 1 ? `0.625rem` : 'none'
-                    }">
+                        }">
                         <!-- Unit name header -->
                         <div class="absolute -top-5 left-1/2 transform -translate-x-1/2 px-6 py-2 rounded-lg font-bold text-xl whitespace-nowrap shadow-md"
                             :style="{ backgroundColor: getUnitColor(unitIndex), color: 'var(--light-text)' }">
@@ -213,7 +223,23 @@
                             </template>
                         </div>
                     </div>
+
+                    <AddUnit 
+                    :library-id="libraryId" 
+                    position="start" 
+                    :existing-units="Object.keys(rawUnitData)" 
+                    @unit-added="handleUnitAdded" 
+                    />
+
                 </template>
+
+                <AddUnit 
+                :library-id="libraryId" 
+                position="start" 
+                :existing-units="Object.keys(rawUnitData)" 
+                @unit-added="handleUnitAdded" 
+                />
+
                 <!-- Added right padding to ensure last nodes have space -->
                 <div class="w-24 flex-shrink-0"></div>
             </div>
@@ -321,9 +347,12 @@
             </div>
         </div>
     </Transition>
+
     <LibrarySettings v-model:showSettingsModal="showSettingsModal" :library-id="libraryId"
         :library-is-public="libraryIsPublic" :library-join-code="libraryJoinCode" />
+
 </template>
+
 <script setup lang="ts">
 import { ref, watch, onMounted, onUnmounted } from 'vue'
 import {
@@ -351,6 +380,7 @@ import { useGameStore } from '@/store/gameStore'
 import { useRouter } from 'vue-router';
 import axios from 'axios';
 import LibrarySettings from "./LibrarySettings.vue";
+import AddUnit from "./AddUnit.vue";
 
 const props = defineProps({
     libraryId: {
@@ -397,7 +427,6 @@ const showSettingsModal = ref(false)
 
 // Track selected room for tooltip
 const selectedRoomId = ref(null)
-const library_id = props.libraryId;
 // File input handling
 const fileInput = ref(null)
 const scrollPosition = ref(0)
@@ -428,11 +457,13 @@ const scrollToEnd = () => {
 function toggleSettings() {
     showSettingsModal.value = !showSettingsModal.value
 }
+
 // Get color for a unit based on its index
 const getUnitColor = (unitIndex) => {
     const colorIndex = unitIndex % unitColors.length
     return unitColors[colorIndex];
 }
+
 // Get gradient for a unit based on its index
 const getUnitGradient = (unitIndex) => {
     const colorIndex = unitIndex % unitColors.length;
@@ -478,6 +509,7 @@ const getGlobalSectionIndex = (unitIndex: number, sectionIndex: number) => {
     }
     return count + sectionIndex;
 }
+
 const handleFileSelection = (event) => {
     const file = event.target.files[0]
     if (!file) return
@@ -500,6 +532,7 @@ const handleFileSelection = (event) => {
     }
     selectedFile.value = file
 }
+
 const removeFile = () => {
     selectedFile.value = null
     fileError.value = ''
@@ -507,21 +540,25 @@ const removeFile = () => {
         fileInput.value.value = ''
     }
 }
+
 const formatFileSize = (bytes) => {
     if (bytes < 1024) return bytes + ' B'
     if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB'
     return (bytes / 1048576).toFixed(1) + ' MB'
 }
+
 // Add a new node name field
 const addNodeNameField = () => {
     newNodeNames.value.push('')
     nodeNameErrors.value.push('')
 }
+
 // Remove a node name field
 const removeNodeName = (index) => {
     newNodeNames.value.splice(index, 1)
     nodeNameErrors.value.splice(index, 1)
 }
+
 // Function to add a new node
 const addNewNodes = async () => {
     // Validate node name
@@ -549,7 +586,7 @@ const addNewNodes = async () => {
     try {
         // Add each node
         const formData = new FormData()
-        formData.append('libraryId', library_id)
+        formData.append('libraryId', props.libraryId)
         // Append all room names with the same key name
         trimmedNames.forEach(room => formData.append("roomNames", room));
         // Add file if present (same file for all nodes)
@@ -578,6 +615,7 @@ const addNewNodes = async () => {
         isAddingNode.value = false
     }
 }
+
 // Function to get the corresponding room data by section ID
 const getRoomData = (sectionId: Number) => {
     for (let i = 0; i < props.roomData.length; i++) {
@@ -588,6 +626,7 @@ const getRoomData = (sectionId: Number) => {
     // Return null if not found
     return null;
 }
+
 // Array of icons to cycle through
 const icons = [
     StarIcon,
@@ -600,10 +639,12 @@ const icons = [
     SparklesIcon,
     RocketLaunchIcon
 ]
+
 // Get icon based on index
 const getIconForIndex = (index) => {
     return icons[index % icons.length]
 }
+
 // Format room name for display
 const formatRoomName = (name) => {
     if (!name) return '';
@@ -612,6 +653,7 @@ const formatRoomName = (name) => {
         .map(word => word.charAt(0).toUpperCase() + word.slice(1))
         .join(' ')
 }
+
 const scrollContainer = ref(null)
 const isDragging = ref(false)
 const startX = ref(0)
@@ -643,6 +685,17 @@ onUnmounted(() => {
         console.debug("LearningPath unmounting, cleared initial scroll timeout.");
     }
 });
+
+// Add to your script section
+const handleUnitAdded = (unitData) => {
+  // You have a few options here:
+  // 1. Refresh the entire page
+  window.location.reload()
+  
+  // OR 2. Update data without a full reload (better UX)
+  // This would require emitting an event to parent components
+  // or using a store to manage state
+}
 
 // Add these variables
 const startY = ref(0)
@@ -698,7 +751,7 @@ const startLesson = (sectionName, sectionId) => {
     gameStore.setSectionId(sectionId);
     router.push({
         name: 'GamePage',
-        params: { id: library_id, roomName: sectionName },
+        params: { id: props.libraryId, roomName: sectionName },
     })
 }
 const scroll = (direction) => {
