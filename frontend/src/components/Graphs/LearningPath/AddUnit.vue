@@ -65,7 +65,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, nextTick } from 'vue'
+import { ref, nextTick } from 'vue'
 import { PlusIcon, XMarkIcon } from '@heroicons/vue/24/solid'
 import axios from 'axios'
 
@@ -75,7 +75,7 @@ const props = defineProps({
         required: true
     },
     position: {
-        type: [Number, String], // 'start', index number, or 'end'
+        type: Number, // 'start', index number, or 'end'
         required: true
     },
     existingUnits: {
@@ -112,35 +112,13 @@ const addNewUnit = async () => {
     if (!trimmedName) {
         unitNameError.value = 'Please enter a unit name'
         return
-    } else if (trimmedName.length > 25) {
-        unitNameError.value = 'Unit name must be 25 characters or less'
+    } else if (trimmedName.length > 25 || trimmedName.length < 4) {
+        unitNameError.value = 'Unit name must be between 4 and 25 characters'
         return
     }
 
-    // TODO --> THIS VVV
-    // topicSpaceError.value = topic.value[0] === " " || topic.value[topic.value.length - 1] === " ";
-    // if (topicSpaceError.value) {
-    //     return true;
-    // }
-
-    // errors to check for
-    // length < 4, length > 25
-    // equal to anything in the list
-            // filter or whatever, photosynthesis and Photosynthesis should not be allowed because of:
-    //
-    // const formatRoomName = (name) => {
-    // if (!name) return '';
-    // return name
-    //     .split('_')
-    //     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-    //     .join(' ')
-    // }
-    // 
-
     // Check for duplicate unit names
-    const formattedUnitName = trimmedName.toLowerCase().replace(/\s+/g, '_')
-    const existingUnitNames = props.existingUnits.map(unit => unit.toLowerCase())
-    if (existingUnitNames.includes(formattedUnitName)) {
+    if (props.existingUnits.includes(trimmedName)) {
         unitNameError.value = 'A unit with this name already exists'
         return
     }
@@ -149,20 +127,13 @@ const addNewUnit = async () => {
     const currentAbortController = new AbortController()
 
     try {
+
         // Determine position for the new unit
-        let position = 0
-        if (props.position === 'end') {
-            position = props.existingUnits.length
-        } else if (props.position === 'start') {
-            position = 0
-        } else {
-            position = props.position
-        }
+        let position = props.existingUnits.length
 
         const response = await axios.post('/api/library/unit', {
             libraryId: props.libraryId,
-            unitName: formattedUnitName,
-            displayName: trimmedName,
+            unitName: trimmedName,
             position: position
         }, {
             signal: currentAbortController.signal
@@ -173,16 +144,16 @@ const addNewUnit = async () => {
         if (response.data && response.data.status === "success") {
             // Clear form and notify parent
             newUnitName.value = ''
-            showAddUnitModal.value = false
+            showAddUnitModal.value = false,
             emit('unitAdded', {
-                name: formattedUnitName,
+                name: trimmedName,
                 displayName: trimmedName,
                 position: position
             })
         }
     } catch (error) {
         console.error('Error adding unit:', error)
-        unitNameError.value = error.message || 'Failed to add unit. Please try again.'
+        unitNameError.value = error.response?.data?.message || 'Failed to add unit. Please try again.'
     } finally {
         isAddingUnit.value = false
     }

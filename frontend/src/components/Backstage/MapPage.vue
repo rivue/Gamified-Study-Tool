@@ -82,7 +82,7 @@ const processedUnitSectionMap = computed(() => {
     
     // Make a defensive copy to avoid mutation issues
     const unitMap = JSON.parse(JSON.stringify(library.value.data.unit_to_section_map));
-    
+
     // Ensure each unit has proper structure
     for (const unitName in unitMap) {
         if (!Array.isArray(unitMap[unitName])) {

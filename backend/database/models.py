@@ -1,9 +1,11 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
-from sqlalchemy import JSON
+from sqlalchemy import JSON, update
 from sqlalchemy.ext.mutable import MutableList
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from datetime import datetime
+import traceback
+import logging
 import secrets, string
 import hashlib
 import random
@@ -201,7 +203,8 @@ class Library(db.Model):
     room_names = db.Column(MutableList.as_mutable(JSON), nullable=False)
     image_url = db.Column(db.String(200), nullable=False, default=DEFAULT_IMAGE_URL)
     
-    units = db.relationship('LibraryUnit', backref='library', cascade="all, delete-orphan", lazy=True)
+    units = db.relationship('LibraryUnit', backref='library', cascade="all, delete-orphan", lazy=True,
+                            order_by="LibraryUnit.position")
 
     factoids = db.relationship('LibraryFactoid', backref='library', cascade="all, delete-orphan")
     
@@ -232,28 +235,76 @@ class Library(db.Model):
             self.join_code = None
         return self.join_code
 
-    def attach_unit(self, unit: 'LibraryUnit'):
-        """Attach a unit to this library"""
+    def attach_unit(self, unit: 'LibraryUnit', position=None):
+        """Attach a unit to this library at the specified position
         
-        if not isinstance(unit, LibraryUnit):
-            raise ValueError("unit must be an instance of LibraryUnit")
+        Args:
+            unit: LibraryUnit to attach
+            position: Position to insert (0-indexed). If None, append to the end.
         
-        if unit.library_id == self.id:
+        Returns:
+            The attached unit
+        """
+
+        try:
+        
+            if not isinstance(unit, LibraryUnit):
+                raise ValueError("unit must be an instance of LibraryUnit")
+            
+            unit.library_id = self.id
+            
+            with db.session.no_autoflush:
+            
+                # Get current maximum position if we need to append
+                if position is None:
+                    
+                    max_position = db.session.query(db.func.max(LibraryUnit.position))\
+                                    .filter(LibraryUnit.library_id == self.id).scalar() or -1
+                    
+                    unit.position = max_position + 1
+
+                else:
+
+                    stmt = (
+                        update(LibraryUnit)
+                        .where(
+                            LibraryUnit.library_id == self.id,
+                            LibraryUnit.position   >= position
+                        )
+                        .values(position = LibraryUnit.position + 1)
+                    )
+                        # db.session.query(LibraryUnit)\
+                        # .filter(LibraryUnit.library_id == self.id, 
+                                # LibraryUnit.position >= position)\
+                        # .update({LibraryUnit.position: LibraryUnit.position + 1})
+                    
+                    db.session.execute(stmt)
+
+                    unit.position = position
+            
+            # Make sure the unit is added to the session if it's not already
+            db.session.add(unit)
+                
+            db.session.flush()
             return unit
         
-        unit.library_id = self.id
-
-        db.session.flush()
-
-        return unit
-    
+        except SQLAlchemyError as e:
+            db.session.rollback()                       # keep the DB clean
+            raise   
 class LibraryUnit(db.Model):
     __tablename__ = "library_unit"
     id = db.Column(db.Integer, primary_key=True)
     library_id = db.Column(db.Integer, db.ForeignKey('library.id'), nullable=False)
     unit_name = db.Column(db.String(200), nullable=False)
         
+    position = db.Column(db.Integer, nullable=False, index=True) 
+
     sections = db.relationship('LibrarySection', backref='unit', cascade="all, delete-orphan", lazy=True)
+
+    __table_args__ = (
+        db.UniqueConstraint('library_id', 'position',
+                            name='uq_library_unit_position'),
+    )
 
     def add_section(self, section_name):
         """Add a new section to this unit"""

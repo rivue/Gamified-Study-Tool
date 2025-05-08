@@ -46,16 +46,13 @@
                 <div class="w-24 flex-shrink-0"></div>
 
                 <!-- Add Unit at the beginning -->
-                <AddUnit 
-                :library-id="libraryId" 
-                position="start" 
-                :existing-units="Object.keys(rawUnitData)" 
-                @unit-added="handleUnitAdded" 
-                />
+                <AddUnit :library-id="libraryId" :position="0" :existing-units="Object.keys(rawUnitData)"
+                    @unit-added="handleUnitAdded" />
 
                 <!-- Unit Headers -->
-                
+
                 <template v-for="([unit], unitName, unitIndex) in rawUnitData" :key="unit.unit_id">
+                    {{ rawUnitData }}
                     <div class="relative -mx-12 my-12 px-12 pt-40 pb-36 border-t-2 border-b-2 flex-shrink-0" :style="{
 
                         borderColor: getUnitColor(unitIndex),
@@ -71,15 +68,17 @@
                             unitIndex === Object.keys(rawUnitData).length - 1 ? `0.625rem` : 'none',
                         borderBottomRightRadius:
                             unitIndex === Object.keys(rawUnitData).length - 1 ? `0.625rem` : 'none'
-                        }">
+                    }">
                         <!-- Unit name header -->
                         <div class="absolute -top-5 left-1/2 transform -translate-x-1/2 px-6 py-2 rounded-lg font-bold text-xl whitespace-nowrap shadow-md"
                             :style="{ backgroundColor: getUnitColor(unitIndex), color: 'var(--light-text)' }">
-                            {{ formatRoomName(unitName) }}
+                            {{ unitName }}
                         </div>
                         <!-- Sections container -->
+
                         <div class="flex items-center gap-24">
-                            <template v-for="([sectionId, sectionName], sectionIndex) in rawUnitData[unitName]"
+                            <template v-if="rawUnitData[unitName].length > 0"
+                                v-for="([sectionId, sectionName], sectionIndex) in rawUnitData[unitName]"
                                 :key="sectionIndex">
                                 <div class="relative flex-shrink-0" :style="{
                                     transform: `translateY(${getNodeOffset(getGlobalSectionIndex(unitIndex, sectionIndex))}px)`
@@ -99,7 +98,7 @@
                                             <!-- Main tooltip content -->
                                             <div class="rounded-2xl p-4 shadow-lg"
                                                 style="background-color: var(--element-color-1); color: var(--light-text);">
-                                                <div class="font-medium mb-3">{{ formatRoomName(sectionName) }}
+                                                <div class="font-medium mb-3">{{ sectionName }}
                                                     <br>
                                                     <span
                                                         v-if="getRoomData(sectionId) && getRoomData(sectionId).lesson_state <= getRoomData(sectionId).num_lessons">
@@ -221,15 +220,29 @@
                                     </div>
                                 </div>
                             </template>
+
+                            <template v-else>
+                                <div class="flex flex-col items-center justify-center p-6 min-w-64">
+                                    <div class="text-center mb-4" style="color: var(--light-text);">
+                                        <p class="text-lg">No stepping stones yet</p>
+                                        <p class="text-sm opacity-75">Add stepping stones to get started</p>
+                                    </div>
+                                    <button @click="showAddNodeModal = true" class="flex items-center gap-2 px-4 py-2 rounded-lg transition-all 
+                               duration-200 hover:scale-105 active:scale-95" :style="{
+                                background: getUnitGradient(unitIndex),
+                                color: 'var(--light-text)'
+                            }">
+                                        <PlusIcon class="w-5 h-5" />
+                                        <span>Add Stepping Stone</span>
+                                    </button>
+                                </div>
+                            </template>
+
                         </div>
                     </div>
 
-                    <AddUnit 
-                    :library-id="libraryId" 
-                    position="start" 
-                    :existing-units="Object.keys(rawUnitData)" 
-                    @unit-added="handleUnitAdded" 
-                    />
+                    <AddUnit :library-id="libraryId" :position="unitIndex + 1" :existing-units="Object.keys(rawUnitData)"
+                        @unit-added="handleUnitAdded" />
 
                 </template>
 
@@ -270,7 +283,7 @@
                                 style="color: var(--color-primary-light);">
                                 <!-- {{ nodeNameErrors }} -->
                                 <span v-for="(error, index) in nodeNameErrors" :key="index">{{ error
-                                }}<br></span>
+                                    }}<br></span>
                             </p>
                         </div>
                         <button @click="addNodeNameField" class="mt-2 text-sm font-medium flex items-center gap-1"
@@ -638,15 +651,6 @@ const getIconForIndex = (index) => {
     return icons[index % icons.length]
 }
 
-// Format room name for display
-const formatRoomName = (name) => {
-    if (!name) return '';
-    return name
-        .split('_')
-        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-        .join(' ')
-}
-
 const scrollContainer = ref(null)
 const isDragging = ref(false)
 const startX = ref(0)
@@ -667,6 +671,7 @@ onMounted(() => {
             scrollTimeoutId = null; // Clear the timeout ID
         }, 100);
     }
+    console.log(rawUnitData)
     const sc = scrollContainer.value
     if (!sc) return
     maxLeft.value = sc.scrollWidth - sc.clientWidth
@@ -681,13 +686,13 @@ onUnmounted(() => {
 
 // Add to your script section
 const handleUnitAdded = (unitData) => {
-  // You have a few options here:
-  // 1. Refresh the entire page
-  window.location.reload()
-  
-  // OR 2. Update data without a full reload (better UX)
-  // This would require emitting an event to parent components
-  // or using a store to manage state
+    // You have a few options here:
+    // 1. Refresh the entire page
+    window.location.reload()
+
+    // OR 2. Update data without a full reload (better UX)
+    // This would require emitting an event to parent components
+    // or using a store to manage state
 }
 
 // Add these variables

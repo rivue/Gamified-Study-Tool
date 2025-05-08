@@ -97,7 +97,7 @@ def create_library_favorite(
         db.session.rollback()
         return jsonify({"message": str(e)}), 400
     
-def create_unit_and_add(library_id, unit_name):
+def create_unit_and_add(library_id, unit_name, position=None):
     try:
         unit = LibraryUnit(
             library_id=library_id,
@@ -111,7 +111,13 @@ def create_unit_and_add(library_id, unit_name):
         if not unit or not library:
             return jsonify({"error": "Library or Unit not found"}), 404
         
-        library.attach_unit(unit)
+        if position is not None:
+            library.attach_unit(unit, position)
+        else:
+            library.attach_unit(unit)
+
+        db.session.flush()  # Flush to get the unit ID before commit
+        db.session.commit()
 
         print(f"Library {library_id} units:")
         for unit in library.units:
@@ -191,6 +197,7 @@ def get_library(library_id, user_id=None, click=True):
         room_names = []
         for unit in library.units:
             unit_list.append(unit.unit_name)
+            unit_to_section_map[unit.unit_name] = []
             for section in unit.sections:
                 room_names.append((section.section_name, section.id))
                 section_to_unit_map[section.section_name] = (unit.id, section.id)
