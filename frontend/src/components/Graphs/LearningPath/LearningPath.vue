@@ -73,7 +73,7 @@
                             unitIndex === Object.keys(rawUnitData).length - 1 ? `0.625rem` : 'none'
                         }">
                         <!-- Unit name header -->
-                        <div class="absolute -top-5 left-1/2 transform -translate-x-1/2 px-6 py-2 rounded-lg font-bold text-xl whitespace-nowrap shadow-md"
+                        <div class="absolute -top-5 left-1/2 transform -translate-x-1/2 px-6 py-2 rounded-lg font-bold text-l whitespace-nowrap shadow-md"
                             :style="{ backgroundColor: getUnitColor(unitIndex), color: 'var(--light-text)' }">
                             {{ formatRoomName(unitName) }}
                         </div>
