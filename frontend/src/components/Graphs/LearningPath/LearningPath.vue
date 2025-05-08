@@ -51,8 +51,7 @@
 
                 <!-- Unit Headers -->
 
-                <template v-for="([unit], unitName, unitIndex) in rawUnitData" :key="unit.unit_id">
-                    {{ rawUnitData }}
+                <template v-for="([unit], unitName, unitIndex) in rawUnitData" :key="unitIndex">
                     <div class="relative -mx-12 my-12 px-12 pt-40 pb-36 border-t-2 border-b-2 flex-shrink-0" :style="{
 
                         borderColor: getUnitColor(unitIndex),
@@ -222,12 +221,12 @@
                             </template>
 
                             <template v-else>
-                                <div class="flex flex-col items-center justify-center p-6 min-w-64">
+                                <div class="flex flex-col pt-12 pb-12 items-center justify-center p-6 min-w-64">
                                     <div class="text-center mb-4" style="color: var(--light-text);">
                                         <p class="text-lg">No stepping stones yet</p>
                                         <p class="text-sm opacity-75">Add stepping stones to get started</p>
                                     </div>
-                                    <button @click="showAddNodeModal = true" class="flex items-center gap-2 px-4 py-2 rounded-lg transition-all 
+                                    <button @click="showAddNodeModal = true" class="flex items-center gap-2 px-4 py-1 rounded-lg transition-all 
                                duration-200 hover:scale-105 active:scale-95" :style="{
                                 background: getUnitGradient(unitIndex),
                                 color: 'var(--light-text)'
@@ -688,7 +687,7 @@ onUnmounted(() => {
 const handleUnitAdded = (unitData) => {
     // You have a few options here:
     // 1. Refresh the entire page
-    window.location.reload()
+    // window.location.reload()
 
     // OR 2. Update data without a full reload (better UX)
     // This would require emitting an event to parent components
