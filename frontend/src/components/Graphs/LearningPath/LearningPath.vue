@@ -228,7 +228,7 @@
                                     </div>
                                     <button @click="showAddNodeModal = true" class="flex items-center gap-2 px-4 py-2 rounded-lg transition-all 
                                duration-200 hover:scale-105 active:scale-95" :style="{
-                                background: getUnitGradient(unitIndex),
+                                background: getUnitColor(unitIndex),
                                 color: 'var(--light-text)'
                             }">
                                         <PlusIcon class="w-5 h-5" />
@@ -439,8 +439,11 @@ const scrollPosition = ref(0)
 const unitColors = [
     '#2ecc71', // green
     '#f1c40f', // yellow
-    '#3498db', // blue
     '#e74c3c', // red
+    '#3498db', // blue
+    '#1abc9c', // teal
+    '#9b59b6', // purple
+    '#e67e22', // orange
 ]
 
 const maxLeft = ref(0)
