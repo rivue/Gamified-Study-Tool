@@ -81,6 +81,7 @@ TODO list:
                 1) make the button vertical, centered on the dotted line and make it able to click it from both sides
                 2) make the order correct when you add the unit
                 3) make the border corners correct when you add the unit
+                4) fix new units appearing above the names of old ones
                 - one idea) add lines in between the nodes and when the course owner mouses over them, it hovers a small node with a "plus" icon
                 - third idea) for course owner, add an "edit" button and "delete / trash can" button when you hover over the course or click it or something, maybe add an "edit mode" in the main bar thing I'm going to add?
             - ⭐️ Add ability to add a unit (later --> come back to, reminder to make it account for 1-n number of sections no matter how that looks)
@@ -116,7 +117,7 @@ TODO list:
     # then add ability to leave libraries (later)
 
         - ⭐️ add google auth
-        - ⭐️ let units / sections / courses have spacings / duplicate values as others in db
+        - ⭐️ let units / sections / courses have duplicate values as others in db
             - ⭐️ add support for links / pdfs / other things and get rid of things like difficulty, tutor, etc... then actually start generating stuff to study
             - ⭐️ add support for multiple file upload as well
         - ⭐️ add ability to see uploaded files in library (list of their names) and maybe even file preview (would require nosql db or something maybe)
