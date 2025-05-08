@@ -10,7 +10,6 @@
         </button>
         <div class="absolute -top-10 left-1/2 transform -translate-x-1/2 px-6 py-1 rounded-lg whitespace-nowrap shadow-md"
         :style="{ backgroundColor: 'var(--background-color-1t)' }">
-        <!-- + Unit -->
         <PlusIcon class="w-8 h-8" style="color: var(--highlight-color);" />
         </div>
     </div>
@@ -29,13 +28,19 @@
                     </button>
                 </div>
                 <div class="space-y-4">
-                    <!-- Unit name input -->
+                    <!-- Unit name input - Fixed version -->
                     <div>
-                        <label class="block text-sm font-medium mb-1" style="color: var(--highlight-color);">Unit
-                            Name</label>
-                        <input v-model="newUnitName" type="text" class="w-full p-2 border rounded-lg"
+                        <label for="unit-name-input" class="block text-sm font-medium mb-1" style="color: var(--highlight-color);">Unit Name</label>
+                        <input 
+                            id="unit-name-input"
+                            v-model="newUnitName" 
+                            type="text" 
+                            class="w-full p-2 border rounded-lg"
                             style="background-color: var(--background-color-1t); color: var(--light-text); border-color: var(--color-primary-dark);"
-                            placeholder="Enter unit name" maxlength="40" />
+                            placeholder="Enter unit name" 
+                            maxlength="40"
+                            autocomplete="off" 
+                        />
                         <p v-if="unitNameError" class="mt-1 text-sm" style="color: var(--color-primary-light);">
                             {{ unitNameError }}
                         </p>
@@ -60,7 +65,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted, nextTick } from 'vue'
 import { PlusIcon, XMarkIcon } from '@heroicons/vue/24/solid'
 import axios from 'axios'
 
@@ -91,6 +96,11 @@ const openAddUnitModal = () => {
     newUnitName.value = ''
     unitNameError.value = ''
     showAddUnitModal.value = true
+    
+    // Focus the input field after the modal is shown
+    nextTick(() => {
+        document.getElementById('unit-name-input')?.focus()
+    })
 }
 
 // Function to add a new unit
@@ -102,13 +112,30 @@ const addNewUnit = async () => {
     if (!trimmedName) {
         unitNameError.value = 'Please enter a unit name'
         return
-    } else if (!/^[a-zA-Z0-9 ]+$/.test(trimmedName)) {
-        unitNameError.value = 'Unit name can only contain letters, numbers and spaces'
-        return
-    } else if (trimmedName.length > 40) {
-        unitNameError.value = 'Unit name must be 40 characters or less'
+    } else if (trimmedName.length > 25) {
+        unitNameError.value = 'Unit name must be 25 characters or less'
         return
     }
+
+    // TODO --> THIS VVV
+    // topicSpaceError.value = topic.value[0] === " " || topic.value[topic.value.length - 1] === " ";
+    // if (topicSpaceError.value) {
+    //     return true;
+    // }
+
+    // errors to check for
+    // length < 4, length > 25
+    // equal to anything in the list
+            // filter or whatever, photosynthesis and Photosynthesis should not be allowed because of:
+    //
+    // const formatRoomName = (name) => {
+    // if (!name) return '';
+    // return name
+    //     .split('_')
+    //     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    //     .join(' ')
+    // }
+    // 
 
     // Check for duplicate unit names
     const formattedUnitName = trimmedName.toLowerCase().replace(/\s+/g, '_')

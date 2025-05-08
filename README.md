@@ -77,6 +77,7 @@ TODO list:
             - https://github.com/tisuela/ratemyprof-api
         - Add "edit mode" for library creator - would allow them to delete sections / units / courses and also add sections / units and would keep editing isolated from actually playing the course
         - ✅ ⭐️ Finish sections + units
+            - ⭐️ During add units with LibraryCreator, make sure you account for capital / lowercase
             - ⭐️ Add ability to add each section to each unit (later --> come back to, reminder to make it account for 1-n number of sections no matter how that looks. add new stepping stones button is commented out for now)
                 - one idea) add lines in between the nodes and when the course owner mouses over them, it hovers a small node with a "plus" icon
                 - third idea) for course owner, add an "edit" button and "delete / trash can" button when you hover over the course or click it or something, maybe add an "edit mode" in the main bar thing I'm going to add?
