@@ -8,12 +8,11 @@
         <button>
             
         </button>
-        <div class="absolute -top-10 left-1/2 transform -translate-x-1/2 px-6 py-1 rounded-lg whitespace-nowrap shadow-md"
+        <div class="absolute top-12 left-1/2 transform -translate-x-1/2 px-2 py-7 rounded-lg whitespace-nowrap shadow-md"
         :style="{ backgroundColor: 'var(--background-color-1t)' }">
         <PlusIcon class="w-8 h-8" style="color: var(--highlight-color);" />
         </div>
     </div>
-
 
     <!-- Add Unit Modal -->
     <Transition name="modal">
