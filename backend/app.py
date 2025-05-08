@@ -50,7 +50,6 @@ else:
 # os.makedirs("instance", exist_ok=True)
 app.config['SQLALCHEMY_DATABASE_URI'] = uri
 print(f"SQLALCHEMY_DATABASE_URI: {app.config['SQLALCHEMY_DATABASE_URI']}")
-app.config['SQLALCHEMY_ECHO'] = True
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['REMEMBER_COOKIE_DURATION'] = timedelta(days=7)
 app.config['FLASK_SECRET_KEY'] = os.getenv('FLASK_SECRET_KEY')

@@ -685,13 +685,17 @@ onUnmounted(() => {
 
 // Add to your script section
 const handleUnitAdded = (unitData) => {
-    // You have a few options here:
-    // 1. Refresh the entire page
-    // window.location.reload()
-
-    // OR 2. Update data without a full reload (better UX)
-    // This would require emitting an event to parent components
-    // or using a store to manage state
+     // Create a new object with the updated unit data
+  const updatedUnitData = { ...rawUnitData.value };
+  
+  // If we have unit_id from the server response, use it
+  const unitId = unitData.unitId || null;
+  
+  // Initialize the new unit with an empty array (no sections yet)
+  updatedUnitData[unitData.name] = [];
+  
+  // Update the raw unit data
+  rawUnitData.value = updatedUnitData;
 }
 
 // Add these variables

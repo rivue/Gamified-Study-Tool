@@ -145,10 +145,12 @@ const addNewUnit = async () => {
             // Clear form and notify parent
             newUnitName.value = ''
             showAddUnitModal.value = false,
+            console.log(response.data?.unit_id)
             emit('unitAdded', {
                 name: trimmedName,
                 displayName: trimmedName,
-                position: position
+                position: position,
+                unitId: response.data.unit_id,
             })
         }
     } catch (error) {

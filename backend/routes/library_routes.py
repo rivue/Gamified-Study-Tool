@@ -292,15 +292,18 @@ def init_library_routes(app):
         
         try:
             
-            _, new_unit_status_code = lbh.create_unit_and_add(library_id, unit_name, position=position)
+            new_unit_response, new_unit_status_code = lbh.create_unit_and_add(library_id, unit_name, position=position)
+            
+            new_unit = new_unit_response.get_json()
 
             if new_unit_status_code != 201:
                 return jsonify(status="error", message="Failed to create unit"), 500
-            
-            return jsonify(status="success", message="Unit created successfully"), 200
+
+            return jsonify(status="success", unit_id=new_unit["unit"], message="Unit created successfully"), 200
 
         except Exception as e:
-            return jsonify(status="error", message=f"Failed to process request: {str(e)}"), 500
+            print(f"Failed to process request: {str(e)}")
+            return jsonify(status="error"), 500
 
     @app.route('/api/library/room', methods=['POST'])
     def generate_room():
