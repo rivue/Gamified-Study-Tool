@@ -6,12 +6,12 @@
             borderRight: 'none',
         }">
         <button>
-            <!-- <PlusIcon class="w-36 h-36" style="color: var(--highlight-color);" /> -->
-
+            
         </button>
-        <div class="absolute -top-10 left-1/2 transform -translate-x-1/2 px-6 py-2 rounded-lg text-l whitespace-nowrap shadow-md"
-            :style="{ backgroundColor: 'var(--background-color-1t)' }">
-            + Unit
+        <div class="absolute -top-10 left-1/2 transform -translate-x-1/2 px-6 py-1 rounded-lg whitespace-nowrap shadow-md"
+        :style="{ backgroundColor: 'var(--background-color-1t)' }">
+        <!-- + Unit -->
+        <PlusIcon class="w-8 h-8" style="color: var(--highlight-color);" />
         </div>
     </div>
 
