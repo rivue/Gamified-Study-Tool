@@ -38,9 +38,8 @@ class User(db.Model, UserMixin):
     tier = db.Column(db.String(50), default='free')  # 'free', 'paid', 'pro'
     daily_request_count = db.Column(db.Integer, default=0) # TODO: I am not using
     last_request_time = db.Column(db.DateTime, default=datetime.utcnow) # TODO: I am not using
-    streak_count     = db.Column(db.Integer, default=0, nullable=False)
-    last_streak_date = db.Column(db.Date,    nullable=True)
-
+    streak_count = db.Column(db.Integer, default=0, nullable=False)
+    last_streak_date = db.Column(db.Date, nullable=True)
 
     violation_count = db.Column(db.Integer, default=0) # TODO: I am not using (yet?)
 
@@ -99,22 +98,28 @@ class User(db.Model, UserMixin):
         # This queries through the LibraryMembership association objects
         return [membership.library for membership in self.library_memberships]
     
-    # def update_daily_streak(self): # TODO: implement once I have streak_count and last_streak_date
+    def update_daily_streak(self): 
+    # streak_count = db.Column(db.Integer, default=0, nullable=False)
+    # last_streak_date = db.Column(db.Date, nullable=True)
+    # reference ^^^
+        # TODO: IMPLEMENT AFTER I COME BACK FROM DINNER
+        # tz = ZoneInfo(self.timezone or 'UTC')
+        # today_local = datetime.now(tz).date()
 
-    #     tz = ZoneInfo(self.timezone or 'UTC')
-    #     today_local = datetime.now(tz).date()
+        # if self.last_request_time.date() == today_local.date():
+        #     return self.streak_count
 
-    #     if self.last_request_time.date() == today_local.date():
+        # if self.last_request_time.date() == yesterday:
+        #     self.streak_count += 1
 
-    #         return
-    #         # New day, reset daily request count
-    #         self.daily_request_count = 1
-    #     else:
-    #         # Same day, increment count
-    #         self.daily_request_count += 1
-    #     self.last_request_time = now
-    #     db.session.commit()
-    #     return self.daily_request_count
+        # else:
+        #     # missed a day :( or first time, so reset to 1
+        #     self.daily_request_count = 1
+        #     self.streak_count = 1
+            
+        # self.last_request_time = today_local
+        # db.session.commit()
+        # return self.daily_request_count
     
 class IPTracking(db.Model):
     id = db.Column(db.Integer, primary_key=True)
