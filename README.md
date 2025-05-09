@@ -79,11 +79,12 @@ TODO list:
         - ✅ ⭐️ Finish sections + units
             - ⭐️ Add ability to add each section to each unit (later --> come back to,
             reminder to make it account for 1-n number of sections no matter how that looks. add new stepping stones button is commented out for now)
+            
                 1) either make scroll buttons appear above unit names or move them
                 2) fix yellow messages
-                2) make dotted lines match up with units
+                2) make dotted line height match up with unit height
                 4) fix blue dotted line appearing above course names like in library id #9
-                5) fix thing that prevents you from adding a unit in the earlier units
+
                 - third idea) for course owner, add an "edit" button and "delete / trash can" button when you hover over the course or click it or something, maybe add an "edit mode" in the main bar thing I'm going to add?
             - ⭐️ Add ability to add a unit (later --> come back to, reminder to make it account for 1-n number of sections no matter how that looks)
         - ⭐️ (would like to implement visibility of different courses first or at least a many:one for non-owners in library model)
@@ -136,14 +137,15 @@ TODO list:
         - ⭐️ all the other routes and stuff (terms & policies, buying subscription)
         - ⭐️ add i-card for all users, maybe description about the library along with a preview of the files used in the library and maybe also users who are members of the library or something 
             - should I replace the proposed "i-card" with some icon that links to library details like discord has with their profile page where I would put files, members, and everything else in the menu, or should I keep it as is?
+            - ⭐️ make library description editable by owner
             - maybe this would be near leaderboard or something
             - this would be a tab / icon in one of the vertical menu bar thing I want to add
         - ⭐️ add staging / pre-production environment that isn't localhost
         
         easy (same as medium):
-        - ⭐️ add library description (editable by owner)
+
         - ⭐️ fix Aryan's problem with viewing it on his phone
-        - ⭐️ should not be able to make duplicate unit and section names within a library, so check before they create it
+        - ⭐️ should not be able to make duplicate section names within a library, so check before they create it
         - ⭐️ users SHOULD be able to create libraries with duplicate names because of how generic some courses can be (philosophy, biology, math, calculus, etc...)
         - ⭐️ error messages in create library look bad
         - ⭐️ add page after you finish a game session, but make it have confetti / small animation or something
