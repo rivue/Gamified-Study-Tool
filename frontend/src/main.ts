@@ -92,7 +92,8 @@ import axios from 'axios';
         { path: '/verify', component: defineAsyncComponent(() => import('./components/Auth/VerifyEmail.vue')), meta: { title: 'Rivue.ai | Verify Email' }},
         { path: '/verify/:token', component: defineAsyncComponent(() => import('./components/Auth/VerifyEmail.vue')), meta: { title: 'Rivue.ai | Verify Email' }},
         { path: '/reset-password/:token', component: defineAsyncComponent(() => import('./components/Auth/PasswordResetForm.vue')), props: true, meta: { title: 'Rivue.ai | Password Reset' }},
-        
+        { path: '/profile', component: defineAsyncComponent(() => import('./components/Graphs/UserStats.vue')), props: true, meta: { title: 'Rivue.ai | My Profile' }},
+
         // Redirects
         // { path: '/lessons', redirect: '/' },
         { path: '/lessons/:pathMatch(.*)*', redirect: '/' },
@@ -103,6 +104,7 @@ import axios from 'axios';
         // { path: '/terms/:pathMatch(.*)*', redirect: '/terms' },
         // { path: '/plan/:pathMatch(.*)*', redirect: '/plan' },
         { path: '/login/:pathMatch(.*)*', redirect: '/login' },
+        { path: '/profile/:pathMatch(.*)*', redirect: '/profile' },
         // { path: '/admin/:pathMatch(.*)*', redirect: '/admin' },
         
         // Catch-all route - must be last!
@@ -131,7 +133,6 @@ router.beforeEach(async (to, from, next) => {
         '/verify', // Explicitly add /verify as a public path
         '/verify/', // Make /verify/ a public path
     ];
-    console.debug(to.path);
     
     // Check if the path is a reset password path
     const isResetPasswordPath = to.path.startsWith('/reset-password/');

@@ -3,8 +3,20 @@
         <router-link to="/" custom v-slot="{ navigate }">
             <div class="app-title" @click="navigate">{{ pageTitle }}</div>
         </router-link>
-
         <div class="menu-buttons">
+            <div v-if="loggedIn" class="streak-container">
+                <div class="streak-wrapper">
+                    <img class="logo" src="../../../dist/img/fireicon.png" alt="Logo"
+                        style="max-height: 24px; pointer-events: none;" />
+                    <span class="streak-count">{{ currentStreak }}</span>
+                </div>
+                <div class="streak-dropdown">
+                    <div class="streak-info">
+                        <p>Current Streak: {{ currentStreak }} days</p>
+                        <p>Max Streak: {{ bestStreak }} days</p>
+                    </div>
+                </div>
+            </div>
             <button class="menu-btn icon-btn" @click="toggleSideMenu" aria-label="side menu">
                 <span class="menu-line"></span>
                 <span class="menu-line"></span>
@@ -15,11 +27,28 @@
 </template>
 
 <script>
+import { storeToRefs } from "pinia";
+import { useUserStatsStore } from "@/store/userStatsStore";
 import { useMenuStore } from "@/store/menuStore";
 import { useThemeStore } from "@/store/themeStore";
+import { useAuthStore } from "@/store/authStore";
+import { computed } from "vue";
 
 export default {
     name: "TopBar",
+    setup() {
+        const authStore = useAuthStore();
+        const loggedIn = computed(() => authStore.loggedIn);
+
+        const userStats = useUserStatsStore();
+        const { currentStreak, bestStreak } = storeToRefs(userStats);
+
+        return {
+            loggedIn,
+            currentStreak,
+            bestStreak
+        };
+    },
     computed: {
         logoPath() {
             const themeStore = useThemeStore();
@@ -28,7 +57,7 @@ export default {
                 : require("@/assets/images/rivueai_logo.png");
         },
         pageTitle() {
-                return "rivue.ai";
+            return "rivue.ai";
         },
     },
     methods: {
@@ -100,7 +129,6 @@ export default {
     transform: translateY(-1px);
 }
 
-
 .menu-btn:active {
     transform: translateY(0);
 }
@@ -128,5 +156,57 @@ export default {
     /* ensures consistent button width */
     text-align: right;
     justify-content: flex-end;
+}
+
+
+.streak-count {
+    font-size: 16px;
+    font-weight: 600;
+    margin-left: -12px;
+
+}
+
+.streak-container {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.streak-container:hover {
+    background-color: var(--background-color-1t);
+}
+
+.streak-container:hover .streak-dropdown {
+    display: block;
+}
+
+.streak-wrapper {
+    display: flex;
+    align-items: center;
+}
+
+.streak-dropdown {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--background-color-2t);
+    border: 1px solid var(--highlight-color);
+    border-radius: 4px;
+    padding: 8px;
+    margin-top: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    min-width: 150px;
+}
+
+.streak-info p {
+    margin: 4px 0;
+    font-size: 14px;
 }
 </style>

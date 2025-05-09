@@ -182,10 +182,6 @@
 import { ref, watch, computed, onMounted, onUnmounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import axios from "axios";
-import { storeToRefs } from "pinia";
-import {
-    useTypingEffect,
-} from "@/scripts/placeholderTyping";
 
 
 import { usePopupStore } from "@/store/popupStore";

@@ -40,6 +40,7 @@ import { useMessageStore } from "@/store/messageStore";
 import { useScrollStore } from "@/store/scrollStore";
 import { useMentorStore } from "@/store/mentorStore";
 import { useLoadingStore } from "@/store/loadingStore";
+import { useUserStatsStore } from "@/store/userStatsStore";
 import LoadingComponent from "./components/Backstage/LoadingComponent.vue";
 
 const router = useRouter();
@@ -59,6 +60,8 @@ const themeClass = computed(() => themeStore.darkMode ? "light-theme" : "");
 
 const authStore = useAuthStore();
 const loggedIn = computed(() => authStore.loggedIn);
+
+const userStatsStore = useUserStatsStore();
 
 const shouldShowChat = computed(() => {
     const path = route.path;
@@ -112,6 +115,11 @@ onUnmounted(() => {
 });
 
 // Watchers
+watch(() => authStore.loggedIn, (loggedIn) => {
+  if (loggedIn) userStatsStore.fetchStreak();
+  else         userStatsStore.resetStats();
+});
+
 watch(loggedIn, (newValue) => {
     if (!newValue) {
         console.debug("login from app");
