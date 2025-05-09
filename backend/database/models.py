@@ -4,6 +4,7 @@ from sqlalchemy import JSON, update
 from sqlalchemy.ext.mutable import MutableList
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from datetime import datetime
+from zoneinfo import ZoneInfo
 import traceback
 import logging
 import secrets, string
@@ -19,12 +20,12 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(200), nullable=True)
     email = db.Column(db.String(100), unique=True, nullable=False)
     timezone = db.Column(db.String(50), default='UTC', nullable=False, server_default='UTC')
-    
-    mentor_name = db.Column(db.String(100), default='Azalea')
-    system_role = db.Column(db.String(100), default='')
-    profile = db.Column(db.Text, nullable=True)
-    ai_tutor_profile = db.Column(db.Text, nullable=True)
-    current_content = db.Column(db.String(500), nullable=True)
+
+    mentor_name = db.Column(db.String(100), default='Azalea') # TODO: not using
+    system_role = db.Column(db.String(100), default='') # TODO: not using
+    profile = db.Column(db.Text, nullable=True) # TODO: not using
+    ai_tutor_profile = db.Column(db.Text, nullable=True) # TODO: not using
+    current_content = db.Column(db.String(500), nullable=True) # TODO: not using
     
     experience_points = db.Column(db.Integer, default=0)
     achievements = db.relationship('UserAchievement', backref='user', cascade="all, delete-orphan")
@@ -35,10 +36,13 @@ class User(db.Model, UserMixin):
     lessons = db.relationship('Lesson', backref='user', cascade="all, delete-orphan")
 
     tier = db.Column(db.String(50), default='free')  # 'free', 'paid', 'pro'
-    daily_request_count = db.Column(db.Integer, default=0)
-    last_request_time = db.Column(db.DateTime, default=datetime.utcnow)
+    daily_request_count = db.Column(db.Integer, default=0) # TODO: I am not using
+    last_request_time = db.Column(db.DateTime, default=datetime.utcnow) # TODO: I am not using
+    streak_count     = db.Column(db.Integer, default=0, nullable=False)
+    last_streak_date = db.Column(db.Date,    nullable=True)
 
-    violation_count = db.Column(db.Integer, default=0)
+
+    violation_count = db.Column(db.Integer, default=0) # TODO: I am not using (yet?)
 
     confirmed = db.Column(db.Boolean, default=False)
     confirmation_token = db.Column(db.String(100), nullable=True)
@@ -94,6 +98,23 @@ class User(db.Model, UserMixin):
         """Returns a list of Library objects the user is a member of."""
         # This queries through the LibraryMembership association objects
         return [membership.library for membership in self.library_memberships]
+    
+    # def update_daily_streak(self): # TODO: implement once I have streak_count and last_streak_date
+
+    #     tz = ZoneInfo(self.timezone or 'UTC')
+    #     today_local = datetime.now(tz).date()
+
+    #     if self.last_request_time.date() == today_local.date():
+
+    #         return
+    #         # New day, reset daily request count
+    #         self.daily_request_count = 1
+    #     else:
+    #         # Same day, increment count
+    #         self.daily_request_count += 1
+    #     self.last_request_time = now
+    #     db.session.commit()
+    #     return self.daily_request_count
     
 class IPTracking(db.Model):
     id = db.Column(db.Integer, primary_key=True)

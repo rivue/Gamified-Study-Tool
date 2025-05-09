@@ -136,6 +136,7 @@ TODO list:
             - maybe add it in settings for owner as well (enable / disable for future lesson content generation)
         - ⭐️ remove library difficulty, mentor, language, etc... from db course structure, backend, frontend course creation screen
             - note: easy to get rid of in the frontend, but have to remove lots of stuff in backend w/ various function calls and stuff
+            - get rid of other stuff I'm not using / don't plan on using like stuff in User model with ai tutor, etc...
         - ⭐️ add some other types of games / questions (ex: true / false, very detailed / specific questions, sorting, compare / contrast, analogies, image based stuff (not sure how to implement) 6 options choose 1-6, etc... see list below)
         - ⭐️ all the other routes and stuff (terms & policies, buying subscription)
         - ⭐️ add i-card for all users, maybe description about the library along with a preview of the files used in the library and maybe also users who are members of the library or something 
@@ -175,7 +176,7 @@ TODO list:
                 - free users get like 10 free uploads / month, and can only join libraries up to like 5 sections or up to 5 libraries or something
                 - first paid tier get unlimited uploads / month, but only have like 2 large textbooks uploaded / month
                 - second paid tier get 10 textbook uploads / month maybe
-        - have a notifivations / dashboard page - errors for generating libraries / units / sections (like for content moderation errors, etc...) and notifications about someone liked your course or someone joined your course or something, etc... (maybe maybe not on this one - I just want a place to tell users without them having to wait 30 minutes for their course to load)
+        - have a notifications / dashboard page - errors for generating libraries / units / sections (like for content moderation errors, etc...) and notifications about someone liked your course or someone joined your course or something, etc... (maybe maybe not on this one - I just want a place to tell users without them having to wait 30 minutes for their course to load)
         - use the ai to generate a course
             - tell it to generate reasonable courses that are like 2-3 times a week or every day or something.
             - below the section name, it could tell what resources it used to create the course in smaller / gray text
@@ -204,7 +205,7 @@ TODO list:
         - tailor the prompt / library to that specific class (ex: thermodynamics = engineering style problems, chemist = real life examples, etc...)
         - add a knowledge graph / knowledge map as one of the option on the vertical left side bar thing
         - shared milestones as opposed to just single user milestones / leaderboards
-        - ability for voice enabled options
+        - ability for voice enabled options for narration / settings and stuff
         - study groups / peer quizzes - not sure how to approach this one
         - ideas for multi-modal content: draggable vectors for physics, audio summaries / transcrips for learning on the go
         - button at the bottom of the page for daily review and maybe another one for review most missed questions (here is where we implement spaced repitition scheduling)
