@@ -13,7 +13,7 @@
                 <div class="streak-dropdown">
                     <div class="streak-info">
                         <p>Current Streak: {{ currentStreak }} days</p>
-                        <p>Max Streak: {{ bestStreak }} days</p>
+                        <p>Best Streak: {{ bestStreak }} days</p>
                     </div>
                 </div>
             </div>
@@ -177,11 +177,13 @@ export default {
 }
 
 .streak-container:hover {
-    background-color: var(--background-color-1t);
+    background-color: var(--background-color-2t);
 }
 
 .streak-container:hover .streak-dropdown {
     display: block;
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
 }
 
 .streak-wrapper {
@@ -190,23 +192,47 @@ export default {
 }
 
 .streak-dropdown {
-    display: none;
+    display: block;
+    opacity: 0;
     position: absolute;
     top: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: var(--background-color-2t);
+    left: -20%;
+    transform: translateX(-50%) translateY(-5px);
+    background-color: var(--background-color-2);
     border: 1px solid var(--highlight-color);
-    border-radius: 4px;
-    padding: 8px;
-    margin-top: 4px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 6px;
+    padding: 10px 12px;
+    margin-top: 8px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
     z-index: 1000;
-    min-width: 150px;
+    min-width: 180px;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    pointer-events: none;
+}
+
+.streak-container:hover .streak-dropdown {
+    pointer-events: auto;
 }
 
 .streak-info p {
     margin: 4px 0;
     font-size: 14px;
+    white-space: nowrap;
+    display: flex;
+    justify-content: space-between;
+}
+
+.streak-dropdown::before {
+    content: '';
+    position: absolute;
+    top: -6px;
+    left: 70%;
+    transform: translateX(-50%);
+    width: 12px;
+    height: 12px;
+    background-color: var(--background-color-2);
+    border-left: 1px solid var(--highlight-color);
+    border-top: 1px solid var(--highlight-color);
+    transform: translateX(-50%) rotate(45deg);
 }
 </style>

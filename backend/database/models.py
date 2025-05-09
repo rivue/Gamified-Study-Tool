@@ -18,6 +18,7 @@ class User(db.Model, UserMixin):
     username = db.Column(db.String(50), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=True)
     email = db.Column(db.String(100), unique=True, nullable=False)
+    timezone = db.Column(db.String(50), default='UTC', nullable=False, server_default='UTC')
     
     mentor_name = db.Column(db.String(100), default='Azalea')
     system_role = db.Column(db.String(100), default='')

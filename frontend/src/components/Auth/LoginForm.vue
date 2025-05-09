@@ -60,6 +60,7 @@ const handleSubmit = () => {
     const formData = new FormData();
     formData.append("email", email.value);
     formData.append("password", password.value);
+    formData.append("timezone", Intl.DateTimeFormat().resolvedOptions().timeZone);
 
     axios.post("api/login", formData)
         .then(response => {

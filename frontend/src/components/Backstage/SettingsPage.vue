@@ -6,22 +6,17 @@
             <h2 class="section-title">Email</h2>
             <p class="profile-info">{{ profile.email }}</p>
             <div class="settings-buttons half-n-half">
-                <!-- <MenuButton label="Reset" @click="resetConversation" class="red" /> -->
                 <MenuButton label="Logout" @click="logout" />
             </div>
         </div>
 
-        <!-- TODO: maybe add later, but also maybe not -->
-        <!-- <div class="profile-section">
-            <h2 class="section-title">Current Theme</h2>
-            <div class="half-n-half">
-                <p v-if="currentTheme" class="profile-info">Note: Dark Mode is recommended</p>
-                <p class="profile-info"> {{ currentTheme ? 'Light Mode' : 'Dark Mode'}} </p>
-                <MenuButton label="Change Theme" @click="changeTheme" />
-            </div>
-        </div> -->
+        <!-- New Time Zone section -->
+        <div class="profile-section">
+            <h2 class="section-title">Time Zone</h2>
+            <p class="profile-info">{{ profile.timezone }}</p>
+        </div>
 
-        <!-- Commented sections omitted for brevity -->
+        <!-- TODO: maybe add light mode later -->
     </div>
 </template>
 
@@ -30,7 +25,6 @@ import { ref, onMounted, nextTick, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import axios from "axios";
 import MenuButton from "@/components/Menus/MenuButton.vue";
-// import TierButton from "@/components/Menus/TierButton.vue";
 import { useMentorStore } from "@/store/mentorStore";
 import { useAuthStore } from "@/store/authStore";
 import { usePopupStore } from "@/store/popupStore";
@@ -47,6 +41,7 @@ interface Profile {
     tutor: string;
     email: string;
     tier: string;
+    timezone: string; // New property for time zone
 }
 
 const profile = ref<Profile>({
@@ -54,18 +49,15 @@ const profile = ref<Profile>({
     tutor: "",
     email: "",
     tier: "",
+    timezone: "" // New property for time zone
 });
 
 const userTextarea = ref<HTMLTextAreaElement | null>(null);
 const tutorTextarea = ref<HTMLTextAreaElement | null>(null);
 
-const cloudTokens = computed(() => {
-    return authStore.cloudTokens;
-});
-
-const currentMentorName = computed(() => {
-    return mentorStore.currentMentor;
-});
+// const cloudTokens = computed(() => authStore.cloudTokens);
+// const currentMentorName = computed(() => mentorStore.currentMentor);
+// const currentTheme = computed(() => themeStore.darkMode);
 
 const displayTierName = computed(() => {
     const tierCode = profile.value.tier;
@@ -77,22 +69,14 @@ const displayTierName = computed(() => {
     return tierNameMap[tierCode] || "Unknown Tier";
 });
 
-const currentTheme = computed(() => {
-    return themeStore.darkMode;
-});
-
 const fetchProfile = async () => {
     try {
         const response = await axios.get("/api/profile");
         if (response.data.status === "success") {
             profile.value = response.data.profile;
             nextTick(() => {
-                if (userTextarea.value) {
-                    autoGrow({ target: userTextarea.value });
-                }
-                if (tutorTextarea.value) {
-                    autoGrow({ target: tutorTextarea.value });
-                }
+                if (userTextarea.value) autoGrow({ target: userTextarea.value });
+                if (tutorTextarea.value) autoGrow({ target: tutorTextarea.value });
             });
         } else {
             console.error("Failed to fetch profile");
@@ -119,7 +103,7 @@ const updateProfile = async (type: 'user' | 'tutor') => {
 
 const logout = async () => {
     try {
-        let response = await axios.get("/api/logout");
+        const response = await axios.get("/api/logout");
         if (response.data.status === "success") {
             authStore.logout();
             router.push("/");
@@ -134,10 +118,6 @@ const logout = async () => {
 const changeTheme = () => {
     themeStore.toggleDarkMode();
 };
-
-// const resetConversation = async () => {
-//     // Commented out functionality
-// };
 
 const autoGrow = (event: { target: HTMLTextAreaElement }) => {
     const textarea = event.target;

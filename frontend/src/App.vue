@@ -104,6 +104,9 @@ onMounted(() => {
     document.addEventListener("visibilitychange", handleVisibilityChange);
 
     authStore.checkAuth();
+    if (authStore.loggedIn) {
+        userStatsStore.fetchStreak();
+    }
 
     if (window.location.search === "?awake") {
         router.push("/");

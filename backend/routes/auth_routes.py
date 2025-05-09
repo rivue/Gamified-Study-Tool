@@ -48,6 +48,7 @@ def init_auth_routes(app):
     def login():
         email = request.form['email']
         password = request.form['password']
+        timezone = request.form['timezone']
         user = User.query.filter_by(email=email).first()
         if not user:
             return jsonify({'status': 'fail', 'message': 'Account not found, signup to use our site!'}), 400
@@ -57,6 +58,11 @@ def init_auth_routes(app):
             # print(current_user.is_authenticated)
             if not user.confirmed:
                 return jsonify({'status': 'fail', 'message': 'Email not authenticated. Check your email inbox for a verification email. (it might also be in the spam folder!)'}), 400
+            
+            if timezone and timezone != user.timezone:
+                user.timezone = timezone
+                db.session.commit()
+
             login_result = login_user(user, remember=True)
 
             return jsonify({'status': 'success'})
@@ -69,51 +75,6 @@ def init_auth_routes(app):
         logout_user()
         return jsonify({"status": "success"})
 
-    @app.route('/api/check-auth', methods=['GET'])
-    def check_auth():
-        if current_user and current_user.is_authenticated and current_user.confirmed:
-            return jsonify({'loggedIn': True, 'userTier': get_user_tier(current_user.id), 'requestCount': get_daily_request_count(current_user.id), 'userId': current_user.id})
-        else:
-            return jsonify({'loggedIn': False, 'userTier': None})
-
-    @app.route('/api/test-cookie', methods=['GET'])
-    def test_cookie():
-        # Try to set a cookie
-        resp = make_response(jsonify({'message': 'Testing cookies'}))
-        resp.set_cookie('test_cookie', 'test_value')
-        print("Response cookies:", resp.headers.get('Set-Cookie'))
-        return resp
-
-    @app.route('/api/check-cookie', methods=['GET'])
-    def check_cookie():
-        # Check if cookie exists
-        cookie_value = request.cookies.get('test_cookie')
-        print("Request cookies:", request.cookies) # returns ImmutableMultiDict([])
-        return jsonify({'cookie_value': cookie_value})
-
-    @app.route('/api/test-session', methods=['GET'])
-    def test_session():
-        # Try to set session data
-        session['test_key'] = 'test_value'
-        print("Current session:", dict(session))
-        return jsonify({'message': 'Session set'})
-
-    @app.route('/api/check-session', methods=['GET'])
-    def check_session():
-        # Check if session data persists
-        session_value = session.get('test_key')
-        print("Current session:", dict(session)) # Current session: {}
-        return jsonify({'session_value': session_value})
-
-    @app.route('/api/debug-headers', methods=['GET'])
-    def debug_headers():
-        print("Request headers:", dict(request.headers))
-        print("Cookies:", request.cookies)
-        return jsonify({
-            'headers': dict(request.headers),
-            'cookies': dict(request.cookies),
-            'session': dict(session)
-        })
 
     # creates new user in database (signup) and sends email to verify account
     @app.route('/api/signup', methods=['POST'])
@@ -263,6 +224,51 @@ def init_auth_routes(app):
             app.logger.error(f"Unexpected error: {e}")
             return jsonify({'status': 'error', 'message': 'An unexpected error occurred'}), 500
         
+    @app.route('/api/check-auth', methods=['GET'])
+    def check_auth():
+        if current_user and current_user.is_authenticated and current_user.confirmed:
+            return jsonify({'loggedIn': True, 'userTier': get_user_tier(current_user.id), 'requestCount': get_daily_request_count(current_user.id), 'userId': current_user.id})
+        else:
+            return jsonify({'loggedIn': False, 'userTier': None})
+
+    @app.route('/api/test-cookie', methods=['GET'])
+    def test_cookie():
+        # Try to set a cookie
+        resp = make_response(jsonify({'message': 'Testing cookies'}))
+        resp.set_cookie('test_cookie', 'test_value')
+        print("Response cookies:", resp.headers.get('Set-Cookie'))
+        return resp
+
+    @app.route('/api/check-cookie', methods=['GET'])
+    def check_cookie():
+        # Check if cookie exists
+        cookie_value = request.cookies.get('test_cookie')
+        print("Request cookies:", request.cookies) # returns ImmutableMultiDict([])
+        return jsonify({'cookie_value': cookie_value})
+
+    @app.route('/api/test-session', methods=['GET'])
+    def test_session():
+        # Try to set session data
+        session['test_key'] = 'test_value'
+        print("Current session:", dict(session))
+        return jsonify({'message': 'Session set'})
+
+    @app.route('/api/check-session', methods=['GET'])
+    def check_session():
+        # Check if session data persists
+        session_value = session.get('test_key')
+        print("Current session:", dict(session)) # Current session: {}
+        return jsonify({'session_value': session_value})
+
+    @app.route('/api/debug-headers', methods=['GET'])
+    def debug_headers():
+        print("Request headers:", dict(request.headers))
+        print("Cookies:", request.cookies)
+        return jsonify({
+            'headers': dict(request.headers),
+            'cookies': dict(request.cookies),
+            'session': dict(session)
+        })
         
     # @app.route('/api/auth/google/callback', methods=['POST'])
     # def google_auth_callback():

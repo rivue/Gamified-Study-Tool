@@ -28,7 +28,7 @@
 
 <script>
 import { defineComponent } from "vue";
-import { useUserStatsStore } from "@/store/userStatsStore";
+// import { useUserStatsStore } from "@/store/userStatsStore";
 import StreakFire from "./StreakFire.vue";
 import ExpProgressBar from "./ExpProgressBar.vue";
 import ProgressPage from "../Backstage/ProgressPage.vue";
@@ -39,8 +39,8 @@ export default defineComponent({
         StreakFire, ExpProgressBar, ProgressPage
     },
     setup() {
-        const userStatsStore = useUserStatsStore();
-        userStatsStore.getStats();
+        // const userStatsStore = useUserStatsStore();
+        // userStatsStore.getStats();
 
         // const streak = computed(() => userStatsStore.streak);
         // const exp = computed(() => userStatsStore.exp);

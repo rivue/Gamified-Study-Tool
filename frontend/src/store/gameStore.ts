@@ -4,7 +4,6 @@ import { defineStore } from "pinia";
 import axios from "axios";
 import { useAuthStore } from "@/store/authStore";
 import { usePopupStore } from "@/store/popupStore";
-import { useUserStatsStore } from "@/store/userStatsStore";
 
 const DEFAULT_SECTIONID_VALUE = -1000;
 
@@ -249,8 +248,6 @@ export const useGameStore = defineStore("gameStore", {
             if (this.incorrectQuestionAnswers.length > 3) {
                 return;
             }
-            const userStatsStore = useUserStatsStore();
-            userStatsStore.resetStats();
 
             // const completedRooms = Object.keys(this.roomStates).filter(
                 // roomName => this.roomStates[roomName].state === 3

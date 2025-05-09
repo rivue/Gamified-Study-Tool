@@ -82,7 +82,9 @@ TODO list:
             
                 2) fix yellow console messages
                 4) fix blue dotted line appearing above course names like in library id #9
-                5) fix scroll buttons overlapping units
+                5) fix scroll buttons overlapping units --> and make scroll buttons the right height no matter the size of the screen
+                6) make side menu work on contact page
+                7) add logic for multiple flame emojis w/ streaks of 1, 5, 10, 25, 50, 100
 
                 - third idea) for course owner, add an "edit" button and "delete / trash can" button when you hover over the course or click it or something, maybe add an "edit mode" in the main bar thing I'm going to add?
             - ⭐️ Add ability to add a unit (later --> come back to, reminder to make it account for 1-n number of sections no matter how that looks)
@@ -163,6 +165,10 @@ TODO list:
 
     general:
     study tool additions / ideas:
+        - ability for user to change language
+        - add toggle for users to set a home 'timezone' (dropdown menu) and add for it to automatically 
+            switch
+        - look into flask Blueprints
         - ⭐️ Syllabus to section / unit converter / parser thing
         - look in to using vueFlow for the nodes --> maybe one day I make it super interactive and colorful with people dragging and creating ornate graphs for their friends or something, or maybe not
         - when users first sign up, give them a medium / long survey to make them think long and hard about their study habits / why they want to get high grades, then when they hit the paywall, they are more likely to join

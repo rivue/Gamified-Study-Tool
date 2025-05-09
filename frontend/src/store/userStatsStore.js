@@ -9,14 +9,12 @@ export const useUserStatsStore = defineStore('user', {
     }),
     actions: {
         async fetchStreak() {
-            console.log("gi")
             if (this.streakLoaded) return
             try {
                 const { data } = await axios.get('/api/user/streak');
-                console.log(data);
                 if (data) { // Fixed: was using response.data instead of data
-                    this.currentStreak = data.currentStreak;
-                    this.bestStreak = data.bestStreak;
+                    this.currentStreak = data.current_streak;
+                    this.bestStreak = data.max_streak;
                 }
             } catch (e) {
                 console.error('Error fetching stats from backend', e);
