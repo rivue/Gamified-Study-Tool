@@ -51,6 +51,7 @@ const route = useRoute();
 const libraryId = route.params.id as string;
 const library = ref<Library | null>(null);
 const loading = ref(true);
+const orderedMap = ref([]);
 const abortController = new AbortController();
 
 
@@ -86,14 +87,14 @@ const processedUnitSectionMap = computed(() => {
     // Ensure each unit has proper structure
     for (const unitName in unitMap) {
         if (!Array.isArray(unitMap[unitName])) {
-            console.warn(`Unit ${unitName} is not an array, fixing...`);
+            console.log(`Unit ${unitName} is not an array, fixing...`);
             unitMap[unitName] = [];
         }
         
         // Ensure each section in each unit has valid data
         for (let i = 0; i < unitMap[unitName].length; i++) {
             if (!unitMap[unitName][i] || !Array.isArray(unitMap[unitName][i])) {
-                console.warn(`Section ${i} in unit ${unitName} is invalid, fixing...`);
+                console.log(`Section ${i} in unit ${unitName} is invalid, fixing...`);
                 unitMap[unitName][i] = [];
             }
         }
@@ -133,11 +134,34 @@ const fetchLibraryData = async (): Promise<void> => {
                 },
             };
             
+            // Order units by their position in unit_to_position_map
+            if (response.data.data.unit_to_position_map) {
+                const orderedMap: Record<string, any> = {};
+                
+                // Get all entries and sort them by position
+                const entries = Object.entries(response.data.data.unit_to_section_map);
+                entries.sort((a, b) => {
+                    const posA = response.data.data.unit_to_position_map[a[0]] || 0;
+                    const posB = response.data.data.unit_to_position_map[b[0]] || 0;
+                    return posA - posB;
+                });
+                
+                // Rebuild the ordered object
+                entries.forEach(([key, value]) => {
+                    orderedMap[key] = value;
+                });
+                
+                orderedMap.value = orderedMap;
+            }
+TODO: FIX ORDERING FOR MAP IN VARIOUS PLACES (MAYBE MOVE ORDERING TO PROCESSEDUNITSECTIONMAP)
+            console.log(response.data.data.unit_to_section_map)
+
             // Log data structure for debugging in production if needed
             console.debug("Initialized library data structure:", JSON.stringify({ hasRoomData: response.data.room_data.length > 0, unitMapKeys: Object.keys(response.data.data.unit_to_section_map)}));
         } else {
             throw new Error("Invalid response data");
         }
+
 
     } catch (error: any) {
         // Handle the error

@@ -191,22 +191,18 @@ def get_library(library_id, user_id=None, click=True):
 
     section_to_unit_map = {}
     unit_to_section_map = {}
-
+    unit_to_position_map = {}
     if user_id:
-        unit_list = []
         room_names = []
         for unit in library.units:
-            unit_list.append(unit.unit_name)
+            unit_to_position_map[unit.unit_name] = unit.position
             unit_to_section_map[unit.unit_name] = []
             for section in unit.sections:
                 room_names.append((section.section_name, section.id))
                 section_to_unit_map[section.section_name] = (unit.id, section.id)
-                if unit.unit_name in unit_to_section_map:
-                    unit_to_section_map[unit.unit_name].append((section.id, section.section_name))
-                else:
-                    unit_to_section_map[unit.unit_name] = [(section.id, section.section_name)]
+                unit_to_section_map[unit.unit_name].append((section.id, section.section_name))
+                    
         library_data["room_names"] = room_names
-        library_data["units"] = unit_list
 
         existing_completion = LibraryCompletion.query.filter_by(library_id=library_id, user_id=user_id).first()
         if existing_completion:
@@ -221,11 +217,13 @@ def get_library(library_id, user_id=None, click=True):
     library_data["clicks"] = library.clicks
     library_data["section_to_unit_map"] = section_to_unit_map
     library_data["unit_to_section_map"] = unit_to_section_map
+    library_data["unit_to_position_map"] = unit_to_position_map
 
     favorited_status = LibraryFavorites.query.filter_by(
         user_id=user_id,
         library_id=library_id
     ).first()
+
     library_data["favorited_status"] = favorited_status.is_favorited
     
     return jsonify(library_data)

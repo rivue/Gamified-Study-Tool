@@ -254,7 +254,6 @@ def init_library_routes(app):
 
             # Attempt to retrieve existing room contents
             room_data = None
-
             if library_topic:
 
                 unit_id, section_id = library_data.get('section_to_unit_map').get(library_topic)
@@ -266,8 +265,9 @@ def init_library_routes(app):
                 room_data = lbh.get_library_room_state(user_id, library_id)
                 # return a map of room names --> unit 
                 # room_data = room_data
+
             test = library_data.get("room_names")
-            # print(f"room_data: {room_data}")
+
 
             return jsonify(status="success", data=library_data, room_data=room_data)
         except: 
