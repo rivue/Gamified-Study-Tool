@@ -5,7 +5,7 @@
             backgroundColor: 'var(--background-color-1t)',
             borderRight: 'none',
         }">
-        <div class="absolute hover:opacity-80 cursor-pointer top-12 left-1/2 transform -translate-x-1/2 px-2 py-7 rounded-lg whitespace-nowrap shadow-md"
+        <div class="absolute hover:opacity-80 cursor-pointer bottom-52 left-1/2 transform -translate-x-1/2 px-2 py-7 rounded-lg whitespace-nowrap shadow-md"
         @click="openAddUnitModal"
         :style="{ backgroundColor: 'var(--background-color-1t)' }">
         <PlusIcon 
@@ -73,7 +73,7 @@ const props = defineProps({
         required: true
     },
     position: {
-        type: Number, // 'start', index number, or 'end'
+        type: Number, // index number
         required: true
     },
     existingUnits: {
@@ -127,7 +127,7 @@ const addNewUnit = async () => {
     try {
 
         // Determine position for the new unit
-        let position = props.existingUnits.length
+        let position = props.position
 
         const response = await axios.post('/api/library/unit', {
             libraryId: props.libraryId,

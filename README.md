@@ -77,8 +77,8 @@ TODO list:
             - https://github.com/tisuela/ratemyprof-api
         - Add "edit mode" for library creator - would allow them to delete sections / units / courses and also add sections / units and would keep editing isolated from actually playing the course
         - ✅ ⭐️ Finish sections + units
-            - ⭐️ Add ability to add each section to each unit (later --> come back to, reminder to make it account for 1-n number of sections no matter how that looks. add new stepping stones button is commented out for now)
-                1) make the button vertical, centered on the dotted line and make it able to click it from both sides
+            - ⭐️ Add ability to add each section to each unit (later --> come back to,
+            reminder to make it account for 1-n number of sections no matter how that looks. add new stepping stones button is commented out for now)
                 2) make the order correct when you add the unit
                 3) make the border corners correct when you add the unit
                 4) fix new units appearing above the names of old ones
