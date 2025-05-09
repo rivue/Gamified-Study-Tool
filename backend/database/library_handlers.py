@@ -108,9 +108,12 @@ def create_unit_and_add(library_id, unit_name, position=None):
 
         db.session.add(unit)
 
+        if len(library.units) > 10:
+            return jsonify({"error": "Library has reached maximum number of units"}), 400
+
         if not unit or not library:
             return jsonify({"error": "Library or Unit not found"}), 404
-        
+
         if position is not None:
             library.attach_unit(unit, position)
         else:
@@ -118,10 +121,6 @@ def create_unit_and_add(library_id, unit_name, position=None):
 
         db.session.flush()  # Flush to get the unit ID before commit
         db.session.commit()
-
-        print(f"Library {library_id} units:")
-        for unit in library.units:
-            print(f"  - Unit ID: {unit.id}, Name: {unit.unit_name}")
 
         return (
             jsonify(

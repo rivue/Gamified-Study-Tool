@@ -223,12 +223,12 @@ class Library(db.Model):
         """Sets the library's privacy and manages the join code."""
         if new_status == self.is_public:
             return # No change needed
-        print("made it in set_privacy")
+
         self.is_public = new_status
         if not new_status:
             # Make private: Generate a code if it doesn't have one
             if not self.join_code:
-                print("here")
+
                 self.join_code = self._generate_unique_code()
         else:
             # Make public: Remove the code
@@ -252,7 +252,7 @@ class Library(db.Model):
                 raise ValueError("unit must be an instance of LibraryUnit")
             
             unit.library_id = self.id
-            
+
             with db.session.no_autoflush:
             
                 # Get current maximum position if we need to append
@@ -262,35 +262,33 @@ class Library(db.Model):
                                     .filter(LibraryUnit.library_id == self.id).scalar() or -1
                     
                     unit.position = max_position + 1
-
+                    
+                    # Make sure the unit is added to the session if it's not already
+                    db.session.add(unit)
+                        
                 else:
 
-                    stmt = (
-                        update(LibraryUnit)
-                        .where(
-                            LibraryUnit.library_id == self.id,
-                            LibraryUnit.position   >= position
-                        )
-                        .values(position = LibraryUnit.position + 1)
-                    )
-                        # db.session.query(LibraryUnit)\
-                        # .filter(LibraryUnit.library_id == self.id, 
-                                # LibraryUnit.position >= position)\
-                        # .update({LibraryUnit.position: LibraryUnit.position + 1})
+                    # Instead of a single update statement
+                    positions = db.session.query(LibraryUnit.id, LibraryUnit.position)\
+                        .filter(LibraryUnit.library_id == self.id, LibraryUnit.position >= position)\
+                        .order_by(LibraryUnit.position.desc()).all()
+                        
+                    for id, current_position in positions:
+                        db.session.query(LibraryUnit).filter(LibraryUnit.id == id)\
+                            .update({LibraryUnit.position: current_position + 1})
                     
-                    db.session.execute(stmt)
-
                     unit.position = position
-            
-            # Make sure the unit is added to the session if it's not already
-            db.session.add(unit)
-                
-            db.session.flush()
+
+                    # Make sure the unit is added to the session if it's not already
+                    db.session.add(unit)
+                        
             return unit
         
         except SQLAlchemyError as e:
-            db.session.rollback()                       # keep the DB clean
-            raise   
+            print(f"error: {e}")
+            db.session.rollback() # keep the DB clean
+            raise
+
 class LibraryUnit(db.Model):
     __tablename__ = "library_unit"
     id = db.Column(db.Integer, primary_key=True)
