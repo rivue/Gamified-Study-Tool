@@ -126,6 +126,7 @@ TODO list:
 
         medium (chip away at when tired / mentally exhausted from hard ones):
         - implement game "score" logic (if you get >80% #attemps:number of questions ratio) then you get more / less points or something, etc...
+            - ⭐️ add a user joined date so I can display "rivuer for 6 months, 19 days, 13 hours, 10 minutes, 5, 6, 7, etc... seconds"
             - ⭐️ save for later, just do a basic fire streak thing for now, maybe with 5, 10, 20, 50, 100 day streak animations from Lottie Files and animations for streak loosing as well
         - ⭐️ Terms of use / Policy Page legal agreement thing
             - ⭐️ Look at websites and stuff for this
