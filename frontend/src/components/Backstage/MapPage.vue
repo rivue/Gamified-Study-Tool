@@ -2,14 +2,9 @@
     <div class="page-main-container">
         <div v-if="!loading && library && isDataValid">
             <h1 class="page-title">{{ library.data.library_topic }} Lessons</h1>
-            <LearningPath 
-            :libraryId="library.data.id"
-            :room-names="library.data.room_names"
-            :room-data="library.room_data"
-            :library-is-public="library.data.is_public"
-            :unit-section-map="processedUnitSectionMap"
-            :library-join-code="library.data.join_code"
-            />
+            <LearningPath :libraryId="library.data.id" :room-names="library.data.room_names"
+                :room-data="library.room_data" :library-is-public="library.data.is_public"
+                :unit-section-map="processedUnitSectionMap" :library-join-code="library.data.join_code" />
         </div>
         <div v-else-if="loading">
             <p>Loading...</p>
@@ -29,7 +24,7 @@ import axios from 'axios';
 
 // Define component name
 defineOptions({
-  name: "MapPage"
+    name: "MapPage"
 });
 
 // Define interfaces for type safety
@@ -42,9 +37,9 @@ interface LibraryData {
 }
 
 interface Library {
-  data: LibraryData;
-  room_data: any[];
-  [key: string]: any;
+    data: LibraryData;
+    room_data: any[];
+    [key: string]: any;
 }
 
 const route = useRoute();
@@ -60,18 +55,18 @@ const isDataValid = computed(() => {
     if (!library.value || !library.value.data || !library.value.data.unit_to_section_map) {
         return false;
     }
-    
+
     // Validate that unit_to_section_map contains valid data
     const unitMap = library.value.data.unit_to_section_map;
-    
+
     // Check that it's not empty
     if (Object.keys(unitMap).length === 0) {
         console.warn("Unit to section map is empty");
         return false;
     }
-    
+
     // Additional validation if needed
-    
+
     return true;
 });
 
@@ -80,7 +75,7 @@ const processedUnitSectionMap = computed(() => {
     if (!isDataValid.value) {
         return {}; // Return safe default
     }
-    
+
     // Make a defensive copy to avoid mutation issues
     const unitMap = JSON.parse(JSON.stringify(library.value.data.unit_to_section_map));
 
@@ -90,7 +85,7 @@ const processedUnitSectionMap = computed(() => {
             console.log(`Unit ${unitName} is not an array, fixing...`);
             unitMap[unitName] = [];
         }
-        
+
         // Ensure each section in each unit has valid data
         for (let i = 0; i < unitMap[unitName].length; i++) {
             if (!unitMap[unitName][i] || !Array.isArray(unitMap[unitName][i])) {
@@ -99,8 +94,24 @@ const processedUnitSectionMap = computed(() => {
             }
         }
     }
-    
-    return unitMap;
+
+    // Create an ordered map based on unit_to_position_map
+    const orderedMap = {};
+
+    // Get all entries and sort them by position
+    const entries = Object.entries(unitMap);
+    entries.sort((a, b) => {
+        const posA = library.value.data.unit_to_position_map?.[a[0]] || 0;
+        const posB = library.value.data.unit_to_position_map?.[b[0]] || 0;
+        return posA - posB;
+    });
+
+    // Rebuild the ordered object
+    entries.forEach(([key, value]) => {
+        orderedMap[key] = value;
+    });
+
+    return orderedMap;
 });
 
 // Utility function to capitalize words
@@ -111,21 +122,21 @@ function capitalizeWords(str: string | null | undefined): string {
 
 // Fetch library data
 const fetchLibraryData = async (): Promise<void> => {
-    
+
     try {
 
         const response = await axios.get(`/api/library/${libraryId}`, {
             signal: abortController.signal
         });
-        
+
         if (response.data && response.data.data && response.data.room_data) {
-            
+
             // Check for unit_to_section_map existence
             if (!response.data.data.unit_to_section_map) {
                 console.error("Missing unit_to_section_map in response data");
                 throw new Error("Invalid response data: missing unit_to_section_map");
             }
-            
+
             library.value = {
                 ...response.data,
                 data: {
@@ -133,31 +144,9 @@ const fetchLibraryData = async (): Promise<void> => {
                     library_topic: capitalizeWords(response.data.data.library_topic),
                 },
             };
-            
-            // Order units by their position in unit_to_position_map
-            if (response.data.data.unit_to_position_map) {
-                const orderedMap: Record<string, any> = {};
-                
-                // Get all entries and sort them by position
-                const entries = Object.entries(response.data.data.unit_to_section_map);
-                entries.sort((a, b) => {
-                    const posA = response.data.data.unit_to_position_map[a[0]] || 0;
-                    const posB = response.data.data.unit_to_position_map[b[0]] || 0;
-                    return posA - posB;
-                });
-                
-                // Rebuild the ordered object
-                entries.forEach(([key, value]) => {
-                    orderedMap[key] = value;
-                });
-                
-                orderedMap.value = orderedMap;
-            }
-TODO: FIX ORDERING FOR MAP IN VARIOUS PLACES (MAYBE MOVE ORDERING TO PROCESSEDUNITSECTIONMAP)
-            console.log(response.data.data.unit_to_section_map)
 
             // Log data structure for debugging in production if needed
-            console.debug("Initialized library data structure:", JSON.stringify({ hasRoomData: response.data.room_data.length > 0, unitMapKeys: Object.keys(response.data.data.unit_to_section_map)}));
+            console.debug("Initialized library data structure:", JSON.stringify({ hasRoomData: response.data.room_data.length > 0, unitMapKeys: Object.keys(response.data.data.unit_to_section_map) }));
         } else {
             throw new Error("Invalid response data");
         }
@@ -184,6 +173,4 @@ onUnmounted(() => {
 });
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

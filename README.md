@@ -79,10 +79,11 @@ TODO list:
         - ✅ ⭐️ Finish sections + units
             - ⭐️ Add ability to add each section to each unit (later --> come back to,
             reminder to make it account for 1-n number of sections no matter how that looks. add new stepping stones button is commented out for now)
-                2) make the order correct when you add the unit
-                3) make the border corners correct when you add the unit
-                4) fix new units appearing above the names of old ones
-                - one idea) add lines in between the nodes and when the course owner mouses over them, it hovers a small node with a "plus" icon
+                1) either make scroll buttons appear above unit names or move them
+                2) fix yellow messages
+                2) make dotted lines match up with units
+                4) fix blue dotted line appearing above course names like in library id #9
+                5) fix thing that prevents you from adding a unit in the earlier units
                 - third idea) for course owner, add an "edit" button and "delete / trash can" button when you hover over the course or click it or something, maybe add an "edit mode" in the main bar thing I'm going to add?
             - ⭐️ Add ability to add a unit (later --> come back to, reminder to make it account for 1-n number of sections no matter how that looks)
         - ⭐️ (would like to implement visibility of different courses first or at least a many:one for non-owners in library model)

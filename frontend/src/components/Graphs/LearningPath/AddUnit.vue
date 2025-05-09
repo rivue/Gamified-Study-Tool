@@ -129,6 +129,8 @@ const addNewUnit = async () => {
         // Determine position for the new unit
         let position = props.position
 
+        console.log(position);
+
         const response = await axios.post('/api/library/unit', {
             libraryId: props.libraryId,
             unitName: trimmedName,
@@ -153,6 +155,7 @@ const addNewUnit = async () => {
         }
     } catch (error) {
         console.error('Error adding unit:', error)
+        console.log(error.response?.data)
         unitNameError.value = error.response?.data?.message || 'Failed to add unit. Please try again.'
     } finally {
         isAddingUnit.value = false

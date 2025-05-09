@@ -51,22 +51,12 @@
 
                 <!-- Unit Headers -->
                 <template v-for="([unit], unitName, unitIndex) in rawUnitData" :key="unitIndex">
-                    <div class="relative -mx-12 my-12 px-12 pt-40 pb-36 border-t-2 border-b-2 flex-shrink-0" :style="{
-
-                        borderColor: getUnitColor(unitIndex),
-                        backgroundColor: 'var(--background-color-1t)',
-                        borderLeft: unitIndex === 0 ? `2px solid ${getUnitColor(unitIndex)}` : 'none',
-                        borderRight:
-                            unitIndex === Object.keys(rawUnitData).length - 1
-                                ? `2px solid ${getUnitColor(unitIndex)}`
-                                : 'none',
-                        borderTopLeftRadius: unitIndex === 0 ? `0.625rem` : 'none',
-                        borderBottomLeftRadius: unitIndex === 0 ? `0.625rem` : 'none',
-                        borderTopRightRadius:
-                            unitIndex === Object.keys(rawUnitData).length - 1 ? `0.625rem` : 'none',
-                        borderBottomRightRadius:
-                            unitIndex === Object.keys(rawUnitData).length - 1 ? `0.625rem` : 'none'
-                    }">
+                    <div class="relative -mx-12 my-12 px-12 pt-40 pb-36 border-t-2 border-b-2 flex-shrink-0"
+                        :class="['unit-box', { 'unit--first': unitIndex === 0, 'unit--last': unitIndex === Object.keys(rawUnitData).length - 1 }]"
+                        :style="{
+                            borderColor: getUnitColor(unitIndex),
+                            backgroundColor: 'var(--background-color-1t)',
+                        }">
                         <!-- Unit name header -->
                         <div class="absolute -top-5 left-1/2 transform -translate-x-1/2 px-6 py-2 rounded-lg font-bold text-xl whitespace-nowrap shadow-md z-10"
                             :style="{ backgroundColor: getUnitColor(unitIndex), color: 'var(--light-text)' }">
@@ -239,8 +229,8 @@
                         </div>
                     </div>
 
-                    <AddUnit :library-id="libraryId" :position="unitIndex + 1" :existing-units="Object.keys(rawUnitData)"
-                        @unit-added="handleUnitAdded" />
+                    <AddUnit :library-id="libraryId" :position="unitIndex + 1"
+                        :existing-units="Object.keys(rawUnitData)" @unit-added="handleUnitAdded" />
 
                 </template>
 
@@ -281,7 +271,7 @@
                                 style="color: var(--color-primary-light);">
                                 <!-- {{ nodeNameErrors }} -->
                                 <span v-for="(error, index) in nodeNameErrors" :key="index">{{ error
-                                    }}<br></span>
+                                }}<br></span>
                             </p>
                         </div>
                         <button @click="addNodeNameField" class="mt-2 text-sm font-medium flex items-center gap-1"
@@ -358,7 +348,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, onMounted, onUnmounted } from 'vue'
+import { ref, watch, onMounted, nextTick, onUnmounted, PropType } from 'vue'
 import {
     StarIcon,
     BookOpenIcon,
@@ -400,7 +390,7 @@ const props = defineProps({
         required: true
     },
     unitSectionMap: {
-        type: Array,
+        type: Object as PropType<Record<string, any[][]>>,
         required: true
     },
     libraryIsPublic: {
@@ -417,6 +407,7 @@ const rawUnitData = ref();
 
 watch(() => props.unitSectionMap, async (newVal) => {
     rawUnitData.value = newVal;
+    recalcMaxLeft()
 }, { deep: true, immediate: true })
 
 // State for adding new nodes
@@ -447,6 +438,13 @@ const unitColors = [
 
 const maxLeft = ref(0)
 
+function recalcMaxLeft () {
+  nextTick(() => {                     // wait until Vue has patched the DOM
+    const sc = scrollContainer.value
+    if (sc) maxLeft.value = sc.scrollWidth - sc.clientWidth
+  })
+}
+
 // snap back to the first node (same 200 px offset you use on mount)
 const scrollToStart = () => {
     if (!scrollContainer.value) return
@@ -457,8 +455,11 @@ const scrollToStart = () => {
 const scrollToEnd = () => {
     if (!scrollContainer.value) return
 
+    const sc = scrollContainer.value
+    if (!sc) return
+
     /* how far we can scroll = total content width – visible width */
-    scrollContainer.value.scrollTo({ left: maxLeft.value, behavior: 'smooth' })
+    scrollContainer.value.scrollTo({ left: sc.scrollWidth - sc.clientWidth, behavior: 'smooth' })
 }
 
 function toggleSettings() {
@@ -660,6 +661,7 @@ let scrollTimeoutId = null;
 
 // Scroll to center on first load
 onMounted(() => {
+    recalcMaxLeft()
     // If there are nodes and the container exists, scroll to position
     if (rawUnitData.value.length > 0 && scrollContainer.value) {
         // Calculate an appropriate starting position based on available width
@@ -672,7 +674,6 @@ onMounted(() => {
             scrollTimeoutId = null; // Clear the timeout ID
         }, 100);
     }
-    console.log(rawUnitData)
     const sc = scrollContainer.value
     if (!sc) return
     maxLeft.value = sc.scrollWidth - sc.clientWidth
@@ -687,17 +688,40 @@ onUnmounted(() => {
 
 // Add to your script section
 const handleUnitAdded = (unitData) => {
-     // Create a new object with the updated unit data
-  const updatedUnitData = { ...rawUnitData.value };
-  
-  // If we have unit_id from the server response, use it
-  const unitId = unitData.unitId || null;
-  
-  // Initialize the new unit with an empty array (no sections yet)
-  updatedUnitData[unitData.name] = [];
-  
-  // Update the raw unit data
-  rawUnitData.value = updatedUnitData;
+    // Create a new object to store the updated unit data
+    const updatedUnitData = {};
+    const unitKeys = Object.keys(rawUnitData.value);
+
+    // Insert the new unit at the specified position
+    let inserted = false;
+
+    // Loop through existing units to maintain order
+    for (let i = 0; i < unitKeys.length; i++) {
+        if (i === unitData.position && !inserted) {
+            // Add the new unit at this position
+            updatedUnitData[unitData.name] = [];
+            inserted = true;
+        }
+
+        // Add the existing unit
+        updatedUnitData[unitKeys[i]] = rawUnitData.value[unitKeys[i]];
+    }
+
+    // If the new unit should be at the end and wasn't inserted yet
+    if (!inserted) {
+        updatedUnitData[unitData.name] = [];
+    }
+
+    // Update the raw unit data
+    rawUnitData.value = updatedUnitData;
+
+    recalcMaxLeft()
+
+    // Force a UI update by refreshing the page
+    // This is a temporary solution - ideally you'd use reactive updates
+    // setTimeout(() => {
+    //     window.location.reload();
+    // }, 500);
 }
 
 // Add these variables
@@ -840,5 +864,22 @@ const handleScroll = () => {
         justify-content: center;
         /* center the items horizontally */
     }
+}
+
+.unit-box{
+  border-top: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+}
+
+.unit--first{
+  border-left: 2px solid currentColor;
+  border-top-left-radius: 0.625rem;
+  border-bottom-left-radius: 0.625rem;
+}
+
+.unit--last{
+  border-right: 2px solid currentColor;
+  border-top-right-radius: 0.625rem;
+  border-bottom-right-radius: 0.625rem;
 }
 </style>
