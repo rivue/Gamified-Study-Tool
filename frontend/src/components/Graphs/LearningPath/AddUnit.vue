@@ -1,18 +1,17 @@
 <template>
-    <div class="relative -mx-12 my-12 pt-72 pb-52 border-dashed border-2 flex-shrink-0 w-0 flex items-center justify-center cursor-pointer hover:opacity-80"
-        @click="openAddUnitModal" :style="{
+    <div class="relative -mx-12 my-12 pt-72 pb-52 border-dashed border-2 flex-shrink-0 w-0 flex items-center justify-center z-10"
+        :style="{
             borderColor: 'var(--background-color-1t)',
             backgroundColor: 'var(--background-color-1t)',
             borderRight: 'none',
         }">
-        <button>
-            
-        </button>
-        <div class="absolute top-12 left-1/2 transform -translate-x-1/2 px-2 py-7 rounded-lg whitespace-nowrap shadow-md"
+        <div class="absolute hover:opacity-80 cursor-pointer top-12 left-1/2 transform -translate-x-1/2 px-2 py-7 rounded-lg whitespace-nowrap shadow-md"
+        @click="openAddUnitModal"
         :style="{ backgroundColor: 'var(--background-color-1t)' }">
-        <PlusIcon class="w-8 h-8" style="color: var(--highlight-color);" />
-        </div>
+        <PlusIcon 
+        class="w-8 h-8" style="color: var(--highlight-color);" />
     </div>
+</div>
 
     <!-- Add Unit Modal -->
     <Transition name="modal">

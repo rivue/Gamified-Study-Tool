@@ -50,7 +50,6 @@
                     @unit-added="handleUnitAdded" />
 
                 <!-- Unit Headers -->
-
                 <template v-for="([unit], unitName, unitIndex) in rawUnitData" :key="unitIndex">
                     <div class="relative -mx-12 my-12 px-12 pt-40 pb-36 border-t-2 border-b-2 flex-shrink-0" :style="{
 
@@ -69,7 +68,7 @@
                             unitIndex === Object.keys(rawUnitData).length - 1 ? `0.625rem` : 'none'
                     }">
                         <!-- Unit name header -->
-                        <div class="absolute -top-5 left-1/2 transform -translate-x-1/2 px-6 py-2 rounded-lg font-bold text-xl whitespace-nowrap shadow-md"
+                        <div class="absolute -top-5 left-1/2 transform -translate-x-1/2 px-6 py-2 rounded-lg font-bold text-xl whitespace-nowrap shadow-md z-10"
                             :style="{ backgroundColor: getUnitColor(unitIndex), color: 'var(--light-text)' }">
                             {{ unitName }}
                         </div>
