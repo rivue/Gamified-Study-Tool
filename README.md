@@ -80,10 +80,9 @@ TODO list:
             - ⭐️ Add ability to add each section to each unit (later --> come back to,
             reminder to make it account for 1-n number of sections no matter how that looks. add new stepping stones button is commented out for now)
             
-                1) either make scroll buttons appear above unit names or move them
-                2) fix yellow messages
-                2) make dotted line height match up with unit height
+                2) fix yellow console messages
                 4) fix blue dotted line appearing above course names like in library id #9
+                5) fix scroll buttons overlapping units
 
                 - third idea) for course owner, add an "edit" button and "delete / trash can" button when you hover over the course or click it or something, maybe add an "edit mode" in the main bar thing I'm going to add?
             - ⭐️ Add ability to add a unit (later --> come back to, reminder to make it account for 1-n number of sections no matter how that looks)
@@ -92,7 +91,7 @@ TODO list:
             - ⭐️ Delete Units( requires entering the name of the unit / course just for accidental reasons)
             - ⭐️ Delete courses / libraries (whatever they're called) (requires entering the name of the unit / course just for accidental reasons)
             - ⭐️ Remember to delete from both DB and pinecone as well, as well as respective child / parent courses / units / sections / libraries, roomNameState, LibraryFavorites, question, question_choice, LibraryMembership, etc...
-        - ⭐️ (courses need ability to add multiple people first) leaderboard / game point tracking system
+        - ⭐️ (courses need ability to add multiple people first) leaderboard / game point tracking system (could be reworked later)
         - ⭐️ ⭐️ ⭐️ (might take at least a couple weeks) UI redesign / rehaul *** --> kinnu, duolingo, saved instagram design reels etc..
             - Note: 1) try to see what horizontal --> vertical learning path looks like, and possibly make a vertical bar on the side for settings, i-card, files list, adding a new stepping stone, etc... but maybe keep lesson name and current unit name at the top?
             - COPY QUIZLET???
@@ -153,6 +152,8 @@ TODO list:
         - ⭐️ add page after you finish a game session, but make it have confetti / small animation or something
         - ⭐️ make sure the background of the site is the color you want if you scroll to far (like in main page if you scroll too far down) (right now its white which is not good)
         - ⭐️ handle weird thing where new library code displays null, just make it look good basically
+        - ⭐️ move dropdown menu to left, replace w/ profile picture --> settings page
+        - ⭐️ fix weird loading... thing that appears on slow internet speed
 
     OTHER PAGES:
         - terms and policies page
