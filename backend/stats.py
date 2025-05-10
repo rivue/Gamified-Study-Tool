@@ -108,37 +108,14 @@ def get_content_per_day(user_id):
     return dict(lessons_per_day), dict(librarys_per_day)
 
 def get_streak(user_id):
-
+    print(user_id)
     user = db.session.query(User).filter_by(id=user_id).first()
-    
-    if not user or not user.is_authenticated:
-       return None, None
-
-    return user.max_streak, user.current_streak
-
-    # today = datetime.now()
-    # last_date = today
-    # lessons_per_day, librarys_per_day = get_content_per_day(user_id)
-
-    # lessons_dates = {k: v for k, v in lessons_per_day.items() if k is not None}
-    # librarys_dates = {k: v for k, v in librarys_per_day.items() if k is not None}
-
-    # combined_dates = sorted(set(lessons_dates) | set(librarys_dates))
-
-    # for date in combined_dates:
-    #     if date.date() == (last_date + timedelta(days=1)).date():
-    #         current_streak += 1
-    #     elif last_date.date() == date.date():
-    #         continue
-    #     else:
-    #         current_streak = 1
-    #     max_streak = max(max_streak, current_streak)
-    #     last_date = date
-
-    # if last_date.date() != today.date():
-    #     current_streak = 0
-
-    return max_streak, current_streak
+    print("here")
+    print(f"{user.streak_count} + {user.highest_streak}")
+    if not user or not user.confirmed:
+        return None, None
+    print("here")
+    return user.streak_count, user.highest_streak
 
 def get_stats(user_id):
     total_lessons = db.session.query(func.count(Lesson.id)).filter_by(user_id=user_id).scalar()

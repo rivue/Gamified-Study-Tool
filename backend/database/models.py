@@ -40,6 +40,7 @@ class User(db.Model, UserMixin):
     last_request_time = db.Column(db.DateTime, default=datetime.utcnow) # TODO: I am not using
     streak_count = db.Column(db.Integer, default=0, nullable=False)
     last_streak_date = db.Column(db.Date, nullable=True)
+    highest_streak = db.Column(db.Integer, default=0, nullable=False)
 
     violation_count = db.Column(db.Integer, default=0) # TODO: I am not using (yet?)
 
@@ -117,7 +118,11 @@ class User(db.Model, UserMixin):
             # broke streak, reset
             else:
                 self.streak_count = 1
+
         self.last_streak_date = today_local
+        
+        if self.streak_count > self.highest_streak:
+            self.highest_streak = self.streak_count
         
         return self.streak_count
     
