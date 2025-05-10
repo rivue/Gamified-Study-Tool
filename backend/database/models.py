@@ -60,32 +60,9 @@ class User(db.Model, UserMixin):
         lazy='dynamic')
 
     def as_dict(self):
-        active_lessons = [lesson.lesson_name for lesson in sorted(
-            [l for l in self.lessons if not l.completion_date], 
-            key=lambda x: x.id, reverse=True)[:50]
-        ]
-
-        completed_lessons = [lesson.lesson_name for lesson in sorted(
-            [l for l in self.lessons if l.completion_date],
-            key=lambda x: x.id, reverse=True)[:100]
-        ]
-
-        active_libraries = [library.library.library_topic for library in sorted(
-            [l for l in self.libraries if not l.is_complete], 
-            key=lambda x: x.id, reverse=True)[:100]
-        ]
-
-        completed_libraries = [library.library.library_topic for library in sorted(
-            [l for l in self.libraries if l.is_complete], 
-            key=lambda x: x.id, reverse=True)[:100]
-        ]
 
         user_data = {
             "profile": self.profile,
-            "active_lessons": active_lessons+active_libraries,
-            "completed_lessons": completed_lessons+completed_libraries
-            # "active_libraries": active_libraries,
-            # "completed_libraries": completed_libraries
         }
         
         user_data["owned_libraries"] = [lib.library_topic for lib in self.owned_libraries]

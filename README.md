@@ -80,7 +80,6 @@ TODO list:
         - ✅ ⭐️ Finish sections + units
             - ⭐️ Add ability to add each section to each unit (later --> come back to, reminder to make it account for 1-n number of sections no matter how that looks. add new stepping stones button is commented out for now)
             
-                2) fix yellow console messages
                 5) fix scroll buttons overlapping units for different sized screens --> and make scroll buttons the right height no matter the size of the screen
                 7) add logic for multiple flame emojis w/ streaks of 1, 5, 10, 25, 50, 100
                         - could be for a smaller one: https://lottiefiles.com/free-animation/fire-flame-4De5RVVPag
@@ -92,6 +91,8 @@ TODO list:
                         - fix the KeyError: 'User' object has no attribute 'libraries'
                 14) fix null thing
                     - what is this?
+                    path:
+                    
                 see 16) below for leaderboard
                 small idea for later (maybe): when you mouse over the unit name in learning path, it hovers a little bit, highlights white or --text-color, and displays above any names it is over
 

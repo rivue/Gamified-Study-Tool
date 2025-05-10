@@ -8,8 +8,8 @@
             <div v-if="status === 'success'" class="success">
                 <h1>Email Verified!</h1>
                 <p>Your email has been successfully verified.</p>
-                <p>You are now logged in and ready to use Rivue!</p>
-                <router-link to="/" class="button">Go to Dashboard</router-link>
+                <p>You are now verified and can now login to use Rivue!</p>
+                <router-link to="/" class="button">Go to Login</router-link>
             </div>
             <div v-else class="success">
 
