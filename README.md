@@ -80,8 +80,7 @@ TODO list:
             - ⭐️ Add ability to add each section to each unit (later --> come back to, reminder to make it account for 1-n number of sections no matter how that looks. add new stepping stones button is commented out for now)
             
                 2) fix yellow console messages
-                4) fix blue dotted line appearing above course names like in library id #9
-                5) fix scroll buttons overlapping units --> and make scroll buttons the right height no matter the size of the screen
+                5) fix scroll buttons overlapping units for different sized screens --> and make scroll buttons the right height no matter the size of the screen
                 7) add logic for multiple flame emojis w/ streaks of 1, 5, 10, 25, 50, 100
                         - could be for a smaller one: https://lottiefiles.com/free-animation/fire-flame-4De5RVVPag
                         - slightly bigger one: https://lottiefiles.com/free-animation/fire-IuJfcIXKF1
@@ -93,7 +92,6 @@ TODO list:
                 10) fix weird verify thing - success is giving erro rmessage
                         - fix the KeyError: 'User' object has no attribute 'libraries'
                 12) for deployment, make "add stepping stones"  menu have text that says "were still adding things, stay tuned to add sections!"
-                15) fix streak info showing side nav menu in the background
                 14) fix null thing
 
             - ⭐️ third idea) for course owner, add an "edit" button and "delete / trash can" button when you hover over the course or click it or something, maybe add an "edit mode" in the main bar thing I'm going to add?
