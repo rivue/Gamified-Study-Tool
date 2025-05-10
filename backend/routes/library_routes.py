@@ -291,6 +291,13 @@ def init_library_routes(app):
         if not library_id:
             return jsonify(status="error", message="No library ID provided"), 400
         
+        library = lbh.get_library(library_id, user_id)
+        if not library:
+            return jsonify(status="error", message="No library ID provided"), 400
+
+        if user_id != library:
+            return jsonify(status="error", message="You do not own this library."), 403
+
         try:
             
             new_unit_response, new_unit_status_code = lbh.create_unit_and_add(library_id, unit_name, position=position)

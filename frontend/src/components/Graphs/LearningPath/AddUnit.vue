@@ -1,24 +1,20 @@
 <template>
-    <div class="relative -mx-12 my-12 flex-shrink-0 w-0 flex items-center justify-center"
-        :class="[
-            (position === 0 || position === existingUnits.length) ? 'pt-72 pb-48' : 'pt-72 pb-52 border-dashed border-2'
-        ]"
-        :style="{
+    <div v-if="canAddUnit" class="relative -mx-12 my-12 flex-shrink-0 w-0 flex items-center justify-center" :class="[
+        (position === 0 || position === existingUnits.length) ? 'pt-72 pb-48' : 'pt-72 pb-52 border-dashed border-2'
+    ]" :style="{
             borderColor: 'var(--background-color-1t)',
             backgroundColor: 'var(--background-color-1t)',
             borderRight: 'none',
         }">
         <div class="absolute hover:opacity-80 cursor-pointer bottom-52 left-1/2 transform -translate-x-1/2 px-2 py-7 rounded-lg whitespace-nowrap shadow-md z-10"
-        @click="openAddUnitModal"
-        :style="{ backgroundColor: 'var(--background-color-1t)' }">
-        <PlusIcon 
-        class="w-8 h-8" style="color: var(--highlight-color);" />
+            @click="openAddUnitModal" :style="{ backgroundColor: 'var(--background-color-1t)' }">
+            <PlusIcon class="w-8 h-8" style="color: var(--highlight-color);" />
+        </div>
     </div>
-</div>
 
     <!-- Add Unit Modal -->
     <Transition name="modal">
-        <div v-if="showAddUnitModal" class="fixed inset-0 flex items-center justify-center z-50 p-4"
+        <div v-if="showAddUnitModal && canAddUnit" class="fixed inset-0 flex items-center justify-center z-50 p-4"
             style="background-color: var(--background-haze);">
             <div class="rounded-2xl p-6 w-full max-w-md shadow-xl border"
                 style="background-color: var(--background-color); color: var(--light-text); border-color: var(--color-primary-dark);">
@@ -31,17 +27,12 @@
                 <div class="space-y-4">
                     <!-- Unit name input - Fixed version -->
                     <div>
-                        <label for="unit-name-input" class="block text-sm font-medium mb-1" style="color: var(--highlight-color);">Unit Name</label>
-                        <input 
-                            id="unit-name-input"
-                            v-model="newUnitName" 
-                            type="text" 
+                        <label for="unit-name-input" class="block text-sm font-medium mb-1"
+                            style="color: var(--highlight-color);">Unit Name</label>
+                        <input id="unit-name-input" v-model="newUnitName" type="text"
                             class="w-full p-2 border rounded-lg"
                             style="background-color: var(--background-color-1t); color: var(--light-text); border-color: var(--color-primary-dark);"
-                            placeholder="Enter unit name" 
-                            maxlength="40"
-                            autocomplete="off" 
-                        />
+                            placeholder="Enter unit name" maxlength="40" autocomplete="off" />
                         <p v-if="unitNameError" class="mt-1 text-sm" style="color: var(--color-primary-light);">
                             {{ unitNameError }}
                         </p>
@@ -82,6 +73,10 @@ const props = defineProps({
     existingUnits: {
         type: Array,
         default: () => []
+    },
+    canAddUnit: {
+        type: Boolean,
+        default: true
     }
 })
 
@@ -91,13 +86,21 @@ const showAddUnitModal = ref(false)
 const newUnitName = ref('')
 const unitNameError = ref('')
 const isAddingUnit = ref(false)
+const canAddUnit = ref(false);
+
+const onMounted = () => {
+    canAddUnit.value = props.canAddUnit
+    if (!canAddUnit.value) {
+        showAddUnitModal.value = false
+    }
+}
 
 // Function to open the add unit modal
 const openAddUnitModal = () => {
     newUnitName.value = ''
     unitNameError.value = ''
     showAddUnitModal.value = true
-    
+
     // Focus the input field after the modal is shown
     nextTick(() => {
         document.getElementById('unit-name-input')?.focus()
@@ -106,6 +109,11 @@ const openAddUnitModal = () => {
 
 // Function to add a new unit
 const addNewUnit = async () => {
+
+    if (!canAddUnit) {
+        return;
+    }
+
     // Validate unit name
     unitNameError.value = ''
     const trimmedName = newUnitName.value.trim()
@@ -148,7 +156,7 @@ const addNewUnit = async () => {
             // Clear form and notify parent
             newUnitName.value = ''
             showAddUnitModal.value = false,
-            console.log(response.data?.unit_id)
+                console.log(response.data?.unit_id)
             emit('unitAdded', {
                 name: trimmedName,
                 displayName: trimmedName,

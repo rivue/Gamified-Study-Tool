@@ -30,34 +30,24 @@
         </button>
 
 
-        <div
-            class="absolute top-20 left-8 right-8 flex justify-end items-center space-x-4 z-20 px-4 py-2 bg-background-color-1t rounded-md shadow-sm">
-            <!-- Leaderboard button -->
-            <button @click="goToLeaderboard"
-                class="px-3 py-1 rounded-md border border-current hover:bg-current hover:text-background-color-1">
-                Leaderboard
-            </button>
-
-            <!-- Settings cog (you already had this) -->
-            <button @click="toggleSettings" class="p-2 rounded-full bg-black/30 backdrop-blur-sm hover:bg-black/40"
-                style="color: var(--highlight-color);">
-                <CogIcon class="w-6 h-6" />
-            </button>
-            
-        </div>
-
+        <!-- Settings Button -->
+        <button v-if="showSettings" @click="toggleSettings"
+            class="fixed top-20 right-6 bg-black/30 backdrop-blur-sm shadow-md rounded-full p-4 hover:bg-black/40 z-10"
+            style="color: var(--highlight-color);">
+            <CogIcon class="w-12 h-12" />
+        </button>
 
         <div ref="scrollContainer"
             class="scrollContainer w-full h-full overflow-x-auto overflow-y-hidden cursor-grab active:cursor-grabbing"
             @mousedown="startDragging" @mousemove="drag" @mouseup="stopDragging" @mouseleave="stopDragging"
             @touchstart="startDragging" @touchmove="drag" @touchend="stopDragging" @scroll="handleScroll">
             <div class="flex items-center gap-24 min-h-screen py-24 relative">
-
+                
                 <!-- Left padding so first node is visible -->
                 <div class="w-24 flex-shrink-0"></div>
 
                 <!-- Add Unit at the beginning -->
-                <AddUnit :library-id="libraryId" :position="0" :existing-units="Object.keys(rawUnitData)"
+                <AddUnit :library-id="libraryId" :position="0" :existing-units="Object.keys(rawUnitData)" :can-add-unit="showSettings"
                     @unit-added="handleUnitAdded" />
 
                 <!-- Unit Headers -->
@@ -242,8 +232,7 @@
                     </div>
 
                     <AddUnit :library-id="libraryId" :position="unitIndex + 1"
-                        :existing-units="Object.keys(rawUnitData)" :can-change-visibility="showSettings"
-                        @unit-added="handleUnitAdded" />
+                        :existing-units="Object.keys(rawUnitData)" :can-add-unit="showSettings" @unit-added="handleUnitAdded" />
 
                 </template>
 
@@ -284,7 +273,7 @@
                                 style="color: var(--color-primary-light);">
                                 <!-- {{ nodeNameErrors }} -->
                                 <span v-for="(error, index) in nodeNameErrors" :key="index">{{ error
-                                    }}<br></span>
+                                }}<br></span>
                             </p>
                         </div>
                         <button @click="addNodeNameField" class="mt-2 text-sm font-medium flex items-center gap-1"
@@ -455,11 +444,11 @@ const unitColors = [
 
 const maxLeft = ref(0)
 
-function recalcMaxLeft() {
-    nextTick(() => {                     // wait until Vue has patched the DOM
-        const sc = scrollContainer.value
-        if (sc) maxLeft.value = sc.scrollWidth - sc.clientWidth
-    })
+function recalcMaxLeft () {
+  nextTick(() => {                     // wait until Vue has patched the DOM
+    const sc = scrollContainer.value
+    if (sc) maxLeft.value = sc.scrollWidth - sc.clientWidth
+  })
 }
 
 // snap back to the first node (same 200 px offset you use on mount)
@@ -482,11 +471,6 @@ const scrollToEnd = () => {
 function toggleSettings() {
     showSettingsModal.value = !showSettingsModal.value
 }
-
-function goToLeaderBoard() {
-    console.log("hi")
-}
-
 
 // Get color for a unit based on its index
 const getUnitColor = (unitIndex) => {
@@ -888,20 +872,20 @@ const handleScroll = () => {
     }
 }
 
-.unit-box {
-    border-top: 2px solid currentColor;
-    border-bottom: 2px solid currentColor;
+.unit-box{
+  border-top: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
 }
 
-.unit--first {
-    border-left: 2px solid currentColor;
-    border-top-left-radius: 0.625rem;
-    border-bottom-left-radius: 0.625rem;
+.unit--first{
+  border-left: 2px solid currentColor;
+  border-top-left-radius: 0.625rem;
+  border-bottom-left-radius: 0.625rem;
 }
 
-.unit--last {
-    border-right: 2px solid currentColor;
-    border-top-right-radius: 0.625rem;
-    border-bottom-right-radius: 0.625rem;
+.unit--last{
+  border-right: 2px solid currentColor;
+  border-top-right-radius: 0.625rem;
+  border-bottom-right-radius: 0.625rem;
 }
 </style>
