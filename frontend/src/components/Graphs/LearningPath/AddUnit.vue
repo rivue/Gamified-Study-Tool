@@ -152,7 +152,6 @@ const addNewUnit = async () => {
             // Clear form and notify parent
             newUnitName.value = ''
             showAddUnitModal.value = false,
-                console.log(response.data?.unit_id)
             emit('unitAdded', {
                 name: trimmedName,
                 displayName: trimmedName,
@@ -162,7 +161,6 @@ const addNewUnit = async () => {
         }
     } catch (error) {
         console.error('Error adding unit:', error)
-        console.log(error.response?.data)
         unitNameError.value = error.response?.data?.message || 'Failed to add unit. Please try again.'
     } finally {
         isAddingUnit.value = false

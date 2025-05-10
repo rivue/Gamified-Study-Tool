@@ -670,7 +670,6 @@ let scrollTimeoutId = null;
 onMounted(() => {
     
     canModify.value = props.canModify
-    console.log("canModify.value: ", canModify.value)
 
     recalcMaxLeft()
     // If there are nodes and the container exists, scroll to position

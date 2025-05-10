@@ -1,10 +1,6 @@
 <template>
     <div class="stats-container rounded-xl border shadow-md" 
              style="background-color: var(--background-color); border-color: var(--color-primary-dark);">
-        <div class="header-row">
-            <h3 class="stats-title" style="color: var(--highlight-color);">Your Progress</h3>
-            
-        </div>
         
         <div class="stats-grid">
             <div class="stat-card">
@@ -75,24 +71,14 @@ export default defineComponent({
     max-width: 32rem;
     width: 100%;
     transition: transform 0.2s, box-shadow 0.2s;
+    position: relative; /* Add position relative */
+    z-index: 1; /* Add z-index to control stacking context */
+    background-color: var(--background-color); /* Make sure this color isn't transparent */
 }
 
 .stats-container:hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-}
-
-.header-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
-}
-
-.stats-title {
-    font-size: 1.25rem;
-    font-weight: 600;
-    margin-bottom: 0;
 }
 
 .settings-icon {

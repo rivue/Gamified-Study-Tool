@@ -82,7 +82,6 @@ TODO list:
                 2) fix yellow console messages
                 4) fix blue dotted line appearing above course names like in library id #9
                 5) fix scroll buttons overlapping units --> and make scroll buttons the right height no matter the size of the screen
-                6) make side menu work on contact page
                 7) add logic for multiple flame emojis w/ streaks of 1, 5, 10, 25, 50, 100
                         - could be for a smaller one: https://lottiefiles.com/free-animation/fire-flame-4De5RVVPag
                         - slightly bigger one: https://lottiefiles.com/free-animation/fire-IuJfcIXKF1
@@ -94,6 +93,7 @@ TODO list:
                 10) fix weird verify thing - success is giving erro rmessage
                         - fix the KeyError: 'User' object has no attribute 'libraries'
                 12) for deployment, make "add stepping stones"  menu have text that says "were still adding things, stay tuned to add sections!"
+                15) fix streak info showing side nav menu in the background
                 14) fix null thing
 
             - ⭐️ third idea) for course owner, add an "edit" button and "delete / trash can" button when you hover over the course or click it or something, maybe add an "edit mode" in the main bar thing I'm going to add?
@@ -149,6 +149,8 @@ TODO list:
         - ⭐️ add some other types of games / questions (ex: true / false, very detailed / specific questions, sorting, compare / contrast, analogies, image based stuff (not sure how to implement) 6 options choose 1-6, etc... see list below)
         - ⭐️ all the other routes and stuff (terms & policies, buying subscription)
         - ⭐️ add i-card for all users, maybe description about the library along with a preview of the files used in the library and maybe also users who are members of the library or something 
+            - make description visible right below library card I think, maybe i card has more detail information, maybe when it was created or current owner or something
+            - also displays number of members of the library
             - should I replace the proposed "i-card" with some icon that links to library details like discord has with their profile page where I would put files, members, and everything else in the menu, or should I keep it as is?
             - ⭐️ make library description editable by owner
             - maybe this would be near leaderboard or something

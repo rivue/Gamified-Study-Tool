@@ -3,10 +3,6 @@
         <div v-if="sideMenuOpen" class="fixed top-16 right-0 w-64 h-auto z-50 p-4 rounded-l-2xl shadow-xl border"
             style="background-color: var(--background-color); border-color: var(--color-primary-dark);">
             <div class="space-y-3">
-                <!-- Menu Header -->
-                <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-lg font-semibold" style="color: var(--light-text);">Navigation</h2>
-                </div>
 
                 <!-- Menu Buttons -->
                 <div class="menu-buttons space-y-2">

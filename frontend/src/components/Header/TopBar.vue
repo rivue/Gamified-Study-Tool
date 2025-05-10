@@ -11,9 +11,9 @@
                     <span class="streak-count">{{ currentStreak }}</span>
                 </div>
                 <div class="streak-dropdown">
-                    <div class="streak-info">
-                        <p>Current Streak: {{ currentStreak }} days</p>
-                        <p>Best Streak: {{ bestStreak }} days</p>
+                    <div class="streak-info text-md text-[var(--highlight-color)] rounded-lg">
+                        <p class="p-2 pl-4 pt-4 pb-4 rounded-xl">Current Streak: {{ currentStreak }} days</p>
+                        <p class="p-2 pl-4 pt-4 pb-4 rounded-xl">Best Streak: {{ bestStreak }} days</p>
                     </div>
                 </div>
             </div>
@@ -198,14 +198,14 @@ export default {
 }
 
 .streak-dropdown {
-    display: block;
+    display: none;
     opacity: 0;
     position: absolute;
     top: 100%;
     left: -20%;
     transform: translateX(-50%) translateY(-5px);
-    background-color: var(--background-color-2);
-    border: 1px solid var(--highlight-color);
+    background-color: var(--background-color);
+    border: 1px solid var(--color-primary-dark);
     border-radius: 6px;
     padding: 10px 12px;
     margin-top: 8px;
@@ -214,18 +214,22 @@ export default {
     min-width: 180px;
     transition: opacity 0.2s ease, transform 0.2s ease;
     pointer-events: none;
+    backdrop-filter: blur(8px); /* Optional: adds blur effect */
 }
 
 .streak-container:hover .streak-dropdown {
     pointer-events: auto;
+    
 }
 
 .streak-info p {
     margin: 4px 0;
-    font-size: 14px;
     white-space: nowrap;
     display: flex;
     justify-content: space-between;
+    background-color: var(--background-color-2t);
+    border: 1px solid var(--color-primary-dark);
+    margin-bottom: 8px;
 }
 
 .streak-dropdown::before {
@@ -237,8 +241,8 @@ export default {
     width: 12px;
     height: 12px;
     background-color: var(--background-color-2);
-    border-left: 1px solid var(--highlight-color);
-    border-top: 1px solid var(--highlight-color);
+    border-left: 1px solid var(--color-primary-dark);
+    border-top: 1px solid var(--color-primary-dark);
     transform: translateX(-50%) rotate(45deg);
 }
 </style>
