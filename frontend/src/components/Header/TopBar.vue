@@ -32,7 +32,7 @@ import { useUserStatsStore } from "@/store/userStatsStore";
 import { useMenuStore } from "@/store/menuStore";
 import { useThemeStore } from "@/store/themeStore";
 import { useAuthStore } from "@/store/authStore";
-import { computed } from "vue";
+import { computed, onMounted } from "vue";
 
 export default {
     name: "TopBar",
@@ -42,6 +42,12 @@ export default {
 
         const userStats = useUserStatsStore();
         const { currentStreak, bestStreak } = storeToRefs(userStats);
+        
+        onMounted(() => {
+            if (loggedIn.value && userStats.streakLoaded == false) {
+                userStats.fetchStreak();
+            }
+        });
 
         return {
             loggedIn,

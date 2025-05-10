@@ -110,8 +110,6 @@ def get_content_per_day(user_id):
 def get_streak(user_id):
     print(user_id)
     user = db.session.query(User).filter_by(id=user_id).first()
-    print("here")
-    print(f"{user.streak_count} + {user.highest_streak}")
     if not user or not user.confirmed:
         return None, None
     print("here")

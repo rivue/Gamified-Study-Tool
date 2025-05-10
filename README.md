@@ -85,6 +85,11 @@ TODO list:
                 5) fix scroll buttons overlapping units --> and make scroll buttons the right height no matter the size of the screen
                 6) make side menu work on contact page
                 7) add logic for multiple flame emojis w/ streaks of 1, 5, 10, 25, 50, 100
+                    - then make sure top bar refreshes when api/library/end is called or whatever to make sure streak resets
+                8) make sure only owner of the library can have access to the settings of the library
+                9) increase size of "send verify link" button and when the mouse hovers over it make it look like a pointer or whatever it usually looks like
+                10) fix weird verify thing - success is giving erro rmessage
+                        - fix the KeyError: 'User' object has no attribute 'libraries'
 
                 - third idea) for course owner, add an "edit" button and "delete / trash can" button when you hover over the course or click it or something, maybe add an "edit mode" in the main bar thing I'm going to add?
             - ⭐️ Add ability to add a unit (later --> come back to, reminder to make it account for 1-n number of sections no matter how that looks)
@@ -167,6 +172,7 @@ TODO list:
 
     general:
     study tool additions / ideas:
+        - ⭐️ cram mode or something at the bottom - basically goes through review mode, but of all of them, effectively giving them the review, but without the need to break their streak
         - ability for user to change language
         - add toggle for users to set a home 'timezone' (dropdown menu) and add for it to automatically 
             switch

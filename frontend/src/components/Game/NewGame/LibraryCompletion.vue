@@ -98,8 +98,9 @@ import { useRouter, useRoute } from "vue-router";
 import axios from "axios";
 import { usePopupStore } from "@/store/popupStore";
 import { useAuthStore } from "@/store/authStore";
-import { useMessageStore } from "@/store/messageStore";
+// import { useMessageStore } from "@/store/messageStore";
 import { useGameStore } from "@/store/gameStore";
+import { useUserStatsStore } from "@/store/userStatsStore";
 import CyclingContentButton from "../Creation/CyclingContentButton.vue";
 import CtaButton from "../../Footer/LandingPageComponents/CtaButton.vue";
 import LeaderBoard from "../LeaderBoard.vue";
@@ -107,8 +108,9 @@ import LeaderBoard from "../LeaderBoard.vue";
 const router = useRouter();
 const route = useRoute();
 const gameStore = useGameStore();
-const messageStore = useMessageStore();
+// const messageStore = useMessageStore();
 const authStore = useAuthStore();
+const userStatsStore = useUserStatsStore();
 
 const page = ref(0);
 const rating = ref(0);
@@ -124,15 +126,16 @@ const completionVisible = computed(() => gameStore.completed);
 const isValid = computed(() => rating.value > 0 || feedback.value.trim().length > 0);
 const loggedIn = computed(() => authStore.loggedIn);
 const firstPage = computed(() => page.value === 0);
-const formattedTime = computed(() => gameStore.formattedTime());
+// const formattedTime = computed(() => gameStore.formattedTime());
 
 function toggleLeaderBoard() {
   showLeaderBoard.value = true;
 }
 
-function nextPage() {
-  router.push(`/lessons/${gameStore.libraryId}`);
-  page.value = 1;
+async function nextPage() {
+    userStatsStore.resetStats(); // triggers fetchStreak in TopBar
+    router.push(`/lessons/${gameStore.libraryId}`);
+    page.value = 1;
 }
 
 function navigateLibrary() {
