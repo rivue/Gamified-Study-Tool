@@ -42,13 +42,13 @@
             @mousedown="startDragging" @mousemove="drag" @mouseup="stopDragging" @mouseleave="stopDragging"
             @touchstart="startDragging" @touchmove="drag" @touchend="stopDragging" @scroll="handleScroll">
             <div class="flex items-center gap-24 min-h-screen py-24 relative">
-                
+
                 <!-- Left padding so first node is visible -->
                 <div class="w-24 flex-shrink-0"></div>
 
                 <!-- Add Unit at the beginning -->
-                <AddUnit :library-id="libraryId" :position="0" :existing-units="Object.keys(rawUnitData)" :can-add-unit="canModify"
-                    @unit-added="handleUnitAdded" />
+                <AddUnit :library-id="libraryId" :position="0" :existing-units="Object.keys(rawUnitData)"
+                    :can-add-unit="canModify" @unit-added="handleUnitAdded" />
 
                 <!-- Unit Headers -->
                 <template v-for="([unit], unitName, unitIndex) in rawUnitData" :key="unitIndex">
@@ -217,13 +217,19 @@
                                         <p class="text-lg">No stepping stones yet</p>
                                         <p class="text-sm opacity-75">Add stepping stones to get started</p>
                                     </div>
-                                    <button @click="showAddNodeModal = true" class="flex items-center gap-2 px-4 py-2 rounded-lg transition-all 
+                                   <button @click="showAddNodeModal = true" 
+                                   disabled="true" 
+                                   class="flex items-center gap-2 px-4 py-2 rounded-lg transition-all 
                                duration-200 hover:scale-105 active:scale-95" :style="{
                                 background: getUnitColor(unitIndex),
-                                color: 'var(--light-text)'
+                                color: 'var(--light-text)',
+                                
                             }">
-                                        <PlusIcon class="w-5 h-5" />
-                                        <span>Add Stepping Stone</span>
+                                        <!-- <PlusIcon class="w-5 h-5" /> -->
+                                        <!-- <span>Add Stepping Stone</span> -->
+                                         <!-- TODO: un-disable button and uncomment out text, also add owner / not owner condition for showing this button or show a small modal / popup or something -->
+                                        <span>Can't add stepping stones yet - we're still building!</span>
+
                                     </button>
                                 </div>
                             </template>
@@ -232,7 +238,8 @@
                     </div>
 
                     <AddUnit :library-id="libraryId" :position="unitIndex + 1"
-                        :existing-units="Object.keys(rawUnitData)" :can-add-unit="canModify" @unit-added="handleUnitAdded" />
+                        :existing-units="Object.keys(rawUnitData)" :can-add-unit="canModify"
+                        @unit-added="handleUnitAdded" />
 
                 </template>
 
@@ -273,7 +280,7 @@
                                 style="color: var(--color-primary-light);">
                                 <!-- {{ nodeNameErrors }} -->
                                 <span v-for="(error, index) in nodeNameErrors" :key="index">{{ error
-                                }}<br></span>
+                                    }}<br></span>
                             </p>
                         </div>
                         <button @click="addNodeNameField" class="mt-2 text-sm font-medium flex items-center gap-1"
@@ -445,11 +452,11 @@ const unitColors = [
 
 const maxLeft = ref(0)
 
-function recalcMaxLeft () {
-  nextTick(() => {                     // wait until Vue has patched the DOM
-    const sc = scrollContainer.value
-    if (sc) maxLeft.value = sc.scrollWidth - sc.clientWidth
-  })
+function recalcMaxLeft() {
+    nextTick(() => {                     // wait until Vue has patched the DOM
+        const sc = scrollContainer.value
+        if (sc) maxLeft.value = sc.scrollWidth - sc.clientWidth
+    })
 }
 
 // snap back to the first node (same 200 px offset you use on mount)
@@ -668,7 +675,7 @@ let scrollTimeoutId = null;
 
 // Scroll to center on first load
 onMounted(() => {
-    
+
     canModify.value = props.canModify
 
     recalcMaxLeft()
@@ -876,20 +883,20 @@ const handleScroll = () => {
     }
 }
 
-.unit-box{
-  border-top: 2px solid currentColor;
-  border-bottom: 2px solid currentColor;
+.unit-box {
+    border-top: 2px solid currentColor;
+    border-bottom: 2px solid currentColor;
 }
 
-.unit--first{
-  border-left: 2px solid currentColor;
-  border-top-left-radius: 0.625rem;
-  border-bottom-left-radius: 0.625rem;
+.unit--first {
+    border-left: 2px solid currentColor;
+    border-top-left-radius: 0.625rem;
+    border-bottom-left-radius: 0.625rem;
 }
 
-.unit--last{
-  border-right: 2px solid currentColor;
-  border-top-right-radius: 0.625rem;
-  border-bottom-right-radius: 0.625rem;
+.unit--last {
+    border-right: 2px solid currentColor;
+    border-top-right-radius: 0.625rem;
+    border-bottom-right-radius: 0.625rem;
 }
 </style>

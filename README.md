@@ -91,7 +91,6 @@ TODO list:
                 11) fix white border around library / course create screen
                 10) fix weird verify thing - success is giving erro rmessage
                         - fix the KeyError: 'User' object has no attribute 'libraries'
-                12) for deployment, make "add stepping stones"  menu have text that says "were still adding things, stay tuned to add sections!"
                 14) fix null thing
 
             - ⭐️ third idea) for course owner, add an "edit" button and "delete / trash can" button when you hover over the course or click it or something, maybe add an "edit mode" in the main bar thing I'm going to add?
