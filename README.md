@@ -87,8 +87,6 @@ TODO list:
                         - maybe for 50 or 100, this whisks accross the little hover menu?: https://lottiefiles.com/free-animation/dancing-fire-CtzldMIEf9
                         - maybe for smaller one like 5-10: https://lottiefiles.com/free-animation/fire-TLLDXwQuCQ
                         - do this a little later
-                9) increase size of "send verify link" button and when the mouse hovers over it make it look like a pointer or whatever it usually looks like
-                11) fix white border around library / course create screen
                 10) fix weird verify thing - success is giving erro rmessage
                         - fix the KeyError: 'User' object has no attribute 'libraries'
                 14) fix null thing
