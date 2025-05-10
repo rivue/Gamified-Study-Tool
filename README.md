@@ -77,8 +77,7 @@ TODO list:
             - https://github.com/tisuela/ratemyprof-api
         - Add "edit mode" for library creator - would allow them to delete sections / units / courses and also add sections / units and would keep editing isolated from actually playing the course
         - ✅ ⭐️ Finish sections + units
-            - ⭐️ Add ability to add each section to each unit (later --> come back to,
-            reminder to make it account for 1-n number of sections no matter how that looks. add new stepping stones button is commented out for now)
+            - ⭐️ Add ability to add each section to each unit (later --> come back to, reminder to make it account for 1-n number of sections no matter how that looks. add new stepping stones button is commented out for now)
             
                 2) fix yellow console messages
                 4) fix blue dotted line appearing above course names like in library id #9
@@ -95,10 +94,9 @@ TODO list:
                 10) fix weird verify thing - success is giving erro rmessage
                         - fix the KeyError: 'User' object has no attribute 'libraries'
                 12) for deployment, make "add stepping stones"  menu have text that says "were still adding things, stay tuned to add sections!"
-                ***13) make sure only owner of library can see / can add units
+                14) fix null thing
 
-                - third idea) for course owner, add an "edit" button and "delete / trash can" button when you hover over the course or click it or something, maybe add an "edit mode" in the main bar thing I'm going to add?
-            - ⭐️ Add ability to add a unit (later --> come back to, reminder to make it account for 1-n number of sections no matter how that looks)
+            - ⭐️ third idea) for course owner, add an "edit" button and "delete / trash can" button when you hover over the course or click it or something, maybe add an "edit mode" in the main bar thing I'm going to add?
         - ⭐️ (would like to implement visibility of different courses first or at least a many:one for non-owners in library model)
             - ⭐️ Delete sections requires entering the name of the unit / course just for accidental reasons)
             - ⭐️ Delete Units( requires entering the name of the unit / course just for accidental reasons)

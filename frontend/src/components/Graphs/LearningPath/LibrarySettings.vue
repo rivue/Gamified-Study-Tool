@@ -78,7 +78,7 @@
 
 <script setup lang="ts">
 
-import { ref, watch, onMounted, computed } from 'vue';
+import { ref, watch, onMounted, computed, toRefs } from 'vue';
 import axios from 'axios';
 import { XMarkIcon, CogIcon } from '@heroicons/vue/24/outline';
 
@@ -116,14 +116,12 @@ const isUpdatingVisibility = ref(false);
 const pendingStatus = ref<boolean | null>(null);
 const joinCode = ref<string | null>(null);
 const isPublic = ref(false);
-const canModify = ref(false);
+const { canModify } = toRefs(props);
 
 onMounted(() => {
     // Initialize joinCode and isPublic based on props
     joinCode.value = props.libraryJoinCode;
     isPublic.value = props.libraryIsPublic;
-    canModify.value = props.canModify;
-    console.log("props.canModify", props.canModify)
 })
 
 watch(() => props.libraryIsPublic, (newVal) => {
@@ -148,7 +146,7 @@ const setLibraryIsPublicStatus = async (newStatus: boolean) => {
     const prev = isPublic.value;
     isPublic.value = newStatus;
     isUpdatingVisibility.value = true;
-    
+
     // pendingStatus.value = newStatus;
     axios.post(`/api/library/visibility_status/${props.libraryId}`, {
         libraryId: props.libraryId,
