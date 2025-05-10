@@ -92,6 +92,7 @@ TODO list:
                 10) fix weird verify thing - success is giving erro rmessage
                         - fix the KeyError: 'User' object has no attribute 'libraries'
                 14) fix null thing
+                15) add padding at the botton of library creator screen between library browser and the rest of the bottom of the page
 
             - ⭐️ third idea) for course owner, add an "edit" button and "delete / trash can" button when you hover over the course or click it or something, maybe add an "edit mode" in the main bar thing I'm going to add?
         - ⭐️ (would like to implement visibility of different courses first or at least a many:one for non-owners in library model)
@@ -150,8 +151,9 @@ TODO list:
             - also displays number of members of the library
             - should I replace the proposed "i-card" with some icon that links to library details like discord has with their profile page where I would put files, members, and everything else in the menu, or should I keep it as is?
             - ⭐️ make library description editable by owner
-            - maybe this would be near leaderboard or something
-            - this would be a tab / icon in one of the vertical menu bar thing I want to add
+                - maybe this would be near leaderboard or something
+                16) look into already existing Leaderboard page for my leaderboard component
+                - this would be a tab / icon in one of the vertical menu bar thing I want to add
         - ⭐️ add staging / pre-production environment that isn't localhost
             - figure out if 1) what I do to migrate the database is safe (swapping uri string and running flask db ugprade) and 2) how I should do it if it is not ideal
         

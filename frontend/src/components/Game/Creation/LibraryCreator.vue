@@ -6,9 +6,7 @@
                 <h1 v-if="libgenRoute">Create a Course to Explore</h1>
                 <div class="libgen-section">
                     <div class="form-group topic-selection">
-                        <div
-                            class="absolute inset-0 border-[1px] border-solid border-[var(--text-color)] rounded-md pointer-events-none">
-                        </div>
+                        
                         <div class="libgen-title">Course name</div>
                         <div class="title-bar">
                             <input type="text" id="topicInput" ref="topicInput" v-model="topic"
@@ -16,7 +14,6 @@
                                 placeholder="Mrs. Frizzle's science class, Biology 272, etc..." maxlength="100" @focus="selectInputText"
                                 @paste="handlePaste" />
                         </div>
-                        <!-- Error Message -->
                         <div v-if="topicError" class="error-message">
                             Please enter a topic.
                         </div>
@@ -572,7 +569,7 @@ onUnmounted(() => {
 
 
 <style scoped>
-.library-gen-page {
+ .library-gen-page {
     display: flex;
     justify-content: flex-start;
     /* Align content at the top */
