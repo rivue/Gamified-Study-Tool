@@ -283,6 +283,7 @@ def init_library_routes(app):
         library_id = data.get("libraryId")
         position = data.get("position")
 
+
         # Validate inputs
         if not user_id:
             return jsonify(status="error", message="Must be signed in."), 403
@@ -291,12 +292,16 @@ def init_library_routes(app):
         if not library_id:
             return jsonify(status="error", message="No library ID provided"), 400
         
-        library = lbh.get_library(library_id, user_id)
+        library = db.session.query(Library).filter_by(id=library_id).first()
+
         if not library:
             return jsonify(status="error", message="No library ID provided"), 400
 
-        if user_id != library:
+        if user_id != library.owner_id:
             return jsonify(status="error", message="You do not own this library."), 403
+        
+        if len(library.units) >= 20:
+            return jsonify(status="error", message="Library has reached maximum number of units (20 for now)"), 400
 
         try:
             

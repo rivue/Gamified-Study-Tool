@@ -108,7 +108,7 @@ def create_unit_and_add(library_id, unit_name, position=None):
 
         db.session.add(unit)
 
-        if len(library.units) > 10:
+        if len(library.units) >= 20:
             return jsonify({"error": "Library has reached maximum number of units"}), 400
 
         if not unit or not library:

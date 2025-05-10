@@ -57,7 +57,7 @@
 </template>
 
 <script setup>
-import { ref, nextTick } from 'vue'
+import { ref, nextTick, onMounted, toRefs } from 'vue'
 import { PlusIcon, XMarkIcon } from '@heroicons/vue/24/solid'
 import axios from 'axios'
 
@@ -76,7 +76,7 @@ const props = defineProps({
     },
     canAddUnit: {
         type: Boolean,
-        default: true
+        default: false
     }
 })
 
@@ -86,14 +86,13 @@ const showAddUnitModal = ref(false)
 const newUnitName = ref('')
 const unitNameError = ref('')
 const isAddingUnit = ref(false)
-const canAddUnit = ref(false);
+const { canAddUnit } = toRefs(props)
 
-const onMounted = () => {
-    canAddUnit.value = props.canAddUnit
+onMounted(() => {
     if (!canAddUnit.value) {
         showAddUnitModal.value = false
     }
-}
+});
 
 // Function to open the add unit modal
 const openAddUnitModal = () => {
@@ -139,13 +138,10 @@ const addNewUnit = async () => {
 
         // Determine position for the new unit
         let position = props.position
-
-        console.log(position);
-
         const response = await axios.post('/api/library/unit', {
             libraryId: props.libraryId,
             unitName: trimmedName,
-            position: position
+            position: position,
         }, {
             signal: currentAbortController.signal
         })

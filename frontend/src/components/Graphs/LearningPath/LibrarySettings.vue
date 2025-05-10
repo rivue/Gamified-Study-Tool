@@ -99,7 +99,7 @@ const props = defineProps({
         type: [String, null],
         required: true
     },
-    canChangeVisibility: {
+    canModify: {
         type: Boolean,
         required: true
     }
@@ -116,13 +116,14 @@ const isUpdatingVisibility = ref(false);
 const pendingStatus = ref<boolean | null>(null);
 const joinCode = ref<string | null>(null);
 const isPublic = ref(false);
-const canChangeVisibility = ref(false);
+const canModify = ref(false);
 
 onMounted(() => {
     // Initialize joinCode and isPublic based on props
     joinCode.value = props.libraryJoinCode;
     isPublic.value = props.libraryIsPublic;
-    canChangeVisibility.value = props.canChangeVisibility;
+    canModify.value = props.canModify;
+    console.log("props.canModify", props.canModify)
 })
 
 watch(() => props.libraryIsPublic, (newVal) => {
@@ -134,17 +135,20 @@ watch(() => props.libraryJoinCode, (newVal) => {
 }, { immediate: true });
 
 const setLibraryIsPublicStatus = async (newStatus: boolean) => {
+    
     if (isPublic.value === newStatus) {
         return; // No change needed
     }
     
-    if (canChangeVisibility.value === false) {
+    if (canModify.value === false) {
+        console.log("hasoidf")
         return; // User does not have permission to change visibility
     }
 
     const prev = isPublic.value;
     isPublic.value = newStatus;
     isUpdatingVisibility.value = true;
+    
     // pendingStatus.value = newStatus;
     axios.post(`/api/library/visibility_status/${props.libraryId}`, {
         libraryId: props.libraryId,

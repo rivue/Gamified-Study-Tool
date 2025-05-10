@@ -95,7 +95,7 @@ TODO list:
                 10) fix weird verify thing - success is giving erro rmessage
                         - fix the KeyError: 'User' object has no attribute 'libraries'
                 12) for deployment, make "add stepping stones"  menu have text that says "were still adding things, stay tuned to add sections!"
-                13) make sure only owner of library can see / can add units
+                ***13) make sure only owner of library can see / can add units
 
                 - third idea) for course owner, add an "edit" button and "delete / trash can" button when you hover over the course or click it or something, maybe add an "edit mode" in the main bar thing I'm going to add?
             - ⭐️ Add ability to add a unit (later --> come back to, reminder to make it account for 1-n number of sections no matter how that looks)
@@ -260,7 +260,8 @@ TODO list:
             2) other resources button where other youtube videos / articles are researched in relation to the topic (grab the resources based on content, not necessarily the name of the section)
 
         - make a constants file for discord links, twitter / x links, any backend urls, etc...
-            - make it available for both frontend and backend
+            - make it available for both frontend and backend like for api routes
+            - max_number of libraries
         - for short answer, 1) make it one word (for now) and most importantly 2) make sure the exact word is in the other side of the card
         - look into adding a resizable area somewhere in your site (like how turbo learn has it) but like people can't change it
         - ??? remove lesson ids, lesson names, password reset tokens and confirmation tokens from urls and communicate them somewhere else

@@ -31,7 +31,7 @@
 
 
         <!-- Settings Button -->
-        <button v-if="showSettings" @click="toggleSettings"
+        <button v-if="canModify" @click="toggleSettings"
             class="fixed top-20 right-6 bg-black/30 backdrop-blur-sm shadow-md rounded-full p-4 hover:bg-black/40 z-10"
             style="color: var(--highlight-color);">
             <CogIcon class="w-12 h-12" />
@@ -47,7 +47,7 @@
                 <div class="w-24 flex-shrink-0"></div>
 
                 <!-- Add Unit at the beginning -->
-                <AddUnit :library-id="libraryId" :position="0" :existing-units="Object.keys(rawUnitData)" :can-add-unit="showSettings"
+                <AddUnit :library-id="libraryId" :position="0" :existing-units="Object.keys(rawUnitData)" :can-add-unit="canModify"
                     @unit-added="handleUnitAdded" />
 
                 <!-- Unit Headers -->
@@ -232,7 +232,7 @@
                     </div>
 
                     <AddUnit :library-id="libraryId" :position="unitIndex + 1"
-                        :existing-units="Object.keys(rawUnitData)" :can-add-unit="showSettings" @unit-added="handleUnitAdded" />
+                        :existing-units="Object.keys(rawUnitData)" :can-add-unit="canModify" @unit-added="handleUnitAdded" />
 
                 </template>
 
@@ -345,7 +345,7 @@
     </Transition>
 
     <LibrarySettings v-model:showSettingsModal="showSettingsModal" :library-id="libraryId"
-        :library-is-public="libraryIsPublic" :library-join-code="libraryJoinCode" />
+        :library-is-public="libraryIsPublic" :library-join-code="libraryJoinCode" :can-modify="canModify" />
 
 </template>
 
@@ -403,7 +403,7 @@ const props = defineProps({
         type: [String, null],
         required: true
     },
-    showSettings: {
+    canModify: {
         type: Boolean,
         required: true
     }
@@ -425,6 +425,7 @@ const fileError = ref('')
 const isAddingNode = ref(false)
 const gameStore = useGameStore()
 const showSettingsModal = ref(false)
+const canModify = ref(false)
 
 // Track selected room for tooltip
 const selectedRoomId = ref(null)
@@ -667,6 +668,10 @@ let scrollTimeoutId = null;
 
 // Scroll to center on first load
 onMounted(() => {
+    
+    canModify.value = props.canModify
+    console.log("canModify.value: ", canModify.value)
+
     recalcMaxLeft()
     // If there are nodes and the container exists, scroll to position
     if (rawUnitData.value.length > 0 && scrollContainer.value) {
