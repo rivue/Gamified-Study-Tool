@@ -1,12 +1,12 @@
 <template>
-    <div class="library-gen-page">
+    <div class="library-gen-page p-8">
         <div class="form-container" @keydown.enter="handleSubmit">
             <!-- Topic Selection -->
             <div class="libgen-create p-16 br-4" style="border: 1px solid var(--text-color); border-radius: 5px;">
                 <h1 v-if="libgenRoute">Create a Course to Explore</h1>
                 <div class="libgen-section">
                     <div class="form-group topic-selection">
-                        
+
                         <div class="libgen-title">Course name</div>
                         <div class="title-bar">
                             <input type="text" id="topicInput" ref="topicInput" v-model="topic"

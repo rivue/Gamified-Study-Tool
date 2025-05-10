@@ -1,5 +1,5 @@
 <template>
-    <div class="library-list p-16">
+    <div class="library-list px-16 py-12">
         <div class="list-header">
             <h1>My Courses</h1>
         </div>
@@ -491,7 +491,6 @@ function goToPage(page: number) {
 
 
 .pagination {
-    padding: 16px;
     display: flex;
     justify-content: space-between;
     align-items: center;
