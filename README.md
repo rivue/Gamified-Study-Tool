@@ -85,6 +85,10 @@ TODO list:
                 5) fix scroll buttons overlapping units --> and make scroll buttons the right height no matter the size of the screen
                 6) make side menu work on contact page
                 7) add logic for multiple flame emojis w/ streaks of 1, 5, 10, 25, 50, 100
+                        - could be for a smaller one: https://lottiefiles.com/free-animation/fire-flame-4De5RVVPag
+                        - slightly bigger one: https://lottiefiles.com/free-animation/fire-IuJfcIXKF1
+                        - maybe for 50 or 100, this whisks accross the little hover menu?: https://lottiefiles.com/free-animation/dancing-fire-CtzldMIEf9
+                        - maybe for smaller one like 5-10: https://lottiefiles.com/free-animation/fire-TLLDXwQuCQ
                         - do this a little later
                 9) increase size of "send verify link" button and when the mouse hovers over it make it look like a pointer or whatever it usually looks like
                 11) fix white border around library / course create screen
