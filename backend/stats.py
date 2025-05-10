@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 from sqlalchemy import func, extract
-from database.models import db, LibraryCompletion, Lesson
+from database.models import db, LibraryCompletion, Lesson, User
+from flask import jsonify
 
 def get_line_graph_data(user_id):
     # Query the database for lessons completed by day, month, and year
@@ -106,9 +107,15 @@ def get_content_per_day(user_id):
 
     return dict(lessons_per_day), dict(librarys_per_day)
 
-def get_streak():#user_id):
-    max_streak = 27
-    current_streak = 16
+def get_streak(user_id):
+
+    user = db.session.query(User).filter_by(id=user_id).first()
+    
+    if not user or not user.is_authenticated:
+       return None, None
+
+    return user.max_streak, user.current_streak
+
     # today = datetime.now()
     # last_date = today
     # lessons_per_day, librarys_per_day = get_content_per_day(user_id)

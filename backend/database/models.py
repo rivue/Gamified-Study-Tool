@@ -3,7 +3,7 @@ from flask_login import UserMixin
 from sqlalchemy import JSON, update
 from sqlalchemy.ext.mutable import MutableList
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
-from datetime import datetime
+from datetime import datetime, timedelta, date
 from zoneinfo import ZoneInfo
 import traceback
 import logging
@@ -99,27 +99,27 @@ class User(db.Model, UserMixin):
         return [membership.library for membership in self.library_memberships]
     
     def update_daily_streak(self): 
-    # streak_count = db.Column(db.Integer, default=0, nullable=False)
-    # last_streak_date = db.Column(db.Date, nullable=True)
-    # reference ^^^
-        # TODO: IMPLEMENT AFTER I COME BACK FROM DINNER
-        # tz = ZoneInfo(self.timezone or 'UTC')
-        # today_local = datetime.now(tz).date()
-
-        # if self.last_request_time.date() == today_local.date():
-        #     return self.streak_count
-
-        # if self.last_request_time.date() == yesterday:
-        #     self.streak_count += 1
-
-        # else:
-        #     # missed a day :( or first time, so reset to 1
-        #     self.daily_request_count = 1
-        #     self.streak_count = 1
+        tz = ZoneInfo(self.timezone or 'UTC')
+        today_local = datetime.now(tz).date()
+        yesterday_local = today_local - timedelta(days=1)
             
-        # self.last_request_time = today_local
-        # db.session.commit()
-        # return self.daily_request_count
+        if self.last_streak_date is None:
+            self.streak_count = 1
+
+        else:
+            last = self.last_streak_date
+            # last request was today, no change
+            if last == today_local:
+                return self.streak_count
+            # last request was yesterday, increment streak
+            if last == yesterday_local:
+                self.streak_count += 1
+            # broke streak, reset
+            else:
+                self.streak_count = 1
+        self.last_streak_date = today_local
+        
+        return self.streak_count
     
 class IPTracking(db.Model):
     id = db.Column(db.Integer, primary_key=True)

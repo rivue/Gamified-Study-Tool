@@ -746,6 +746,8 @@ def update_game_end(user_id, library_id, section_id):
          
         increase_lesson_state(user_id, library_id, section_id)
 
+        user.update_daily_streak()
+
         # existing_completion = LibraryCompletion.query.filter_by(library_id=library_id, user_id=user_id).first()
         # if existing_completion:
         #     if is_complete and not existing_completion.is_complete:

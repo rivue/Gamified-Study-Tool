@@ -13,12 +13,11 @@ def init_profile_routes(app):
     @app.route('/api/user/streak', methods=['GET'])
     @login_required
     def get_user_streak():
-        # streak_data, streak_result = get_streak(current_user.id)
-        # if streak_result == 0:
-        #     return jsonify({'error': 'Failed to retrieve streak data'}), 500
-        # max_streak = streak_data[0]
-        # current_streak = streak_data[1]
-        return jsonify({'current_streak': 12, 'max_streak': 24})#, 'exp':get_total_user_exp(current_user.id)})
+        max_streak, current_streak = get_streak(current_user.id)
+        if max_streak is None or current_streak is None:
+            return jsonify({'error': 'Failed to retrieve streak data'}), 500
+
+        return jsonify({'current_streak': current_streak, 'max_streak': max_streak}) #, 'exp':get_total_user_exp(current_user.id)})
 
     @app.route("/api/profile", methods=["GET"])
     @login_required
