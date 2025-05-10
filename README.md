@@ -72,6 +72,7 @@ TODO list:
     LAUNCH LIST: goal: July 6th then start working on social media posts
 
         hard probably (goal: 2 high level bullet points / wk):
+        - ⭐️ remove alert message in library creator (not hard but have to remember)
         - integrate with teacher / school list from rate my professors 
             - would probably be pretty easy: https://classic.yarnpkg.com/en/package/ratemyprofessor-api
             - https://github.com/tisuela/ratemyprof-api
@@ -87,10 +88,12 @@ TODO list:
                         - maybe for 50 or 100, this whisks accross the little hover menu?: https://lottiefiles.com/free-animation/dancing-fire-CtzldMIEf9
                         - maybe for smaller one like 5-10: https://lottiefiles.com/free-animation/fire-TLLDXwQuCQ
                         - do this a little later
-                10) fix weird verify thing - success is giving erro rmessage
+                10) fix weird verify thing - login or signin is giving error rmessage
                         - fix the KeyError: 'User' object has no attribute 'libraries'
                 14) fix null thing
+                    - what is this?
                 see 16) below for leaderboard
+                small idea for later (maybe): when you mouse over the unit name in learning path, it hovers a little bit, highlights white or --text-color, and displays above any names it is over
 
             - ⭐️ third idea) for course owner, add an "edit" button and "delete / trash can" button when you hover over the course or click it or something, maybe add an "edit mode" in the main bar thing I'm going to add?
         - ⭐️ (would like to implement visibility of different courses first or at least a many:one for non-owners in library model)

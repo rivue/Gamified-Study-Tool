@@ -82,7 +82,7 @@ import { useRouter } from "vue-router";
 import { Input } from "@/components/ui/input";
 import { StarIcon } from "@heroicons/vue/24/solid";
 import { Table, TableRow, TableBody, TableCell } from "@/components/ui/table";
-import { Alert } from "@/components/ui/alert";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import axios from "axios";
 // Props
 const props = defineProps<{

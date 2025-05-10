@@ -63,7 +63,7 @@ import axios from 'axios'
 
 const props = defineProps({
     libraryId: {
-        type: String,
+        type: Number,
         required: true
     },
     position: {

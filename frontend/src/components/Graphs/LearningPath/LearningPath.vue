@@ -387,7 +387,7 @@ import AddUnit from "./AddUnit.vue";
 
 const props = defineProps({
     libraryId: {
-        type: String,
+        type: Number,
         required: true
     },
     roomNames: {

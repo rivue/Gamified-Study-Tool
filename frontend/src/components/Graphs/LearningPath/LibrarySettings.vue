@@ -88,7 +88,7 @@ const props = defineProps({
         required: true
     },
     libraryId: {
-        type: String,
+        type: Number,
         required: true
     },
     libraryIsPublic: {
