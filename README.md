@@ -179,6 +179,14 @@ TODO list:
 
     general:
     study tool additions / ideas:
+        - Front page: 1-2 boxes, "what are you here to study" then a text input box that slides through different classes, maybe filter by location and have a second optional box for professor name and third for school name. Displays a list or libraries along with a butt9n thay says "create"
+
+        -User retention: streak and cram mode
+        Complete a lesson daily to keep stream. 24 hrs after u complete a lesson, the next one unlocks. Maybe some external reward like irl merch or snth
+        Cram node is basically creative mode, can't do rewards but can skip around to any lesson
+        -Possible idea: adding the ability to schedule group study sessions within each library, maybe a ventral calendar for all the meetings, and maybe add the ability to pull things from canvas and moodle?
+        Good- idk
+        Bad- location in an app might be dangerous especially for public libraries, not an original feature, might get people off the app?
         - ⭐️ cram mode or something at the bottom - basically goes through review mode, but of all of them, effectively giving them the review, but without the need to break their streak
         - ability for user to change language
         - add toggle for users to set a home 'timezone' (dropdown menu) and add for it to automatically 
