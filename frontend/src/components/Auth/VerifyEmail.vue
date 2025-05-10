@@ -31,7 +31,7 @@
                         If there is an unverified account associated with this email, a reset link was sent to it.
                     </div>
                     <div v-if="!completed" class="completed-message">Please enter your email and click the button below to resend a verification link.</div>
-                    <div class="button-containered py-2 px-4 text-md">
+                    <div class="button-containered px-8 py-4 text-md">
                         <input type="submit" id="submit" :value="buttonText" />
                     </div>
                 </form>
