@@ -87,12 +87,8 @@ TODO list:
                         - maybe for 50 or 100, this whisks accross the little hover menu?: https://lottiefiles.com/free-animation/dancing-fire-CtzldMIEf9
                         - maybe for smaller one like 5-10: https://lottiefiles.com/free-animation/fire-TLLDXwQuCQ
                         - do this a little later
-                10) fix weird verify thing - login or signin is giving error rmessage
-                        - fix the KeyError: 'User' object has no attribute 'libraries'
                 14) fix null thing
                     - what is this?
-                    path:
-                    
                 see 16) below for leaderboard
                 small idea for later (maybe): when you mouse over the unit name in learning path, it hovers a little bit, highlights white or --text-color, and displays above any names it is over
 
@@ -180,6 +176,7 @@ TODO list:
 
     general:
     study tool additions / ideas:
+        - massive reorg / cleaning - get rid of unused functions / db models, commands / db calls / api calls / frontend components and rearrange existing ones using files structures / Blueprints that make sense
         - big idea: for multiplayer, make a way for people to join a "call" like discord, but with like a host maybe, so they have mini-games just like jack in the box where you have a host judge, or maybe the other players or ai judges the players responses. the games would be very high in retrieval so players really burn in the studying, like playeres could be given a prompt from something from their studying or notes or courses like "photosynthesis" and the user would have to construct a concept map using bubbles and lines and would name them accordingly to see how deeply they can remember a topic, then everyone would rate and compare responses. the level deeper then that would be if people would describe each bubble word in a sentance / essay form, obviously there could be more retrieval based games but this is just a start
         - big idea #2 (slightly smaller): add an ability for users to click a button and the website / app generates / can print out a "study guide" for tests and stuff, and the user can choose what size it is, like 2 page front and back, 1 page, 1 page 12"x18", 1 5"x3" index card, etc...
         - Front page: 1-2 boxes, "what are you here to study" then a text input box that slides through different classes, maybe filter by location and have a second optional box for professor name and third for school name. Displays a list or libraries along with a butt9n thay says "create"
