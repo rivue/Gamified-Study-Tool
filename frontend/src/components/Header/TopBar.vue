@@ -10,10 +10,10 @@
                         style="max-height: 24px; pointer-events: none;" />
                     <span class="streak-count">{{ currentStreak }}</span>
                 </div>
-                <div class="streak-dropdown">
-                    <div class="streak-info text-md text-[var(--highlight-color)] rounded-lg">
-                        <p class="p-2 pl-4 pt-4 pb-4 rounded-xl">Current Streak: {{ currentStreak }} days</p>
-                        <p class="p-2 pl-4 pt-4 pb-4 rounded-xl">Best Streak: {{ bestStreak }} days</p>
+                <div class="streak-dropdown rounded-2xl">
+                    <div class="streak-info text-md text-[var(--highlight-color)] rounded-2xl">
+                        <p class="pr-8 pl-4 pt-4 pb-4 rounded-xl">Current Streak: {{ currentStreak }}</p>
+                        <p class="pr-8 pl-4 pt-4 pb-4 rounded-xl">Best Streak: {{ bestStreak }}</p>
                     </div>
                 </div>
             </div>
@@ -206,7 +206,6 @@ export default {
     transform: translateX(-50%) translateY(-5px);
     background-color: var(--background-color);
     border: 1px solid var(--color-primary-dark);
-    border-radius: 6px;
     padding: 10px 12px;
     margin-top: 8px;
     box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
