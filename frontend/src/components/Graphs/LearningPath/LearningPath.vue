@@ -31,7 +31,7 @@
 
 
         <!-- Settings Button -->
-        <button @click="toggleSettings"
+        <button v-if="showSettings" @click="toggleSettings"
             class="fixed top-20 right-6 bg-black/30 backdrop-blur-sm shadow-md rounded-full p-4 hover:bg-black/40 z-10"
             style="color: var(--highlight-color);">
             <CogIcon class="w-12 h-12" />
@@ -232,7 +232,7 @@
                     </div>
 
                     <AddUnit :library-id="libraryId" :position="unitIndex + 1"
-                        :existing-units="Object.keys(rawUnitData)" @unit-added="handleUnitAdded" />
+                        :existing-units="Object.keys(rawUnitData)" :can-change-visibility="showSettings" @unit-added="handleUnitAdded" />
 
                 </template>
 
@@ -401,6 +401,10 @@ const props = defineProps({
     },
     libraryJoinCode: {
         type: [String, null],
+        required: true
+    },
+    showSettings: {
+        type: Boolean,
         required: true
     }
 })

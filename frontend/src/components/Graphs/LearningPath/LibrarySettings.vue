@@ -98,6 +98,10 @@ const props = defineProps({
     libraryJoinCode: {
         type: [String, null],
         required: true
+    },
+    canChangeVisibility: {
+        type: Boolean,
+        required: true
     }
 })
 
@@ -112,11 +116,13 @@ const isUpdatingVisibility = ref(false);
 const pendingStatus = ref<boolean | null>(null);
 const joinCode = ref<string | null>(null);
 const isPublic = ref(false);
+const canChangeVisibility = ref(false);
 
 onMounted(() => {
     // Initialize joinCode and isPublic based on props
     joinCode.value = props.libraryJoinCode;
     isPublic.value = props.libraryIsPublic;
+    canChangeVisibility.value = props.canChangeVisibility;
 })
 
 watch(() => props.libraryIsPublic, (newVal) => {
@@ -131,6 +137,11 @@ const setLibraryIsPublicStatus = async (newStatus: boolean) => {
     if (isPublic.value === newStatus) {
         return; // No change needed
     }
+    
+    if (canChangeVisibility.value === false) {
+        return; // User does not have permission to change visibility
+    }
+
     const prev = isPublic.value;
     isPublic.value = newStatus;
     isUpdatingVisibility.value = true;

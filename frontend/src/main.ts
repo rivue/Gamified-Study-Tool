@@ -159,7 +159,7 @@ router.beforeEach(async (to, from, next) => {
                 const response = await axios.get(`/api/library/${to.params.id}`);
                 if (response.data && 
                     response.data.data && 
-                    response.data.data.owner_id == user) {
+                    (response.data.data.owner_id == user || response.data.data.is_public)) {
                         // User is the creator, continues as per usual
                         return next();
                 } else { // invalid data 

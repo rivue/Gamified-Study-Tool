@@ -268,6 +268,7 @@ def init_library_routes(app):
 
             test = library_data.get("room_names")
 
+            library_data["show_settings"] = user_id == library_data.get("owner_id")
 
             return jsonify(status="success", data=library_data, room_data=room_data)
         except: 
@@ -481,6 +482,13 @@ def init_library_routes(app):
                 if not user_id:
                     return jsonify(status="error", message="Must be logged in to check library visibility status."), 403
                 
+                library = lbh.get_library(library_id, user_id)
+                if not library:
+                    return jsonify(status="error", message="Library not found."), 404
+                
+                if library.owner_id != user_id:
+                    return jsonify(status="error", message="You do not own this library."), 403
+
                 visibility_status = lbh.get_library_visibility_status(user_id, library_id)
             
                 if visibility_status is None:
