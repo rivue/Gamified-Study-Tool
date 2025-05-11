@@ -90,7 +90,6 @@ TODO list:
                 14) fix null thing
                     - what is this?
                 see 16) below for leaderboard
-                small idea for later (maybe): when you mouse over the unit name in learning path, it hovers a little bit, highlights white or --text-color, and displays above any names it is over
 
             - ⭐️ third idea) for course owner, add an "edit" button and "delete / trash can" button when you hover over the course or click it or something, maybe add an "edit mode" in the main bar thing I'm going to add?
         - ⭐️ (would like to implement visibility of different courses first or at least a many:one for non-owners in library model)
@@ -176,6 +175,8 @@ TODO list:
 
     general:
     study tool additions / ideas:
+        
+        - small idea for later (maybe): when you mouse over the unit name in learning path, it hovers a little bit, highlights white or --text-color, and displays above any names it is over
         - massive reorg / cleaning - get rid of unused functions / db models, commands / db calls / api calls / frontend components and rearrange existing ones using files structures / Blueprints that make sense
         - big idea: for multiplayer, make a way for people to join a "call" like discord, but with like a host maybe, so they have mini-games just like jack in the box where you have a host judge, or maybe the other players or ai judges the players responses. the games would be very high in retrieval so players really burn in the studying, like playeres could be given a prompt from something from their studying or notes or courses like "photosynthesis" and the user would have to construct a concept map using bubbles and lines and would name them accordingly to see how deeply they can remember a topic, then everyone would rate and compare responses. the level deeper then that would be if people would describe each bubble word in a sentance / essay form, obviously there could be more retrieval based games but this is just a start
         - big idea #2 (slightly smaller): add an ability for users to click a button and the website / app generates / can print out a "study guide" for tests and stuff, and the user can choose what size it is, like 2 page front and back, 1 page, 1 page 12"x18", 1 5"x3" index card, etc...
