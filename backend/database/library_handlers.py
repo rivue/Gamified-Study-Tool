@@ -243,7 +243,7 @@ def get_library_scores(library_id):
                 member_list.append({
                     'user_id': membership.user_id,
                 })
-        print(member_list)
+
         return jsonify(member_list)
     
     except Exception as e:

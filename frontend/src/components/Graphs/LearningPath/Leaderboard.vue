@@ -18,26 +18,21 @@
             
             <!-- Leaderboard Entries -->
             <div v-else class="divide-y" style="border-color: var(--color-primary-dark);">
-                <div v-for="(entry, index) in leaderboardData" :key="entry.id"
+                <div v-for="(entry, index) in leaderboardData.members" :key="entry.user_id"
                          class="grid grid-cols-12 gap-2 p-3 items-center transition-colors"
-                         :class="{'opacity-85': highlightCurrentUser && entry.id !== currentUserId}"
+                         :class="{'opacity-85': highlightCurrentUser && entry.user_id !== currentUserId}"
                          :style="{
-                             backgroundColor: entry.id === currentUserId ? 'var(--background-color-2t)' : 'var(--background-color)',
+                             backgroundColor: entry.user_id === currentUserId ? 'var(--background-color-2t)' : 'var(--background-color)',
                          }">
+                         {{ entry.user_id }}
                     
                     <!-- User Info -->
                     <div class="col-span-7 flex items-center">
                         <div class="truncate">
-                            <span :class="{ 'font-semibold': entry.id === currentUserId }">{{ entry.name }}</span>
-                            <span v-if="entry.id === currentUserId" class="ml-2 text-xs px-1 rounded"
+                            <span :class="{ 'font-semibold': entry.user_id === currentUserId }">{{ entry.name }}</span>
+                            <span v-if="entry.user_id === currentUserId" class="ml-2 text-xs px-1 rounded"
                                         style="background-color: var(--highlight-color); color: var(--background-color);">You</span>
                         </div>
-                    </div>
-                    
-                    <!-- Score -->
-                    <div class="col-span-4 text-right font-mono font-semibold">
-                        {{ entry.score.toLocaleString() }}
-                        <span class="text-xs ml-1" style="color: var(--highlight-color);">pts</span>
                     </div>
                 </div>
             </div>
@@ -83,7 +78,7 @@ const fetchLeaderboard = async () => {
         });
 
         // Apply default sort
-        sortByScore();
+        // sortByScore();
     } catch (error) {
         console.error('Error fetching leaderboard:', error);
         leaderboardData.value = [];
@@ -93,15 +88,15 @@ const fetchLeaderboard = async () => {
 };
 
 // Sort methods
-const sortByScore = () => {
-    sortCriteria.value = 'score';
-    leaderboardData.value.sort((a, b) => b.score - a.score);
-};
+// const sortByScore = () => {
+//     sortCriteria.value = 'score';
+//     leaderboardData.value.sort((a, b) => b.score - a.score);
+// };
 
-const sortByName = () => {
-    sortCriteria.value = 'name';
-    leaderboardData.value.sort((a, b) => a.name.localeCompare(b.name));
-};
+// const sortByName = () => {
+//     sortCriteria.value = 'name';
+//     leaderboardData.value.sort((a, b) => a.name.localeCompare(b.name));
+// };
 
 // Filter methods
 const applyFilters = () => {

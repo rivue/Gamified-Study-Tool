@@ -282,9 +282,9 @@ def init_library_routes(app):
             if not user_id:
                 return jsonify(status="error", message="Failed to retrieve library data"), 500
             
-            members = lbh.get_library_scores(library_id)
+            members = lbh.get_library_scores(library_id).get_json()
               
-            return jsonify(status="success", members=members.get_json())
+            return jsonify(status="success", members=members)
 
         except:
             return jsonify(status="error", message="Failed to retrieve library data"), 500
