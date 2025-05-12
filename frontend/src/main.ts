@@ -80,6 +80,22 @@ import axios from 'axios';
                 }
             }
         },
+        { 
+            name: 'Leaderboard',
+            path: '/lessons/:libraryId/leaderboard',
+            component: defineAsyncComponent(() => import('./components/Graphs/LearningPath/Leaderboard.vue')), 
+            meta: { title: 'Rivue.ai | Leaderboard', requiresCreator: true },
+            beforeEnter: async (to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext) => {
+                try {
+                    console.log(to.params.libraryId)
+                    const response = await axios.get(`/api/library/${to.params.libraryId}/scores`);
+                    response.data?.status === "success" ? next() : next('/library');
+                } catch (error) {
+                    console.error("Failed to validate library:", error);
+                    next('/library');
+                }
+            }
+        },
         
         // Simple routes
         { path: '/library', component: defineAsyncComponent(() => import('./components/Game/Creation/LibraryCreator.vue')), meta: { title: 'Rivue.ai | Create Library' } },

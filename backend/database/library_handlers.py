@@ -226,6 +226,29 @@ def get_library(library_id, user_id=None, click=True):
     library_data["favorited_status"] = favorited_status.is_favorited
     
     return jsonify(library_data)
+
+def get_library_scores(library_id):
+    
+    # TODO: update once I implement a points system
+
+    try:
+
+        memberships = LibraryMembership.query.filter_by(library_id=library_id).all()
+        
+        if not memberships:
+            return jsonify({'error': 'No memberships found for the given library'}), 404
+        
+        member_list = []
+        for membership in memberships:
+                member_list.append({
+                    'user_id': membership.user_id,
+                })
+        print(member_list)
+        return jsonify(member_list)
+    
+    except Exception as e:
+        print("no")
+        return jsonify({'error': str(e)}), 500
     
 def get_library_details(library_id):
     try:
@@ -936,3 +959,4 @@ LibraryQuestion.as_dict = lambda self: model_to_dict(self)
 LibraryRoomState.as_dict = lambda self: model_to_dict(self)
 LibraryQuestionChoice.as_dict = lambda self: model_to_dict(self)
 LibraryCompletion.as_dict = lambda self: model_to_dict(self)
+LibraryMembership.as_dict = lambda self: model_to_dict(self)

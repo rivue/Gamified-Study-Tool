@@ -274,6 +274,22 @@ def init_library_routes(app):
         except: 
             return jsonify(status="error", message="Failed to retrieve library data"), 500
         
+    @app.route("/api/library/<int:library_id>/scores", methods=["GET"])
+    def get_library_users(library_id):
+        try:
+            user_id = current_user.id if not isinstance(current_user, AnonymousUserMixin) else None
+
+            if not user_id:
+                return jsonify(status="error", message="Failed to retrieve library data"), 500
+            
+            members = lbh.get_library_scores(library_id)
+              
+            return jsonify(status="success", members=members.get_json())
+
+        except:
+            return jsonify(status="error", message="Failed to retrieve library data"), 500
+        
+        
     @app.route('/api/library/unit', methods=['POST'])
     def generate_unit():
         user_id = current_user.id if not isinstance(current_user, AnonymousUserMixin) else None
@@ -546,14 +562,14 @@ def init_library_routes(app):
             })
         return jsonify(data), 200
 
-    @app.route('/api/scores/library/<int:library_id>', methods=['GET'])
-    def fetch_scores_for_library(library_id):
-        completions = lbh.get_library_top_scores_by_unique_users(library_id=library_id, limit=5)
-        data = []
-        for email, library_id, time in completions:
-            data.append({
-                "email": mask_email(email),
-                "library_id": library_id,
-                "time": time
-            })
-        return jsonify(data), 200
+    # @app.route('/api/scores/library/<int:library_id>', methods=['GET'])
+    # def fetch_scores_for_library(library_id):
+    #     completions = lbh.get_library_top_scores_by_unique_users(library_id=library_id, limit=5)
+    #     data = []
+    #     for email, library_id, time in completions:
+    #         data.append({
+    #             "email": mask_email(email),
+    #             "library_id": library_id,
+    #             "time": time
+    #         })
+    #     return jsonify(data), 200

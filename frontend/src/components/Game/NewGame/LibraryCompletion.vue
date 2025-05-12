@@ -32,9 +32,6 @@
             :isSubmitting="isSubmitting"
           />
         </div>
-        <div v-if="showLeaderBoard">
-          <LeaderBoard />
-        </div>
         <div v-if="loggedIn" class="what-next-container">
           <div class="nav-row">
             <button class="nav-button" @click="navigateLibrary">🏛 New</button>

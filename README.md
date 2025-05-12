@@ -7,6 +7,9 @@ Note: use npm audit --only=prod for this, 0 vulnerabilities = good
 IDEAS:
 
     cleanup / maintenence:
+        - remove library difficulty, mentor, language, etc... from db course structure, backend, frontend course creation screen
+        - note: easy to get rid of in the frontend, but have to remove lots of stuff in backend w/ various function calls and stuff
+        - get rid of other stuff I'm not using / don't plan on using like stuff in User model with ai tutor, etc...
         - break up different files to make them smaller and more modular:
         - library_routes
         - library_handlers
@@ -73,10 +76,8 @@ TODO list:
 
         hard probably (goal: 2 high level bullet points / wk):
         - ⭐️ remove alert message in library creator (not hard but have to remember)
-        - integrate with teacher / school list from rate my professors 
-            - would probably be pretty easy: https://classic.yarnpkg.com/en/package/ratemyprofessor-api
-            - https://github.com/tisuela/ratemyprof-api
-        - Add "edit mode" for library creator - would allow them to delete sections / units / courses and also add sections / units and would keep editing isolated from actually playing the course
+
+        - ⭐️ Add "edit mode" for library creator - toggle for: delete sections / units / courses and also add sections / units and would keep editing isolated from actually playing the course
         - ✅ ⭐️ Finish sections + units
             - ⭐️ Add ability to add each section to each unit (later --> come back to, reminder to make it account for 1-n number of sections no matter how that looks. add new stepping stones button is commented out for now)
             - ⭐️ third idea) for course owner, add an "edit" button and "delete / trash can" button when you hover over the course or click it or something, maybe add an "edit mode" in the main bar thing I'm going to add?
@@ -91,6 +92,8 @@ TODO list:
             - COPY QUIZLET???
             - change popups --> toast, possibly with bar that displays when it will leave
             - note: maybe change top navbar to be a constant hovering side menu on the side / bottom of the screen maybe similar to duolingo and possibly replace "my library", "settings", etc.. with actual icons
+                - maybe move name of library to top left corner, then add a box for the actual map, with buttons / settings / leaderboard outside of the bo
+                    box or on the bottom / lining the right / left edge or something
                 - potential new menu: "my libraries" "browse libraries" (would link from search?) "notifications" (like error messages or who joined a library or something), create / + (or maybe it would be a tab at the top next to search)
                 - menu for library would have members list, settings for course owner, potentially a list of files to see, potentially a screen to see library statistics like # likes, # people, etc... 
                 -  settings button would enable course owners to remove people, change visibility settings I think? or check different boxes for question types, or see users or something
@@ -98,47 +101,35 @@ TODO list:
                 - instead of making path a long rectangle shape, make it follow the curve of the nodes
                 - ⭐️ explore adding "scroll to current" on map page (last unlocked node)
                 - also, maybe change it to vertical
+                - ⭐️ add ability to leave libraries (later)
+                - ⭐️ all the other routes and stuff (terms & policies, buying subscription, can't think of others?)
             - add ui ability to "join" private libraries / public libraries that you didn't create maybe in like a seperate page or list or maybe I could add a box for putting in library codes or something
             - ⭐️ after user submits something and is waiting, display a loading bar or wheel or different rotating facts (maybe relevant to the library?) letting the user know that it is generating
             - also note: ask gemini / grok / gpt / claude for some ui design tips like adding a menu bar, or ui tips / tricks / helpful websites / youtube videos, etc...
             use this maybe: https://www.shadcn-vue.com/docs/components/stepper.html
             - note: for main page, add two / 3 simple boxes, class you want, school, and possibly professor, and it gives you classes close to you like quizlet / rate my professor along with option for creating your own
                 maybe it shows private ones with a "lock" icon and prompts you to enter a password. this way it would be like more of a network, which would differentiate us from a copy paste ai study tool (turbolearn) / NotebookLM
-        - ability to verify by school email which helps with filtering results?
         - ⭐️ Stripe implementation
             - have to think abt what different payment levels mean / how I want to do it
-
-    # basically in library browser, see all libraries
-    # then add ability to leave libraries (later)
-
         - ⭐️ add google auth
         - ⭐️ let units / sections / courses have duplicate values as others in db
-            - ⭐️ add support for links / pdfs / other things and get rid of things like difficulty, tutor, etc... then actually start generating stuff to study
-            - ⭐️ add support for multiple file upload as well
         - ⭐️ add ability to see uploaded files in library (list of their names) and maybe even file preview (would require nosql db or something maybe)
 
         medium (chip away at when tired / mentally exhausted from hard ones):
         - implement game "score" logic (if you get >80% #attemps:number of questions ratio) then you get more / less points or something, etc...
             - ⭐️ add a user joined date so I can display "rivuer for 6 months, 19 days, 13 hours, 10 minutes, 5, 6, 7, etc... seconds"
-            - ⭐️ save for later, just do a basic fire streak thing for now, maybe with 5, 10, 20, 50, 100 day streak animations from Lottie Files and animations for streak loosing as well
-                - ⭐️ will probably involve a last_lesson variable
         - ⭐️ Terms of use / Policy Page legal agreement thing
             - ⭐️ Look at websites and stuff for this
         - ⭐️ In creating a new library, add checkboxes for different types of modes (fill-in-the-blank, t/f, mcq, etc…)
             - maybe add it in settings for owner as well (enable / disable for future lesson content generation)
-        - ⭐️ remove library difficulty, mentor, language, etc... from db course structure, backend, frontend course creation screen
-            - note: easy to get rid of in the frontend, but have to remove lots of stuff in backend w/ various function calls and stuff
-            - get rid of other stuff I'm not using / don't plan on using like stuff in User model with ai tutor, etc...
+
         - ⭐️ add some other types of games / questions (ex: true / false, very detailed / specific questions, sorting, compare / contrast, analogies, image based stuff (not sure how to implement) 6 options choose 1-6, etc... see list below)
-        - ⭐️ all the other routes and stuff (terms & policies, buying subscription)
         - ⭐️ add i-card for all users, maybe description about the library along with a preview of the files used in the library and maybe also users who are members of the library or something 
             - make description visible right below library card I think, maybe i card has more detail information, maybe when it was created or current owner or something
             - also displays number of members of the library
             - should I replace the proposed "i-card" with some icon that links to library details like discord has with their profile page where I would put files, members, and everything else in the menu, or should I keep it as is?
             - ⭐️ make library description editable by owner
                 - maybe this would be near leaderboard or something
-                16) look into already existing Leaderboard page for my leaderboard component
-                - this would be a tab / icon in one of the vertical menu bar thing I want to add
         - ⭐️ add staging / pre-production environment that isn't localhost
             - figure out if 1) what I do to migrate the database is safe (swapping uri string and running flask db ugprade) and 2) how I should do it if it is not ideal
         
@@ -150,10 +141,12 @@ TODO list:
         - ⭐️ error messages in create library look bad
         - ⭐️ add page after you finish a game session, but make it have confetti / small animation or something
         - ⭐️ make sure the background of the site is the color you want if you scroll to far (like in main page if you scroll too far down) (right now its white which is not good)
-        - ⭐️ handle weird thing where new library code displays null, just make it look good basically
-        - ⭐️ move dropdown menu to left, replace w/ profile picture --> settings page
-        - ⭐️ fix weird loading... thing that appears on slow internet speed
+        - ⭐️ handle weird thing in production where new library code displays null for like half a second, just make it look good basically
+        - ⭐️ move dropdown menu to left + make dropdown menu permanant, replace w/ profile picture --> hover menu for settings pageor something
+        - ⭐️ fix weird loading... thing that appears on the top left corner
         - ⭐️ make redirect smooth, like make it not show other pages or whatever (use repomix + gpt)
+        - leaderboard
+            - for leaderboard, make sure only members of the library can access it, else redirect somewhere else
 
     OTHER PAGES:
         - terms and policies page
@@ -163,6 +156,12 @@ TODO list:
 
     general:
     study tool additions / ideas:
+        - integrate with teacher / school list from rate my professors 
+            - would probably be pretty easy: https://classic.yarnpkg.com/en/package/ratemyprofessor-api
+            - https://github.com/tisuela/ratemyprof-api
+        - ability to verify by school email which helps with filtering results? 
+        - (later) add support for links / pdfs / other things and get rid of things like difficulty, tutor, etc... then actually start generating stuff to study
+        - (later) add support for multiple file upload as well
         7) add logic for multiple flame emojis w/ streaks of 1, 5, 10, 25, 50, 100
             - could be for a smaller one: https://lottiefiles.com/free-animation/fire-flame-4De5RVVPag
             - slightly bigger one: https://lottiefiles.com/free-animation/fire-IuJfcIXKF1

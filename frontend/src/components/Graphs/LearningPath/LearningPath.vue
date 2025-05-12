@@ -1,6 +1,15 @@
 <template>
     <div class="fixed left-8 right-8 top-0 bottom-0 overflow-hidden">
 
+
+        <!-- Settings Button -->
+        <!-- @click="toggleSettings" -->
+        <button @click="goToLeaderboard"
+            class="fixed top-20 right-36 bg-black/30 backdrop-blur-sm shadow-md rounded-full p-4 hover:bg-black/40 z-10"
+            style="color: var(--highlight-color);">
+            <ChartBarIcon class="w-12 h-12" />
+        </button>
+
         <!-- Settings Button -->
         <button v-if="canModify" @click="toggleSettings"
             class="fixed top-20 right-6 bg-black/30 backdrop-blur-sm shadow-md rounded-full p-4 hover:bg-black/40 z-10"
@@ -382,8 +391,9 @@ import {
     DocumentIcon,
     XCircleIcon,
     ChevronDoubleLeftIcon,
-    ChevronDoubleRightIcon
-} from '@heroicons/vue/24/solid'
+    ChevronDoubleRightIcon,
+    ChartBarIcon
+} from '@heroicons/vue/24/solid';
 import { useGameStore } from '@/store/gameStore'
 import { useRouter } from 'vue-router';
 import axios from 'axios';
@@ -483,6 +493,11 @@ const scrollToEnd = () => {
 
 function toggleSettings() {
     showSettingsModal.value = !showSettingsModal.value
+}
+
+function goToLeaderboard() {
+    console.log(props.libraryId)
+    router.push(`/lessons/${props.libraryId}/leaderboard`)
 }
 
 // Get color for a unit based on its index
