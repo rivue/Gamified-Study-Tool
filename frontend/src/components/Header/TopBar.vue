@@ -6,8 +6,13 @@
         <div class="menu-buttons">
             <div v-if="loggedIn" class="streak-container">
                 <div class="streak-wrapper">
-                    <img class="logo" src="../../../dist/img/fireicon.png" alt="Logo"
-                        style="max-height: 24px; pointer-events: none;" />
+                    <img class="logo" 
+                         :src="currentStreak >= 100 ? '../../../dist/img/goldicon.png' 
+                              : currentStreak >= 50 ? '../../../dist/img/fireicon.png' 
+                              : currentStreak >= 10 ? '../../../dist/img/iceicon.png' 
+                              : '../../../dist/img/defaulticon.png'" 
+                         alt="Logo"
+                         style="max-height: 24px; pointer-events: none;" />
                     <span class="streak-count">{{ currentStreak }}</span>
                 </div>
                 <div class="streak-dropdown rounded-2xl">

@@ -79,18 +79,7 @@ TODO list:
         - Add "edit mode" for library creator - would allow them to delete sections / units / courses and also add sections / units and would keep editing isolated from actually playing the course
         - ✅ ⭐️ Finish sections + units
             - ⭐️ Add ability to add each section to each unit (later --> come back to, reminder to make it account for 1-n number of sections no matter how that looks. add new stepping stones button is commented out for now)
-            
-                5) fix scroll buttons overlapping units for different sized screens --> and make scroll buttons the right height no matter the size of the screen
-                7) add logic for multiple flame emojis w/ streaks of 1, 5, 10, 25, 50, 100
-                        - could be for a smaller one: https://lottiefiles.com/free-animation/fire-flame-4De5RVVPag
-                        - slightly bigger one: https://lottiefiles.com/free-animation/fire-IuJfcIXKF1
-                        - maybe for 50 or 100, this whisks accross the little hover menu?: https://lottiefiles.com/free-animation/dancing-fire-CtzldMIEf9
-                        - maybe for smaller one like 5-10: https://lottiefiles.com/free-animation/fire-TLLDXwQuCQ
-                        - do this a little later
-                14) fix null thing
-                    - what is this?
-                see 16) below for leaderboard
-
+s
             - ⭐️ third idea) for course owner, add an "edit" button and "delete / trash can" button when you hover over the course or click it or something, maybe add an "edit mode" in the main bar thing I'm going to add?
         - ⭐️ (would like to implement visibility of different courses first or at least a many:one for non-owners in library model)
             - ⭐️ Delete sections requires entering the name of the unit / course just for accidental reasons)
@@ -175,7 +164,12 @@ TODO list:
 
     general:
     study tool additions / ideas:
-        
+        7) add logic for multiple flame emojis w/ streaks of 1, 5, 10, 25, 50, 100
+            - could be for a smaller one: https://lottiefiles.com/free-animation/fire-flame-4De5RVVPag
+            - slightly bigger one: https://lottiefiles.com/free-animation/fire-IuJfcIXKF1
+            - maybe for 50 or 100, this whisks accross the little hover menu?: https://lottiefiles.com/free-animation/dancing-fire-CtzldMIEf9
+            - maybe for smaller one like 5-10: https://lottiefiles.com/free-animation/fire-TLLDXwQuCQ
+            - do this a little later
         - small idea for later (maybe): when you mouse over the unit name in learning path, it hovers a little bit, highlights white or --text-color, and displays above any names it is over
         - massive reorg / cleaning - get rid of unused functions / db models, commands / db calls / api calls / frontend components and rearrange existing ones using files structures / Blueprints that make sense
         - big idea: for multiplayer, make a way for people to join a "call" like discord, but with like a host maybe, so they have mini-games just like jack in the box where you have a host judge, or maybe the other players or ai judges the players responses. the games would be very high in retrieval so players really burn in the studying, like playeres could be given a prompt from something from their studying or notes or courses like "photosynthesis" and the user would have to construct a concept map using bubbles and lines and would name them accordingly to see how deeply they can remember a topic, then everyone would rate and compare responses. the level deeper then that would be if people would describe each bubble word in a sentance / essay form, obviously there could be more retrieval based games but this is just a start

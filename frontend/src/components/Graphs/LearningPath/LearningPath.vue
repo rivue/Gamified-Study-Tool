@@ -1,35 +1,6 @@
 <template>
     <div class="fixed left-8 right-8 top-0 bottom-0 overflow-hidden">
 
-        <!-- Double‐left chevron: hide once we’ve scrolled past a bit -->
-        <button v-if="scrollPosition > 300" @click="scrollToStart(); $nextTick(() => handleScroll())" class="fixed left-16 bottom-72 translate-y-1/2 bg-black/30 backdrop-blur-sm shadow-md rounded-full p-4 hover:bg-black/40 z-15
-                         flex items-center gap-2" style="color: var(--highlight-color);">
-            <ChevronDoubleLeftIcon class="w-6 h-6" />
-            <span>To Start</span>
-        </button>
-
-        <!-- Double‐right chevron -->
-        <button v-if="scrollPosition < (maxLeft - 300)" @click="scrollToEnd(); $nextTick(() => handleScroll())" class="fixed right-16 bottom-72 translate-y-1/2 bg-black/30 backdrop-blur-sm shadow-md rounded-full p-4 hover:bg-black/40 z-15
-                         flex items-center gap-2" style="color: var(--highlight-color);">
-            <span>To End</span>
-            <ChevronDoubleRightIcon class="w-6 h-6" />
-        </button>
-
-        <!-- Single‐left chevron -->
-        <button v-if="scrollPosition > 300" @click="scroll('left'); $nextTick(() => handleScroll())"
-            class="fixed left-16 top-64 +translate-y-1/4 bg-black/30 backdrop-blur-sm shadow-md rounded-full p-4 hover:bg-black/40 z-15"
-            style="color: var(--highlight-color);">
-            <ChevronLeftIcon class="w-6 h-6" />
-        </button>
-
-        <!-- Single‐right chevron -->
-        <button v-if="scrollPosition < (maxLeft - 300)" @click="scroll('right'); $nextTick(() => handleScroll())"
-            class="fixed right-16 top-64 +translate-y-1/4 bg-black/30 backdrop-blur-sm shadow-md rounded-full p-4 hover:bg-black/40 z-15"
-            style="color: var(--highlight-color);">
-            <ChevronRightIcon class="w-6 h-6" />
-        </button>
-
-
         <!-- Settings Button -->
         <button v-if="canModify" @click="toggleSettings"
             class="fixed top-20 right-6 bg-black/30 backdrop-blur-sm shadow-md rounded-full p-4 hover:bg-black/40 z-10"
@@ -37,95 +8,97 @@
             <CogIcon class="w-12 h-12" />
         </button>
 
-        <div ref="scrollContainer"
-            class="scrollContainer w-full h-full overflow-x-auto overflow-y-hidden cursor-grab active:cursor-grabbing"
-            @mousedown="startDragging" @mousemove="drag" @mouseup="stopDragging" @mouseleave="stopDragging"
-            @touchstart="startDragging" @touchmove="drag" @touchend="stopDragging" @scroll="handleScroll">
-            <div class="flex items-center gap-24 min-h-screen py-24 relative">
+        <div class="relative flex flex-col w-full h-full">
 
-                <!-- Left padding so first node is visible -->
-                <div class="w-24 flex-shrink-0"></div>
+            <div ref="scrollContainer"
+                class="scrollContainer flex-1 overflow-x-auto overflow-y-hidden cursor-grab active:cursor-grabbing"
+                @mousedown="startDragging" @mousemove="drag" @mouseup="stopDragging" @mouseleave="stopDragging"
+                @touchstart="startDragging" @touchmove="drag" @touchend="stopDragging" @scroll="handleScroll">
+                <div class="flex items-center gap-24 min-h-screen py-24 relative">
 
-                <!-- Add Unit at the beginning -->
-                <AddUnit :library-id="libraryId" :position="0" :existing-units="Object.keys(rawUnitData)"
-                    :can-add-unit="canModify" @unit-added="handleUnitAdded" />
+                    <!-- Left padding so first node is visible -->
+                    <div class="w-24 flex-shrink-0"></div>
 
-                <!-- Unit Headers -->
-                <template v-for="([unit], unitName, unitIndex) in rawUnitData" :key="unitIndex">
-                    <div class="relative -mx-12 my-12 px-12 pt-40 pb-36 border-t-2 border-b-2 flex-shrink-0"
-                        :class="['unit-box', { 'unit--first': unitIndex === 0, 'unit--last': unitIndex === Object.keys(rawUnitData).length - 1 }]"
-                        :style="{
-                            borderColor: getUnitColor(unitIndex),
-                            backgroundColor: 'var(--background-color-1t)',
-                        }">
+                    <!-- Add Unit at the beginning -->
+                    <AddUnit :library-id="libraryId" :position="0" :existing-units="Object.keys(rawUnitData)"
+                        :can-add-unit="canModify" @unit-added="handleUnitAdded" />
 
-                        <!-- Unit name header -->
-                        <div class="absolute -top-5 left-1/2 transform -translate-x-1/2 px-6 py-2 rounded-lg font-bold text-xl whitespace-nowrap shadow-md z-10"
-                            :style="{ backgroundColor: getUnitColor(unitIndex), color: 'var(--light-text)' }">
-                            {{ unitName }}
-                        </div>
+                    <!-- Unit Headers -->
+                    <template v-for="([unit], unitName, unitIndex) in rawUnitData" :key="unitIndex">
+                        <div class="relative -mx-12 my-12 px-12 pt-40 pb-36 border-t-2 border-b-2 flex-shrink-0"
+                            :class="['unit-box', { 'unit--first': unitIndex === 0, 'unit--last': unitIndex === Object.keys(rawUnitData).length - 1 }]"
+                            :style="{
+                                borderColor: getUnitColor(unitIndex),
+                                backgroundColor: 'var(--background-color-1t)',
+                            }">
 
-                        <!-- Sections container -->
-                        <div class="flex items-center gap-24">
-                            <template v-if="rawUnitData[unitName].length > 0"
-                                v-for="([sectionId, sectionName], sectionIndex) in rawUnitData[unitName]"
-                                :key="sectionIndex">
-                                <div class="relative flex-shrink-0" :style="{
-                                    transform: `translateY(${getNodeOffset(getGlobalSectionIndex(unitIndex, sectionIndex))}px)`
-                                }" @click="handleNodeClick(sectionId)">
-                                    <!-- THIS IS THE KEY CHANGE: Moved the tooltip outside the group element that controls hovering -->
-                                    <!-- Tooltip -->
-                                    <div v-if="selectedRoomId && selectedRoomId === sectionId"
-                                        class="absolute -top-32 left-1/2 -translate-x-1/2 w-64 z-50" @mouseenter.stop
-                                        @mouseover.stop>
-                                        <div class="relative" style="pointer-events: auto;">
-                                            <!-- Red close button in top-right -->
-                                            <div @click.stop="selectedRoomId = null"
-                                                class="absolute -top-3 -right-3 w-8 h-8 rounded-full flex items-center justify-center cursor-pointer"
-                                                style="background-color: red;">
-                                                <XMarkIcon class="w-4 h-4" style="color: var(--light-text);" />
-                                            </div>
-                                            <!-- Main tooltip content -->
-                                            <div class="rounded-2xl p-4 shadow-lg"
-                                                style="background-color: var(--element-color-1); color: var(--light-text);">
-                                                <div class="font-medium mb-3">{{ sectionName }}
-                                                    <br>
-                                                    <span
-                                                        v-if="getRoomData(sectionId) && getRoomData(sectionId).lesson_state <= getRoomData(sectionId).num_lessons">
-                                                        lesson {{ getRoomData(sectionId).lesson_state }} / {{
-                                                            getRoomData(sectionId).num_lessons }}
-                                                    </span>
+                            <!-- Unit name header -->
+                            <div class="absolute -top-5 left-1/2 transform -translate-x-1/2 px-6 py-2 rounded-lg font-bold text-xl whitespace-nowrap shadow-md z-10"
+                                :style="{ backgroundColor: getUnitColor(unitIndex), color: 'var(--light-text)' }">
+                                {{ unitName }}
+                            </div>
+
+                            <!-- Sections container -->
+                            <div class="flex items-center gap-24">
+                                <template v-if="rawUnitData[unitName].length > 0"
+                                    v-for="([sectionId, sectionName], sectionIndex) in rawUnitData[unitName]"
+                                    :key="sectionIndex">
+                                    <div class="relative flex-shrink-0" :style="{
+                                        transform: `translateY(${getNodeOffset(getGlobalSectionIndex(unitIndex, sectionIndex))}px)`
+                                    }" @click="handleNodeClick(sectionId)">
+                                        <!-- THIS IS THE KEY CHANGE: Moved the tooltip outside the group element that controls hovering -->
+                                        <!-- Tooltip -->
+                                        <div v-if="selectedRoomId && selectedRoomId === sectionId"
+                                            class="absolute -top-32 left-1/2 -translate-x-1/2 w-64 z-50"
+                                            @mouseenter.stop @mouseover.stop>
+                                            <div class="relative" style="pointer-events: auto;">
+                                                <!-- Red close button in top-right -->
+                                                <div @click.stop="selectedRoomId = null"
+                                                    class="absolute -top-3 -right-3 w-8 h-8 rounded-full flex items-center justify-center cursor-pointer"
+                                                    style="background-color: red;">
+                                                    <XMarkIcon class="w-4 h-4" style="color: var(--light-text);" />
                                                 </div>
-                                                <div class="relative">
-                                                    <!-- Shadow element (bottom layer) -->
-                                                    <div class="absolute inset-0 rounded-xl"
-                                                        style="background-color: rgba(0,0,0,0.2); transform: translateY(4px);">
-                                                    </div>
-
-                                                    <!-- Button element (top layer) -->
-                                                    <button @click.stop="startLesson(sectionName, sectionId)"
-                                                        class="relative w-full rounded-xl py-2 px-4 font-medium flex items-center justify-center gap-2 transition-transform duration-200 hover:translate-y-1"
-                                                        style="background-color: var(--light-text); color: var(--element-color-1);">
+                                                <!-- Main tooltip content -->
+                                                <div class="rounded-2xl p-4 shadow-lg"
+                                                    style="background-color: var(--element-color-1); color: var(--light-text);">
+                                                    <div class="font-medium mb-3">{{ sectionName }}
+                                                        <br>
                                                         <span
                                                             v-if="getRoomData(sectionId) && getRoomData(sectionId).lesson_state <= getRoomData(sectionId).num_lessons">
-                                                            PLAY
+                                                            lesson {{ getRoomData(sectionId).lesson_state }} / {{
+                                                                getRoomData(sectionId).num_lessons }}
                                                         </span>
-                                                        <span v-else>
-                                                            REVIEW
-                                                        </span>
-                                                    </button>
-                                                </div>
-                                            </div>
-                                            <!-- Triangle pointer -->
-                                            <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 transform rotate-45"
-                                                style="background-color: var(--element-color-1);" />
-                                        </div>
-                                    </div>
+                                                    </div>
+                                                    <div class="relative">
+                                                        <!-- Shadow element (bottom layer) -->
+                                                        <div class="absolute inset-0 rounded-xl"
+                                                            style="background-color: rgba(0,0,0,0.2); transform: translateY(4px);">
+                                                        </div>
 
-                                    <!-- Icon button with hover group -->
-                                    <div class="group perspective-1000">
-                                        <!-- Main button container with enhanced 3D transforms -->
-                                        <div class="
+                                                        <!-- Button element (top layer) -->
+                                                        <button @click.stop="startLesson(sectionName, sectionId)"
+                                                            class="relative w-full rounded-xl py-2 px-4 font-medium flex items-center justify-center gap-2 transition-transform duration-200 hover:translate-y-1"
+                                                            style="background-color: var(--light-text); color: var(--element-color-1);">
+                                                            <span
+                                                                v-if="getRoomData(sectionId) && getRoomData(sectionId).lesson_state <= getRoomData(sectionId).num_lessons">
+                                                                PLAY
+                                                            </span>
+                                                            <span v-else>
+                                                                REVIEW
+                                                            </span>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <!-- Triangle pointer -->
+                                                <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 transform rotate-45"
+                                                    style="background-color: var(--element-color-1);" />
+                                            </div>
+                                        </div>
+
+                                        <!-- Icon button with hover group -->
+                                        <div class="group perspective-1000">
+                                            <!-- Main button container with enhanced 3D transforms -->
+                                            <div class="
                                             relative 
                                             transform-gpu 
                                             transition-all 
@@ -136,8 +109,8 @@
                                             group-active:scale-95
                                             group-active:translate-y-1
                                         ">
-                                            <!-- Enhanced shadow with depth -->
-                                            <div class="
+                                                <!-- Enhanced shadow with depth -->
+                                                <div class="
                                                     absolute 
                                                     inset-0 
                                                     rounded-full 
@@ -156,12 +129,12 @@
                                                     backgroundColor: getUnitColor(unitIndex),
                                                     transform: 'translateY(10px) scale(0.85)'
                                                 }">
-                                            </div>
+                                                </div>
 
-                                            <!-- Base and background elements -->
-                                            <div class="relative w-48 h-48">
-                                                <!-- Bottom layer for 3D effect (shadow/base) -->
-                                                <div class="
+                                                <!-- Base and background elements -->
+                                                <div class="relative w-48 h-48">
+                                                    <!-- Bottom layer for 3D effect (shadow/base) -->
+                                                    <div class="
                                                 absolute 
                                                 inset-0 
                                                 rounded-full 
@@ -172,10 +145,10 @@
                                                 group-hover:translate-y-4
                                                 group-active:translate-y-1
                                                 " :style="{ backgroundColor: getUnitColor(unitIndex) }">
-                                                </div>
+                                                    </div>
 
-                                                <!-- Main button background with subtle gradient -->
-                                                <div class="
+                                                    <!-- Main button background with subtle gradient -->
+                                                    <div class="
                                                         absolute 
                                                         inset-0 
                                                         rounded-full 
@@ -193,58 +166,90 @@
                                                             background: getUnitGradient(unitIndex)
                                                         }">
 
-                                                    <!-- Icon with enhanced transitions -->
-                                                    <component
-                                                        :is="getIconForIndex(getGlobalSectionIndex(unitIndex, sectionIndex))"
-                                                        class="
+                                                        <!-- Icon with enhanced transitions -->
+                                                        <component
+                                                            :is="getIconForIndex(getGlobalSectionIndex(unitIndex, sectionIndex))"
+                                                            class="
                                                             relative
                                                             w-24 
                                                             h-24 
                                                             duration-300 
                                                             drop-shadow-lg
                                                         " style="color: var(--light-text);" />
-                                                </div>
+                                                    </div>
 
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                            </template>
+                                </template>
 
-                            <template v-else>
-                                <div class="flex flex-col pt-10 pb-10 items-center justify-center p-6 min-w-64">
-                                    <div class="text-center mb-4 mt-2" style="color: var(--light-text);">
-                                        <p class="text-lg">No stepping stones yet</p>
-                                        <p class="text-sm opacity-75">Add stepping stones to get started</p>
-                                    </div>
-                                   <button @click="showAddNodeModal = true" 
-                                   disabled="true" 
-                                   class="flex items-center gap-2 px-4 py-2 rounded-lg transition-all 
+                                <template v-else>
+                                    <div class="flex flex-col pt-10 pb-10 items-center justify-center p-6 min-w-64">
+                                        <div class="text-center mb-4 mt-2" style="color: var(--light-text);">
+                                            <p class="text-lg">No stepping stones yet</p>
+                                            <p class="text-sm opacity-75">Add stepping stones to get started</p>
+                                        </div>
+                                        <button @click="showAddNodeModal = true" disabled="true" class="flex items-center gap-2 px-4 py-2 rounded-lg transition-all 
                                duration-200 hover:scale-105 active:scale-95" :style="{
                                 background: getUnitColor(unitIndex),
                                 color: 'var(--light-text)',
-                                
+
                             }">
-                                        <!-- <PlusIcon class="w-5 h-5" /> -->
-                                        <!-- <span>Add Stepping Stone</span> -->
-                                         <!-- TODO: un-disable button and uncomment out text, also add owner / not owner condition for showing this button or show a small modal / popup or something -->
-                                        <span>Can't add stepping stones yet - we're still building!</span>
+                                            <!-- <PlusIcon class="w-5 h-5" /> -->
+                                            <!-- <span>Add Stepping Stone</span> -->
+                                            <!-- TODO: un-disable button and uncomment out text, also add owner / not owner condition for showing this button or show a small modal / popup or something -->
+                                            <span>Can't add stepping stones yet - we're still building!</span>
 
-                                    </button>
-                                </div>
-                            </template>
+                                        </button>
+                                    </div>
+                                </template>
 
+                            </div>
                         </div>
-                    </div>
 
-                    <AddUnit :library-id="libraryId" :position="unitIndex + 1"
-                        :existing-units="Object.keys(rawUnitData)" :can-add-unit="canModify"
-                        @unit-added="handleUnitAdded" />
+                        <AddUnit :library-id="libraryId" :position="unitIndex + 1"
+                            :existing-units="Object.keys(rawUnitData)" :can-add-unit="canModify"
+                            @unit-added="handleUnitAdded" />
 
-                </template>
+                    </template>
 
-                <!-- Added right padding to ensure last nodes have space -->
-                <div class="p-16"></div>
+                    <!-- Added right padding to ensure last nodes have space -->
+                    <div class="p-16"></div>
+                </div>
+            </div>
+
+            <div class="flex justify-between mt-4 px-8 pb-32">
+
+                <!-- left side -->
+                <div class="flex gap-2 pointer-events-auto">
+                    <button v-if="scrollPosition > 300" @click="scrollToStart(); $nextTick(handleScroll)"
+                        class="p-4 rounded-full bg-black/30 backdrop-blur-sm hover:bg-black/40 shadow-md flex items-center gap-2"
+                        style="color: var(--highlight-color);">
+                        <ChevronDoubleLeftIcon class="w-6 h-6" />
+                        <span class="mx-1">To Start</span>
+                    </button>
+                    <button v-if="scrollPosition > 300" @click="scroll('left'); $nextTick(handleScroll)"
+                        class="p-4 rounded-full bg-black/30 backdrop-blur-sm hover:bg-black/40 shadow-md flex items-center gap-2"
+                        style="color: var(--highlight-color);">
+                        <ChevronLeftIcon class="w-6 h-6" />
+                    </button>
+                </div>
+
+                <!-- right side -->
+                <div class="flex gap-2 pointer-events-auto">
+                    <button v-if="scrollPosition < (maxLeft - 300)" @click="scroll('right'); $nextTick(handleScroll)"
+                        class="p-4 rounded-full bg-black/30 backdrop-blur-sm hover:bg-black/40 shadow-md"
+                        style="color: var(--highlight-color);">
+                        <ChevronRightIcon class="w-6 h-6" />
+                    </button>
+                    <button v-if="scrollPosition < (maxLeft - 300)" @click="scrollToEnd(); $nextTick(handleScroll)"
+                        class="p-4 rounded-full bg-black/30 backdrop-blur-sm hover:bg-black/40 shadow-md flex items-center gap-2"
+                        style="color: var(--highlight-color);">
+                        <span>To End</span>
+                        <ChevronDoubleRightIcon class="w-6 h-6" />
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -280,7 +285,7 @@
                                 style="color: var(--color-primary-light);">
                                 <!-- {{ nodeNameErrors }} -->
                                 <span v-for="(error, index) in nodeNameErrors" :key="index">{{ error
-                                    }}<br></span>
+                                }}<br></span>
                             </p>
                         </div>
                         <button @click="addNodeNameField" class="mt-2 text-sm font-medium flex items-center gap-1"
