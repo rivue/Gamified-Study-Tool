@@ -140,7 +140,6 @@ TODO list:
         - ⭐️ users SHOULD be able to create libraries with duplicate names because of how generic some courses can be (philosophy, biology, math, calculus, etc...)
         - ⭐️ add page after you finish a game session, but make it have confetti / small animation or something
         - ⭐️ handle weird thing in production where new library code displays null for like half a second, just make it look good basically
-        - ⭐️ fix weird loading... thing that appears on the top left corner
         - ⭐️ make redirect smooth, like make it not show other pages or whatever (use repomix + gpt)
         - ⭐️ change create library to use Zod and add the following error messages: (check claude)
             - ⭐️ error messages in create library look bad

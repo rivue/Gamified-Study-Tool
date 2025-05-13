@@ -1,8 +1,5 @@
 <!-- App.vue -->
 <template>
-    <div v-if="isLoading">
-        <LoadingComponent/>
-    </div>
     <div class="app-container" :class="themeClass">
         <div v-if="!hideHeaderFooter">
             <TopBar />
