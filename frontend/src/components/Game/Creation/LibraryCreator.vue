@@ -10,7 +10,7 @@
                         <div class="libgen-title">Course name</div>
                         <div class="title-bar">
                             <input type="text" id="topicInput" ref="topicInput" v-model="topic"
-                                :class="{ 'input-error': topicError || topicTypingError || topicSpaceError }"
+                                :class="{ 'input-error': topicError || topicTypingError }"
                                 placeholder="Mrs. Frizzle's science class, Biology 272, etc..." maxlength="100" @focus="selectInputText"
                                 @paste="handlePaste" />
                         </div>
@@ -19,9 +19,6 @@
                         </div>
                         <div v-if="topicTypingError" class="error-message">
                             Topic can only have spaces or letters and must be between 4 and 25 characters long.
-                        </div>
-                        <div v-if="topicSpaceError" class="error-message">
-                            Topic must not start or end with a space.
                         </div>
                     </div>
                 </div>
@@ -101,7 +98,7 @@
                                         <div class="section-input-wrapper">
                                             <input type="text" v-model="group.newSectionName"
                                                 placeholder="Mitosis, Derivative Rule, etc..."
-                                                :class="{ 'input-error': groupNoSectionErrors[groupIndex] || groupSectionNamingErrors[groupIndex] }"
+                                                :class="{ 'input-error': groupNoSectionErrors[groupIndex] || groupSectionNamingErrors[groupIndex] || duplicateGroupError[groupIndex] }"
                                                 maxlength="40" :disabled="group.sections.length >= 15 || disableExtras"
                                                 @keyup.enter="addSection(groupIndex)" />
                                             <button class="add-btn" @click="addSection(groupIndex)"
@@ -114,6 +111,10 @@
                                                 Every Unit must have at least one section
                                             </div>
                                             <div v-if="groupSectionNamingErrors[groupIndex]" class="error-message">
+                                                Section names must only have letters or spaces and must be between 4 and 25
+                                                characters long.
+                                            </div>
+                                            <div v-if="duplicateGroupError[groupIndex]" class="error-message">
                                                 Section names must only have letters or spaces and must be between 4 and 25
                                                 characters long.
                                             </div>
@@ -203,6 +204,7 @@ const popupStore = usePopupStore();
 const groups = ref<Group[]>([]);
 const groupNoSectionErrors = ref<boolean[]>([])
 const groupSectionNamingErrors = ref<boolean[]>([])
+const duplicateGroupError = ref<boolean[]>([])
 const newGroupName = ref("");
 const groupError = ref(false);
 const groupTypingError = ref(false);
@@ -212,16 +214,9 @@ const groupEmptyError = ref(false);
 watch(
     () => groups.value.length,
     (len) => {
-        groupNoSectionErrors.value = Array(len).fill(false)
-    },
-    { immediate: true }
-)
-
-watch(
-    () => groups.value.length,
-    (len) => {
         groupNoSectionErrors.value = Array(len).fill(false);
         groupSectionNamingErrors.value = Array(len).fill(false);
+        duplicateGroupError.value = Array(len).fill(false);
     },
     { immediate: true }
 );
@@ -289,6 +284,16 @@ const addGroup = () => {
         groupSpaceError.value = trimmedName[0] === " " || trimmedName[trimmedName.length - 1] === " ";
 
         if (groupSpaceError.value) {
+            return;
+        }
+
+        const existingGroup = groups.value.find(group => 
+            group.name.toLowerCase() === trimmedName.toLowerCase()
+        );
+
+        if (existingGroup) {
+            groupSpaceError.value = true;
+            popupStore.showPopup("This unit name already exists. Please use a different name.");
             return;
         }
 
@@ -419,22 +424,18 @@ const hasErrors = (): boolean => {
 
     buttonDisabled.value.isSubmitting = true;
 
-    if (topic.value.trim() === "") {
+    // no topic
+    if (topic.value === "") {
         topicError.value = true;
         return true;
     }
 
-    topicError.value = false;
+    topic.value = topic.value.trim();
 
     topicTypingError.value = 
     topic.value.length < 4 || topic.value.length > 25;
 
     if (topicTypingError.value) {
-        return true;
-    }
-
-    topicSpaceError.value = topic.value[0] === " " || topic.value[topic.value.length - 1] === " ";
-    if (topicSpaceError.value) {
         return true;
     }
 
@@ -472,12 +473,32 @@ const hasErrors = (): boolean => {
             return true;
         }
 
-
         for (const section of group.sections) {
             if (section.trim() === "" || 
                 section[0] === " " || section[section.length - 1] === " ") {
                 return true;
             }
+        }
+    }
+
+    const groupNames = groups.value.map(group => group.name.toLowerCase());
+    const hasDuplicateGroups = groupNames.length !== new Set(groupNames).size;
+
+    
+    if (hasDuplicateGroups) {
+        groupError.value = true; // TODO come back to
+        popupStore.showPopup("Duplicate unit names are not allowed."); // TODO come back to
+        return true;
+    }
+
+    for (let i = 0; i < groups.value.length; i++) {
+        const sectionNames = groups.value[i].sections.map(section => section.toLowerCase());
+        const hasDuplicateSections = sectionNames.length !== new Set(sectionNames).size;
+    
+        if (hasDuplicateSections) {
+            duplicateGroupError.value[i] = true;
+            popupStore.showPopup("Duplicate section names are not allowed within a unit.");
+            return true;
         }
     }
 
@@ -634,7 +655,7 @@ onUnmounted(() => {
 
 
 .error-message {
-    color: red;
+    color: lightcoral;
     font-size: 1em;
     margin-top: 0.5em;
 }

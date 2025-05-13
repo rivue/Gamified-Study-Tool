@@ -102,6 +102,7 @@ TODO list:
                 - ⭐️ explore adding "scroll to current" on map page (last unlocked node)
                 - also, maybe change it to vertical
                 - ⭐️ add ability to leave libraries (later)
+                - ⭐️ move dropdown menu to left + make dropdown menu permanant, replace w/ profile picture --> hover menu for to see profile settings or something
                 - ⭐️ all the other routes and stuff (terms & policies, buying subscription, can't think of others?)
             - add ui ability to "join" private libraries / public libraries that you didn't create maybe in like a seperate page or list or maybe I could add a box for putting in library codes or something
             - ⭐️ after user submits something and is waiting, display a loading bar or wheel or different rotating facts (maybe relevant to the library?) letting the user know that it is generating
@@ -136,17 +137,14 @@ TODO list:
         easy (same as medium):
 
         - ⭐️ fix Aryan's problem with viewing it on his phone
-        - ⭐️ should not be able to make duplicate section names within a library, so check before they create it
         - ⭐️ users SHOULD be able to create libraries with duplicate names because of how generic some courses can be (philosophy, biology, math, calculus, etc...)
-        - ⭐️ error messages in create library look bad
         - ⭐️ add page after you finish a game session, but make it have confetti / small animation or something
-        - ⭐️ make sure the background of the site is the color you want if you scroll to far (like in main page if you scroll too far down) (right now its white which is not good)
         - ⭐️ handle weird thing in production where new library code displays null for like half a second, just make it look good basically
-        - ⭐️ move dropdown menu to left + make dropdown menu permanant, replace w/ profile picture --> hover menu for settings pageor something
         - ⭐️ fix weird loading... thing that appears on the top left corner
         - ⭐️ make redirect smooth, like make it not show other pages or whatever (use repomix + gpt)
-        - leaderboard
-            - for leaderboard, make sure only members of the library can access it, else redirect somewhere else
+        - ⭐️ change create library to use Zod and add the following error messages: (check claude)
+            - ⭐️ error messages in create library look bad
+            - ⭐️ should not be able to make duplicate section names within a library, so check before they create it
 
     OTHER PAGES:
         - terms and policies page
