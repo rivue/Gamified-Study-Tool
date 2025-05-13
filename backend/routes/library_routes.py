@@ -283,6 +283,7 @@ def init_library_routes(app):
                 return jsonify(status="error", message="Failed to retrieve library data"), 500
             
             members = lbh.get_library_scores(library_id).get_json()
+            print(members)
               
             return jsonify(status="success", members=members)
 

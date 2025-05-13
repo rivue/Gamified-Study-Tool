@@ -97,11 +97,12 @@ def create_library_favorite(
         db.session.rollback()
         return jsonify({"message": str(e)}), 400
     
-def create_unit_and_add(library_id, unit_name, position=None):
+def create_unit_and_add(library_id, unit_name, position=-1):
     try:
         unit = LibraryUnit(
             library_id=library_id,
-            unit_name=unit_name
+            unit_name=unit_name,
+            position=position # use -1 for placeholder since it doesn't allow None
         )
 
         library = Library.query.get(library_id)
@@ -116,7 +117,7 @@ def create_unit_and_add(library_id, unit_name, position=None):
             print("not unit")
             return jsonify({"error": "Library or Unit not found"}), 404
 
-        if position is not None:
+        if position is not -1:
             library.attach_unit(unit, position)
         else:
             library.attach_unit(unit)
@@ -206,16 +207,6 @@ def get_library(library_id, user_id=None, click=True):
                 unit_to_section_map[unit.unit_name].append((section.id, section.section_name))
                     
         library_data["room_names"] = room_names
-
-        existing_completion = LibraryCompletion.query.filter_by(library_id=library_id, user_id=user_id).first()
-        if existing_completion:
-            library_data["score"] = existing_completion.score
-            library_data["best_time"] = existing_completion.time
-            library_data["completion"] = len(existing_completion.completed_rooms.split(","))*4
-        any_completion = LibraryCompletion.query.filter_by(user_id=user_id, is_complete=True).first()
-
-        if any_completion:
-            library_data["tutorial"] = False
 
     library_data["clicks"] = library.clicks
     library_data["section_to_unit_map"] = section_to_unit_map
@@ -328,10 +319,11 @@ def save_library_room_contents(library_id, section_unit_map, section_contents_ma
                     # 3) add room states
                     add_section_user_state(user_id, library_id, section_id, num_lessons)
                     print("add section user state error")
+                    
                     if "factoids" not in section_contents_map[section]:
                         print(f"Warning: No factoids for section '{section}'")
                         continue
-                    print(" some error")
+                    
                     print(f"Processing section: {section}")
                     print(f"Section content structure: {type(section_contents_map[section])}")
                     print(f"Keys in section content: {section_contents_map[section].keys()}")

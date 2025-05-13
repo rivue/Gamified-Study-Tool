@@ -105,6 +105,8 @@ TODO list:
             - note: for main page, add two / 3 simple boxes, class you want, school, and possibly professor, and it gives you classes close to you like quizlet / rate my professor along with option for creating your own
                 maybe it shows private ones with a "lock" icon and prompts you to enter a password. this way it would be like more of a network, which would differentiate us from a copy paste ai study tool (turbolearn) / NotebookLM
         
+        glitches / things
+            - why is public generating a code on library creation? 
 
         hard probably (goal: 2 high level bullet points / wk):
         - ⭐️ remove alert message in library creator (not hard but have to remember)
@@ -146,6 +148,7 @@ TODO list:
         - ⭐️ change create library to use Zod and add the following error messages: (check claude)
             - ⭐️ error messages in create library look bad
             - ⭐️ should not be able to make duplicate section names within a library, so check before they create it
+        
 
     OTHER PAGES:
         - terms and policies page

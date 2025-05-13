@@ -260,7 +260,6 @@ class Library(db.Model):
             if not isinstance(unit, LibraryUnit):
                 raise ValueError("unit must be an instance of LibraryUnit")
             
-            unit.library_id = self.id
 
             with db.session.no_autoflush:
             
@@ -291,6 +290,8 @@ class Library(db.Model):
                     # Make sure the unit is added to the session if it's not already
                     db.session.add(unit)
                         
+            unit.library_id = self.id # attach after position is set
+
             return unit
         
         except SQLAlchemyError as e:
