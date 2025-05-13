@@ -74,19 +74,13 @@ TODO list:
 
     LAUNCH LIST: goal: July 6th then start working on social media posts
 
-        hard probably (goal: 2 high level bullet points / wk):
-        - ⭐️ remove alert message in library creator (not hard but have to remember)
 
-        - ⭐️ Add "edit mode" for library creator - toggle for: delete sections / units / courses and also add sections / units and would keep editing isolated from actually playing the course
-        - ✅ ⭐️ Finish sections + units
-            - ⭐️ Add ability to add each section to each unit (later --> come back to, reminder to make it account for 1-n number of sections no matter how that looks. add new stepping stones button is commented out for now)
-            - ⭐️ third idea) for course owner, add an "edit" button and "delete / trash can" button when you hover over the course or click it or something, maybe add an "edit mode" in the main bar thing I'm going to add?
-        - ⭐️ (would like to implement visibility of different courses first or at least a many:one for non-owners in library model)
-            - ⭐️ Delete sections requires entering the name of the unit / course just for accidental reasons)
-            - ⭐️ Delete Units( requires entering the name of the unit / course just for accidental reasons)
-            - ⭐️ Delete courses / libraries (whatever they're called) (requires entering the name of the unit / course just for accidental reasons)
-            - ⭐️ Remember to delete from both DB and pinecone as well, as well as respective child / parent courses / units / sections / libraries, roomNameState, LibraryFavorites, question, question_choice, LibraryMembership, etc...
-        - ⭐️ (courses need ability to add multiple people first) leaderboard / game point tracking system (could be reworked later)
+        last / harder:
+
+          - ⭐️ Terms of use / Policy Page legal agreement thing
+            - ⭐️ There are probably websites and stuff for this --> do this before Stripe
+        - ⭐️ Stripe implementation
+            - have to think abt what different payment levels mean / how I want to do it
         - ⭐️ ⭐️ ⭐️ (might take at least a couple weeks) UI redesign / rehaul *** --> kinnu, duolingo, saved instagram design reels etc..
             - Note: 1) try to see what horizontal --> vertical learning path looks like, and possibly make a vertical bar on the side for settings, i-card, files list, adding a new stepping stone, etc... but maybe keep lesson name and current unit name at the top?
             - COPY QUIZLET???
@@ -110,8 +104,20 @@ TODO list:
             use this maybe: https://www.shadcn-vue.com/docs/components/stepper.html
             - note: for main page, add two / 3 simple boxes, class you want, school, and possibly professor, and it gives you classes close to you like quizlet / rate my professor along with option for creating your own
                 maybe it shows private ones with a "lock" icon and prompts you to enter a password. this way it would be like more of a network, which would differentiate us from a copy paste ai study tool (turbolearn) / NotebookLM
-        - ⭐️ Stripe implementation
-            - have to think abt what different payment levels mean / how I want to do it
+        
+
+        hard probably (goal: 2 high level bullet points / wk):
+        - ⭐️ remove alert message in library creator (not hard but have to remember)
+        - ⭐️ Add "edit mode" for library creator - toggle for: delete sections / units / courses and also add sections / units and would keep editing isolated from actually playing the course
+        - ✅ ⭐️ Finish sections + units
+            - ⭐️ Add ability to add each section to each unit (later --> come back to, reminder to make it account for 1-n number of sections no matter how that looks. add new stepping stones button is commented out for now)
+            - ⭐️ third idea) for course owner, add an "edit" button and "delete / trash can" button when you hover over the course or click it or something, maybe add an "edit mode" in the main bar thing I'm going to add?
+        - ⭐️ (would like to implement visibility of different courses first or at least a many:one for non-owners in library model)
+            - ⭐️ Delete sections requires entering the name of the unit / course just for accidental reasons)
+            - ⭐️ Delete Units( requires entering the name of the unit / course just for accidental reasons)
+            - ⭐️ Delete courses / libraries (whatever they're called) (requires entering the name of the unit / course just for accidental reasons)
+            - ⭐️ Remember to delete from both DB and pinecone as well, as well as respective child / parent courses / units / sections / libraries, roomNameState, LibraryFavorites, question, question_choice, LibraryMembership, etc...
+        - ⭐️ (courses need ability to add multiple people first) leaderboard / game point tracking system (could be reworked later)
         - ⭐️ add google auth
         - ⭐️ let units / sections / courses have duplicate values as others in db
         - ⭐️ add ability to see uploaded files in library (list of their names) and maybe even file preview (would require nosql db or something maybe)
@@ -119,11 +125,8 @@ TODO list:
         medium (chip away at when tired / mentally exhausted from hard ones):
         - implement game "score" logic (if you get >80% #attemps:number of questions ratio) then you get more / less points or something, etc...
             - ⭐️ add a user joined date so I can display "rivuer for 6 months, 19 days, 13 hours, 10 minutes, 5, 6, 7, etc... seconds"
-        - ⭐️ Terms of use / Policy Page legal agreement thing
-            - ⭐️ Look at websites and stuff for this
         - ⭐️ In creating a new library, add checkboxes for different types of modes (fill-in-the-blank, t/f, mcq, etc…)
             - maybe add it in settings for owner as well (enable / disable for future lesson content generation)
-
         - ⭐️ add some other types of games / questions (ex: true / false, very detailed / specific questions, sorting, compare / contrast, analogies, image based stuff (not sure how to implement) 6 options choose 1-6, etc... see list below)
         - ⭐️ add i-card for all users, maybe description about the library along with a preview of the files used in the library and maybe also users who are members of the library or something 
             - make description visible right below library card I think, maybe i card has more detail information, maybe when it was created or current owner or something
@@ -135,7 +138,6 @@ TODO list:
             - figure out if 1) what I do to migrate the database is safe (swapping uri string and running flask db ugprade) and 2) how I should do it if it is not ideal
         
         easy (same as medium):
-
         - ⭐️ fix Aryan's problem with viewing it on his phone
         - ⭐️ users SHOULD be able to create libraries with duplicate names because of how generic some courses can be (philosophy, biology, math, calculus, etc...)
         - ⭐️ add page after you finish a game session, but make it have confetti / small animation or something
