@@ -69,8 +69,9 @@
     /* Special Colors */
     --gold-color: rgba(255, 216, 4, 0.8);  /* Slightly transparent gold */
     
+
     /* Utility Colors */
-    --light-text: #f8fafc;
+    --light-text: #f8fafc; /* idk*/
     --light-highlight: #99f6e4;
     --black-back: #0a1f1f;
     
@@ -94,7 +95,7 @@
     --text-color-rgb: 14, 12, 20;
     --gold-color: #ffd804cc;
 
-    --light-text: #f0f8ff;
+    --light-text: #f0f8ff; 
     --light-highlight: #cea8fc;
     --black-back: #0e0c14;
 }

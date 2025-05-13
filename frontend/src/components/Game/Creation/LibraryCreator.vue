@@ -1,24 +1,24 @@
 <template>
-    <div class="library-gen-page">
+    <div class="library-gen-page p-8">
         <div class="form-container" @keydown.enter="handleSubmit">
             <!-- Topic Selection -->
             <div class="libgen-create p-16 br-4" style="border: 1px solid var(--text-color); border-radius: 5px;">
                 <h1 v-if="libgenRoute">Create a Course to Explore</h1>
                 <div class="libgen-section">
                     <div class="form-group topic-selection">
+
                         <div class="libgen-title">Course name</div>
                         <div class="title-bar">
                             <input type="text" id="topicInput" ref="topicInput" v-model="topic"
                                 :class="{ 'input-error': topicError || topicTypingError || topicSpaceError }"
-                                placeholder="What to learn about" maxlength="100" @focus="selectInputText"
+                                placeholder="Mrs. Frizzle's science class, Biology 272, etc..." maxlength="100" @focus="selectInputText"
                                 @paste="handlePaste" />
                         </div>
-                        <!-- Error Message -->
                         <div v-if="topicError" class="error-message">
                             Please enter a topic.
                         </div>
                         <div v-if="topicTypingError" class="error-message">
-                            Topic can only have spaces or letters and must be between 4 and 70 characters long.
+                            Topic can only have spaces or letters and must be between 4 and 25 characters long.
                         </div>
                         <div v-if="topicSpaceError" class="error-message">
                             Topic must not start or end with a space.
@@ -58,7 +58,7 @@
                             <div class="group-controls">
 
                                 <div class="group-input-wrapper">
-                                    <input type="text" v-model="newGroupName" placeholder="Enter unit/chapter name"
+                                    <input type="text" v-model="newGroupName" placeholder="Exam 1, Exam 2, etc..."
                                         :class="{ 'input-error': groupError || groupTypingError || groupSpaceError || groupEmptyError }"
                                         maxlength="40" :disabled="disableExtras" @keyup.enter="addGroup" />
                                     <button class="add-btn" @click="addGroup"
@@ -68,10 +68,8 @@
                                 </div>
                                 <div class="error-container">
                                     <div v-if="groupError" class="error-message">Please enter a valid unit name.</div>
-                                    <div v-if="groupTypingError" class="error-message">Unit name can only have spaces or
-                                        letters and must be at least 4 characters long.</div>
-                                    <div v-if="groupSpaceError" class="error-message">Unit name must not start or end
-                                        with a space.</div>
+                                    <div v-if="groupTypingError" class="error-message">Unit name must be between 4 and 25 characters long.</div>
+                                    <div v-if="groupSpaceError" class="error-message">Unit name must not start or end with a space.</div>
                                     <div v-if="groupEmptyError" class="error-message">Must have at least one Unit</div>
 
                                 </div>
@@ -102,7 +100,7 @@
                                         <!-- Section input for this group -->
                                         <div class="section-input-wrapper">
                                             <input type="text" v-model="group.newSectionName"
-                                                placeholder="Enter section name"
+                                                placeholder="Mitosis, Derivative Rule, etc..."
                                                 :class="{ 'input-error': groupNoSectionErrors[groupIndex] || groupSectionNamingErrors[groupIndex] }"
                                                 maxlength="40" :disabled="group.sections.length >= 15 || disableExtras"
                                                 @keyup.enter="addSection(groupIndex)" />
@@ -116,7 +114,7 @@
                                                 Every Unit must have at least one section
                                             </div>
                                             <div v-if="groupSectionNamingErrors[groupIndex]" class="error-message">
-                                                Section names must only have letters or spaces and must be at least 4
+                                                Section names must only have letters or spaces and must be between 4 and 25
                                                 characters long.
                                             </div>
                                         </div>
@@ -124,10 +122,6 @@
                                 </div>
                             </div>
 
-
-                            <div class="helper-text">
-                                🐙 Structure your course with units/chapters and sections for better organization.
-                            </div>
                             <div class="helper-text">
                                 🐙 You can create up to 10 units, with up to 15 sections each.
                             </div>
@@ -137,25 +131,23 @@
                         </div>
                     </div>
                 </div>
-               
+
                 <!-- Public/Private Toggle -->
                 <div class="libgen-section">
                     <div class="form-group visibility-toggle p-4">
-                        <div style="font-size:0.8em; opacity:0.7; display:flex; justify-content:center; align-items:center;" class="mb-2">Visibility</div>
+                        <div style="font-size:0.8em; opacity:0.7; display:flex; justify-content:center; align-items:center;"
+                            class="mb-2">Visibility</div>
                         <div class="flex items-center justify-center w-full mb-3">
                             <Tabs v-model="visibilityTab" class="w-full max-w-[400px]">
-                                <TabsList class="grid w-full grid-cols-2 p-1 py-0.5" style="background-color: rgba(var(--element-color-1-rgb), 0.5);">
-                                    <TabsTrigger 
-                                        value="private"
-                                        class="border-0 data-[state=inactive]:opacity-50 data-[state=active]:bg-[var(--element-color-1)] data-[state=active]:text-[var(--text-color)]"
-                                    >
+                                <TabsList class="grid w-full grid-cols-2 p-1 py-0.5"
+                                    style="background-color: rgba(var(--element-color-1-rgb), 0.5);">
+                                    <TabsTrigger value="private"
+                                        class="border-0 data-[state=inactive]:opacity-50 data-[state=active]:bg-[var(--element-color-1)] data-[state=active]:text-[var(--text-color)]">
                                         Private
                                     </TabsTrigger>
 
-                                    <TabsTrigger 
-                                        value="public"
-                                        class="border-0 data-[state=inactive]:opacity-50 data-[state=active]:bg-[var(--element-color-1)] data-[state=active]:text-[var(--text-color)]"
-                                        >
+                                    <TabsTrigger value="public"
+                                        class="border-0 data-[state=inactive]:opacity-50 data-[state=active]:bg-[var(--element-color-1)] data-[state=active]:text-[var(--text-color)]">
                                         Public
                                     </TabsTrigger>
                                 </TabsList>
@@ -187,13 +179,8 @@
 import { ref, watch, computed, onMounted, onUnmounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import axios from "axios";
-import { storeToRefs } from "pinia";
-import {
-    useTypingEffect,
-} from "@/scripts/placeholderTyping";
 
 
-import { useLibGenStore } from "@/store/libGenStore";
 import { usePopupStore } from "@/store/popupStore";
 import { useAuthStore } from "@/store/authStore";
 import CtaButton from "../../Footer/LandingPageComponents/CtaButton.vue";
@@ -210,7 +197,6 @@ interface Group {
 
 const route = useRoute();
 const router = useRouter();
-const libGenStore = useLibGenStore();
 const authStore = useAuthStore();
 const popupStore = usePopupStore();
 // New refs for groups
@@ -222,8 +208,6 @@ const groupError = ref(false);
 const groupTypingError = ref(false);
 const groupSpaceError = ref(false);
 const groupEmptyError = ref(false);
-
-const { topics } = storeToRefs(libGenStore);
 
 watch(
     () => groups.value.length,
@@ -264,10 +248,6 @@ const fileInput = ref<HTMLInputElement | null>(null);
 const visibilityTab = ref<'public' | 'private'>('public');
 const isPublic = computed<boolean>(() => visibilityTab.value === 'public');
 
-// Computed properties
-const computedTopics = computed(() => {
-    return topics.value.length > 0 ? topics.value : safeTopics.value;
-});
 
 const libgenRoute = computed(() => {
     return route.path === "/library";
@@ -299,7 +279,8 @@ const addGroup = () => {
     if (trimmedName && groups.value.length < 10) {
 
         groupError.value = false;
-        groupTypingError.value = !/^[a-zA-Z ]+$/.test(trimmedName) || trimmedName.length < 4;
+        groupTypingError.value =
+          trimmedName.length < 4 || trimmedName.length > 25;
 
         if (groupTypingError.value) {
             return;
@@ -345,7 +326,7 @@ const addSection = (groupIndex: number) => {
 
 
         // Validate section name
-        const typingError = !/^[a-zA-Z ]+$/.test(trimmedName) || trimmedName.length < 4;
+        const typingError =  trimmedName.length < 4 || trimmedName.length > 25;
         const spaceError = trimmedName[0] === " " || trimmedName[trimmedName.length - 1] === " ";
 
         if (typingError || spaceError) {
@@ -445,7 +426,8 @@ const hasErrors = (): boolean => {
 
     topicError.value = false;
 
-    topicTypingError.value = !/^[a-zA-Z ]+$/.test(topic.value) || topic.value.length < 4 || topic.value.length > 70;
+    topicTypingError.value = 
+    topic.value.length < 4 || topic.value.length > 25;
 
     if (topicTypingError.value) {
         return true;
@@ -460,7 +442,7 @@ const hasErrors = (): boolean => {
         /^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)$/;
     if (urlPattern.test(topic.value)) {
         popupStore.showPopup(
-            "We do not currently support links.</br>Try entering the topic of the website instead.</br>Note: This app can teach you about anything, but will not do your homework!"
+            "We do not currently support links as are currently still in development. If you would like this to be added, please contact us through the contact page or discord."
         );
         return true;
     }
@@ -492,7 +474,7 @@ const hasErrors = (): boolean => {
 
 
         for (const section of group.sections) {
-            if (section.trim() === "" || !/^[a-zA-Z ]+$/.test(section) ||
+            if (section.trim() === "" || 
                 section[0] === " " || section[section.length - 1] === " ") {
                 return true;
             }
@@ -577,13 +559,6 @@ const handleSubmit = () => {
 // Lifecycle hooks
 onMounted(() => {
     libraryDifficulty.value = "Normal";
-    if (computedTopics.value.length > 0 && topicInput.value) {
-        const { start, stop } = useTypingEffect(topicInput.value, computedTopics.value);
-        typingEffectStop.value = stop; // Store the stop function
-        start();
-    } else {
-        //console.log("never started");
-    }
 });
 
 
@@ -594,7 +569,7 @@ onUnmounted(() => {
 
 
 <style scoped>
-.library-gen-page {
+ .library-gen-page {
     display: flex;
     justify-content: flex-start;
     /* Align content at the top */
@@ -674,7 +649,7 @@ onUnmounted(() => {
 
 input[type="text"]::placeholder {
     color: var(--text-color);
-
+    opacity: 0.65;
 }
 
 

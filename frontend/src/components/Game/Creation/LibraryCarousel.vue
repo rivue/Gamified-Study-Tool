@@ -1,5 +1,5 @@
 <template>
-    <div class="library-list p-16">
+    <div class="library-list px-16 py-12">
         <div class="list-header">
             <h1>My Courses</h1>
         </div>
@@ -7,36 +7,39 @@
             class="mb-4 text-lg bg-transparent border-[1px] border-solid border-[var(--text-color)] rounded-[4px] placeholder-[var(--text-color)] text-[var(--text-color)]"
             type="text" v-model="searchQuery" @input="filterLibraries" @keydown="handleSearchKeydown"
             placeholder="Search courses..." />
-        <div
-            class="missing-courses-notice p-4 mb-4 border-[1px] border-solid border-[var(--text-color)] rounded-[4px] bg-[var(--background-color-2t)]">
-            <p class="text-[var(--text-color)]">
-                <strong>Missing courses?</strong> We're working fast to bring the best experience possible and might
+
+        <!-- TODO: REMOVE THIS BEFORE HARD LAUNCH!!! -->
+        <Alert
+            class="p-4 mb-4 border-[1px] border-solid border-[var(--text-color)] rounded-[4px] bg-[var(--background-color-2t)] text-[var(--text-color)]">
+            <AlertTitle class="text-xl font-bold mb-2">Missing Courses?</AlertTitle>
+            <AlertDescription class="text-base">
+                We're working fast to bring the best experience possible and might
                 have broken some things. If you made a course before April 28th, 2025, you may not be able to see your
                 course listed. We are still learning and will not do this again. Please feel free to generate another
                 course, we sincerely apologize for any inconvenience and aim to not do this again.
-            </p>
-        </div>
+            </AlertDescription>
+        </Alert>
         <!-- Conditional rendering based on library count -->
         <div v-if="libraries.length > 0" class="list-table">
             <Table>
                 <TableBody>
                     <template v-if="paginatedLibraries.length">
                         <TableRow v-for="library in paginatedLibraries" :key="library.id"
-                            class="cursor-pointer text-[var(--text-color)] hover:text-white hover:bg-[var(--element-color-1)] border-[1px] border-solid border-[var(--text-color)]"
+                            class="cursor-pointer text-[var(--text-color)] hover:text-white hover:bg-[var(--element-color-1)]"
                             @click="goToLibrary(library.id)">
-                            <TableCell>
-                                <button
-                                    @click.stop="updateFavoritedStatus(library.id, libraryFavoritesMap[library.id])"
+                            <div class="absolute inset-0 border-[1px] border-solid border-[var(--text-color)] rounded-lg pointer-events-none"></div>
+                            <TableCell class="w-16">
+                                <button @click.stop="updateFavoritedStatus(library.id, libraryFavoritesMap[library.id])"
                                     class="star-button flex items-center justify-center w-8 h-8 rounded-full hover:bg-[var(--background-color-2)]">
                                     <StarIcon v-if="libraryFavoritesMap[library.id] === true"
                                         class="text-yellow-500 hover:text-yellow-400" size="20" />
                                     <StarIcon v-else class="text-white-500 hover:text-yellow-300" size="20" />
                                 </button>
                             </TableCell>
-                            <TableCell class="text-xl text-center p-4">{{ library.library_topic }}</TableCell>
+                            <TableCell class="text-xl text-center p-4 w-full">{{ library.library_topic }}</TableCell>
                         </TableRow>
                     </template>
-                    <TableRow v-else>
+                    <TableRow v-else class="border-[1px] border-solid border-[var(--text-color)]">
                         <TableCell colspan="5" class="h-24 text-center text-xl">
                             No results
                         </TableCell>
@@ -79,6 +82,7 @@ import { useRouter } from "vue-router";
 import { Input } from "@/components/ui/input";
 import { StarIcon } from "@heroicons/vue/24/solid";
 import { Table, TableRow, TableBody, TableCell } from "@/components/ui/table";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import axios from "axios";
 // Props
 const props = defineProps<{
@@ -98,17 +102,17 @@ const libraryFavoritesMap = computed(() => props.libraryFavoritesMap);
 // Filtering function
 function filterLibraries() {
     let libraries = [...props.libraries];
-    
+
     // First, sort libraries so favorited ones appear first
     libraries.sort((a, b) => {
         const aFavorited = props.libraryFavoritesMap[a.id] === true;
         const bFavorited = props.libraryFavoritesMap[b.id] === true;
-        
+
         if (aFavorited && !bFavorited) return -1;
         if (!aFavorited && bFavorited) return 1;
         return 0;
     });
-    
+
     if (!searchQuery.value.trim()) {
         filteredLibraries.value = libraries;
     } else {
@@ -487,7 +491,6 @@ function goToPage(page: number) {
 
 
 .pagination {
-    padding: 16px;
     display: flex;
     justify-content: space-between;
     align-items: center;

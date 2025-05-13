@@ -1,9 +1,12 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
-from sqlalchemy import JSON
+from sqlalchemy import JSON, update
 from sqlalchemy.ext.mutable import MutableList
-from sqlalchemy.exc import IntegrityError
-from datetime import datetime
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
+from datetime import datetime, timedelta, date
+from zoneinfo import ZoneInfo
+import traceback
+import logging
 import secrets, string
 import hashlib
 import random
@@ -16,12 +19,13 @@ class User(db.Model, UserMixin):
     username = db.Column(db.String(50), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=True)
     email = db.Column(db.String(100), unique=True, nullable=False)
-    
-    mentor_name = db.Column(db.String(100), default='Azalea')
-    system_role = db.Column(db.String(100), default='')
-    profile = db.Column(db.Text, nullable=True)
-    ai_tutor_profile = db.Column(db.Text, nullable=True)
-    current_content = db.Column(db.String(500), nullable=True)
+    timezone = db.Column(db.String(50), default='UTC', nullable=False, server_default='UTC')
+
+    mentor_name = db.Column(db.String(100), default='Azalea') # TODO: not using
+    system_role = db.Column(db.String(100), default='') # TODO: not using
+    profile = db.Column(db.Text, nullable=True) # TODO: not using
+    ai_tutor_profile = db.Column(db.Text, nullable=True) # TODO: not using
+    current_content = db.Column(db.String(500), nullable=True) # TODO: not using
     
     experience_points = db.Column(db.Integer, default=0)
     achievements = db.relationship('UserAchievement', backref='user', cascade="all, delete-orphan")
@@ -32,10 +36,13 @@ class User(db.Model, UserMixin):
     lessons = db.relationship('Lesson', backref='user', cascade="all, delete-orphan")
 
     tier = db.Column(db.String(50), default='free')  # 'free', 'paid', 'pro'
-    daily_request_count = db.Column(db.Integer, default=0)
-    last_request_time = db.Column(db.DateTime, default=datetime.utcnow)
+    daily_request_count = db.Column(db.Integer, default=0) # TODO: I am not using
+    last_request_time = db.Column(db.DateTime, default=datetime.utcnow) # TODO: I am not using
+    streak_count = db.Column(db.Integer, default=0, nullable=False)
+    last_streak_date = db.Column(db.Date, nullable=True)
+    highest_streak = db.Column(db.Integer, default=0, nullable=False)
 
-    violation_count = db.Column(db.Integer, default=0)
+    violation_count = db.Column(db.Integer, default=0) # TODO: I am not using (yet?)
 
     confirmed = db.Column(db.Boolean, default=False)
     confirmation_token = db.Column(db.String(100), nullable=True)
@@ -53,32 +60,9 @@ class User(db.Model, UserMixin):
         lazy='dynamic')
 
     def as_dict(self):
-        active_lessons = [lesson.lesson_name for lesson in sorted(
-            [l for l in self.lessons if not l.completion_date], 
-            key=lambda x: x.id, reverse=True)[:50]
-        ]
-
-        completed_lessons = [lesson.lesson_name for lesson in sorted(
-            [l for l in self.lessons if l.completion_date],
-            key=lambda x: x.id, reverse=True)[:100]
-        ]
-
-        active_libraries = [library.library.library_topic for library in sorted(
-            [l for l in self.libraries if not l.is_complete], 
-            key=lambda x: x.id, reverse=True)[:100]
-        ]
-
-        completed_libraries = [library.library.library_topic for library in sorted(
-            [l for l in self.libraries if l.is_complete], 
-            key=lambda x: x.id, reverse=True)[:100]
-        ]
 
         user_data = {
             "profile": self.profile,
-            "active_lessons": active_lessons+active_libraries,
-            "completed_lessons": completed_lessons+completed_libraries
-            # "active_libraries": active_libraries,
-            # "completed_libraries": completed_libraries
         }
         
         user_data["owned_libraries"] = [lib.library_topic for lib in self.owned_libraries]
@@ -91,6 +75,33 @@ class User(db.Model, UserMixin):
         """Returns a list of Library objects the user is a member of."""
         # This queries through the LibraryMembership association objects
         return [membership.library for membership in self.library_memberships]
+    
+    def update_daily_streak(self): 
+        tz = ZoneInfo(self.timezone or 'UTC')
+        today_local = datetime.now(tz).date()
+        yesterday_local = today_local - timedelta(days=1)
+            
+        if self.last_streak_date is None:
+            self.streak_count = 1
+
+        else:
+            last = self.last_streak_date
+            # last request was today, no change
+            if last == today_local:
+                return self.streak_count
+            # last request was yesterday, increment streak
+            if last == yesterday_local:
+                self.streak_count += 1
+            # broke streak, reset
+            else:
+                self.streak_count = 1
+
+        self.last_streak_date = today_local
+        
+        if self.streak_count > self.highest_streak:
+            self.highest_streak = self.streak_count
+        
+        return self.streak_count
     
 class IPTracking(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -201,7 +212,8 @@ class Library(db.Model):
     room_names = db.Column(MutableList.as_mutable(JSON), nullable=False)
     image_url = db.Column(db.String(200), nullable=False, default=DEFAULT_IMAGE_URL)
     
-    units = db.relationship('LibraryUnit', backref='library', cascade="all, delete-orphan", lazy=True)
+    units = db.relationship('LibraryUnit', backref='library', cascade="all, delete-orphan", lazy=True,
+                            order_by="LibraryUnit.position")
 
     factoids = db.relationship('LibraryFactoid', backref='library', cascade="all, delete-orphan")
     
@@ -220,40 +232,86 @@ class Library(db.Model):
         """Sets the library's privacy and manages the join code."""
         if new_status == self.is_public:
             return # No change needed
-        print("made it in set_privacy")
+
         self.is_public = new_status
         if not new_status:
             # Make private: Generate a code if it doesn't have one
             if not self.join_code:
-                print("here")
+
                 self.join_code = self._generate_unique_code()
         else:
             # Make public: Remove the code
             self.join_code = None
         return self.join_code
 
-    def attach_unit(self, unit: 'LibraryUnit'):
-        """Attach a unit to this library"""
+    def attach_unit(self, unit: 'LibraryUnit', position=None):
+        """Attach a unit to this library at the specified position
         
-        if not isinstance(unit, LibraryUnit):
-            raise ValueError("unit must be an instance of LibraryUnit")
+        Args:
+            unit: LibraryUnit to attach
+            position: Position to insert (0-indexed). If None, append to the end.
         
-        if unit.library_id == self.id:
+        Returns:
+            The attached unit
+        """
+
+        try:
+        
+            if not isinstance(unit, LibraryUnit):
+                raise ValueError("unit must be an instance of LibraryUnit")
+            
+            unit.library_id = self.id
+
+            with db.session.no_autoflush:
+            
+                # Get current maximum position if we need to append
+                if position is None:
+                    
+                    max_position = db.session.query(db.func.max(LibraryUnit.position))\
+                                    .filter(LibraryUnit.library_id == self.id).scalar() or -1
+                    
+                    unit.position = max_position + 1
+                    
+                    # Make sure the unit is added to the session if it's not already
+                    db.session.add(unit)
+                        
+                else:
+
+                    # Instead of a single update statement
+                    positions = db.session.query(LibraryUnit.id, LibraryUnit.position)\
+                        .filter(LibraryUnit.library_id == self.id, LibraryUnit.position >= position)\
+                        .order_by(LibraryUnit.position.desc()).all()
+                        
+                    for id, current_position in positions:
+                        db.session.query(LibraryUnit).filter(LibraryUnit.id == id)\
+                            .update({LibraryUnit.position: current_position + 1})
+                    
+                    unit.position = position
+
+                    # Make sure the unit is added to the session if it's not already
+                    db.session.add(unit)
+                        
             return unit
         
-        unit.library_id = self.id
+        except SQLAlchemyError as e:
+            print(f"error: {e}")
+            db.session.rollback() # keep the DB clean
+            raise
 
-        db.session.flush()
-
-        return unit
-    
 class LibraryUnit(db.Model):
     __tablename__ = "library_unit"
     id = db.Column(db.Integer, primary_key=True)
     library_id = db.Column(db.Integer, db.ForeignKey('library.id'), nullable=False)
     unit_name = db.Column(db.String(200), nullable=False)
         
+    position = db.Column(db.Integer, nullable=False, index=True) 
+
     sections = db.relationship('LibrarySection', backref='unit', cascade="all, delete-orphan", lazy=True)
+
+    __table_args__ = (
+        db.UniqueConstraint('library_id', 'position',
+                            name='uq_library_unit_position'),
+    )
 
     def add_section(self, section_name):
         """Add a new section to this unit"""

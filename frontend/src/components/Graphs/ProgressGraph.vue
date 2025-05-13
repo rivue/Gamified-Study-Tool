@@ -1,7 +1,7 @@
 <!-- ProgressGraph.vue -->
 <template>
   <div class="progress-graph">
-    <LineGraph :data="data" :options="options"></LineGraph>
+    <!-- <LineGraph :data="data" :options="options"></LineGraph> -->
   </div>
 </template>
 

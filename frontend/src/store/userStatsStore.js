@@ -1,37 +1,31 @@
 import { defineStore } from 'pinia';
 import axios from 'axios';
 
-export const useUserStatsStore = defineStore('userStats', {
-  state: () => ({
-    streak: null,
-    exp: null,
-  }),
-  actions: {
-    async fetchStatsFromBackend() {
-      try {
-        const response = await axios.get('/api/user/stats');
-        if (response.data) {
-          this.streak = response.data.streak;
-          this.exp = response.data.exp;
+export const useUserStatsStore = defineStore('user', {
+    state: () => ({
+        currentStreak: null,
+        bestStreak: null,
+        streakLoaded: false,
+    }),
+    actions: {
+        async fetchStreak() {
+            if (this.streakLoaded) return
+            try {
+                const { data } = await axios.get('/api/user/streak');
+                if (data) { // Fixed: was using response.data instead of data
+                    this.currentStreak = data.current_streak;
+                    this.bestStreak = data.max_streak;
+                }
+            } catch (e) {
+                console.error('Error fetching stats from backend', e);
+            } finally {
+                this.streakLoaded = true;
+            }
+        },
+        resetStats() {
+            this.currentStreak = null;
+            this.bestStreak = null;
+            this.streakLoaded = false;
         }
-      } catch (error) {
-        console.error('Error fetching stats from backend', error);
-      }
     },
-    getStats() {
-      if (this.streak === null || this.exp === null) {
-        // console.log("nulls")
-        this.fetchStatsFromBackend();
-      }
-    //   console.log(this.exp, this.ste)
-      return {
-        streak: this.streak,
-        exp: this.exp,
-      };
-    },
-    resetStats(){
-      this.streak = null;
-      this.exp = null;
-    }
-  },
 });

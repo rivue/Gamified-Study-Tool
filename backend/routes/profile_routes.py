@@ -10,6 +10,18 @@ from message_handler import update_system_role, initialize_messages
 
 def init_profile_routes(app):
 
+    @app.route('/api/user/streak', methods=['GET'])
+    @login_required
+    def get_user_streak():
+        try:
+            streak_count, highest_streak = get_streak(current_user.id)
+            if streak_count is None or highest_streak is None:
+                return jsonify({'error': 'Failed to retrieve streak data'}), 500
+            return jsonify({'current_streak': streak_count, 'max_streak': highest_streak})
+        except Exception:
+            return jsonify({'error': 'Failed to retrieve streak data'}), 500
+
+
     @app.route("/api/profile", methods=["GET"])
     @login_required
     def get_profile_route():
@@ -71,8 +83,3 @@ def init_profile_routes(app):
     #     if isInitial == 2:
     #         initialize_messages(current_user.id)
     #     return jsonify(status="success")
-    
-    @app.route('/api/user/stats', methods=['GET'])
-    @login_required
-    def get_user_stats():
-        return jsonify({'streak': get_streak(current_user.id)[1], 'exp':get_total_user_exp(current_user.id)})

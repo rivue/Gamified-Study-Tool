@@ -32,7 +32,7 @@ import SubHeader from "./components/Header/SubHeader.vue";
 import InfoPopup from "./components/Menus/InfoPopup.vue";
 import AdPopup from "./components/Monetization/AdPopup.vue";
 import MentorSelection from "./components/Backstage/MentorSelection.vue";
-import HomePage from './components/Footer/HomePage.vue';
+import HomePage from './components/HomePage.vue';
 import { useAuthStore } from "@/store/authStore";
 import { useMenuStore } from "@/store/menuStore";
 import { useThemeStore } from "@/store/themeStore";
@@ -40,6 +40,7 @@ import { useMessageStore } from "@/store/messageStore";
 import { useScrollStore } from "@/store/scrollStore";
 import { useMentorStore } from "@/store/mentorStore";
 import { useLoadingStore } from "@/store/loadingStore";
+import { useUserStatsStore } from "@/store/userStatsStore";
 import LoadingComponent from "./components/Backstage/LoadingComponent.vue";
 
 const router = useRouter();
@@ -59,6 +60,8 @@ const themeClass = computed(() => themeStore.darkMode ? "light-theme" : "");
 
 const authStore = useAuthStore();
 const loggedIn = computed(() => authStore.loggedIn);
+
+const userStatsStore = useUserStatsStore();
 
 const shouldShowChat = computed(() => {
     const path = route.path;
@@ -101,6 +104,9 @@ onMounted(() => {
     document.addEventListener("visibilitychange", handleVisibilityChange);
 
     authStore.checkAuth();
+    if (authStore.loggedIn) {
+        userStatsStore.fetchStreak();
+    }
 
     if (window.location.search === "?awake") {
         router.push("/");
@@ -112,6 +118,11 @@ onUnmounted(() => {
 });
 
 // Watchers
+watch(() => authStore.loggedIn, (loggedIn) => {
+  if (loggedIn) userStatsStore.fetchStreak();
+  else         userStatsStore.resetStats();
+});
+
 watch(loggedIn, (newValue) => {
     if (!newValue) {
         console.debug("login from app");

@@ -83,7 +83,6 @@ function handleSubmit() {
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 150;
 }
 
 .popup-content {

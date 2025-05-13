@@ -4,7 +4,8 @@ import { defineStore } from "pinia";
 import axios from "axios";
 import { useAuthStore } from "@/store/authStore";
 import { usePopupStore } from "@/store/popupStore";
-import { useUserStatsStore } from "@/store/userStatsStore";
+
+const DEFAULT_SECTIONID_VALUE = -1000;
 
 export const useGameStore = defineStore("gameStore", {
     state: () => ({
@@ -42,10 +43,10 @@ export const useGameStore = defineStore("gameStore", {
         completion: 0,
         noGeneratedRooms: false,
         libraryError: false,
-        sectionId: '',
+        sectionId: DEFAULT_SECTIONID_VALUE as number,
     }),
     actions: {
-        setSectionId(sectionId: string) {
+        setSectionId(sectionId: number) {
             this.sectionId = sectionId;
         },
         setId(libraryId: string) {
@@ -116,7 +117,7 @@ export const useGameStore = defineStore("gameStore", {
         },
         async fetchLibraryDetails(libraryId: string, roomNameThing: string) {
 
-            let sectionid = '';
+            let sectionid = DEFAULT_SECTIONID_VALUE;
 
             if (this.sectionId) {
                 const sectionid = this.sectionId
@@ -125,7 +126,7 @@ export const useGameStore = defineStore("gameStore", {
             this.libraryError = false;
             this.setId(libraryId);
 
-            if (sectionid !== '') {
+            if (sectionid !== DEFAULT_SECTIONID_VALUE) {
                 this.setSectionId(sectionid);
             }
             
@@ -247,8 +248,6 @@ export const useGameStore = defineStore("gameStore", {
             if (this.incorrectQuestionAnswers.length > 3) {
                 return;
             }
-            const userStatsStore = useUserStatsStore();
-            userStatsStore.resetStats();
 
             // const completedRooms = Object.keys(this.roomStates).filter(
                 // roomName => this.roomStates[roomName].state === 3
@@ -268,7 +267,7 @@ export const useGameStore = defineStore("gameStore", {
                 .then(response => {
                     if (response.data.status === "success") {
                         this.completed = true;
-                        this.setSectionId('');
+                        this.setSectionId(DEFAULT_SECTIONID_VALUE);
                     } else {
                         console.error("Failed to end game:", response.data.message);
                     }

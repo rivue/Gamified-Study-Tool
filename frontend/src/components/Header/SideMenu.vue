@@ -1,80 +1,47 @@
 <template>
-  <aside :class="{ 'slide-out': sideMenuOpen }" class="side-menu">
-    
-    <SideMenuButton
-      v-if="!loggedIn"
-      label="Log in"
-      :isSelected="isRouteActive('/login')"
-      @click="openRoute('/login')"
-    >
-    </SideMenuButton>
+    <Transition name="slide"> 
+        <div v-if="sideMenuOpen" class="fixed top-16 right-0 w-64 h-auto z-50 p-4 rounded-l-2xl shadow-xl border"
+            style="background-color: var(--background-color); border-color: var(--color-primary-dark);">
+            <div class="space-y-3">
 
-    <SideMenuButton
-      label="My Library "
-      :isSelected="isRouteActive('/library')"
-      @click="openRoute('/library')"
-    >
-      <!-- <template v-slot:icon>🏛</template> -->
-    </SideMenuButton>
-<!-- TODO look at these more -->
-    <!-- <SideMenuButton
-      v-if="loggedIn"
-      label="Lessons"
-      :isSelected="isRouteActive('/lessons')"
-      @click="openRoute('/lessons')"
-    >
-      <template v-slot:icon>&#128172;</template>
-    </SideMenuButton> -->
+                <!-- Menu Buttons -->
+                <div class="menu-buttons space-y-2">
+                    <SideMenuButton
+                        v-if="!loggedIn"
+                        label="Log in"
+                        :isSelected="isRouteActive('/login')"
+                        @click="openRoute('/login')"
+                        class="menu-button"
+                    />
 
-    <!-- <SideMenuButton
-      v-if="loggedIn"
-      label="Knowledge Map"
-      :isSelected="isRouteActive('/knowledge')"
-      @click="openRoute('/knowledge')"
-    >
-      <template v-slot:icon>🗺️</template>
-    </SideMenuButton> -->
-    <!-- <SideMenuButton
-      v-if="loggedIn"
-      label="Progress"
-      :isSelected="isRouteActive('/progress')"
-      @click="openRoute('/progress')"
-    >
-      <template v-slot:icon>&#128200;</template>
-    </SideMenuButton> -->
-    <SideMenuButton
-      label="Changelog"
-      :isSelected="isRouteActive('/changelog')"
-      @click="openRoute('/changelog')"
-    > 
-    </SideMenuButton>
+                    <SideMenuButton
+                        label="My Libraries"
+                        :isSelected="isRouteActive('/library')"
+                        @click="openRoute('/library')"
+                        class="menu-button"
+                    />
 
-    <SideMenuButton
-      label="Contact"
-      :isSelected="isRouteActive('/contact')"
-      @click="openRoute('/contact')"
-    >
-      <!-- <template v-slot:icon>&#9993;</template> -->
-    </SideMenuButton>
-    
-    <!-- <SideMenuButton
-      label="Terms & Policies"
-      :isSelected="isRouteActive('/terms')"
-      @click="openRoute('/terms')"
-    >
-      <template v-slot:icon>&#128279;</template>
-    </SideMenuButton> -->
-    <SideMenuButton
-      v-if="loggedIn"
-      label="Settings"
-      :isSelected="isRouteActive('/settings')"
-      @click="openRoute('/settings')"
-    >
-      <!-- <template v-slot:icon>&#128295;</template> -->
-    </SideMenuButton>
-  </aside>
+                    
+                    <SideMenuButton
+                        v-if="loggedIn"
+                        label="Settings"
+                        :isSelected="isRouteActive('/settings')"
+                        @click="openRoute('/settings')"
+                        class="menu-button"
+                    />
+                    
+                    <SideMenuButton
+                        label="Contact"
+                        :isSelected="isRouteActive('/contact')"
+                        @click="openRoute('/contact')"
+                        class="menu-button"
+                    />
+
+                </div>
+            </div>
+        </div>
+    </Transition>
 </template>
-
 
 <script setup lang="ts">
 import SideMenuButton from "@/components/Menus/SideMenuButton.vue";
@@ -92,59 +59,61 @@ const sideMenuOpen = computed(() => menuStore.sideMenuOpen);
 const loggedIn = computed(() => authStore.loggedIn);
 
 function isRouteActive(target: string, pattern: string | null = null): boolean {
-  if (target === "/" && route.path !== "/") return false;
-  if (pattern && new RegExp(pattern).test(route.path)) return true;
-  return route.path === target;
+    if (target === "/" && route.path !== "/") return false;
+    if (pattern && new RegExp(pattern).test(route.path)) return true;
+    return route.path === target;
 }
 
 function openRoute(target: string) {
-  router.push(target);
-  menuStore.hideSideMenu();
+    router.push(target);
+    menuStore.hideSideMenu();
 }
 </script>
 
-  
 <style scoped>
-.side-menu {
-  padding: 4px;
-  margin-left: 2px;
-  margin-right: 6px;
-  position: fixed;
-  top: 44px;
-  right: -300px;
-  height: fit-content;
-  width: 210px;
-  transition: right 0.3s ease;
-  z-index: 200;
+/* Slide transition */
+.slide-enter-active,
+.slide-leave-active {
+    transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
-.slide-out {
-  right: 0;
+.slide-enter-from,
+.slide-leave-to {
+    transform: translateX(100%);
+    opacity: 0;
 }
 
-button {
-  padding: 8px 16px;
-  margin: 4px;
-  background-color: var(--background-color-1t);
-  border: 2px solid var(--text-color);
-  border-radius: 8px;
-  display: inline-block;
-  width: 100%;
-  backdrop-filter: blur(8px);
-  transition: transform 0.2s, background-color 0.2s;
+.menu-buttons {
+    display: flex;
+    flex-direction: column;
 }
 
-button:hover {
-  background-color: var(--element-color-1);
-  border-color: #e0e0e0;
+.menu-button {
+    width: 100%;
+    padding: 10px 16px;
+    margin-bottom: 8px;
+    border-radius: 10px;
+    background-color: var(--background-color-1t);
+    color: var(--highlight-color);
+    border: 1px solid var(--color-primary-dark);
+    transition: all 0.2s ease;
+    text-align: left;
+    font-weight: 500;
 }
 
-button:active {
-  transform: scale(0.95);
+.menu-button:hover {
+    background-color: var(--element-color-1);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-button.selected {
-  background-color: var(--element-color-1);
-  border-color: #e0e0e0;
+.menu-button:active {
+    transform: translateY(0);
+}
+
+.menu-button.selected {
+    background-color: var(--element-color-1);
+    border-color: var(--color-primary);
+    color: var(--light-text);
 }
 </style>

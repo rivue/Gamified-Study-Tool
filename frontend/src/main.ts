@@ -10,23 +10,22 @@ import './assets/styles.css';
 import './assets/themes.css';
 import axios from 'axios';
 
-    // basically main home page
-    // { path: '/changelog', component: defineAsyncComponent(() => import('./components/Footer/MainPage.vue')), meta: { title: Rivue.ai | Learn Anything!' } },
-    // { path: '/', component: defineAsyncComponent(() => import('./components/Footer/MainPage.vue')), meta: { title: Rivue.ai | Learn Anything!' } },
+// basically main home page
+// { path: '/', component: defineAsyncComponent(() => import('./components/Footer/MainPage.vue')), meta: { title: Rivue.ai | Learn Anything!' } },
 
-    // { 
-    //     path: '/:pathMatch(.*)*', 
-    //     component: defineAsyncComponent(() => import('./components/Footer/HomePage.vue')),
-    //     meta: { title: Rivue.ai | Page Not Found' } 
-    // }
-    // llm chatbot = not necessary for me
-    //   { path: '/lessons', component: defineAsyncComponent(() => import('./components/Chat/ChatComponent.vue')), meta: { title: Rivue.ai | Lessons' } }, 
-    //   { path: '/lesson/:id', component: defineAsyncComponent(() => import('./components/Chat/ChatComponent.vue')), meta: { title: Rivue.ai | Learning' } },
+// { 
+//     path: '/:pathMatch(.*)*', 
+//     component: defineAsyncComponent(() => import('./components/Footer/HomePage.vue')),
+//     meta: { title: Rivue.ai | Page Not Found' } 
+// }
+// llm chatbot = not necessary for me
+//   { path: '/lessons', component: defineAsyncComponent(() => import('./components/Chat/ChatComponent.vue')), meta: { title: Rivue.ai | Lessons' } }, 
+//   { path: '/lesson/:id', component: defineAsyncComponent(() => import('./components/Chat/ChatComponent.vue')), meta: { title: Rivue.ai | Learning' } },
 
 
-    // actual games - come back to later, try to access whole game
-    //   { path: '/library/:id', component: defineAsyncComponent(() => import('./components/Game/NewGame/GamePage.vue')), meta: { title: Rivue.ai | Explore Library' } },
-    //   { path: '/library/:id/:roomName', component: defineAsyncComponent(() => import('./components/Game/NewGame/GamePage.vue')), meta: { title: Rivue.ai | Explore Library', hideHeaderFooter: true } },
+// actual games - come back to later, try to access whole game
+//   { path: '/library/:id', component: defineAsyncComponent(() => import('./components/Game/NewGame/GamePage.vue')), meta: { title: Rivue.ai | Explore Library' } },
+//   { path: '/library/:id/:roomName', component: defineAsyncComponent(() => import('./components/Game/NewGame/GamePage.vue')), meta: { title: Rivue.ai | Explore Library', hideHeaderFooter: true } },
 // knowledge map (probably not going to include yet)
 //   { path: '/knowledge', component: defineAsyncComponent(() => import('./components/Backstage/MapPage.vue')), meta: { title: Rivue.ai | Knowledge Map' } },
 
@@ -40,8 +39,10 @@ import axios from 'axios';
 //     component: defineAsyncComponent(() => import('./components/Footer/HomePage.vue')),
 //     meta: { title: 'Rivue.ai | Page Not Found' } 
 // }
+
     const routes = [
         // Main routes
+        { path: '/', component: defineAsyncComponent(() => import('./components/HomePage.vue')), meta: { title: 'Rivue.ai' } },
         {
             name: 'GamePage',
             path: '/lessons/:id/:roomName',
@@ -53,7 +54,8 @@ import axios from 'axios';
                     if (response.data?.status === "success") {
                         const roomList = response.data.data.room_names || [];
                         const roomNames = roomList.map((room: any[]) => room[0]); // Extract just the room names
-                        roomNames.includes(to.params.roomName) ? next() : next(`/lessons/${to.params.id}`);
+                        const decodedRoomName = decodeURIComponent(to.params.roomName as string);
+                        roomNames.includes(decodedRoomName) ? next() : next(`/lessons/${to.params.id}`);
 
                     } else {
                         next('/library');
@@ -70,9 +72,23 @@ import axios from 'axios';
             meta: { title: 'Rivue.ai | Explore Library', requiresCreator: true },
             beforeEnter: async (to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext) => {
                 try {
-                    console.log("hello");
                     const response = await axios.get(`/api/library/${to.params.id}`);
-                    console.log("there");
+                    response.data?.status === "success" ? next() : next('/library');
+                } catch (error) {
+                    console.error("Failed to validate library:", error);
+                    next('/library');
+                }
+            }
+        },
+        { 
+            name: 'Leaderboard',
+            path: '/lessons/:libraryId/leaderboard',
+            component: defineAsyncComponent(() => import('./components/Graphs/LearningPath/Leaderboard.vue')), 
+            meta: { title: 'Rivue.ai | Leaderboard', requiresCreator: true },
+            beforeEnter: async (to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext) => {
+                try {
+                    console.log(to.params.libraryId)
+                    const response = await axios.get(`/api/library/${to.params.libraryId}/scores`);
                     response.data?.status === "success" ? next() : next('/library');
                 } catch (error) {
                     console.error("Failed to validate library:", error);
@@ -82,7 +98,6 @@ import axios from 'axios';
         },
         
         // Simple routes
-        { path: '/changelog', component: defineAsyncComponent(() => import('./components/Backstage/ChangelogPage.vue')), meta: { title: 'Rivue.ai | Learn Anything!' } },
         { path: '/library', component: defineAsyncComponent(() => import('./components/Game/Creation/LibraryCreator.vue')), meta: { title: 'Rivue.ai | Create Library' } },
         // { path: '/progress', component: defineAsyncComponent(() => import('./components/Backstage/ProgressPage.vue')), meta: { title: 'Rivue.ai | Progress' } },
         { path: '/contact', component: defineAsyncComponent(() => import('./components/Footer/ContactPage.vue')), meta: { title: 'Rivue.ai | Contact Us' } },
@@ -94,11 +109,11 @@ import axios from 'axios';
         { path: '/verify', component: defineAsyncComponent(() => import('./components/Auth/VerifyEmail.vue')), meta: { title: 'Rivue.ai | Verify Email' }},
         { path: '/verify/:token', component: defineAsyncComponent(() => import('./components/Auth/VerifyEmail.vue')), meta: { title: 'Rivue.ai | Verify Email' }},
         { path: '/reset-password/:token', component: defineAsyncComponent(() => import('./components/Auth/PasswordResetForm.vue')), props: true, meta: { title: 'Rivue.ai | Password Reset' }},
-        
+        { path: '/profile', component: defineAsyncComponent(() => import('./components/Graphs/UserStats.vue')), props: true, meta: { title: 'Rivue.ai | My Profile' }},
+
         // Redirects
         // { path: '/lessons', redirect: '/' },
         { path: '/lessons/:pathMatch(.*)*', redirect: '/' },
-        { path: '/changelog/:pathMatch(.*)*', redirect: '/' },
         { path: '/library/:pathMatch(.*)*', redirect: '/library' },
         // { path: '/progress/:pathMatch(.*)*', redirect: '/progress' },
         { path: '/contact/:pathMatch(.*)*', redirect: '/contact' },
@@ -106,6 +121,7 @@ import axios from 'axios';
         // { path: '/terms/:pathMatch(.*)*', redirect: '/terms' },
         // { path: '/plan/:pathMatch(.*)*', redirect: '/plan' },
         { path: '/login/:pathMatch(.*)*', redirect: '/login' },
+        { path: '/profile/:pathMatch(.*)*', redirect: '/profile' },
         // { path: '/admin/:pathMatch(.*)*', redirect: '/admin' },
         
         // Catch-all route - must be last!
@@ -127,7 +143,6 @@ router.beforeEach(async (to, from, next) => {
 
     const publicPaths = [
         '/',
-        '/changelog',
         '/login',
         '/terms',
         '/contact',
@@ -135,7 +150,6 @@ router.beforeEach(async (to, from, next) => {
         '/verify', // Explicitly add /verify as a public path
         '/verify/', // Make /verify/ a public path
     ];
-    console.debug(to.path);
     
     // Check if the path is a reset password path
     const isResetPasswordPath = to.path.startsWith('/reset-password/');
@@ -162,8 +176,7 @@ router.beforeEach(async (to, from, next) => {
                 const response = await axios.get(`/api/library/${to.params.id}`);
                 if (response.data && 
                     response.data.data && 
-                    response.data.data.owner_id == user) {
-                        console.log("User is the creator of the library");
+                    (response.data.data.owner_id == user || response.data.data.is_public)) {
                         // User is the creator, continues as per usual
                         return next();
                 } else { // invalid data 

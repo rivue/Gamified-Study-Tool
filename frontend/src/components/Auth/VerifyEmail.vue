@@ -1,5 +1,5 @@
 <template>
-    <div class="verification-container">
+    <div class="verification-container p-8">
         <div v-if="loading" class="loading">
             <p>Loading...</p>
         </div>
@@ -8,8 +8,8 @@
             <div v-if="status === 'success'" class="success">
                 <h1>Email Verified!</h1>
                 <p>Your email has been successfully verified.</p>
-                <p>You are now logged in and ready to use Rivue!</p>
-                <router-link to="/" class="button">Go to Dashboard</router-link>
+                <p>You are now verified and can now login to use Rivue!</p>
+                <router-link to="/" class="button">Go to Login</router-link>
             </div>
             <div v-else class="success">
 
@@ -22,16 +22,16 @@
                 <h1 v-if="!token">Resend Verification Email</h1>
 
                 <form @submit.prevent="handleSendNewVerificationEmail">
+                    <br/>
                     <div class="form-field">
                         <label for="email">Email:</label>
                         <input type="text" id="email" name="email" v-model="email" autocomplete="email" required />
                     </div>
-                    <br />
                     <div v-if="completed && status === ''" class="completed-message">
                         If there is an unverified account associated with this email, a reset link was sent to it.
                     </div>
                     <div v-if="!completed" class="completed-message">Please enter your email and click the button below to resend a verification link.</div>
-                    <div class="button-containered">
+                    <div class="button-containered px-8 py-4 text-md">
                         <input type="submit" id="submit" :value="buttonText" />
                     </div>
                 </form>
@@ -97,7 +97,6 @@ const handleSendNewVerificationEmail = () => {
 <style>
 .button-containered {
     text-align: center;
-    padding: 8px;
     border-radius: 6px;
     background-color: var(--color-primary)
 }
@@ -157,7 +156,6 @@ form {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    padding: 30px;
     background-color: var(--background-color-1t);
     color: #f0f8ff;
     border-radius: 8px;

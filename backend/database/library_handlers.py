@@ -97,7 +97,7 @@ def create_library_favorite(
         db.session.rollback()
         return jsonify({"message": str(e)}), 400
     
-def create_unit_and_add(library_id, unit_name):
+def create_unit_and_add(library_id, unit_name, position=None):
     try:
         unit = LibraryUnit(
             library_id=library_id,
@@ -108,14 +108,19 @@ def create_unit_and_add(library_id, unit_name):
 
         db.session.add(unit)
 
+        if len(library.units) >= 20:
+            return jsonify({"error": "Library has reached maximum number of units"}), 400
+
         if not unit or not library:
             return jsonify({"error": "Library or Unit not found"}), 404
-        
-        library.attach_unit(unit)
 
-        print(f"Library {library_id} units:")
-        for unit in library.units:
-            print(f"  - Unit ID: {unit.id}, Name: {unit.unit_name}")
+        if position is not None:
+            library.attach_unit(unit, position)
+        else:
+            library.attach_unit(unit)
+
+        db.session.flush()  # Flush to get the unit ID before commit
+        db.session.commit()
 
         return (
             jsonify(
@@ -185,21 +190,18 @@ def get_library(library_id, user_id=None, click=True):
 
     section_to_unit_map = {}
     unit_to_section_map = {}
-
+    unit_to_position_map = {}
     if user_id:
-        unit_list = []
         room_names = []
         for unit in library.units:
-            unit_list.append(unit.unit_name)
+            unit_to_position_map[unit.unit_name] = unit.position
+            unit_to_section_map[unit.unit_name] = []
             for section in unit.sections:
                 room_names.append((section.section_name, section.id))
                 section_to_unit_map[section.section_name] = (unit.id, section.id)
-                if unit.unit_name in unit_to_section_map:
-                    unit_to_section_map[unit.unit_name].append((section.id, section.section_name))
-                else:
-                    unit_to_section_map[unit.unit_name] = [(section.id, section.section_name)]
+                unit_to_section_map[unit.unit_name].append((section.id, section.section_name))
+                    
         library_data["room_names"] = room_names
-        library_data["units"] = unit_list
 
         existing_completion = LibraryCompletion.query.filter_by(library_id=library_id, user_id=user_id).first()
         if existing_completion:
@@ -214,14 +216,39 @@ def get_library(library_id, user_id=None, click=True):
     library_data["clicks"] = library.clicks
     library_data["section_to_unit_map"] = section_to_unit_map
     library_data["unit_to_section_map"] = unit_to_section_map
+    library_data["unit_to_position_map"] = unit_to_position_map
 
     favorited_status = LibraryFavorites.query.filter_by(
         user_id=user_id,
         library_id=library_id
     ).first()
+
     library_data["favorited_status"] = favorited_status.is_favorited
     
     return jsonify(library_data)
+
+def get_library_scores(library_id):
+    
+    # TODO: update once I implement a points system
+
+    try:
+
+        memberships = LibraryMembership.query.filter_by(library_id=library_id).all()
+        
+        if not memberships:
+            return jsonify({'error': 'No memberships found for the given library'}), 404
+        
+        member_list = []
+        for membership in memberships:
+                member_list.append({
+                    'user_id': membership.user_id,
+                })
+
+        return jsonify(member_list)
+    
+    except Exception as e:
+        print("no")
+        return jsonify({'error': str(e)}), 500
     
 def get_library_details(library_id):
     try:
@@ -733,14 +760,16 @@ def is_center_room(library_id, room_name):
         return jsonify({"message": "Library not found"}), 404
     return room_name == library.library_topic
 
-def update_game_end(user_id, library_id, room_name):
+def update_game_end(user_id, library_id, section_id):
     try:
         user = User.query.get(user_id)
 
         if not user:
             return jsonify({'status': 'error', 'message': 'User not found'}), 404
          
-        increase_lesson_state(user_id, library_id, room_name)
+        increase_lesson_state(user_id, library_id, section_id)
+
+        user.update_daily_streak()
 
         # existing_completion = LibraryCompletion.query.filter_by(library_id=library_id, user_id=user_id).first()
         # if existing_completion:
@@ -930,3 +959,4 @@ LibraryQuestion.as_dict = lambda self: model_to_dict(self)
 LibraryRoomState.as_dict = lambda self: model_to_dict(self)
 LibraryQuestionChoice.as_dict = lambda self: model_to_dict(self)
 LibraryCompletion.as_dict = lambda self: model_to_dict(self)
+LibraryMembership.as_dict = lambda self: model_to_dict(self)

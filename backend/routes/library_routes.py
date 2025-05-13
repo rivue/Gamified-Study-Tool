@@ -15,7 +15,7 @@ import database.library_handlers as lbh
 import knowledge_net.library_generator as lgn
 from images.library_imager import generate_images_task, save_image
 from database.user_handler import increment_violations, is_within_limit, check_generation_allowed, mark_generation_done
-from database.models import LibraryFactoid, LibraryQuestion, db
+from database.models import Library, LibraryFactoid, LibraryQuestion, db
 from vector_processing.file_handler import process_document
 from vector_processing.retrieval import query_and_respond_pinecone
 
@@ -254,7 +254,6 @@ def init_library_routes(app):
 
             # Attempt to retrieve existing room contents
             room_data = None
-
             if library_topic:
 
                 unit_id, section_id = library_data.get('section_to_unit_map').get(library_topic)
@@ -266,13 +265,75 @@ def init_library_routes(app):
                 room_data = lbh.get_library_room_state(user_id, library_id)
                 # return a map of room names --> unit 
                 # room_data = room_data
+
             test = library_data.get("room_names")
-            # print(f"room_data: {room_data}")
+
+            library_data["show_settings"] = user_id == library_data.get("owner_id")
 
             return jsonify(status="success", data=library_data, room_data=room_data)
         except: 
             return jsonify(status="error", message="Failed to retrieve library data"), 500
         
+    @app.route("/api/library/<int:library_id>/scores", methods=["GET"])
+    def get_library_users(library_id):
+        try:
+            user_id = current_user.id if not isinstance(current_user, AnonymousUserMixin) else None
+
+            if not user_id:
+                return jsonify(status="error", message="Failed to retrieve library data"), 500
+            
+            members = lbh.get_library_scores(library_id).get_json()
+              
+            return jsonify(status="success", members=members)
+
+        except:
+            return jsonify(status="error", message="Failed to retrieve library data"), 500
+        
+        
+    @app.route('/api/library/unit', methods=['POST'])
+    def generate_unit():
+        user_id = current_user.id if not isinstance(current_user, AnonymousUserMixin) else None
+        
+        data = request.get_json()
+        unit_name = data.get("unitName")
+        library_id = data.get("libraryId")
+        position = data.get("position")
+
+
+        # Validate inputs
+        if not user_id:
+            return jsonify(status="error", message="Must be signed in."), 403
+        if not unit_name:
+            return jsonify(status="error", message="No unit name provided"), 400
+        if not library_id:
+            return jsonify(status="error", message="No library ID provided"), 400
+        
+        library = db.session.query(Library).filter_by(id=library_id).first()
+
+        if not library:
+            return jsonify(status="error", message="No library ID provided"), 400
+
+        if user_id != library.owner_id:
+            return jsonify(status="error", message="You do not own this library."), 403
+        
+        if len(library.units) >= 20:
+            return jsonify(status="error", message="Library has reached maximum number of units (20 for now)"), 400
+
+        try:
+            
+            new_unit_response, new_unit_status_code = lbh.create_unit_and_add(library_id, unit_name, position=position)
+            
+            new_unit = new_unit_response.get_json()
+
+            if new_unit_status_code != 201:
+                return jsonify(status="error", message="Failed to create unit"), 500
+
+            return jsonify(status="success", unit_id=new_unit["unit"], message="Unit created successfully"), 200
+
+        except Exception as e:
+            print(f"Failed to process request: {str(e)}")
+            return jsonify(status="error"), 500
+
     @app.route('/api/library/room', methods=['POST'])
     def generate_room():
         user_id = current_user.id if not isinstance(current_user, AnonymousUserMixin) else None
@@ -449,6 +510,13 @@ def init_library_routes(app):
                 if not user_id:
                     return jsonify(status="error", message="Must be logged in to check library visibility status."), 403
                 
+                library = lbh.get_library(library_id, user_id)
+                if not library:
+                    return jsonify(status="error", message="Library not found."), 404
+                
+                if library.owner_id != user_id:
+                    return jsonify(status="error", message="You do not own this library."), 403
+
                 visibility_status = lbh.get_library_visibility_status(user_id, library_id)
             
                 if visibility_status is None:
@@ -494,14 +562,14 @@ def init_library_routes(app):
             })
         return jsonify(data), 200
 
-    @app.route('/api/scores/library/<int:library_id>', methods=['GET'])
-    def fetch_scores_for_library(library_id):
-        completions = lbh.get_library_top_scores_by_unique_users(library_id=library_id, limit=5)
-        data = []
-        for email, library_id, time in completions:
-            data.append({
-                "email": mask_email(email),
-                "library_id": library_id,
-                "time": time
-            })
-        return jsonify(data), 200
+    # @app.route('/api/scores/library/<int:library_id>', methods=['GET'])
+    # def fetch_scores_for_library(library_id):
+    #     completions = lbh.get_library_top_scores_by_unique_users(library_id=library_id, limit=5)
+    #     data = []
+    #     for email, library_id, time in completions:
+    #         data.append({
+    #             "email": mask_email(email),
+    #             "library_id": library_id,
+    #             "time": time
+    #         })
+    #     return jsonify(data), 200

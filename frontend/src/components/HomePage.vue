@@ -55,9 +55,9 @@ import { useRoute, useRouter } from 'vue-router';
 import { usePopupStore } from "@/store/popupStore";
 import { useThemeStore } from "@/store/themeStore";
 import { useAuthStore } from "@/store/authStore";
-import CtaButton from "./LandingPageComponents/CtaButton.vue";
-import FaqComponent from "./LandingPageComponents/FaqComponent.vue";
-import FeaturesComponent from "./LandingPageComponents/FeaturesComponent.vue";
+import CtaButton from "./Footer/LandingPageComponents/CtaButton.vue"
+import FaqComponent from "./Footer/LandingPageComponents/FaqComponent.vue";
+import FeaturesComponent from "./Footer/LandingPageComponents/FeaturesComponent.vue";
 
 // Component name is automatically inferred from the filename when using <script setup>
 

@@ -274,6 +274,7 @@ def get_complete_user_data(user_id):
         "tier": user.tier,
         "user": user.profile,
         "tutor": user.ai_tutor_profile,
+        "timezone": user.timezone,
     }
     return user_data
 

@@ -1,5 +1,5 @@
 <template>
-    <div class="library-browser">
+    <div class="library-browser pb-8">
         <div v-if="isLoading" class="loading">
             <span>Loading Your Libraries</span>
             <LoadingComponent />

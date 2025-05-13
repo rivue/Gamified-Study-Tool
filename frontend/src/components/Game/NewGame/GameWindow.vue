@@ -50,7 +50,6 @@ onMounted(async () => {
 
 // Add onUnmounted hook
 onUnmounted(() => {
-    console.log("GameWindow unmounting, aborting fetch.");
     abortController.abort(); // Abort the request
 });
 </script>

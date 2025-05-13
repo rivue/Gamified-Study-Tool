@@ -144,28 +144,28 @@ const changePage = (direction: number) => {
 
 // Lifecycle hook
 onMounted(async () => {
-    try {
-        const response = await axios.get("/api/user-progress");
-        if (response.data.status === "success") {
-            userProgress.value = response.data.progress.lineGraph;
-            totalCompleted.value = response.data.progress.totalCompleted;
-            totalLessons.value = response.data.progress.totalLessons;
-            activeLessons.value = response.data.progress.activeLessons;
-            completedLessons.value = response.data.progress.completedLessons;
-            totalLibraries.value = response.data.progress.totalLibrarys;
-            activeLibraries.value = response.data.progress.activeLibrarys;
-            completedLibraries.value = response.data.progress.completedLibrarys;
-            percentCompletedLessons.value = response.data.progress.percentCompletedLessons;
-            percentCompletedLibraries.value = response.data.progress.percentCompletedLibrarys;
-            maxStreak.value = response.data.progress.maxStreak;
-            currentStreak.value = response.data.progress.currentStreak;
+    // try {
+    //     const response = await axios.get("/api/user-progress");
+    //     if (response.data.status === "success") {
+            userProgress.value = 3; //response.data.progress.lineGraph;
+            totalCompleted.value = 3; //response.data.progress.totalCompleted;
+            totalLessons.value = 3; //response.data.progress.totalLessons;
+            activeLessons.value = 3; //response.data.progress.activeLessons;
+            completedLessons.value = 3; //response.data.progress.completedLessons;
+            totalLibraries.value = 3; //response.data.progress.totalLibrarys;
+            activeLibraries.value = 3; //response.data.progress.activeLibrarys;
+            completedLibraries.value = 3; //response.data.progress.completedLibrarys;
+            percentCompletedLessons.value = 3; //response.data.progress.percentCompletedLessons;
+            percentCompletedLibraries.value = 3; //response.data.progress.percentCompletedLibrarys;
+            maxStreak.value = 3; //response.data.progress.maxStreak;
+            currentStreak.value = 3; //response.data.progress.currentStreak;
             dataLoaded.value = true;
-        } else {
-            console.error("Failed to fetch user progress");
-        }
-    } catch (error) {
-        console.error("Error fetching user progress:", error);
-    }
+    //     } else {
+    //         console.error("Failed to fetch user progress");
+    //     }
+    // } catch (error) {
+    //     console.error("Error fetching user progress:", error);
+    // }
 });
 </script>
 
