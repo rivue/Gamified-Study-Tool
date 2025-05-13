@@ -10,18 +10,13 @@
                         <div class="libgen-title">Course name</div>
                         <div class="title-bar">
                             <input type="text" id="topicInput" ref="topicInput" v-model="topic"
-                                :class="{ 'input-error': topicError || topicTypingError || topicSpaceError }"
+                                :class="{ 'input-error': topicError }"
+                                @input="handleTopicInput"
                                 placeholder="Mrs. Frizzle's science class, Biology 272, etc..." maxlength="100" @focus="selectInputText"
                                 @paste="handlePaste" />
                         </div>
                         <div v-if="topicError" class="error-message">
-                            Please enter a topic.
-                        </div>
-                        <div v-if="topicTypingError" class="error-message">
-                            Topic can only have spaces or letters and must be between 4 and 25 characters long.
-                        </div>
-                        <div v-if="topicSpaceError" class="error-message">
-                            Topic must not start or end with a space.
+                            Please enter a topic - Topics can only have spaces or letters and must be between 4 and 25 characters long.
                         </div>
                     </div>
                 </div>
@@ -58,7 +53,7 @@
                             <div class="group-controls">
 
                                 <div class="group-input-wrapper">
-                                    <input type="text" v-model="newGroupName" placeholder="Exam 1, Exam 2, etc..."
+                                    <input type="text" v-model="newGroupName" @input="handleGroupNameInput" placeholder="Exam 1, Exam 2, etc..."
                                         :class="{ 'input-error': groupError || groupTypingError || groupSpaceError || groupEmptyError }"
                                         maxlength="40" :disabled="disableExtras" @keyup.enter="addGroup" />
                                     <button class="add-btn" @click="addGroup"
@@ -101,7 +96,8 @@
                                         <div class="section-input-wrapper">
                                             <input type="text" v-model="group.newSectionName"
                                                 placeholder="Mitosis, Derivative Rule, etc..."
-                                                :class="{ 'input-error': groupNoSectionErrors[groupIndex] || groupSectionNamingErrors[groupIndex] }"
+                                                @input="handleSectionNameInput(groupIndex)"
+                                                :class="{ 'input-error': groupNoSectionErrors[groupIndex] || groupSectionNamingErrors[groupIndex] || duplicateGroupError[groupIndex] }"
                                                 maxlength="40" :disabled="group.sections.length >= 15 || disableExtras"
                                                 @keyup.enter="addSection(groupIndex)" />
                                             <button class="add-btn" @click="addSection(groupIndex)"
@@ -114,8 +110,11 @@
                                                 Every Unit must have at least one section
                                             </div>
                                             <div v-if="groupSectionNamingErrors[groupIndex]" class="error-message">
-                                                Section names must only have letters or spaces and must be between 4 and 25
+                                                Section names must be between 4 and 25
                                                 characters long.
+                                            </div>
+                                            <div v-if="duplicateGroupError[groupIndex]" class="error-message">
+                                                There must be no duplicate group names
                                             </div>
                                         </div>
                                     </div>
@@ -194,7 +193,63 @@ interface Group {
     newSectionName: string;
     sectionError: boolean;
 }
+import { z } from "zod";
 
+// Define schemas for your form
+const sectionSchema = z.string()
+  .min(4, "Section names must be at least 4 characters")
+  .max(25, "Section names must be at most 25 characters")
+  .refine(val => !val.startsWith(" ") && !val.endsWith(" "), 
+    "Section names must not start or end with a space");
+
+const groupSchema = z.object({
+  name: z.string()
+    .min(4, "Unit names must be at least 4 characters")
+    .max(25, "Unit names must be at most 25 characters")
+    .refine(val => !val.startsWith(" ") && !val.endsWith(" "), 
+      "Unit names must not start or end with a space"),
+  sections: z.array(sectionSchema)
+    .min(1, "Every Unit must have at least one section")
+    .refine(
+      sections => sections.length === new Set(sections.map(s => s.toLowerCase())).size,
+      "Duplicate section names are not allowed within a unit"
+    )
+});
+
+// Create schema for the entire form
+const formSchema = z.object({
+  topic: z.string()
+    .min(4, "Course name must be at least 4 characters")
+    .max(25, "Course name must be at most 25 characters")
+    .refine(val => !val.startsWith(" ") && !val.endsWith(" "), 
+      "Course name must not start or end with a space"),
+  visibility: z.boolean(),
+  selectedFile: z.instanceof(File, { message: "Must have at least one file" }),
+  groups: z.array(groupSchema)
+    .min(1, "Must have at least one Unit")
+    .refine(
+      groups => {
+        const names = groups.map(g => g.name.toLowerCase());
+        return names.length === new Set(names).size;
+      },
+      "Duplicate unit names are not allowed"
+    )
+    // Optional: check for unique section names across all groups
+    .refine(
+      groups => {
+        const allSections = new Set();
+        for (const group of groups) {
+          for (const section of group.sections) {
+            const lowerSection = section.toLowerCase();
+            if (allSections.has(lowerSection)) return false;
+            allSections.add(lowerSection);
+          }
+        }
+        return true;
+      },
+      "Section names must be unique across all units"
+    )
+});
 const route = useRoute();
 const router = useRouter();
 const authStore = useAuthStore();
@@ -203,40 +258,17 @@ const popupStore = usePopupStore();
 const groups = ref<Group[]>([]);
 const groupNoSectionErrors = ref<boolean[]>([])
 const groupSectionNamingErrors = ref<boolean[]>([])
+const duplicateGroupError = ref<boolean[]>([])
 const newGroupName = ref("");
 const groupError = ref(false);
 const groupTypingError = ref(false);
 const groupSpaceError = ref(false);
 const groupEmptyError = ref(false);
-
-watch(
-    () => groups.value.length,
-    (len) => {
-        groupNoSectionErrors.value = Array(len).fill(false)
-    },
-    { immediate: true }
-)
-
-watch(
-    () => groups.value.length,
-    (len) => {
-        groupNoSectionErrors.value = Array(len).fill(false);
-        groupSectionNamingErrors.value = Array(len).fill(false);
-    },
-    { immediate: true }
-);
-
 const typingEffectStop = ref(() => { });
 const topic = ref("");
 const topicError = ref(false);
-const topicTypingError = ref(false);
 const topicSpaceError = ref(false);
 const noFileError = ref(false);
-const safeTopics = ref([
-    "Engineering 101",
-    "Materials Science",
-    "Health and Fitness",
-]);
 const libraryDifficulty = ref("Normal");
 const buttonDisabled = ref({
     noRooms: true,
@@ -247,6 +279,62 @@ const topicInput = ref<HTMLInputElement | null>(null);
 const fileInput = ref<HTMLInputElement | null>(null);
 const visibilityTab = ref<'public' | 'private'>('public');
 const isPublic = computed<boolean>(() => visibilityTab.value === 'public');
+
+watch(
+    () => groups.value.length,
+    (len) => {
+        groupNoSectionErrors.value = Array(len).fill(false);
+        groupSectionNamingErrors.value = Array(len).fill(false);
+        duplicateGroupError.value = Array(len).fill(false);
+    },
+    { immediate: true }
+);
+
+watch(formSchema, (newValue) => {
+  if (newValue) {
+    topicError.value = false;
+  }
+});
+
+// Watch for file uploads
+watch(selectedFile, (newValue) => {
+  if (newValue) {
+    noFileError.value = false;
+  }
+});
+
+// Watch for group additions
+watch(() => groups.value.length, (newLength) => {
+  if (newLength > 0) {
+    groupEmptyError.value = false;
+  }
+});
+
+// Watch for section additions in each group
+watch(groups, (newGroups) => {
+  newGroups.forEach((group, index) => {
+    if (group.sections.length > 0) {
+      groupNoSectionErrors.value[index] = false;
+    }
+  });
+}, { deep: true });
+
+const handleTopicInput = () => {
+  topicError.value = false;
+};
+
+const handleGroupNameInput = (
+    // index
+) => {
+  groupError.value = false;
+//   duplicateGroupError.value[index] = false;
+};
+
+const handleSectionNameInput = (groupIndex) => {
+  groupSectionNamingErrors.value[groupIndex] = false;
+  duplicateGroupError.value[groupIndex] = false;
+};
+
 
 
 const libgenRoute = computed(() => {
@@ -392,103 +480,85 @@ const getTotalSectionCount = () => {
     return groups.value.reduce((total, group) => total + group.sections.length, 0);
 };
 
-const hasErrors = (): boolean => {
+const resetErrorStates = () => {
+  // Reset all single-value error states
+  topicError.value = false;
+  topicSpaceError.value = false;
+  noFileError.value = false;
+  groupError.value = false;
+  groupTypingError.value = false;
+  groupSpaceError.value = false;
+  groupEmptyError.value = false;
+  
+  // Reset array error states
+  groupNoSectionErrors.value = Array(groups.value.length).fill(false);
+  groupSectionNamingErrors.value = Array(groups.value.length).fill(false);
+  duplicateGroupError.value = Array(groups.value.length).fill(false);
+}; 
 
-    if (!(isPublic.value || !isPublic.value)) {
-        console.log(isPublic.value)
-        popupStore.showPopup(
-            "Please select a visibility option."
-        );
-        return true;
-    }
+const validateForm = () => {
+  try {
+    // Create the form data object
+    const formData = {
+      topic: topic.value,
+      visibility: isPublic.value,
+      selectedFile: selectedFile.value,
+      groups: groups.value.map(group => ({
+        name: group.name,
+        sections: group.sections
+      }))
+    };
 
-    if (!authStore.loggedIn) {
-        // must login to submit
-        popupStore.showPopup(
-            "Please login to continue."
-        );
-        return true;
-    }
-
-    if (!selectedFile.value) {
-        noFileError.value = true;
-        return true;
-    }
-
-    noFileError.value = false;
-
-    buttonDisabled.value.isSubmitting = true;
-
-    if (topic.value.trim() === "") {
-        topicError.value = true;
-        return true;
-    }
-
-    topicError.value = false;
-
-    topicTypingError.value = 
-    topic.value.length < 4 || topic.value.length > 25;
-
-    if (topicTypingError.value) {
-        return true;
-    }
-
-    topicSpaceError.value = topic.value[0] === " " || topic.value[topic.value.length - 1] === " ";
-    if (topicSpaceError.value) {
-        return true;
-    }
-
-    const urlPattern =
-        /^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)$/;
-    if (urlPattern.test(topic.value)) {
-        popupStore.showPopup(
-            "We do not currently support links as are currently still in development. If you would like this to be added, please contact us through the contact page or discord."
-        );
-        return true;
-    }
-
-
-    // Check if there are groups and sections
-    if (groups.value.length === 0) {
-        groupEmptyError.value = true;
-        return true;
-    }
-
-    groupEmptyError.value = false;
-
-    groupNoSectionErrors.value = groups.value.map(g => g.sections.length === 0)
-
-    if (groupNoSectionErrors.value.some(err => err)) {
-        return true;
-    }
-
-    if (groupSectionNamingErrors.value.some(err => err)) {
-        return true;
-    }
-
-    // Validate all group and section names
-    for (const group of groups.value) {
-        if (group.name.trim() === "" || group.sections.length === 0) {
-            return true;
-        }
-
-
-        for (const section of group.sections) {
-            if (section.trim() === "" || 
-                section[0] === " " || section[section.length - 1] === " ") {
-                return true;
+    // Validate the form data
+    formSchema.parse(formData);
+    
+    // If we get here, validation passed
+    return true;
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      // Format and display errors
+      const formattedErrors = error.format();
+      
+      // Handle errors specifically based on path
+      error.errors.forEach(err => {
+        const path = err.path.join('.');
+        const message = err.message;
+        
+        if (path.startsWith('topic')) {
+            console.log(path)
+          topicError.value = true;
+        } else if (path.startsWith('selectedFile')) {
+          noFileError.value = true;
+        } else if (path.startsWith('groups')) {
+          if (path === 'groups') {
+            groupEmptyError.value = true;
+          } else {
+            // Extract group index if available
+            const match = path.match(/groups\[(\d+)\]/);
+            if (match) {
+              const index = parseInt(match[1]);
+              if (path.includes('sections')) {
+                groupNoSectionErrors.value[index] = true;
+              } else {
+                groupError.value = true;
+              }
             }
+          }
         }
+      });
+      
+      // Show a general error message
+    //   popupStore.showPopup(error.errors[0].message);
     }
-
     return false;
-
-}
+  }
+};
 
 const handleSubmit = () => {
 
-    if (hasErrors()) {
-        popupStore.showPopup("Please check all unit and section names.");
+    resetErrorStates();
+
+    if (!validateForm()) {
         buttonDisabled.value.isSubmitting = false;
         return;
     }
