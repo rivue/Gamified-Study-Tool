@@ -20,7 +20,7 @@
                             Current Streak:
                             <span class="streak-icon-container">
 
-                                <img src="../../../../dist/img/fireicon.png" alt="Fire icon" class="streak-fire-icon"
+                                <img src="../../../assets/images/fireicon.png" alt="Fire Streak Icon" class="streak-fire-icon"
                                 />
                                 {{ currentStreak }}
                             </span>
@@ -40,7 +40,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted } from "vue";
+import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
 import { useGameStore } from "@/store/gameStore";
 import { useUserStatsStore } from "@/store/userStatsStore";

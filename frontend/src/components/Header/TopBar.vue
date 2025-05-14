@@ -6,7 +6,7 @@
         <div class="menu-buttons">
             <div v-if="loggedIn" class="streak-container">
                 <div class="streak-wrapper">
-                    <img class="logo" src="../../../dist/img/fireicon.png" alt="Logo"
+                    <img class="logo" src="../../assets/images/fireicon.png" alt="Fire Streak Icon"
                         style="max-height: 24px; pointer-events: none;" />
                     <span class="streak-count">{{ currentStreak }}</span>
                 </div>
