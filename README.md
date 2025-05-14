@@ -126,9 +126,8 @@ TODO list:
 
         medium (chip away at when tired / mentally exhausted from hard ones):
         - implement game "score" logic (if you get >80% #attemps:number of questions ratio) then you get more / less points or something, etc...
-            - ⭐️ add a user joined date so I can display "rivuer for 6 months, 19 days, 13 hours, 10 minutes, 5, 6, 7, etc... seconds"
-        - ⭐️ In creating a new library, add checkboxes for different types of modes (fill-in-the-blank, t/f, mcq, etc…)
-            - maybe add it in settings for owner as well (enable / disable for future lesson content generation)
+            - ⭐️ add a user joined date so I can display "rivuer for 6 months, 19 days, 13 hours, 10 minutes, 5, 6, 7, etc... seconds" in different places
+
         - ⭐️ add some other types of games / questions (ex: true / false, very detailed / specific questions, sorting, compare / contrast, analogies, image based stuff (not sure how to implement) 6 options choose 1-6, etc... see list below)
         - ⭐️ add i-card for all users, maybe description about the library along with a preview of the files used in the library and maybe also users who are members of the library or something 
             - make description visible right below library card I think, maybe i card has more detail information, maybe when it was created or current owner or something
@@ -158,6 +157,8 @@ TODO list:
 
     general:
     study tool additions / ideas:
+        - ⭐️ In creating a new library, add checkboxes for different types of modes (fill-in-the-blank, t/f, mcq, etc…)
+            - maybe add it in settings for owner as well (enable / disable for future lesson content generation)
         - integrate with teacher / school list from rate my professors 
             - would probably be pretty easy: https://classic.yarnpkg.com/en/package/ratemyprofessor-api
             - https://github.com/tisuela/ratemyprof-api
