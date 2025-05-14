@@ -77,11 +77,13 @@ TODO list:
 
         last / harder:
 
-          - ⭐️ Terms of use / Policy Page legal agreement thing
+
+        - ⭐️ add google auth
+        - ⭐️ Terms of use / Policy Page legal agreement thing - ask gpt if I actually need, maybe ask jake how to do but maybe not
             - ⭐️ There are probably websites and stuff for this --> do this before Stripe
         - ⭐️ Stripe implementation
             - have to think abt what different payment levels mean / how I want to do it
-        - ⭐️ ⭐️ ⭐️ (might take at least a couple weeks) UI redesign / rehaul *** --> kinnu, duolingo, saved instagram design reels etc..
+        - ⭐️ ⭐️ ⭐️ (might take at least a couple weeks) UI redesign / rehaul *** --> kinnu, duolingo, saved instagram design reels etc...) --> ask nc state entreprenuership ppl for tips while i'm designing
             - Note: 1) try to see what horizontal --> vertical learning path looks like, and possibly make a vertical bar on the side for settings, i-card, files list, adding a new stepping stone, etc... but maybe keep lesson name and current unit name at the top?
             - COPY QUIZLET???
             - change popups --> toast, possibly with bar that displays when it will leave
@@ -107,6 +109,8 @@ TODO list:
         
         glitches / things
             - why is public generating a code on library creation? 
+            - current streak in lesson complete displays current streak not current streak + 1 (maybe just refetch it?)
+            - improve question generation eventually, like make all answers similar length, use similar answer choices, utilize SAT / ACT / MCAT style questions, maybe tailor the answer style for each course, like MCAT = premed, SAT / ACT = SAT / ACT prep, college style = college final exam style / quiz, etc...
 
         hard probably (goal: 2 high level bullet points / wk):
         - ⭐️ remove alert message in library creator (not hard but have to remember)
@@ -120,7 +124,6 @@ TODO list:
             - ⭐️ Delete courses / libraries (whatever they're called) (requires entering the name of the unit / course just for accidental reasons)
             - ⭐️ Remember to delete from both DB and pinecone as well, as well as respective child / parent courses / units / sections / libraries, roomNameState, LibraryFavorites, question, question_choice, LibraryMembership, etc...
         - ⭐️ (courses need ability to add multiple people first) leaderboard / game point tracking system (could be reworked later)
-        - ⭐️ add google auth
         - ⭐️ let units / sections / courses have duplicate values as others in db
         - ⭐️ add ability to see uploaded files in library (list of their names) and maybe even file preview (would require nosql db or something maybe)
 
@@ -138,10 +141,11 @@ TODO list:
             - figure out if 1) what I do to migrate the database is safe (swapping uri string and running flask db ugprade) and 2) how I should do it if it is not ideal
         
         easy (same as medium):
-        - ⭐️ fix Aryan's problem with viewing it on his phone
+        - ⭐️ fix Aryan's problem with viewing it on his phone - some samsung variation?
         - ⭐️ users SHOULD be able to create libraries with duplicate names because of how generic some courses can be (philosophy, biology, math, calculus, etc...)
         - ⭐️ handle weird thing in production where new library code displays null for like half a second, just make it look good basically
         - ⭐️ make redirect smooth, like make it not show other pages or whatever (use repomix + gpt)
+        - ⭐️ get rid of powered by openai logo thing
 
     OTHER PAGES:
         - terms and policies page
@@ -255,6 +259,7 @@ TODO list:
         - make a constants file for discord links, twitter / x links, any backend urls, etc...
             - make it available for both frontend and backend like for api routes
             - max_number of libraries
+            - image links, like fireicon, discord logo, etc... ="../../assets/images/fireicon.png
         - for short answer, 1) make it one word (for now) and most importantly 2) make sure the exact word is in the other side of the card
         - look into adding a resizable area somewhere in your site (like how turbo learn has it) but like people can't change it
         - ??? remove lesson ids, lesson names, password reset tokens and confirmation tokens from urls and communicate them somewhere else
