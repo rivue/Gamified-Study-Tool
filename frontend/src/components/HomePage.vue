@@ -41,7 +41,6 @@
                     </a>
                 </div>
             </div>
-            <img :src="openaiPath" alt="Powered by OpenAI" class="openai" />
             <div class="faq-container">
                 <FaqComponent />
             </div>

@@ -420,6 +420,8 @@ function validateForm(data: unknown) {
 
 async function handleSubmit() {
 
+    buttonDisabled.value.isSubmitting = true;
+
     const payload = {
         topic: topic.value,
         visibility: isPublic.value,

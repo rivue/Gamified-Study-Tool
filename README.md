@@ -77,7 +77,7 @@ TODO list:
 
         last / harder:
 
-
+        - ⭐️ vvvmaybe ask for feedback before doing vvv
         - ⭐️ add google auth
         - ⭐️ Terms of use / Policy Page legal agreement thing - ask gpt if I actually need, maybe ask jake how to do but maybe not
             - ⭐️ There are probably websites and stuff for this --> do this before Stripe
@@ -122,15 +122,13 @@ TODO list:
             - ⭐️ Delete sections requires entering the name of the unit / course just for accidental reasons)
             - ⭐️ Delete Units( requires entering the name of the unit / course just for accidental reasons)
             - ⭐️ Delete courses / libraries (whatever they're called) (requires entering the name of the unit / course just for accidental reasons)
-            - ⭐️ Remember to delete from both DB and pinecone as well, as well as respective child / parent courses / units / sections / libraries, roomNameState, LibraryFavorites, question, question_choice, LibraryMembership, etc...
+               - ⭐️ Remember to delete from both DB and pinecone as well, as well as respective child / parent courses / units / sections / libraries, roomNameState, LibraryFavorites, question, question_choice, LibraryMembership, etc...
         - ⭐️ (courses need ability to add multiple people first) leaderboard / game point tracking system (could be reworked later)
         - ⭐️ let units / sections / courses have duplicate values as others in db
         - ⭐️ add ability to see uploaded files in library (list of their names) and maybe even file preview (would require nosql db or something maybe)
 
         medium (chip away at when tired / mentally exhausted from hard ones):
-        - implement game "score" logic (if you get >80% #attemps:number of questions ratio) then you get more / less points or something, etc...
-
-        - ⭐️ add some other types of games / questions (ex: true / false, very detailed / specific questions, sorting, compare / contrast, analogies, image based stuff (not sure how to implement) 6 options choose 1-6, etc... see list below)
+        - ⭐️ implement some game "score" logic (if you get >80% #attemps:number of questions ratio) then you get more / less points or something, etc...
         - ⭐️ add i-card for all users, maybe description about the library along with a preview of the files used in the library and maybe also users who are members of the library or something 
             - make description visible right below library card I think, maybe i card has more detail information, maybe when it was created or current owner or something
             - also displays number of members of the library
@@ -142,10 +140,8 @@ TODO list:
         
         easy (same as medium):
         - ⭐️ fix Aryan's problem with viewing it on his phone - some samsung variation?
-        - ⭐️ users SHOULD be able to create libraries with duplicate names because of how generic some courses can be (philosophy, biology, math, calculus, etc...)
         - ⭐️ handle weird thing in production where new library code displays null for like half a second, just make it look good basically
         - ⭐️ make redirect smooth, like make it not show other pages or whatever (use repomix + gpt)
-        - ⭐️ get rid of powered by openai logo thing
 
     OTHER PAGES:
         - terms and policies page
@@ -156,6 +152,7 @@ TODO list:
     general:
     study tool additions / ideas:
     
+        - ⭐️ add some other types of games / questions (ex: true / false, very detailed / specific questions, sorting, compare / contrast, analogies, image based stuff (not sure how to implement) 6 options choose 1-6, etc... see list below)
         - ⭐️ In creating a new library, add checkboxes for different types of modes (fill-in-the-blank, t/f, mcq, etc…)
             - maybe add it in settings for owner as well (enable / disable for future lesson content generation)
         - integrate with teacher / school list from rate my professors 
