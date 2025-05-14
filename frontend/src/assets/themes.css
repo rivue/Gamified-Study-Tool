@@ -68,6 +68,7 @@
     
     /* Special Colors */
     --gold-color: rgba(255, 216, 4, 0.8);  /* Slightly transparent gold */
+    --error-color: #ff746c; /* Soft red */
     
 
     /* Utility Colors */

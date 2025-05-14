@@ -74,19 +74,13 @@ TODO list:
 
     LAUNCH LIST: goal: July 6th then start working on social media posts
 
-        hard probably (goal: 2 high level bullet points / wk):
-        - ⭐️ remove alert message in library creator (not hard but have to remember)
 
-        - ⭐️ Add "edit mode" for library creator - toggle for: delete sections / units / courses and also add sections / units and would keep editing isolated from actually playing the course
-        - ✅ ⭐️ Finish sections + units
-            - ⭐️ Add ability to add each section to each unit (later --> come back to, reminder to make it account for 1-n number of sections no matter how that looks. add new stepping stones button is commented out for now)
-            - ⭐️ third idea) for course owner, add an "edit" button and "delete / trash can" button when you hover over the course or click it or something, maybe add an "edit mode" in the main bar thing I'm going to add?
-        - ⭐️ (would like to implement visibility of different courses first or at least a many:one for non-owners in library model)
-            - ⭐️ Delete sections requires entering the name of the unit / course just for accidental reasons)
-            - ⭐️ Delete Units( requires entering the name of the unit / course just for accidental reasons)
-            - ⭐️ Delete courses / libraries (whatever they're called) (requires entering the name of the unit / course just for accidental reasons)
-            - ⭐️ Remember to delete from both DB and pinecone as well, as well as respective child / parent courses / units / sections / libraries, roomNameState, LibraryFavorites, question, question_choice, LibraryMembership, etc...
-        - ⭐️ (courses need ability to add multiple people first) leaderboard / game point tracking system (could be reworked later)
+        last / harder:
+
+          - ⭐️ Terms of use / Policy Page legal agreement thing
+            - ⭐️ There are probably websites and stuff for this --> do this before Stripe
+        - ⭐️ Stripe implementation
+            - have to think abt what different payment levels mean / how I want to do it
         - ⭐️ ⭐️ ⭐️ (might take at least a couple weeks) UI redesign / rehaul *** --> kinnu, duolingo, saved instagram design reels etc..
             - Note: 1) try to see what horizontal --> vertical learning path looks like, and possibly make a vertical bar on the side for settings, i-card, files list, adding a new stepping stone, etc... but maybe keep lesson name and current unit name at the top?
             - COPY QUIZLET???
@@ -102,6 +96,7 @@ TODO list:
                 - ⭐️ explore adding "scroll to current" on map page (last unlocked node)
                 - also, maybe change it to vertical
                 - ⭐️ add ability to leave libraries (later)
+                - ⭐️ move dropdown menu to left + make dropdown menu permanant, replace w/ profile picture --> hover menu for to see profile settings or something
                 - ⭐️ all the other routes and stuff (terms & policies, buying subscription, can't think of others?)
             - add ui ability to "join" private libraries / public libraries that you didn't create maybe in like a seperate page or list or maybe I could add a box for putting in library codes or something
             - ⭐️ after user submits something and is waiting, display a loading bar or wheel or different rotating facts (maybe relevant to the library?) letting the user know that it is generating
@@ -109,44 +104,44 @@ TODO list:
             use this maybe: https://www.shadcn-vue.com/docs/components/stepper.html
             - note: for main page, add two / 3 simple boxes, class you want, school, and possibly professor, and it gives you classes close to you like quizlet / rate my professor along with option for creating your own
                 maybe it shows private ones with a "lock" icon and prompts you to enter a password. this way it would be like more of a network, which would differentiate us from a copy paste ai study tool (turbolearn) / NotebookLM
-        - ⭐️ Stripe implementation
-            - have to think abt what different payment levels mean / how I want to do it
+        
+        glitches / things
+            - why is public generating a code on library creation? 
+
+        hard probably (goal: 2 high level bullet points / wk):
+        - ⭐️ remove alert message in library creator (not hard but have to remember)
+        - ⭐️ Add "edit mode" for library creator - toggle for: delete sections / units / courses and also add sections / units and would keep editing isolated from actually playing the course
+        - ✅ ⭐️ Finish sections + units
+            - ⭐️ Add ability to add each section to each unit (later --> come back to, reminder to make it account for 1-n number of sections no matter how that looks. add new stepping stones button is commented out for now)
+            - ⭐️ third idea) for course owner, add an "edit" button and "delete / trash can" button when you hover over the course or click it or something, maybe add an "edit mode" in the main bar thing I'm going to add?
+        - ⭐️ (would like to implement visibility of different courses first or at least a many:one for non-owners in library model)
+            - ⭐️ Delete sections requires entering the name of the unit / course just for accidental reasons)
+            - ⭐️ Delete Units( requires entering the name of the unit / course just for accidental reasons)
+            - ⭐️ Delete courses / libraries (whatever they're called) (requires entering the name of the unit / course just for accidental reasons)
+            - ⭐️ Remember to delete from both DB and pinecone as well, as well as respective child / parent courses / units / sections / libraries, roomNameState, LibraryFavorites, question, question_choice, LibraryMembership, etc...
+        - ⭐️ (courses need ability to add multiple people first) leaderboard / game point tracking system (could be reworked later)
         - ⭐️ add google auth
         - ⭐️ let units / sections / courses have duplicate values as others in db
         - ⭐️ add ability to see uploaded files in library (list of their names) and maybe even file preview (would require nosql db or something maybe)
 
         medium (chip away at when tired / mentally exhausted from hard ones):
         - implement game "score" logic (if you get >80% #attemps:number of questions ratio) then you get more / less points or something, etc...
-            - ⭐️ add a user joined date so I can display "rivuer for 6 months, 19 days, 13 hours, 10 minutes, 5, 6, 7, etc... seconds"
-        - ⭐️ Terms of use / Policy Page legal agreement thing
-            - ⭐️ Look at websites and stuff for this
-        - ⭐️ In creating a new library, add checkboxes for different types of modes (fill-in-the-blank, t/f, mcq, etc…)
-            - maybe add it in settings for owner as well (enable / disable for future lesson content generation)
 
         - ⭐️ add some other types of games / questions (ex: true / false, very detailed / specific questions, sorting, compare / contrast, analogies, image based stuff (not sure how to implement) 6 options choose 1-6, etc... see list below)
         - ⭐️ add i-card for all users, maybe description about the library along with a preview of the files used in the library and maybe also users who are members of the library or something 
             - make description visible right below library card I think, maybe i card has more detail information, maybe when it was created or current owner or something
             - also displays number of members of the library
             - should I replace the proposed "i-card" with some icon that links to library details like discord has with their profile page where I would put files, members, and everything else in the menu, or should I keep it as is?
-            - ⭐️ make library description editable by owner
-                - maybe this would be near leaderboard or something
+        - ⭐️ make library description editable by owner
+            - maybe this would be near leaderboard or something
         - ⭐️ add staging / pre-production environment that isn't localhost
             - figure out if 1) what I do to migrate the database is safe (swapping uri string and running flask db ugprade) and 2) how I should do it if it is not ideal
         
         easy (same as medium):
-
         - ⭐️ fix Aryan's problem with viewing it on his phone
-        - ⭐️ should not be able to make duplicate section names within a library, so check before they create it
         - ⭐️ users SHOULD be able to create libraries with duplicate names because of how generic some courses can be (philosophy, biology, math, calculus, etc...)
-        - ⭐️ error messages in create library look bad
-        - ⭐️ add page after you finish a game session, but make it have confetti / small animation or something
-        - ⭐️ make sure the background of the site is the color you want if you scroll to far (like in main page if you scroll too far down) (right now its white which is not good)
         - ⭐️ handle weird thing in production where new library code displays null for like half a second, just make it look good basically
-        - ⭐️ move dropdown menu to left + make dropdown menu permanant, replace w/ profile picture --> hover menu for settings pageor something
-        - ⭐️ fix weird loading... thing that appears on the top left corner
         - ⭐️ make redirect smooth, like make it not show other pages or whatever (use repomix + gpt)
-        - leaderboard
-            - for leaderboard, make sure only members of the library can access it, else redirect somewhere else
 
     OTHER PAGES:
         - terms and policies page
@@ -156,13 +151,18 @@ TODO list:
 
     general:
     study tool additions / ideas:
+    
+        - ⭐️ In creating a new library, add checkboxes for different types of modes (fill-in-the-blank, t/f, mcq, etc…)
+            - maybe add it in settings for owner as well (enable / disable for future lesson content generation)
         - integrate with teacher / school list from rate my professors 
             - would probably be pretty easy: https://classic.yarnpkg.com/en/package/ratemyprofessor-api
             - https://github.com/tisuela/ratemyprof-api
         - ability to verify by school email which helps with filtering results? 
         - (later) add support for links / pdfs / other things and get rid of things like difficulty, tutor, etc... then actually start generating stuff to study
         - (later) add support for multiple file upload as well
-        7) add logic for multiple flame emojis w/ streaks of 1, 5, 10, 25, 50, 100
+        - add logic for multiple flame emojis w/ streaks of 1, 5, 10, 25, 50, 100
+            - or make it adopt to a curve like exponential games or like xp in skyblock something more broken like --> (1, 3, 6, 8, 18, 36, 42, 69, 120, 210, etc...)
+                - but offer rewards at even perks (5, 10, 15, 25, 50) to make it even more enticing?
             - could be for a smaller one: https://lottiefiles.com/free-animation/fire-flame-4De5RVVPag
             - slightly bigger one: https://lottiefiles.com/free-animation/fire-IuJfcIXKF1
             - maybe for 50 or 100, this whisks accross the little hover menu?: https://lottiefiles.com/free-animation/dancing-fire-CtzldMIEf9

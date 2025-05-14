@@ -1,8 +1,5 @@
 <!-- App.vue -->
 <template>
-    <div v-if="isLoading">
-        <LoadingComponent/>
-    </div>
     <div class="app-container" :class="themeClass">
         <div v-if="!hideHeaderFooter">
             <TopBar />
@@ -161,6 +158,8 @@ watch(() => route.path, () => {
     height: 100%;
     width: 100vw;
     z-index: 1;
+    overscroll-behavior-x: none;
+    overscroll-behavior-y: none;
 }
 
 .main-content {
@@ -174,6 +173,9 @@ watch(() => route.path, () => {
     display: flex;
     justify-content: center;
     height: 100%;
-    overflow: auto;
+    overflow-y: auto; /* Only vertical scroll */
+    overflow-x: hidden; /* Disable horizontal swipe */
+    overscroll-behavior: contain; /* Prevent pull-to-refresh and bounce */
+    touch-action: pan-y; /* Only allow vertical scrolling gestures */
 }
 </style>

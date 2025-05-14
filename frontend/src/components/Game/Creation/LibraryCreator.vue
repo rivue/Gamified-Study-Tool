@@ -1,6 +1,7 @@
 <template>
     <div class="library-gen-page p-8">
         <div class="form-container" @keydown.enter="handleSubmit">
+
             <!-- Topic Selection -->
             <div class="libgen-create p-16 br-4" style="border: 1px solid var(--text-color); border-radius: 5px;">
                 <h1 v-if="libgenRoute">Create a Course to Explore</h1>
@@ -10,18 +11,12 @@
                         <div class="libgen-title">Course name</div>
                         <div class="title-bar">
                             <input type="text" id="topicInput" ref="topicInput" v-model="topic"
-                                :class="{ 'input-error': topicError || topicTypingError || topicSpaceError }"
-                                placeholder="Mrs. Frizzle's science class, Biology 272, etc..." maxlength="100" @focus="selectInputText"
-                                @paste="handlePaste" />
+                                :class="{ 'input-error': formattedErrors.topic?._errors?.length }"
+                                placeholder="Mrs. Frizzle's science class, Biology 272, etc..." maxlength="100"
+                                @focus="selectInputText" @paste="handlePaste" />
                         </div>
-                        <div v-if="topicError" class="error-message">
-                            Please enter a topic.
-                        </div>
-                        <div v-if="topicTypingError" class="error-message">
-                            Topic can only have spaces or letters and must be between 4 and 25 characters long.
-                        </div>
-                        <div v-if="topicSpaceError" class="error-message">
-                            Topic must not start or end with a space.
+                        <div v-if="formattedErrors.topic?._errors?.length" class="error-message">
+                            {{ formattedErrors.topic._errors[0] }}
                         </div>
                     </div>
                 </div>
@@ -34,12 +29,15 @@
                             <div class="libgen-title">Upload File</div>
                             <div class="file-input-container text-[var(--text-color)] border-[var(--text-color)]">
                                 <input type="file" id="fileInput" ref="fileInput" @change="handleFileUpload"
-                                    :disabled="disableExtras" :class="{ 'input-error': noFileError }" accept=".pdf" />
+                                    :class="{ 'input-error': formattedErrors.selectedFile?._errors?.length }"
+                                    :disabled="disableExtras" accept=".pdf" />
                                 <div v-if="selectedFile" class="selected-file">
                                     Selected: {{ selectedFile.name }}
                                     <button class="remove-file-btn" @click="removeFile">×</button>
                                 </div>
-                                <div v-if="noFileError" class="error-message">Must have at least one file.</div>
+                                <div v-if="formattedErrors.selectedFile?._errors?.length" class="error-message">
+                                    {{ formattedErrors.selectedFile._errors[0] }}
+                                </div>
                                 <div class="helper-text">
                                     🐙 Only accepting .pdf files that are 500kb or less for now - we're still building!
                                 </div>
@@ -59,25 +57,22 @@
 
                                 <div class="group-input-wrapper">
                                     <input type="text" v-model="newGroupName" placeholder="Exam 1, Exam 2, etc..."
-                                        :class="{ 'input-error': groupError || groupTypingError || groupSpaceError || groupEmptyError }"
                                         maxlength="40" :disabled="disableExtras" @keyup.enter="addGroup" />
                                     <button class="add-btn" @click="addGroup"
                                         :disabled="!newGroupName.trim() || groups.length >= 10 || disableExtras">
                                         Add Unit
                                     </button>
                                 </div>
-                                <div class="error-container">
-                                    <div v-if="groupError" class="error-message">Please enter a valid unit name.</div>
-                                    <div v-if="groupTypingError" class="error-message">Unit name must be between 4 and 25 characters long.</div>
-                                    <div v-if="groupSpaceError" class="error-message">Unit name must not start or end with a space.</div>
-                                    <div v-if="groupEmptyError" class="error-message">Must have at least one Unit</div>
 
+                                <div v-if="formattedErrors.groups?._errors?.length" class="error-message">
+                                    {{ formattedErrors.groups._errors[0] }}
                                 </div>
                             </div>
 
                             <!-- Groups list -->
                             <div class="groups-container">
                                 <div v-for="(group, groupIndex) in groups" :key="groupIndex" class="group-item">
+
                                     <div class="group-header">
                                         <div class="group-title">{{ group.name }}</div>
                                         <div class="group-actions">
@@ -86,6 +81,7 @@
                                         </div>
                                     </div>
 
+
                                     <!-- Sections for this group -->
                                     <div class="group-sections">
                                         <div class="section-chips">
@@ -93,41 +89,43 @@
                                                 class="section-chip">
                                                 {{ section }}
                                                 <button class="remove-section-btn"
-                                                    @click="removeSection(groupIndex, sectionIndex)">×</button>
+                                                @click="removeSection(groupIndex, sectionIndex)">×
+                                            </button>
                                             </div>
                                         </div>
 
                                         <!-- Section input for this group -->
                                         <div class="section-input-wrapper">
                                             <input type="text" v-model="group.newSectionName"
-                                                placeholder="Mitosis, Derivative Rule, etc..."
-                                                :class="{ 'input-error': groupNoSectionErrors[groupIndex] || groupSectionNamingErrors[groupIndex] }"
-                                                maxlength="40" :disabled="group.sections.length >= 15 || disableExtras"
+                                                placeholder="Mitosis, Derivative Rule, etc..." maxlength="40"
+                                                :disabled="group.sections.length >= 15 || disableExtras"
+                                                :class="{ 'input-error': formattedErrors.groups?.[groupIndex]?.sections?._errors?.length }"
                                                 @keyup.enter="addSection(groupIndex)" />
                                             <button class="add-btn" @click="addSection(groupIndex)"
                                                 :disabled="!group.newSectionName?.trim() || group.sections.length >= 15 || disableExtras">
                                                 Add Section
                                             </button>
                                         </div>
-                                        <div class="error-container">
-                                            <div v-if="groupNoSectionErrors[groupIndex]" class="error-message">
-                                                Every Unit must have at least one section
-                                            </div>
-                                            <div v-if="groupSectionNamingErrors[groupIndex]" class="error-message">
-                                                Section names must only have letters or spaces and must be between 4 and 25
-                                                characters long.
-                                            </div>
+                                        <div v-if="formattedErrors.groups?.[groupIndex]?.name?._errors?.length"
+                                            class="error-message">
+                                            {{ formattedErrors.groups[groupIndex].name._errors[0] }}
                                         </div>
+
+                                        <div v-if="formattedErrors.groups?.[groupIndex]?.sections?._errors?.length"
+                                            class="error-message">
+                                            {{ formattedErrors.groups[groupIndex].sections._errors[0] }}
+                                        </div>
+
                                     </div>
                                 </div>
                             </div>
+                        </div>
 
-                            <div class="helper-text">
-                                🐙 You can create up to 10 units, with up to 15 sections each.
-                            </div>
-                            <div class="helper-text">
-                                🐙 Don't worry about adding everything now - you can add more later!
-                            </div>
+                        <div class="helper-text">
+                            🐙 You can create up to 10 units, with up to 15 sections each.
+                        </div>
+                        <div class="helper-text">
+                            🐙 Don't worry about adding everything now - you can add more later!
                         </div>
                     </div>
                 </div>
@@ -176,7 +174,7 @@
 
 
 <script setup lang="ts">
-import { ref, watch, computed, onMounted, onUnmounted } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import axios from "axios";
 
@@ -194,49 +192,87 @@ interface Group {
     newSectionName: string;
     sectionError: boolean;
 }
+import { z } from "zod";
 
+// Define schemas for your form
+const sectionSchema = z.string()
+    .min(4, "Section names must be at least 4 characters")
+    .max(25, "Section names must be at most 25 characters")
+    .refine(val => !val.startsWith(" ") && !val.endsWith(" "),
+        "Section names must not start or end with a space");
+
+const groupSchema = z.object({
+    name: z.string()
+        .min(4, "Unit names must be at least 4 characters")
+        .max(25, "Unit names must be at most 25 characters")
+        .refine(val => !val.startsWith(" ") && !val.endsWith(" "),
+            "Unit names must not start or end with a space"),
+    sections: z.array(z.string())
+        .min(1, "Every Unit must have at least one section")
+        .superRefine((sections, ctx) => {
+            // Check for length issues first
+            const lengthIssues = sections.some(
+                section => section.length < 4 || section.length > 25
+            );
+            
+            if (lengthIssues) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: "All section names must be between 4 and 25 characters"
+                });
+                return;
+            }
+            
+            // Check for whitespace
+            const whitespaceIssues = sections.some(
+                section => section.startsWith(" ") || section.endsWith(" ")
+            );
+            
+            if (whitespaceIssues) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: "Section names must not start or end with a space"
+                });
+                return;
+            }
+            
+            // Check duplicates within a unit
+            if (sections.length !== new Set(sections.map(s => s.toLowerCase())).size) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: "Duplicate section names are not allowed within a unit"
+                });
+            }
+        })
+});
+
+// Create schema for the entire form
+const formSchema = z.object({
+    topic: z.string()
+        .min(4, "Course name must be at least 4 characters")
+        .max(25, "Course name must be at most 25 characters")
+        .refine(val => !val.startsWith(" ") && !val.endsWith(" "),
+            "Course name must not start or end with a space"),
+    visibility: z.boolean(),
+    selectedFile: z.instanceof(File, { message: "Must have at least one file" }),
+    groups: z.array(groupSchema)
+        .min(1, "Must have at least one Unit")
+        .refine(
+            groups => {
+                const names = groups.map(g => g.name.toLowerCase());
+                return names.length === new Set(names).size;
+            },
+            "Duplicate unit names are not allowed"
+        )
+});
 const route = useRoute();
 const router = useRouter();
 const authStore = useAuthStore();
 const popupStore = usePopupStore();
 // New refs for groups
 const groups = ref<Group[]>([]);
-const groupNoSectionErrors = ref<boolean[]>([])
-const groupSectionNamingErrors = ref<boolean[]>([])
-const newGroupName = ref("");
-const groupError = ref(false);
-const groupTypingError = ref(false);
-const groupSpaceError = ref(false);
-const groupEmptyError = ref(false);
-
-watch(
-    () => groups.value.length,
-    (len) => {
-        groupNoSectionErrors.value = Array(len).fill(false)
-    },
-    { immediate: true }
-)
-
-watch(
-    () => groups.value.length,
-    (len) => {
-        groupNoSectionErrors.value = Array(len).fill(false);
-        groupSectionNamingErrors.value = Array(len).fill(false);
-    },
-    { immediate: true }
-);
-
 const typingEffectStop = ref(() => { });
 const topic = ref("");
-const topicError = ref(false);
-const topicTypingError = ref(false);
-const topicSpaceError = ref(false);
-const noFileError = ref(false);
-const safeTopics = ref([
-    "Engineering 101",
-    "Materials Science",
-    "Health and Fitness",
-]);
 const libraryDifficulty = ref("Normal");
 const buttonDisabled = ref({
     noRooms: true,
@@ -247,7 +283,8 @@ const topicInput = ref<HTMLInputElement | null>(null);
 const fileInput = ref<HTMLInputElement | null>(null);
 const visibilityTab = ref<'public' | 'private'>('public');
 const isPublic = computed<boolean>(() => visibilityTab.value === 'public');
-
+const formattedErrors = ref<ReturnType<z.ZodError["format"]>>({} as any)
+const newGroupName = ref("");
 
 const libgenRoute = computed(() => {
     return route.path === "/library";
@@ -278,20 +315,6 @@ const addGroup = () => {
 
     if (trimmedName && groups.value.length < 10) {
 
-        groupError.value = false;
-        groupTypingError.value =
-          trimmedName.length < 4 || trimmedName.length > 25;
-
-        if (groupTypingError.value) {
-            return;
-        }
-
-        groupSpaceError.value = trimmedName[0] === " " || trimmedName[trimmedName.length - 1] === " ";
-
-        if (groupSpaceError.value) {
-            return;
-        }
-
         groups.value.push({
             name: trimmedName,
             sections: [],
@@ -300,7 +323,6 @@ const addGroup = () => {
         });
 
         buttonDisabled.value.noRooms = false;
-        groupEmptyError.value = false;
         newGroupName.value = "";
     }
 };
@@ -319,22 +341,8 @@ const addSection = (groupIndex: number) => {
     const group = groups.value[groupIndex];
     const trimmedName = group.newSectionName.trim();
 
-    groupSectionNamingErrors.value[groupIndex] = false;
-
     if (trimmedName && group.sections.length < 15) {
-        group.sectionError = false;
 
-
-        // Validate section name
-        const typingError =  trimmedName.length < 4 || trimmedName.length > 25;
-        const spaceError = trimmedName[0] === " " || trimmedName[trimmedName.length - 1] === " ";
-
-        if (typingError || spaceError) {
-            groupSectionNamingErrors.value[groupIndex] = true;
-            return;
-        }
-
-        groupNoSectionErrors.value[groupIndex] = false;
         group.sections.push(trimmedName);
         group.newSectionName = "";
         buttonDisabled.value.noRooms = false;
@@ -392,115 +400,44 @@ const getTotalSectionCount = () => {
     return groups.value.reduce((total, group) => total + group.sections.length, 0);
 };
 
-const hasErrors = (): boolean => {
-
-    if (!(isPublic.value || !isPublic.value)) {
-        console.log(isPublic.value)
-        popupStore.showPopup(
-            "Please select a visibility option."
-        );
-        return true;
-    }
-
-    if (!authStore.loggedIn) {
-        // must login to submit
-        popupStore.showPopup(
-            "Please login to continue."
-        );
-        return true;
-    }
-
-    if (!selectedFile.value) {
-        noFileError.value = true;
-        return true;
-    }
-
-    noFileError.value = false;
-
-    buttonDisabled.value.isSubmitting = true;
-
-    if (topic.value.trim() === "") {
-        topicError.value = true;
-        return true;
-    }
-
-    topicError.value = false;
-
-    topicTypingError.value = 
-    topic.value.length < 4 || topic.value.length > 25;
-
-    if (topicTypingError.value) {
-        return true;
-    }
-
-    topicSpaceError.value = topic.value[0] === " " || topic.value[topic.value.length - 1] === " ";
-    if (topicSpaceError.value) {
-        return true;
-    }
-
-    const urlPattern =
-        /^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)$/;
-    if (urlPattern.test(topic.value)) {
-        popupStore.showPopup(
-            "We do not currently support links as are currently still in development. If you would like this to be added, please contact us through the contact page or discord."
-        );
-        return true;
-    }
+const resetErrors = () => {
+    formattedErrors.value = {} as any
+};
 
 
-    // Check if there are groups and sections
-    if (groups.value.length === 0) {
-        groupEmptyError.value = true;
-        return true;
-    }
-
-    groupEmptyError.value = false;
-
-    groupNoSectionErrors.value = groups.value.map(g => g.sections.length === 0)
-
-    if (groupNoSectionErrors.value.some(err => err)) {
-        return true;
-    }
-
-    if (groupSectionNamingErrors.value.some(err => err)) {
-        return true;
-    }
-
-    // Validate all group and section names
-    for (const group of groups.value) {
-        if (group.name.trim() === "" || group.sections.length === 0) {
-            return true;
+function validateForm(data: unknown) {
+    resetErrors()
+    try {
+        formSchema.parse(data)
+        return true
+    } catch (e) {
+        if (e instanceof z.ZodError) {
+            formattedErrors.value = e.format()
         }
-
-
-        for (const section of group.sections) {
-            if (section.trim() === "" || 
-                section[0] === " " || section[section.length - 1] === " ") {
-                return true;
-            }
-        }
+        return false
     }
-
-    return false;
-
 }
 
-const handleSubmit = () => {
+async function handleSubmit() {
 
-    if (hasErrors()) {
-        popupStore.showPopup("Please check all unit and section names.");
-        buttonDisabled.value.isSubmitting = false;
-        return;
+    const payload = {
+        topic: topic.value,
+        visibility: isPublic.value,
+        selectedFile: selectedFile.value,
+        groups: groups.value.map(g => ({
+            name: g.name,
+            sections: g.sections
+        }))
     }
+
+    if (!validateForm(payload)) return
 
     // Flatten groups and sections into the format expected by your API
     const formData = new FormData();
 
-
     if (selectedFile.value) {
         formData.append("selectedFile", selectedFile.value);
     }
-
 
     // Add group structure data
     groups.value.forEach((group, index) => {
@@ -518,10 +455,10 @@ const handleSubmit = () => {
     formData.append("libraryDifficulty", libraryDifficulty.value);
     formData.append("guide", "Azalea"); // TODO delete later (from backend and library model)
     formData.append("visibility", isPublic.value.toString());
+
     if (selectedFile.value) {
         formData.append("selectedFile", selectedFile.value);
     }
-
 
     axios
         .post("/api/library/generate", formData, {
@@ -569,7 +506,7 @@ onUnmounted(() => {
 
 
 <style scoped>
- .library-gen-page {
+.library-gen-page {
     display: flex;
     justify-content: flex-start;
     /* Align content at the top */
@@ -634,7 +571,7 @@ onUnmounted(() => {
 
 
 .error-message {
-    color: red;
+    color: var(--error-color);
     font-size: 1em;
     margin-top: 0.5em;
 }

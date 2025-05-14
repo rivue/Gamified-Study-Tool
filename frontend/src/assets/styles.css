@@ -5,6 +5,9 @@
 html,
 body {
     overflow: overlay;
+    overscroll-behavior: none;
+    touch-action: pan-y; /* Only vertical swipes allowed */
+    overflow-x: hidden; /* Prevent accidental horizontal scrolling */
     scrollbar-width: auto;
     scrollbar-color: transparent transparent;
     display: flex;

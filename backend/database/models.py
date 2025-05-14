@@ -20,6 +20,7 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(200), nullable=True)
     email = db.Column(db.String(100), unique=True, nullable=False)
     timezone = db.Column(db.String(50), default='UTC', nullable=False, server_default='UTC')
+    joined_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False, server_default=db.func.now())
 
     mentor_name = db.Column(db.String(100), default='Azalea') # TODO: not using
     system_role = db.Column(db.String(100), default='') # TODO: not using
@@ -260,7 +261,6 @@ class Library(db.Model):
             if not isinstance(unit, LibraryUnit):
                 raise ValueError("unit must be an instance of LibraryUnit")
             
-            unit.library_id = self.id
 
             with db.session.no_autoflush:
             
@@ -291,6 +291,8 @@ class Library(db.Model):
                     # Make sure the unit is added to the session if it's not already
                     db.session.add(unit)
                         
+            unit.library_id = self.id # attach after position is set
+
             return unit
         
         except SQLAlchemyError as e:

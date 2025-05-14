@@ -88,25 +88,6 @@ def init_library_routes(app):
             if len(extra_context) > 200:
                 return jsonify({"error": "Extra context is too long. Maximum 200 characters allowed."}), 400
 
-        # Check for existing library
-        if not extra_context:
-            existing_library = lbh.get_library_id(topic, library_difficulty, language, language_difficulty, guide)
-            if existing_library:
-                # Now check if first room exists
-                user_id = current_user.id if not isinstance(current_user, AnonymousUserMixin) else None
-                existing_content = lbh.retrieve_library_room_contents(existing_library, topic, user_id)
-                if existing_content:
-                    return jsonify(status="success", library_id=existing_library)
-                else:
-                    try:
-                        # Generate room content asynchronously
-                        room_future = executor.submit(lgn.generate_libroom_content, user_id, topic, existing_library)
-                        room_contents = room_future.result()
-                        lbh.save_library_room_contents(existing_library, topic, room_contents, user_id=user_id)
-                        return jsonify(status="success", library_id=existing_library)
-                    except Exception as e:
-                        return jsonify(status="error", message=f"Failed to generate room content {e}"), 500
-        
         groups = parse_group_structure()
         if groups:
             print("Parsed Groups:", groups)
@@ -152,6 +133,7 @@ def init_library_routes(app):
 
         else:
             return jsonify(status="error", message="Failed to create library"), 500
+        
         try:
 
             form = request.form.to_dict(flat=False)
@@ -166,26 +148,22 @@ def init_library_routes(app):
                 if key.startswith('groupSections[') and key.endswith('][]'):
                     # Extract group index from the key (format: "groupSections[index][]")
                     group_index = key[len('groupSections['):-3]  # Remove 'groupSections[' and '[]'
-                    print(f"group_index: {group_index}")
                     # Get the corresponding group name if available
                     group_name = form.get(f'groupNames[{group_index}]', ['Group ' + group_index])[0]
-                    print(f"group_name: {group_name}")
                     # Add group name to unit_names if not already there
                     if group_name and group_name not in unit_names:
                         unit_names.append(group_name)
-                        section_unit_map[group_name] = []  # Initialize the list of sections for this unit
+                        section_unit_map[group_name] = []
                         
                     for section in values:
                         if section:  # Skip empty section names
-                            print(f" appending section named {section}")
                             section_names.append(section)
-                            section_unit_map[group_name].append(section)  # Add section to the unit's list
+                            section_unit_map[group_name].append(section)
 
             futures_dict = {}
             for section_name in section_names:
                 if section_name: # Skip empty section names
                     rag_context = query_and_respond_pinecone(section_name, library_id)
-                    print(f" section_name: {section_name} rag_context: {rag_context}")
                     future = executor.submit(lgn.generate_room_content, user_id, section_name, library_difficulty, language, language_difficulty, extra_context, guide, rag_context)
                     futures_dict[future] = section_name
 
@@ -204,11 +182,8 @@ def init_library_routes(app):
 
             # Check if all rooms were successfully completed
             if all(completed_rooms.values()):
-                
                 try:
-                    print(section_contents_map)
                     lbh.save_library_room_contents(library_id, section_unit_map, section_contents_map, user_id)
-
                 except Exception as e:
                     print(f"Error saving generated content: {str(e)}")
 
@@ -283,6 +258,7 @@ def init_library_routes(app):
                 return jsonify(status="error", message="Failed to retrieve library data"), 500
             
             members = lbh.get_library_scores(library_id).get_json()
+            print(members)
               
             return jsonify(status="success", members=members)
 

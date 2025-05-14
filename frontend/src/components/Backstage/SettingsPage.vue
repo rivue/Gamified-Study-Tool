@@ -16,6 +16,11 @@
             <p class="profile-info">{{ profile.timezone }}</p>
         </div>
 
+         <!-- New Time Zone section -->
+            <p class="text-center opacity-70 pt-4">
+                Member Since: {{ new Date(profile.joined_at).toLocaleDateString() }}
+            </p>
+
         <!-- TODO: maybe add light mode later -->
     </div>
 </template>
@@ -42,6 +47,7 @@ interface Profile {
     email: string;
     tier: string;
     timezone: string; // New property for time zone
+    joined_at: string; // Optional property for joined date
 }
 
 const profile = ref<Profile>({
@@ -49,7 +55,8 @@ const profile = ref<Profile>({
     tutor: "",
     email: "",
     tier: "",
-    timezone: "" // New property for time zone
+    timezone: "",
+    joined_at: ""
 });
 
 const userTextarea = ref<HTMLTextAreaElement | null>(null);
