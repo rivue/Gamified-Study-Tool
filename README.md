@@ -144,10 +144,6 @@ TODO list:
         - ⭐️ add page after you finish a game session, but make it have confetti / small animation or something
         - ⭐️ handle weird thing in production where new library code displays null for like half a second, just make it look good basically
         - ⭐️ make redirect smooth, like make it not show other pages or whatever (use repomix + gpt)
-        - ⭐️ change create library to use Zod and add the following error messages: (check claude)
-            - ⭐️ error messages in create library look bad
-            - ⭐️ should not be able to make duplicate section names within a library, so check before they create it
-        
 
     OTHER PAGES:
         - terms and policies page

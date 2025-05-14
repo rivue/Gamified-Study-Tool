@@ -1,7 +1,7 @@
 <template>
     <div class="library-gen-page p-8">
         <div class="form-container" @keydown.enter="handleSubmit">
-            
+
             <!-- Topic Selection -->
             <div class="libgen-create p-16 br-4" style="border: 1px solid var(--text-color); border-radius: 5px;">
                 <h1 v-if="libgenRoute">Create a Course to Explore</h1>
@@ -81,15 +81,6 @@
                                         </div>
                                     </div>
 
-                                    <div v-if="formattedErrors.groups?.[groupIndex]?.name?.length"
-                                        class="error-message">
-                                        {{ formattedErrors.groups[groupIndex].name[0] }}
-                                    </div>
-
-                                    <div v-if="formattedErrors.groups?.[groupIndex]?.sections?._errors?.length"
-                                        class="error-message">
-                                        {{ formattedErrors.groups[groupIndex].sections._errors[0] }}
-                                    </div>
 
                                     <!-- Sections for this group -->
                                     <div class="group-sections">
@@ -98,19 +89,13 @@
                                                 class="section-chip">
                                                 {{ section }}
                                                 <button class="remove-section-btn"
-                                                    @click="removeSection(groupIndex, sectionIndex)">×
-                                                </button>
-                                                <div v-if="formattedErrors.groups[groupIndex]?.sections?.[sectionIndex]?._errors?.length"
-                                                    class="error-message">
-                                                    {{ formattedErrors.groups[groupIndex].sections[sectionIndex][0] }}
-                                                </div>
+                                                @click="removeSection(groupIndex, sectionIndex)">×
+                                            </button>
                                             </div>
                                         </div>
 
                                         <!-- Section input for this group -->
                                         <div class="section-input-wrapper">
-                                            {{ formattedErrors }}
-
                                             <input type="text" v-model="group.newSectionName"
                                                 placeholder="Mitosis, Derivative Rule, etc..." maxlength="40"
                                                 :disabled="group.sections.length >= 15 || disableExtras"
@@ -121,6 +106,16 @@
                                                 Add Section
                                             </button>
                                         </div>
+                                        <div v-if="formattedErrors.groups?.[groupIndex]?.name?._errors?.length"
+                                            class="error-message">
+                                            {{ formattedErrors.groups[groupIndex].name._errors[0] }}
+                                        </div>
+
+                                        <div v-if="formattedErrors.groups?.[groupIndex]?.sections?._errors?.length"
+                                            class="error-message">
+                                            {{ formattedErrors.groups[groupIndex].sections._errors[0] }}
+                                        </div>
+
                                     </div>
                                 </div>
                             </div>
@@ -212,12 +207,43 @@ const groupSchema = z.object({
         .max(25, "Unit names must be at most 25 characters")
         .refine(val => !val.startsWith(" ") && !val.endsWith(" "),
             "Unit names must not start or end with a space"),
-    sections: z.array(sectionSchema)
+    sections: z.array(z.string())
         .min(1, "Every Unit must have at least one section")
-        .refine(
-            sections => sections.length === new Set(sections.map(s => s.toLowerCase())).size,
-            "Duplicate section names are not allowed within a unit"
-        )
+        .superRefine((sections, ctx) => {
+            // Check for length issues first
+            const lengthIssues = sections.some(
+                section => section.length < 4 || section.length > 25
+            );
+            
+            if (lengthIssues) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: "All section names must be between 4 and 25 characters"
+                });
+                return;
+            }
+            
+            // Check for whitespace
+            const whitespaceIssues = sections.some(
+                section => section.startsWith(" ") || section.endsWith(" ")
+            );
+            
+            if (whitespaceIssues) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: "Section names must not start or end with a space"
+                });
+                return;
+            }
+            
+            // Check duplicates within a unit
+            if (sections.length !== new Set(sections.map(s => s.toLowerCase())).size) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: "Duplicate section names are not allowed within a unit"
+                });
+            }
+        })
 });
 
 // Create schema for the entire form
@@ -237,21 +263,6 @@ const formSchema = z.object({
                 return names.length === new Set(names).size;
             },
             "Duplicate unit names are not allowed"
-        )
-        // Optional: check for unique section names across all groups
-        .refine(
-            groups => {
-                const allSections = new Set();
-                for (const group of groups) {
-                    for (const section of group.sections) {
-                        const lowerSection = section.toLowerCase();
-                        if (allSections.has(lowerSection)) return false;
-                        allSections.add(lowerSection);
-                    }
-                }
-                return true;
-            },
-            "Section names must be unique across all units"
         )
 });
 const route = useRoute();
