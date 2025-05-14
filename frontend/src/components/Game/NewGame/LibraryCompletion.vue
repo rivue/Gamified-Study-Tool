@@ -1,10 +1,10 @@
 <template>
     <transition name="fade">
-        <!-- v-if="completionVisible"  -->
-        <!-- v-if="firstPage"  -->
         <div 
+        v-if="completionVisible" 
         class="completion-overlay">
-            <div 
+        <div 
+        v-if="firstPage" 
             class="pre-completion-content">
                 <div class="confetti-container">
                     <div v-for="i in 50" :key="i" :class="`confetti confetti-${i}`" :style="{
@@ -15,17 +15,15 @@
                 </div>
                 <div class="celebration-container">
                     <div class="main-title animate-pop">Lesson Complete!</div>
-                    <div class="streak-counter animate-bounce">
+                    <div class="streak-counter animate-bounce p-4 pt-8">
                         <span class="streak-days">
                             Current Streak:
-                            </span>
-                        <span class="streak-days">
+                            <span class="streak-icon-container">
 
-                            <img class="streak-fire-icon" src="../../../../dist/img/fireicon.png" alt="Fire icon"
-                                style="height: 1.8rem; width: 1px; vertical-align: middle; margin-right: 0.3rem; pointer-events: none;" />
-                        </span>
-                        <span class="streak-days">
-                            {{ currentStreak }}
+                                <img src="../../../../dist/img/fireicon.png" alt="Fire icon" class="streak-fire-icon"
+                                />
+                                {{ currentStreak }}
+                            </span>
 
                         </span>
                     </div>
@@ -58,23 +56,6 @@ const showLeaderBoard = ref(false);
 
 const completionVisible = computed(() => gameStore.completed);
 const firstPage = computed(() => page.value === 0);
-
-function playCompletionSound() {
-    const audio = new Audio('/sounds/completion.mp3'); // Add a cheerful sound file to your public folder
-    audio.play().catch(e => console.log('Audio playback failed:', e));
-}
-
-// onMounted(() => {
-//     if (completionVisible.value) {
-//         playCompletionSound();
-//     }
-// });
-
-// watch(completionVisible, (newValue) => {
-//     if (newValue) {
-//         playCompletionSound();
-//     }
-// });
 
 async function nextPage() {
     userStatsStore.resetStats(); // triggers fetchStreak in TopBar
@@ -142,10 +123,8 @@ function toggleLeaderBoard() {
     font-size: 2rem;
     font-weight: bold;
     margin: 1.5rem 0;
-    padding: 0.8rem;
-    background-color: rgba(255, 255, 255, 0.1);
-    border-radius: 12px;
-    display: inline-block;
+    display: flex;
+    justify-content: center;
 }
 
 .streak-fire {
@@ -154,7 +133,15 @@ function toggleLeaderBoard() {
 }
 
 .streak-days {
-    margin-left: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 0.8rem 1.2rem;
+    width: auto;
+    display: inline-flex;
 }
 
 .xp-badge {
@@ -388,16 +375,6 @@ function toggleLeaderBoard() {
     }
 }
 
-/* Add this new style for the fire icon */
-.streak-fire-icon {
-    height: 1.8rem;
-    width: auto;
-    vertical-align: middle;
-    margin-right: 0.3rem;
-    pointer-events: none;
-    animation: flame 1s infinite alternate;
-}
-
 @keyframes confetti-fall {
     0% {
         transform: translateY(0) rotate(0deg);
@@ -408,5 +385,17 @@ function toggleLeaderBoard() {
         transform: translateY(500px) rotate(720deg);
         opacity: 0;
     }
+}
+
+.streak-icon-container {
+    display: flex;
+    align-items: center;
+}
+
+.streak-fire-icon {
+    height: 1.8rem;
+    width: auto;
+    margin: 0 0.3rem;
+    pointer-events: none;
 }
 </style>

@@ -141,7 +141,6 @@ TODO list:
         easy (same as medium):
         - ⭐️ fix Aryan's problem with viewing it on his phone
         - ⭐️ users SHOULD be able to create libraries with duplicate names because of how generic some courses can be (philosophy, biology, math, calculus, etc...)
-        - ⭐️ add page after you finish a game session, but make it have confetti / small animation or something
         - ⭐️ handle weird thing in production where new library code displays null for like half a second, just make it look good basically
         - ⭐️ make redirect smooth, like make it not show other pages or whatever (use repomix + gpt)
 
