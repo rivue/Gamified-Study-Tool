@@ -571,7 +571,7 @@ onUnmounted(() => {
 
 
 .error-message {
-    color: red;
+    color: var(--error-color);
     font-size: 1em;
     margin-top: 0.5em;
 }

@@ -133,8 +133,8 @@ TODO list:
             - make description visible right below library card I think, maybe i card has more detail information, maybe when it was created or current owner or something
             - also displays number of members of the library
             - should I replace the proposed "i-card" with some icon that links to library details like discord has with their profile page where I would put files, members, and everything else in the menu, or should I keep it as is?
-            - ⭐️ make library description editable by owner
-                - maybe this would be near leaderboard or something
+        - ⭐️ make library description editable by owner
+            - maybe this would be near leaderboard or something
         - ⭐️ add staging / pre-production environment that isn't localhost
             - figure out if 1) what I do to migrate the database is safe (swapping uri string and running flask db ugprade) and 2) how I should do it if it is not ideal
         
@@ -153,6 +153,7 @@ TODO list:
 
     general:
     study tool additions / ideas:
+    
         - ⭐️ In creating a new library, add checkboxes for different types of modes (fill-in-the-blank, t/f, mcq, etc…)
             - maybe add it in settings for owner as well (enable / disable for future lesson content generation)
         - integrate with teacher / school list from rate my professors 
@@ -161,7 +162,9 @@ TODO list:
         - ability to verify by school email which helps with filtering results? 
         - (later) add support for links / pdfs / other things and get rid of things like difficulty, tutor, etc... then actually start generating stuff to study
         - (later) add support for multiple file upload as well
-        7) add logic for multiple flame emojis w/ streaks of 1, 5, 10, 25, 50, 100
+        - add logic for multiple flame emojis w/ streaks of 1, 5, 10, 25, 50, 100
+            - or make it adopt to a curve like exponential games or like xp in skyblock something more broken like --> (1, 3, 6, 8, 18, 36, 42, 69, 120, 210, etc...)
+                - but offer rewards at even perks (5, 10, 15, 25, 50) to make it even more enticing?
             - could be for a smaller one: https://lottiefiles.com/free-animation/fire-flame-4De5RVVPag
             - slightly bigger one: https://lottiefiles.com/free-animation/fire-IuJfcIXKF1
             - maybe for 50 or 100, this whisks accross the little hover menu?: https://lottiefiles.com/free-animation/dancing-fire-CtzldMIEf9
