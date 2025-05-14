@@ -1,6 +1,7 @@
 <template>
     <div class="library-gen-page p-8">
         <div class="form-container" @keydown.enter="handleSubmit">
+            
             <!-- Topic Selection -->
             <div class="libgen-create p-16 br-4" style="border: 1px solid var(--text-color); border-radius: 5px;">
                 <h1 v-if="libgenRoute">Create a Course to Explore</h1>
@@ -57,11 +58,11 @@
                                 <div class="group-input-wrapper">
                                     <input type="text" v-model="newGroupName" placeholder="Exam 1, Exam 2, etc..."
                                         maxlength="40" :disabled="disableExtras" @keyup.enter="addGroup" />
+                                    <button class="add-btn" @click="addGroup"
+                                        :disabled="!newGroupName.trim() || groups.length >= 10 || disableExtras">
+                                        Add Unit
+                                    </button>
                                 </div>
-                                <button class="add-btn" @click="addGroup"
-                                    :disabled="!newGroupName.trim() || groups.length >= 10 || disableExtras">
-                                    Add Unit
-                                </button>
 
                                 <div v-if="formattedErrors.groups?._errors?.length" class="error-message">
                                     {{ formattedErrors.groups._errors[0] }}
@@ -80,13 +81,15 @@
                                         </div>
                                     </div>
 
-                                    <div v-if="formattedErrors.groups?.[groupIndex]?.name?.length" class="error-message">
+                                    <div v-if="formattedErrors.groups?.[groupIndex]?.name?.length"
+                                        class="error-message">
                                         {{ formattedErrors.groups[groupIndex].name[0] }}
                                     </div>
 
-                                    <div v-if="formattedErrors.groups?.[groupIndex]?.sections?._errors?.length" class="error-message">
+                                    <div v-if="formattedErrors.groups?.[groupIndex]?.sections?._errors?.length"
+                                        class="error-message">
                                         {{ formattedErrors.groups[groupIndex].sections._errors[0] }}
-                                        </div>
+                                    </div>
 
                                     <!-- Sections for this group -->
                                     <div class="group-sections">
@@ -97,7 +100,8 @@
                                                 <button class="remove-section-btn"
                                                     @click="removeSection(groupIndex, sectionIndex)">×
                                                 </button>
-                                                <div v-if="formattedErrors.groups?.[groupIndex]?.sections?.[sectionIndex]?.length" class="error-message">
+                                                <div v-if="formattedErrors.groups[groupIndex]?.sections?.[sectionIndex]?._errors?.length"
+                                                    class="error-message">
                                                     {{ formattedErrors.groups[groupIndex].sections[sectionIndex][0] }}
                                                 </div>
                                             </div>
@@ -105,6 +109,8 @@
 
                                         <!-- Section input for this group -->
                                         <div class="section-input-wrapper">
+                                            {{ formattedErrors }}
+
                                             <input type="text" v-model="group.newSectionName"
                                                 placeholder="Mitosis, Derivative Rule, etc..." maxlength="40"
                                                 :disabled="group.sections.length >= 15 || disableExtras"
@@ -128,46 +134,46 @@
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Public/Private Toggle -->
-            <div class="libgen-section">
-                <div class="form-group visibility-toggle p-4">
-                    <div style="font-size:0.8em; opacity:0.7; display:flex; justify-content:center; align-items:center;"
-                        class="mb-2">Visibility</div>
-                    <div class="flex items-center justify-center w-full mb-3">
-                        <Tabs v-model="visibilityTab" class="w-full max-w-[400px]">
-                            <TabsList class="grid w-full grid-cols-2 p-1 py-0.5"
-                                style="background-color: rgba(var(--element-color-1-rgb), 0.5);">
-                                <TabsTrigger value="private"
-                                    class="border-0 data-[state=inactive]:opacity-50 data-[state=active]:bg-[var(--element-color-1)] data-[state=active]:text-[var(--text-color)]">
-                                    Private
-                                </TabsTrigger>
+                <!-- Public/Private Toggle -->
+                <div class="libgen-section">
+                    <div class="form-group visibility-toggle p-4">
+                        <div style="font-size:0.8em; opacity:0.7; display:flex; justify-content:center; align-items:center;"
+                            class="mb-2">Visibility</div>
+                        <div class="flex items-center justify-center w-full mb-3">
+                            <Tabs v-model="visibilityTab" class="w-full max-w-[400px]">
+                                <TabsList class="grid w-full grid-cols-2 p-1 py-0.5"
+                                    style="background-color: rgba(var(--element-color-1-rgb), 0.5);">
+                                    <TabsTrigger value="private"
+                                        class="border-0 data-[state=inactive]:opacity-50 data-[state=active]:bg-[var(--element-color-1)] data-[state=active]:text-[var(--text-color)]">
+                                        Private
+                                    </TabsTrigger>
 
-                                <TabsTrigger value="public"
-                                    class="border-0 data-[state=inactive]:opacity-50 data-[state=active]:bg-[var(--element-color-1)] data-[state=active]:text-[var(--text-color)]">
-                                    Public
-                                </TabsTrigger>
-                            </TabsList>
+                                    <TabsTrigger value="public"
+                                        class="border-0 data-[state=inactive]:opacity-50 data-[state=active]:bg-[var(--element-color-1)] data-[state=active]:text-[var(--text-color)]">
+                                        Public
+                                    </TabsTrigger>
+                                </TabsList>
 
-                        </Tabs>
-                    </div>
-                    <div class="helper-text">
-                        🐙 Public courses will appear in the course library for all users to explore.
-                    </div>
-                    <div class="helper-text">
-                        🐙 Private courses need a code to join.
+                            </Tabs>
+                        </div>
+                        <div class="helper-text">
+                            🐙 Public courses will appear in the course library for all users to explore.
+                        </div>
+                        <div class="helper-text">
+                            🐙 Private courses need a code to join.
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- CTA Button -->
-            <div class="cta-container">
-                <CtaButton :buttonText="submitButtonText" @click="handleSubmit"
-                    :isSubmitting="buttonDisabled.isSubmitting || buttonDisabled.noRooms" />
+                <!-- CTA Button -->
+                <div class="cta-container">
+                    <CtaButton :buttonText="submitButtonText" @click="handleSubmit"
+                        :isSubmitting="buttonDisabled.isSubmitting || buttonDisabled.noRooms" />
+                </div>
             </div>
+            <library-browser />
         </div>
-        <library-browser />
     </div>
 </template>
 
@@ -413,11 +419,10 @@ async function handleSubmit() {
         }))
     }
 
-    // if (!validateForm(payload)) return
+    if (!validateForm(payload)) return
 
     // Flatten groups and sections into the format expected by your API
     const formData = new FormData();
-
 
     if (selectedFile.value) {
         formData.append("selectedFile", selectedFile.value);
