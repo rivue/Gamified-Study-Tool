@@ -88,7 +88,8 @@ def init_auth_routes(app):
 
             password = request.form['new-password']
             hashed_password = generate_password_hash(password)
-            new_user = User(email=email, password=hashed_password, username=email)
+            joined_at = datetime.utcnow()
+            new_user = User(email=email, password=hashed_password, username=email, joined_at=joined_at)
             db.session.add(new_user)
             db.session.commit()
 

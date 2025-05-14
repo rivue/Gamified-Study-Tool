@@ -2,6 +2,7 @@ from database.models import db, User, ChatHistory, Challenge, Lesson, UserAction
 from utils import decode_if_needed, extract_single_emoji
 from datetime import datetime
 from sqlalchemy.exc import SQLAlchemyError
+import pytz
 
 history_limit = 16
 MAX_LESSON_NAME_LENGTH = 200
@@ -269,12 +270,28 @@ def get_complete_user_data(user_id):
     if not user:
         return None
 
+    # Format joined_at with user timezone if available
+    formatted_date = None
+    if user.joined_at:
+        try:
+            
+            # Default to UTC if timezone not set
+            tz = pytz.timezone(user.timezone) if user.timezone else pytz.UTC
+            # Convert the datetime to the user's timezone
+            localized_date = user.joined_at.replace(tzinfo=pytz.UTC).astimezone(tz)
+            # Format the date nicely
+            formatted_date = localized_date.strftime("%B %d, %Y")
+        except Exception:
+            # Fallback if timezone processing fails
+            formatted_date = user.joined_at.strftime("%Y-%m-%d %H:%M:%S UTC")
+
     user_data = {
         "email": user.email,
         "tier": user.tier,
         "user": user.profile,
         "tutor": user.ai_tutor_profile,
         "timezone": user.timezone,
+        "joined_at": formatted_date,
     }
     return user_data
 
