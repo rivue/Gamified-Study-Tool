@@ -295,7 +295,7 @@ const submitButtonText = computed(() => {
         return "Loading (~45s)";
     }
     else if (buttonDisabled.value.noRooms) {
-        return "Add at least one room to get started!";
+        return "Add at least one Unit to get started!";
     }
     else {
         return "Explore!";
@@ -432,7 +432,11 @@ async function handleSubmit() {
         }))
     }
 
-    if (!validateForm(payload)) return
+    if (!validateForm(payload)) {
+        buttonDisabled.value.isSubmitting = false;
+        return
+    }
+    
 
     // Flatten groups and sections into the format expected by your API
     const formData = new FormData();

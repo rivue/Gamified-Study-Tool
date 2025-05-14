@@ -77,6 +77,9 @@ TODO list:
 
         last / harder:
 
+        - ⭐️ for LibraryCreator, outline the rules clearly somewhere, like in an i-card next to "create a course to explore" 
+        or just put in text "rules for creating courses" or something
+            - also, make room / course / unit / section consistent in frontend
         - ⭐️ vvvmaybe ask for feedback before doing vvv
         - ⭐️ add google auth
         - ⭐️ Terms of use / Policy Page legal agreement thing - ask gpt if I actually need, maybe ask jake how to do but maybe not
@@ -124,8 +127,8 @@ TODO list:
             - ⭐️ Delete courses / libraries (whatever they're called) (requires entering the name of the unit / course just for accidental reasons)
                - ⭐️ Remember to delete from both DB and pinecone as well, as well as respective child / parent courses / units / sections / libraries, roomNameState, LibraryFavorites, question, question_choice, LibraryMembership, etc...
         - ⭐️ (courses need ability to add multiple people first) leaderboard / game point tracking system (could be reworked later)
-        - ⭐️ let units / sections / courses have duplicate values as others in db
         - ⭐️ add ability to see uploaded files in library (list of their names) and maybe even file preview (would require nosql db or something maybe)
+            - should I limit file size for this? like can only display files < 50 MB or something?
 
         medium (chip away at when tired / mentally exhausted from hard ones):
         - ⭐️ implement some game "score" logic (if you get >80% #attemps:number of questions ratio) then you get more / less points or something, etc...
@@ -140,7 +143,6 @@ TODO list:
         
         easy (same as medium):
         - ⭐️ fix Aryan's problem with viewing it on his phone - some samsung variation?
-        - ⭐️ handle weird thing in production where new library code displays null for like half a second, just make it look good basically
         - ⭐️ make redirect smooth, like make it not show other pages or whatever (use repomix + gpt)
 
     OTHER PAGES:
@@ -234,7 +236,9 @@ TODO list:
             - we could also section it off, like load part of it at a time, or load it in the background 
                 while the user it playing an already unlocked game or something
         - make a better loading screen / bar / wheel while the courses are being created
+            - make it like not able to navigate away or something idk
             - maybe even tell users not to navigate away from the page or something
+            - for improving textbook loading, maybe make textbook take a long time, but load users with similar sections / libraries while it still loads - like just direct them to actual section games of public libraries while they wait, or do a survey or something while they wait like who it is for or something
         - improve prompt generation a great fold (make sure as many of the quesitons relate to the section name as possible)
         - eventually combine library_question model with library_factoid model (why are they seperate to begin with?)
         - get student verification on Mobbin pro (UI library)

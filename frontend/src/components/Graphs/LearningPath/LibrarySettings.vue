@@ -58,11 +58,13 @@
                         </button>
                     </div>
                     <p class="text-xs mt-1" style="color: var(--color-primary-light); font-weight: bold;">
-                        {{ !!(isPublic) ? 'Anyone can view this course' : `Only this code can access this course:
-                        ${joinCode}` }}
+                        {{ !!(isPublic) 
+                        ? 'Anyone can view this course' 
+                        : joinCode === null
+                            ? "Loading..." 
+                            : `Only this code can access this course: ${joinCode}` }}
                     </p>
                 </div>
-                <!-- Add more settings fields as needed -->
             </div>
             <div class="mt-6 flex justify-end">
                 <button @click="toggleSettings" class="px-4 py-2 rounded-lg border"
