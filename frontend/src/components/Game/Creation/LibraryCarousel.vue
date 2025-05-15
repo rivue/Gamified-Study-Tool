@@ -72,7 +72,7 @@
                         {{ page }}
                     </button>
                 </div>
-                <button class="pagination-btn" :disabled="currentPage === totalPages" @click="nextPage">
+                < TODO: SEE library corousel add private button!!! button class="pagination-btn" :disabled="currentPage === totalPages" @click="nextPage">
                     Next <span class="pagination-icon">→</span>
                 </button>
             </div>
