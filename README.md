@@ -104,6 +104,13 @@ TODO list:
                 - ⭐️ add ability to leave libraries (later)
                 - ⭐️ move dropdown menu to left + make dropdown menu permanant, replace w/ profile picture --> hover menu for to see profile settings or something
                 - ⭐️ all the other routes and stuff (terms & policies, buying subscription, can't think of others?)
+                - ⭐️ add i-card for all users, maybe description about the library along with a preview of the files used in the library and maybe also users who are members of the library or something 
+                    - make description visible right below library card I think, maybe i card has more detail information, maybe when it was created or current owner or something
+                    - also displays number of members of the library
+                    - should I replace the proposed "i-card" with some icon that links to library details like discord has with their profile page where I would put files, members, and everything else in the menu, or should I keep it as is?
+                    - (maybe?) ⭐️ add ability to see uploaded files in library (list of their names) and maybe even file preview (would require nosql db or something maybe)
+                        - should I limit file size for this? like can only display files < 50 MB or something?
+
             - add ui ability to "join" private libraries / public libraries that you didn't create maybe in like a seperate page or list or maybe I could add a box for putting in library codes or something
             - ⭐️ after user submits something and is waiting, display a loading bar or wheel or different rotating facts (maybe relevant to the library?) letting the user know that it is generating
             - also note: ask gemini / grok / gpt / claude for some ui design tips like adding a menu bar, or ui tips / tricks / helpful websites / youtube videos, etc...
@@ -118,33 +125,34 @@ TODO list:
 
         hard probably (goal: 2 high level bullet points / wk):
         - ⭐️ remove alert message in library creator (not hard but have to remember)
+        - ⭐️ add username (backfill username w/ 1st part of email before @ symbol - maybe let people change later)
         - ✅ ⭐️ Finish sections + units
             - ⭐️ Add ability to add each section to each unit (later --> come back to, reminder to make it account for 1-n number of sections no matter how that looks. add new stepping stones button is commented out for now)
-        - ⭐️ (would like to implement visibility of different courses first or at least a many:one for non-owners in library model)
+        - ✅ ⭐️ (would like to implement visibility of different courses first or at least a many:one for non-owners in library model)
             - ⭐️ Delete sections requires entering the name of the unit / course just for accidental reasons)
-            - ⭐️ Delete Units( requires entering the name of the unit / course just for accidental reasons)
+            - ⭐️ Delete Units (requires entering the name of the unit / course just for accidental reasons)
             - ⭐️ Delete courses / libraries (whatever they're called) (requires entering the name of the unit / course just for accidental reasons)
                - ⭐️ Remember to delete from both DB and pinecone as well, as well as respective child / parent courses / units / sections / libraries, roomNameState, LibraryFavorites, question, question_choice, LibraryMembership, etc...
-        - ⭐️ (courses need ability to add multiple people first) leaderboard / game point tracking system (could be reworked later)
-            - ⭐️ implement some game "score" logic (if you get >80% #attemps:number of questions ratio) then you get more / less points or something, etc...
-            - would need num_points for each user in a library - maybe in library membership data structure?
-        - ⭐️ add ability to see uploaded files in library (list of their names) and maybe even file preview (would require nosql db or something maybe)
-            - should I limit file size for this? like can only display files < 50 MB or something?
 
-        medium (chip away at when tired / mentally exhausted from hard ones):
+        - ⭐️ (courses need ability to add multiple people first in a UI way)
+            - account for:
+                - ✅ public user has joined
+                - ✅ private user has joined
+                - public user has not joined
+                    - browse public library page
+                - private user has not joined
+                    - thing next to "Courses" that says Enter code to join
+                        - already in = popup that says "you are already in this library!"
+                        - new join = small popup that says the library was added and then fetch / update the courses list
+                        - incorrect code = incorrect code message
+          
         
-        - ⭐️ add i-card for all users, maybe description about the library along with a preview of the files used in the library and maybe also users who are members of the library or something 
-            - make description visible right below library card I think, maybe i card has more detail information, maybe when it was created or current owner or something
-            - also displays number of members of the library
-            - should I replace the proposed "i-card" with some icon that links to library details like discord has with their profile page where I would put files, members, and everything else in the menu, or should I keep it as is?
-        - ⭐️ make library description editable by owner
-            - maybe this would be near leaderboard or something
+        medium (chip away at when tired / mentally exhausted from hard ones):
         - ⭐️ add staging / pre-production environment that isn't localhost
-            - figure out if 1) what I do to migrate the database is safe (swapping uri string and running flask db ugprade) and 2) how I should do it if it is not ideal
+            - also figure out if 1) what I do to migrate the database is safe (swapping uri string and running flask db ugprade) and 2) how I should do it if it is not ideal
         
         easy (same as medium):
-        - ⭐️ fix Aryan's problem with viewing it on his phone - some samsung variation?
-        - ⭐️ make redirect smooth, like make it not show other pages or whatever (use repomix + gpt)
+        - ⭐️ eventually fix Aryan's problem with viewing it on his phone - some samsung variation?
 
     OTHER PAGES:
         - terms and policies page
@@ -154,7 +162,11 @@ TODO list:
 
     general:
     study tool additions / ideas:
-    
+        - trending courses tab?
+        - ⭐️ add leaderboard / game point tracking system (could be reworked later)once user base grows a bit (on every course, do all time and monthly)
+            - ⭐️ implement some game "score" logic (if you get >80% #attemps:number of questions ratio) then you get more / less points or something, etc...
+            - would need num_points for each user in a library - maybe in library membership data structure?
+        - ⭐️ ask for feedback / look at how people are joining public / private libraries / give users a school variable / track users joining libraries across different timezones to see if I should add descripitions or not
         - ⭐️ for various buttons / other things, when you hover over them, make them display what they do / their names (edit button, toggles edit mode, etc...)
         - ⭐️ replace chevron / double chevron with arrows (copy openai / grok / claude, etc...)
         - ⭐️ add some other types of games / questions (ex: true / false, very detailed / specific questions, sorting, compare / contrast, analogies, image based stuff (not sure how to implement) 6 options choose 1-6, etc... see list below)

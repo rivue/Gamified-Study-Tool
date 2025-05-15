@@ -37,6 +37,9 @@
                                 </button>
                             </TableCell>
                             <TableCell class="text-xl text-center p-4 w-full">{{ library.library_topic }}</TableCell>
+                            <TableCell class="text-xs text-right italic opacity-70 pr-4">
+                                <span v-if="library.owner_id == authStore.user.id" class="px-2 py-1 rounded-md bg-[var(--background-color-2t)]">Owner</span>
+                            </TableCell>
                         </TableRow>
                     </template>
                     <TableRow v-else class="border-[1px] border-solid border-[var(--text-color)]">
@@ -83,7 +86,9 @@ import { Input } from "@/components/ui/input";
 import { StarIcon } from "@heroicons/vue/24/solid";
 import { Table, TableRow, TableBody, TableCell } from "@/components/ui/table";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { useAuthStore } from "@/store/authStore";
 import axios from "axios";
+
 // Props
 const props = defineProps<{
     libraries: Array<{ clicks: number; context: any; difficulty: string; guide: string; id: number; image_url: string, language: string; language_difficulty: string; likes: number; library_topic: string }>;
@@ -98,6 +103,7 @@ const searchQuery = ref("");
 const filteredLibraries = ref<Array<any>>([]);
 // Create a reactive reference to libraryFavoritesMap
 const libraryFavoritesMap = computed(() => props.libraryFavoritesMap);
+const authStore = useAuthStore();
 
 // Filtering function
 function filterLibraries() {

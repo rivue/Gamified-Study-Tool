@@ -13,14 +13,13 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from "vue";
-import { useRouter, useRoute } from "vue-router";
+import { useRoute } from "vue-router";
 import axios from "axios";
 import { useAuthStore } from "@/store/authStore";
 import LoadingComponent from "@/components/Backstage/LoadingComponent.vue";
 import LibraryCarousel from "./LibraryCarousel.vue";
 
 const authStore = useAuthStore();
-const router = useRouter();
 const route = useRoute();
 const isLoading = ref(true);
 const myLibraries = ref([]);
@@ -34,11 +33,19 @@ function fetchLibraries() {
     axios
         .get("/api/libraries")
         .then((response) => {
-            // console.log(response.data.mine);
             if (authStore.loggedIn) {
-                myLibraries.value = response.data.mine;
-                favoritesMap.value = response.data.favorites_map;
 
+                const combinedLibraries = [
+                    ...response.data.mine,
+                    ...response.data.joined_public,
+                    ...response.data.joined_private
+                ];
+                
+                myLibraries.value = combinedLibraries.sort((a, b) => 
+                    a.library_topic.localeCompare(b.library_topic)
+                );
+
+                favoritesMap.value = response.data.favorites_map;
             }
         })
         .catch((error) => {

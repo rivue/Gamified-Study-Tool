@@ -31,10 +31,10 @@ class User(db.Model, UserMixin):
     experience_points = db.Column(db.Integer, default=0)
     achievements = db.relationship('UserAchievement', backref='user', cascade="all, delete-orphan")
 
-    actions = db.relationship('UserAction', backref='user', cascade="all, delete-orphan")
+    actions = db.relationship('UserAction', backref='user', cascade="all, delete-orphan") # TODO: not using
 
-    chats = db.relationship('ChatHistory', backref='user', cascade="all, delete-orphan")
-    lessons = db.relationship('Lesson', backref='user', cascade="all, delete-orphan")
+    chats = db.relationship('ChatHistory', backref='user', cascade="all, delete-orphan") # TODO: not using
+    lessons = db.relationship('Lesson', backref='user', cascade="all, delete-orphan") # TODO: not using
 
     tier = db.Column(db.String(50), default='free')  # 'free', 'paid', 'pro'
     daily_request_count = db.Column(db.Integer, default=0) # TODO: I am not using
