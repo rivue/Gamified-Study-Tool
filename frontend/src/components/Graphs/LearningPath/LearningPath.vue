@@ -4,18 +4,26 @@
 
         <!-- Settings Button -->
         <!-- @click="toggleSettings" -->
-        <button @click="goToLeaderboard"
-            class="fixed top-20 right-36 bg-black/30 backdrop-blur-sm shadow-md rounded-full p-4 hover:bg-black/40 z-10"
-            style="color: var(--highlight-color);">
-            <ChartBarIcon class="w-12 h-12" />
-        </button>
+        <div class="fixed top-20 right-6 flex gap-6 z-10">
 
-        <!-- Settings Button -->
-        <button v-if="canModify" @click="toggleSettings"
-            class="fixed top-20 right-6 bg-black/30 backdrop-blur-sm shadow-md rounded-full p-4 hover:bg-black/40 z-10"
-            style="color: var(--highlight-color);">
-            <CogIcon class="w-12 h-12" />
-        </button>
+            <button @click="toggleEditMode"
+                class="bg-black/30 backdrop-blur-sm shadow-md rounded-full p-4 hover:bg-black/40"
+                style="color: var(--highlight-color);">
+                <PencilIcon class="w-12 h-12" />
+            </button>
+
+            <button @click="goToLeaderboard"
+                class="bg-black/30 backdrop-blur-sm shadow-md rounded-full p-4 hover:bg-black/40"
+                style="color: var(--highlight-color);">
+                <ChartBarIcon class="w-12 h-12" />
+            </button>
+
+            <button v-if="isOwner" @click="toggleSettings"
+                class="bg-black/30 backdrop-blur-sm shadow-md rounded-full p-4 hover:bg-black/40"
+                style="color: var(--highlight-color);">
+                <CogIcon class="w-12 h-12" />
+            </button>
+        </div>
 
         <div class="relative flex flex-col w-full h-full">
 
@@ -29,8 +37,8 @@
                     <div class="w-24 flex-shrink-0"></div>
 
                     <!-- Add Unit at the beginning -->
-                    <AddUnit :library-id="libraryId" :position="0" :existing-units="Object.keys(rawUnitData)"
-                        :can-add-unit="canModify" @unit-added="handleUnitAdded" />
+                    <AddUnit v-if="editModeEnabled" :library-id="libraryId" :position="0" :existing-units="Object.keys(rawUnitData)"
+                        :can-add-unit="isOwner" @unit-added="handleUnitAdded" />
 
                     <!-- Unit Headers -->
                     <template v-for="([unit], unitName, unitIndex) in rawUnitData" :key="unitIndex">
@@ -217,8 +225,8 @@
                             </div>
                         </div>
 
-                        <AddUnit :library-id="libraryId" :position="unitIndex + 1"
-                            :existing-units="Object.keys(rawUnitData)" :can-add-unit="canModify"
+                        <AddUnit  v-if="editModeEnabled" :library-id="libraryId" :position="unitIndex + 1"
+                            :existing-units="Object.keys(rawUnitData)" :can-add-unit="isOwner"
                             @unit-added="handleUnitAdded" />
 
                     </template>
@@ -294,7 +302,7 @@
                                 style="color: var(--color-primary-light);">
                                 <!-- {{ nodeNameErrors }} -->
                                 <span v-for="(error, index) in nodeNameErrors" :key="index">{{ error
-                                }}<br></span>
+                                    }}<br></span>
                             </p>
                         </div>
                         <button @click="addNodeNameField" class="mt-2 text-sm font-medium flex items-center gap-1"
@@ -366,7 +374,7 @@
     </Transition>
 
     <LibrarySettings v-model:showSettingsModal="showSettingsModal" :library-id="libraryId"
-        :library-is-public="libraryIsPublic" :library-join-code="libraryJoinCode" :can-modify="canModify" />
+        :library-is-public="libraryIsPublic" :library-join-code="libraryJoinCode" :can-modify="isOwner" />
 
 </template>
 
@@ -392,7 +400,8 @@ import {
     XCircleIcon,
     ChevronDoubleLeftIcon,
     ChevronDoubleRightIcon,
-    ChartBarIcon
+    ChartBarIcon,
+    PencilIcon,
 } from '@heroicons/vue/24/solid';
 import { useGameStore } from '@/store/gameStore'
 import { useRouter } from 'vue-router';
@@ -425,7 +434,7 @@ const props = defineProps({
         type: [String, null],
         required: true
     },
-    canModify: {
+    isOwner: {
         type: Boolean,
         required: true
     }
@@ -447,7 +456,8 @@ const fileError = ref('')
 const isAddingNode = ref(false)
 const gameStore = useGameStore()
 const showSettingsModal = ref(false)
-const canModify = ref(false)
+const isOwner = ref(false)
+const editModeEnabled = ref(false);
 
 // Track selected room for tooltip
 const selectedRoomId = ref(null)
@@ -495,8 +505,11 @@ function toggleSettings() {
     showSettingsModal.value = !showSettingsModal.value
 }
 
+function toggleEditMode() {
+    editModeEnabled.value = !editModeEnabled.value
+}
+
 function goToLeaderboard() {
-    console.log(props.libraryId)
     router.push(`/lessons/${props.libraryId}/leaderboard`)
 }
 
@@ -696,7 +709,7 @@ let scrollTimeoutId = null;
 // Scroll to center on first load
 onMounted(() => {
 
-    canModify.value = props.canModify
+    isOwner.value = props.isOwner
 
     recalcMaxLeft()
     // If there are nodes and the container exists, scroll to position

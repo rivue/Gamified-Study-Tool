@@ -59,10 +59,10 @@
                     </div>
                     <p class="text-xs mt-1" style="color: var(--color-primary-light); font-weight: bold;">
                         {{ !!(isPublic) 
-                        ? 'Anyone can view this course' 
-                        : joinCode === null
-                            ? "Loading..." 
-                            : `Only this code can access this course: ${joinCode}` }}
+                            ? 'Anyone can view this course' 
+                            : joinCode === null
+                                ? "Loading..." 
+                                : `Only this code can access this course: ${joinCode}` }}
                     </p>
                 </div>
             </div>

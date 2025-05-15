@@ -81,6 +81,7 @@ TODO list:
         or just put in text "rules for creating courses" or something
             - also, make room / course / unit / section consistent in frontend
         - ⭐️ vvvmaybe ask for feedback before doing vvv
+            - also make sure it works well(ish) for mobile
         - ⭐️ add google auth
         - ⭐️ Terms of use / Policy Page legal agreement thing - ask gpt if I actually need, maybe ask jake how to do but maybe not
             - ⭐️ There are probably websites and stuff for this --> do this before Stripe
@@ -117,21 +118,21 @@ TODO list:
 
         hard probably (goal: 2 high level bullet points / wk):
         - ⭐️ remove alert message in library creator (not hard but have to remember)
-        - ⭐️ Add "edit mode" for library creator - toggle for: delete sections / units / courses and also add sections / units and would keep editing isolated from actually playing the course
         - ✅ ⭐️ Finish sections + units
             - ⭐️ Add ability to add each section to each unit (later --> come back to, reminder to make it account for 1-n number of sections no matter how that looks. add new stepping stones button is commented out for now)
-            - ⭐️ third idea) for course owner, add an "edit" button and "delete / trash can" button when you hover over the course or click it or something, maybe add an "edit mode" in the main bar thing I'm going to add?
         - ⭐️ (would like to implement visibility of different courses first or at least a many:one for non-owners in library model)
             - ⭐️ Delete sections requires entering the name of the unit / course just for accidental reasons)
             - ⭐️ Delete Units( requires entering the name of the unit / course just for accidental reasons)
             - ⭐️ Delete courses / libraries (whatever they're called) (requires entering the name of the unit / course just for accidental reasons)
                - ⭐️ Remember to delete from both DB and pinecone as well, as well as respective child / parent courses / units / sections / libraries, roomNameState, LibraryFavorites, question, question_choice, LibraryMembership, etc...
         - ⭐️ (courses need ability to add multiple people first) leaderboard / game point tracking system (could be reworked later)
+            - ⭐️ implement some game "score" logic (if you get >80% #attemps:number of questions ratio) then you get more / less points or something, etc...
+            - would need num_points for each user in a library - maybe in library membership data structure?
         - ⭐️ add ability to see uploaded files in library (list of their names) and maybe even file preview (would require nosql db or something maybe)
             - should I limit file size for this? like can only display files < 50 MB or something?
 
         medium (chip away at when tired / mentally exhausted from hard ones):
-        - ⭐️ implement some game "score" logic (if you get >80% #attemps:number of questions ratio) then you get more / less points or something, etc...
+        
         - ⭐️ add i-card for all users, maybe description about the library along with a preview of the files used in the library and maybe also users who are members of the library or something 
             - make description visible right below library card I think, maybe i card has more detail information, maybe when it was created or current owner or something
             - also displays number of members of the library
@@ -154,6 +155,8 @@ TODO list:
     general:
     study tool additions / ideas:
     
+        - ⭐️ for various buttons / other things, when you hover over them, make them display what they do / their names (edit button, toggles edit mode, etc...)
+        - ⭐️ replace chevron / double chevron with arrows (copy openai / grok / claude, etc...)
         - ⭐️ add some other types of games / questions (ex: true / false, very detailed / specific questions, sorting, compare / contrast, analogies, image based stuff (not sure how to implement) 6 options choose 1-6, etc... see list below)
         - ⭐️ In creating a new library, add checkboxes for different types of modes (fill-in-the-blank, t/f, mcq, etc…)
             - maybe add it in settings for owner as well (enable / disable for future lesson content generation)
