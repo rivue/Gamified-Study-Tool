@@ -150,7 +150,7 @@ const setLibraryIsPublicStatus = async (newStatus: boolean) => {
     isUpdatingVisibility.value = true;
 
     // pendingStatus.value = newStatus;
-    axios.post(`/api/library/visibility_status/${props.libraryId}`, {
+    axios.put(`/api/library/visibility_status/${props.libraryId}`, {
         libraryId: props.libraryId,
         newStatus: newStatus
     })

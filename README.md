@@ -140,12 +140,11 @@ TODO list:
                 - ✅ private user has joined
                 - public user has not joined
                     - browse public library page
-                - private user has not joined
+                - private user has not joined <-- TODO NEXT
                     - thing next to "Courses" that says Enter code to join
                         - already in = popup that says "you are already in this library!"
                         - new join = small popup that says the library was added and then fetch / update the courses list
                         - incorrect code = incorrect code message
-          
         
         medium (chip away at when tired / mentally exhausted from hard ones):
         - ⭐️ add staging / pre-production environment that isn't localhost
