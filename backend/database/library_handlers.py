@@ -1,6 +1,7 @@
 from datetime import datetime
-from flask import jsonify
+from flask import jsonify, current_app as app
 from sqlalchemy import func, distinct
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from contextlib import contextmanager
 import random
 import math
@@ -456,59 +457,35 @@ def retrieve_library_room_contents(library_id, section_id, user_id):
 
     return {"factoids": room_contents}
 
-def add_user_to_library(user_id, library_id, join_code):
-    try:
-        # If library_id is provided, start with that lookup
-        if library_id is not None:
-            library = Library.query.get(library_id)
-            
-            # For private libraries, we need to verify the join code
-            if library and not library.is_public and library.join_code != join_code:
-                return jsonify({'error': 'Invalid join code for private library'}), 403
-        else:
-            # Otherwise, look up by join code only
-            library = Library.query.filter_by(join_code=join_code).first()
+def add_user_to_library(user_id: int, library_id: int | None, join_code: str):
+    """Put the current user into a library (public or private)"""
 
+    try:
+
+        # If library_id is provided, start with that lookup
+        if library_id:
+            library = Library.query.get(library_id)
+            if not library:
+                return jsonify({"error": "Library not found"}), 404
+            if not library.is_public and library.join_code != join_code:
+                return jsonify({"error": "Invalid join code"}), 403
+        else:
+            library = Library.query.filter_by(join_code=join_code).first()
+            if not library:
+                return jsonify({"error": "Invalid join code"}), 404
 
         user = User.query.get(user_id)
         if not user:
             return jsonify({"status": 'User not found'}), 404
         
-        membership = LibraryMembership.query.filter_by(
-            user_id=user_id,
-            library_id=library.id
-        ).first()
-        
-        library_favorite = LibraryFavorites.query.filter_by(
-            user_id=user_id,
-            library_id=library.id
-        ).first()
-
-        if library in user.joined_libraries and membership and library_favorite:
-            return jsonify({'error': 'User already in library'}), 400
-        
-        all_sections = []
-        for unit in library.units:
-            all_sections.extend(unit.sections)
-
-        all_section_ids = set(section.id for section in all_sections)
-
-        room_state_sections = LibraryRoomState.query.filter_by(
-            user_id=user_id,
-            library_id=library.id
-        ).all()
-
-        room_state_section_ids = set(room_state.section_id for room_state in room_state_sections)
-
-        if room_state_section_ids and room_state_section_ids == all_section_ids:
-            return jsonify({'error': 'User already in library'}), 400
-
-        membership = LibraryMembership.query.filter_by(
-            user_id=user_id,
-            library_id=library.id
-        ).first()
-        if membership:
-            return jsonify({'error': 'User already in library'}), 400
+        already = db.session.query(
+            db.exists().where(
+                LibraryMembership.user_id == user_id,
+                LibraryMembership.library_id == library.id
+            )
+        ).scalar()
+        if already:
+            return jsonify({"error": "User already in library"}), 400
         
         membership = LibraryMembership(
             user_id=user_id,
@@ -517,16 +494,12 @@ def add_user_to_library(user_id, library_id, join_code):
         )
 
         db.session.add(membership)
-        db.session.flush()
 
-        library_favorite = LibraryFavorites(
+        db.session.add(LibraryFavorites(
             user_id=user_id,
             library_id=library.id,
             is_favorited=False,
-        )
-
-        db.session.add(library_favorite)
-        db.session.flush()
+        ))
 
         # add library room states
         num_lessons = 3
@@ -541,17 +514,26 @@ def add_user_to_library(user_id, library_id, join_code):
         print(f"Found {len(all_sections)} sections")
         print(f"Sections: {[section for section in all_sections]}")
         # Create room states for each section
-        # for section in all_sections:
-        #     # Note: already accounts for duplicates
-        #     add_section_user_state(user_id, library_id, section.id, num_lessons)
+        for section in all_sections:
+            add_section_user_state(user_id, library_id, section.id, num_lessons)
         
-        # db.session.commit()
+        db.session.commit()
 
         return jsonify({"message": "User added to library successfully"}), 200
             
+    except IntegrityError as ie:
+        db.session.rollback()
+        app.logger.warning("IntegrityError joining library: %s", ie)
+        # Unique violation is almost always “already a member”
+        return jsonify({"error": "User already in library"}), 400
+    except SQLAlchemyError as se:
+        db.session.rollback()
+        app.logger.exception("DB error joining library")
+        return jsonify({"error": "Database error"}), 500
     except Exception as e:
         db.session.rollback()
-        return jsonify({"message": str(e)}), 400
+        app.logger.exception("Unexpected error joining library")
+        return jsonify({"error": str(e)}), 500
 
 def add_section_user_state(user_id, library_id, section_id, num_lessons, initial_lesson_state=1):
 
