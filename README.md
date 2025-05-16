@@ -103,6 +103,7 @@ TODO list:
                 - also, maybe change it to vertical
                 - ⭐️ add ability to leave libraries (later)
                 - ⭐️ move dropdown menu to left + make dropdown menu permanant, replace w/ profile picture --> hover menu for to see profile settings or something
+                - for course creation, make a "advanced settings" toggle for t/f, mcq, other questions, max users, etc... maybe other stuff as well
                 - ⭐️ all the other routes and stuff (terms & policies, buying subscription, can't think of others?)
                 - ⭐️ add i-card for all users, maybe description about the library along with a preview of the files used in the library and maybe also users who are members of the library or something 
                     - make description visible right below library card I think, maybe i card has more detail information, maybe when it was created or current owner or something
@@ -167,7 +168,7 @@ TODO list:
 
     general:
     study tool additions / ideas:
-        - when errors popup, prompt the user with a contact form (tell them we check this every hour or something)
+        - when errors popup, prompt the user subtly with a contact form and discord (tell them we're constantly on Discord and check the contact form every hour or something)
         - ⭐️ ability to leave a library
         - voice mode based on textbook w/ knowledge bars of things you've covered so far and possibly quick lessons to make sure you know your stuff (insipired by gpt voice mode)
         - trending courses tab?

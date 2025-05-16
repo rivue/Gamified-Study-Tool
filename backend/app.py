@@ -107,6 +107,13 @@ def forbidden(e):
 def bad_request(e):
     return jsonify({"error": "Bad request", "message": str(e)}), 400
 
+class UserAlreadyMemberError(Exception):
+    pass
+
+class InvalidJoinCodeError(Exception):
+    """Raised when a private library’s join-code is wrong."""
+    pass
+
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'

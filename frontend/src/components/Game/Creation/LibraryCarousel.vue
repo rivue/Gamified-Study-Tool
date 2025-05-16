@@ -230,54 +230,55 @@ async function joinPrivateCourse() {
     
     joinLoading.value = true;
     joinMessage.value = "";
+        
+    axios
+    .post('/api/library/join', {
+        joinCode: joinCode.value.trim(),
+    })
+    .then((response) => {
+        if (response.status === 200) {
+            // Update the local favorites map
+            joinMessageType.value = "success";
+            joinMessage.value = "Successfully joined course!";
+            joinCode.value = "";
+            
+            // Emit event to refresh libraries list
+            emit('libraryJoined', response.data.library);
     
-    try {
-        const response = await axios.post('/api/library/join', {
-            joinCode: joinCode.value.trim(),
-            libraryId: null // Assuming you want to join a course without specifying a library ID
-        });
-        
-        joinMessageType.value = "success";
-        joinMessage.value = "Successfully joined course!";
-        joinCode.value = "";
-        
-        // Emit event to refresh libraries list
-        emit('libraryJoined', response.data.library);
-        
-        // Add to local libraries array if needed
-        if (response.data.library) {
-            // You could add the library to your local list here if needed
-            filterLibraries(); // Re-filter to show the new library
-        }
-        
-    } catch (error: any) {
-        joinMessageType.value = "error";
-        
-        if (error.response) {
-            if (error.response.status === 409) {
-                joinMessage.value = "You have already joined that course";
-            } else if (error.response.status === 404) {
-                joinMessage.value = "Invalid course code";
-            } else {
-                joinMessage.value = "Failed to join course";
+            // Add to local libraries array if needed
+            if (response.data.library) {
+                const newLibrary = response.data.library;
+                const libraryExists = props.libraries.some(lib => lib.id === newLibrary.id);
+                if (!libraryExists) {
+                    filteredLibraries.value.unshift(newLibrary);
+                    filterLibraries();
+                }
             }
-        } else {
-            joinMessage.value = "Network error, please try again";
         }
-    } finally {
+    })
+    .catch((error) => {
+        console.log(error);
+        console.error("Error updating favorite status:", error);
+        joinMessageType.value = "error";
+        joinMessage.value = error.response.data.error;
+    
+    })
+    .finally(() => {
         joinLoading.value = false;
-        
+    
         // Auto-hide message after 5 seconds
         setTimeout(() => {
             joinMessage.value = "";
         }, 5000);
-    }
+
+    });
+       
 }
 
 function updateFavoritedStatus(libraryId: number, oldStatus: boolean) {
     const newStatus = oldStatus === true ? false : true;
     axios
-        .post(`/api/library/favorited_status/${libraryId}`, {
+        .put(`/api/library/favorited_status/${libraryId}`, {
             newStatus: newStatus,
         })
         .then((response) => {
@@ -287,6 +288,7 @@ function updateFavoritedStatus(libraryId: number, oldStatus: boolean) {
             }
         })
         .catch((error) => {
+            console.log(error);
             console.error("Error updating favorite status:", error);
         });
 }
@@ -696,8 +698,6 @@ function goToPage(page: number) {
 .list-header-container {
     display: flex;
     flex-direction: column;
-    gap: 16px;
-    margin-bottom: 24px;
 }
 
 @media (min-width: 768px) {
@@ -762,9 +762,9 @@ function goToPage(page: number) {
 }
 
 .error {
-    background-color: rgba(239, 68, 68, 0.2);
-    color: #b91c1c;
-    border: 1px solid rgba(239, 68, 68, 0.3);
+    background-color: rgba(239, 68, 68, 0.3);
+    color: #dc2626;
+    border: 1px solid rgba(239, 68, 68, 0.4);
 }
 
 .fade-enter-active,

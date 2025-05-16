@@ -8,6 +8,8 @@ import math
 import string
 import time
 import secrets
+from app import InvalidJoinCodeError, UserAlreadyMemberError
+from sqlalchemy import or_
 from database.models import (
     db,
     User,
@@ -22,6 +24,7 @@ from database.models import (
     LibraryFavorites,
     LibraryCompletion
 )
+
 
 @contextmanager
 def db_transaction():
@@ -64,13 +67,6 @@ def create_library(
         )
         db.session.add(library)
         db.session.flush()
-
-        membership = LibraryMembership(
-            user_id=user_id,
-            library_id=library.id,
-            joined_at=datetime.utcnow()
-        )
-        db.session.add(membership)
         db.session.commit()
 
         return (
@@ -100,6 +96,13 @@ def create_library_favorite(
             ),
             201,
         )
+    except IntegrityError:
+        db.session.rollback()
+        return (
+            jsonify(
+                {"message": "Library Favorites object already exists"}
+            ),
+            400)
     except Exception as e:
         db.session.rollback()
         return jsonify({"message": str(e)}), 400
@@ -457,83 +460,68 @@ def retrieve_library_room_contents(library_id, section_id, user_id):
 
     return {"factoids": room_contents}
 
-def add_user_to_library(user_id: int, library_id: int | None, join_code: str):
-    """Put the current user into a library (public or private)"""
+def join_library(user_id: int, library_id: int, join_code: str = None):
+    """
+    Atomically:
+      • add membership (or raise IntegrityError if already member)
+      • pre-populate room states
+      • create favorite row
+    """
+    user = User.query.get(user_id)
+    if not user:
+        raise ValueError(f"User {user_id} not found")
+
+    library = Library.query.filter(Library.id == library_id).first()
+    if not library:
+
+        if not join_code:
+            raise ValueError(f"Library {library_id} not found")
+        else:
+            library = Library.query.filter(
+                (Library.join_code == join_code) and 
+                (not Library.is_public)
+                ).first()
+            if not library:
+                raise InvalidJoinCodeError("Invalid join code")
+
+    already_exists = db.session.query(LibraryMembership) \
+        .filter_by(user_id=user_id, library_id=library_id) \
+        .first()
+    if already_exists:
+        raise UserAlreadyMemberError("user already in this library")
 
     try:
-
-        # If library_id is provided, start with that lookup
-        if library_id:
-            library = Library.query.get(library_id)
-            if not library:
-                return jsonify({"error": "Library not found"}), 404
-            if not library.is_public and library.join_code != join_code:
-                return jsonify({"error": "Invalid join code"}), 403
-        else:
-            library = Library.query.filter_by(join_code=join_code).first()
-            if not library:
-                return jsonify({"error": "Invalid join code"}), 404
-
-        user = User.query.get(user_id)
-        if not user:
-            return jsonify({"status": 'User not found'}), 404
-        
-        already = db.session.query(
-            db.exists().where(
-                LibraryMembership.user_id == user_id,
-                LibraryMembership.library_id == library.id
-            )
-        ).scalar()
-        if already:
-            return jsonify({"error": "User already in library"}), 400
-        
-        membership = LibraryMembership(
-            user_id=user_id,
-            library_id=library.id,
-            joined_at=datetime.utcnow()
-        )
-
+        print("test")
+        membership = LibraryMembership(user_id=user.id, library_id=library.id, joined_at=datetime.now())
         db.session.add(membership)
+        print("test1")
+        # bulk-insert room states
+        states = [
+            LibraryRoomState(user_id=user.id,
+                             library_id=library.id,
+                             section_id=section.id,
+                             num_lessons=3,
+                             lesson_state=1)
+            for unit in library.units for section in unit.sections
+        ]
+        db.session.bulk_save_objects(states)
+        print("test2")
 
-        db.session.add(LibraryFavorites(
-            user_id=user_id,
-            library_id=library.id,
-            is_favorited=False,
-        ))
-
-        # add library room states
-        num_lessons = 3
-        
-        all_sections = []
-        for unit in library.units:
-            all_sections.extend(unit.sections)
-        
-        if not all_sections:
-            return jsonify({"error": "No sections found in the library"}), 404
-        
-        print(f"Found {len(all_sections)} sections")
-        print(f"Sections: {[section for section in all_sections]}")
-        # Create room states for each section
-        for section in all_sections:
-            add_section_user_state(user_id, library_id, section.id, num_lessons)
-        
+        db.session.add(LibraryFavorites(user_id=user.id,
+                                            library_id=library.id,
+                                            is_favorited=False))
+        print("test3")
         db.session.commit()
-
-        return jsonify({"message": "User added to library successfully"}), 200
-            
-    except IntegrityError as ie:
+    except IntegrityError as e:
         db.session.rollback()
-        app.logger.warning("IntegrityError joining library: %s", ie)
-        # Unique violation is almost always “already a member”
-        return jsonify({"error": "User already in library"}), 400
-    except SQLAlchemyError as se:
-        db.session.rollback()
-        app.logger.exception("DB error joining library")
-        return jsonify({"error": "Database error"}), 500
-    except Exception as e:
-        db.session.rollback()
-        app.logger.exception("Unexpected error joining library")
-        return jsonify({"error": str(e)}), 500
+        print(f"{e}")
+        raise UserAlreadyMemberError  # your custom error
+    
+def leave_library(user: User, library: Library):
+    # TODO: not implemented, in theory all I have to do is remove library_membership since the CASCADE FK will wipe states and favorites
+    # automatically
+    pass
+    
 
 def add_section_user_state(user_id, library_id, section_id, num_lessons, initial_lesson_state=1):
 

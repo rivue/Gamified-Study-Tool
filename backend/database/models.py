@@ -344,6 +344,13 @@ class LibraryRoomState(db.Model): # maps users to states of rooms they are in
     # __table_args__ = (
     #     db.UniqueConstraint('user_id', 'factoid_id', name='uq_user_factoid'),
     # )
+    __table_args__ = (
+        db.ForeignKeyConstraint(
+            ['user_id', 'library_id'],
+            ['library_membership.user_id', 'library_membership.library_id'],
+            ondelete="CASCADE"          # removes room-states automatically if membership is removed
+        ),
+    )
 
     def as_dict(self):
         return {

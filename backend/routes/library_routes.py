@@ -6,6 +6,7 @@ from flask_login import current_user, AnonymousUserMixin
 from bleach import clean
 from flask_executor import Executor
 import concurrent.futures
+from app import InvalidJoinCodeError, UserAlreadyMemberError
 
 from io import BytesIO
 
@@ -18,6 +19,7 @@ from database.user_handler import increment_violations, is_within_limit, check_g
 from database.models import Library, LibraryFactoid, LibraryQuestion, db
 from vector_processing.file_handler import process_document
 from vector_processing.retrieval import query_and_respond_pinecone
+import app
 
 def init_library_routes(app):
 
@@ -123,8 +125,15 @@ def init_library_routes(app):
         if library_response_status_code == 201:
             
             library_id = library_response.get_json().get("library_id")
+
+            join_code = None
+            if not is_public:
+                # fetches join code if new library is private
+                library = Library.query.filter_by(id=library_id).first()
+                join_code = library.join_code 
+
             
-            library_favorites_response, library_favorites_status_code = lbh.create_library_favorite(user_id, library_id)
+            library_favorites_response, library_favorites_status_code = lbh.join_library(user_id, library_id, join_code)
             
             if library_favorites_status_code == 201:
                 process_document(selected_file, library_id) # extract embeddings + and upload to pinecone
@@ -272,12 +281,28 @@ def init_library_routes(app):
                 return jsonify(status="error", message="Can't find user"), 500
             data = request.get_json()
             library_id = data.get("libraryId")
+            print(library_id)
             join_code = data.get("joinCode")
+            print(join_code)
             print(f"library_id: {library_id}, join_code: {join_code}")
-            add_user_to_library(user_id, library_id, join_code)
+            
+            new_library = lbh.join_library(user_id, library_id, join_code)
+
             # return new library at some point?
-        except:
-            return jsonify(status="error", message="Failed to retrieve library data"), 500
+            return jsonify(status="success", message="User added to library", library=new_library)
+            
+        except InvalidJoinCodeError:
+            return jsonify({"error": "Invalid join-code"}), 403
+
+        except UserAlreadyMemberError:
+            return jsonify({"error": "User already a member"}), 400
+
+        except ValueError as e:
+            return jsonify({"error": str(e)}), 404
+
+        except Exception as e:
+            app.logger.exception(e)
+            return jsonify({"error": "internal error"}), 500
         
     @app.route('/api/library/unit', methods=['POST'])
     def generate_unit():
@@ -458,10 +483,10 @@ def init_library_routes(app):
         except Exception as e:
             return jsonify({'status': 'error', 'message': str(e)}), 500
 
-    @app.route("/api/library/favorited_status/<int:library_id>", methods=["POST", "GET"])
+    @app.route("/api/library/favorited_status/<int:library_id>", methods=["PUT", "GET"])
     def library_favorited_status(library_id):
         try:
-            if request.method == "POST":    
+            if request.method == "PUT":    
                 data = request.get_json()
                 new_status = data.get('newStatus')
                 user_id = current_user.id if not isinstance(current_user, AnonymousUserMixin) else None
@@ -490,7 +515,7 @@ def init_library_routes(app):
         except Exception as e:
             return jsonify(status="error", message=f"Failed to update library favorited status: {str(e)}"), 500
         
-    @app.route("/api/library/visibility_status/<int:library_id>", methods=["GET", "PUT"])
+    @app.route("/api/library/visibility_status/<int:library_id>", methods=["GET", "POST"])
     def library_visibility_status(library_id):
         try:
             if request.method == "GET":
@@ -513,7 +538,7 @@ def init_library_routes(app):
                 
                 return jsonify({'is_public': visibility_status}), 200
             
-            elif request.method == "PUT":
+            elif request.method == "POST":
                 
                 data = request.get_json()
                 new_status = data.get('newStatus')
