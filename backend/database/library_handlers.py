@@ -123,7 +123,7 @@ def create_unit_and_add(library_id, unit_name, position=-1):
             print("not unit")
             return jsonify({"error": "Library or Unit not found"}), 404
 
-        if position is not -1:
+        if position != -1:
             library.attach_unit(unit, position)
         else:
             library.attach_unit(unit)
@@ -458,18 +458,29 @@ def retrieve_library_room_contents(library_id, section_id, user_id):
 
 def add_user_to_library(user_id, library_id, join_code):
     try:
-        library = Library.query.filter(
-            (Library.join_code == join_code if join_code is not None else True),
-            (Library.id == library_id if library_id is not None else True)
+        # If library_id is provided, start with that lookup
+        if library_id is not None:
+            library = Library.query.get(library_id)
+            
+            # For private libraries, we need to verify the join code
+            if library and not library.is_public and library.join_code != join_code:
+                return jsonify({'error': 'Invalid join code for private library'}), 403
+        else:
+            # Otherwise, look up by join code only
+            library = Library.query.filter_by(join_code=join_code).first()
+
+
+        if library in user.joined_libraries and... TODO: COMPLETE WHEN I COME BACK
+        if library already in user's joined libraries and there is a membership and library favorites and all room states:
+            return "already in library"
+
+        membership = LibraryMembership.query.filter_by(
+            user_id=user_id,
+            library_id=library.id
         ).first()
-
-        # account for:
-            # 1) user is already in library
-            # 2) incorrect join code (should be None and we can just say Library not found)
-
-        if library is None:
-            return jsonify({'error': 'Library not found'}), 404
-
+        if membership:
+            return jsonify({'error': 'User already in library'}), 400
+        
         membership = LibraryMembership(
             user_id=user_id,
             library_id=library.id,
@@ -499,12 +510,13 @@ def add_user_to_library(user_id, library_id, join_code):
             return jsonify({"error": "No sections found in the library"}), 404
         
         print(f"Found {len(all_sections)} sections")
-        
+        print(f"Sections: {[section for section in all_sections]}")
         # Create room states for each section
-        for section in all_sections:
-            add_section_user_state(user_id, library_id, section.id, num_lessons)
+        # for section in all_sections:
+        #     # Note: already accounts for duplicates
+        #     add_section_user_state(user_id, library_id, section.id, num_lessons)
         
-        db.session.commit()
+        # db.session.commit()
 
         return jsonify({"message": "User added to library successfully"}), 200
             

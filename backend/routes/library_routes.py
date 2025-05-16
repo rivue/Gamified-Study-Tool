@@ -258,7 +258,6 @@ def init_library_routes(app):
                 return jsonify(status="error", message="Failed to retrieve library data"), 500
             
             members = lbh.get_library_scores(library_id).get_json()
-            print(members)
               
             return jsonify(status="success", members=members)
 
@@ -274,7 +273,7 @@ def init_library_routes(app):
             data = request.get_json()
             library_id = data.get("libraryId")
             join_code = data.get("joinCode")
-
+            print(f"library_id: {library_id}, join_code: {join_code}")
             add_user_to_library(user_id, library_id, join_code)
             # return new library at some point?
         except:
