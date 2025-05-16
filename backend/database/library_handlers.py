@@ -458,8 +458,14 @@ def retrieve_library_room_contents(library_id, section_id, user_id):
 
 def add_user_to_library(user_id, library_id, join_code):
     try:
-       
-        library = Library.filter_by(join_code=join_code).first()
+        library = Library.query.filter(
+            (Library.join_code == join_code if join_code is not None else True),
+            (Library.id == library_id if library_id is not None else True)
+        ).first()
+
+        # account for:
+            # 1) user is already in library
+            # 2) incorrect join code (should be None and we can just say Library not found)
 
         if library is None:
             return jsonify({'error': 'Library not found'}), 404
@@ -484,10 +490,20 @@ def add_user_to_library(user_id, library_id, join_code):
 
         # add library room states
         num_lessons = 3
-        # fetch sections from unit
-        sections = library.query.filter_by(library_id=library.id).all() # not correct
-        for section in sections:
+        
+        all_sections = []
+        for unit in library.units:
+            all_sections.extend(unit.sections)
+        
+        if not all_sections:
+            return jsonify({"error": "No sections found in the library"}), 404
+        
+        print(f"Found {len(all_sections)} sections")
+        
+        # Create room states for each section
+        for section in all_sections:
             add_section_user_state(user_id, library_id, section.id, num_lessons)
+        
         db.session.commit()
 
         return jsonify({"message": "User added to library successfully"}), 200

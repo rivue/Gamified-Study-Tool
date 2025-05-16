@@ -233,7 +233,8 @@ async function joinPrivateCourse() {
     
     try {
         const response = await axios.post('/api/library/join', {
-            code: joinCode.value.trim()
+            joinCode: joinCode.value.trim(),
+            libraryId: null // Assuming you want to join a course without specifying a library ID
         });
         
         joinMessageType.value = "success";
