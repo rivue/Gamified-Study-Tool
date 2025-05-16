@@ -15,7 +15,7 @@
                     />
 
                     <SideMenuButton
-                        label="My Libraries"
+                        label="Courses"
                         :isSelected="isRouteActive('/library')"
                         @click="openRoute('/library')"
                         class="menu-button"

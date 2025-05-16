@@ -265,6 +265,27 @@ def init_library_routes(app):
         except:
             return jsonify(status="error", message="Failed to retrieve library data"), 500
         
+    @app.route("/api/library/user", methods=["POST"])
+    def add_user_to_library():
+        try:
+            user_id = current_user.id if not isinstance(current_user, AnonymousUserMixin) else None
+            if not user_id:
+                return jsonify(status="error", message="Can't find user"), 500
+            data = request.get_json()
+            library_id = data.get("libraryId")
+            join_code = data.get("joinCode")
+
+            add_user_to_library(user_id, library_id, join_code)
+            # note: either library_id or join_code is not None, not both, not neither
+                # create library membership
+                # create library favorites
+                # create library room state
+
+            else:
+                return jsonify(status="error", message="Invalid library join arguments"), 400
+
+        except:
+            return jsonify(status="error", message="Failed to retrieve library data"), 500
         
     @app.route('/api/library/unit', methods=['POST'])
     def generate_unit():

@@ -62,10 +62,16 @@ def create_library(
             is_public=is_public,
         )
         db.session.add(library)
+        db.session.flush()
+
+        membership = LibraryMembership(
+            user_id=user_id,
+            library_id=library.id,
+            joined_at=datetime.utcnow()
+        )
+        db.session.add(membership)
         db.session.commit()
-        membership, status = create_library_membership(user_id, library.id)
-        if status != 200:
-            return jsonify({"message": f"Library error creating: + {membership}"}), status
+
         return (
             jsonify(
                 {"message": "Library created successfully", "library_id": library.id}
@@ -449,6 +455,52 @@ def retrieve_library_room_contents(library_id, section_id, user_id):
         )
 
     return {"factoids": room_contents}
+
+def add_user_to_library(user_id, library_id, join_code):
+    try:
+        if library_id and not join_code: # public
+            print("something")
+
+        elif join_code and not library_id: # private
+            library = Library.query.get(library_id)
+            if library is None:
+                return jsonify({'error': 'Library not found'}), 404
+            
+            if library.join_code != join_code:
+                return jsonify({'error': 'Invalid join code'}), 400
+
+            membership = LibraryMembership(
+                user_id=user_id,
+                library_id=library_id,
+                joined_at=datetime.utcnow()
+            )
+
+            db.session.add(membership)
+            db.session.flush()
+
+            library_favorite = LibraryFavorites(
+                user_id=user_id,
+                library_id=library_id,
+                is_favorited=False,
+            )
+
+            db.session.add(library_favorite)
+            db.session.flush()
+
+            # add library room states
+            num_lessons = 3
+            sections = LibrarySection.query.filter_by(library_id=library_id).all()
+            for section in sections:
+                add_section_user_state(user_id, library_id, section.id, num_lessons)
+            db.session.commit()
+
+            return jsonify({"message": "User added to library successfully"}), 200
+        else:
+            return jsonify({"message": "User added to library successfully"}), 200
+            
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"message": str(e)}), 400
 
 def add_section_user_state(user_id, library_id, section_id, num_lessons, initial_lesson_state=1):
 

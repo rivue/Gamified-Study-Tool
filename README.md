@@ -128,6 +128,7 @@ TODO list:
         - ⭐️ add username (backfill username w/ 1st part of email before @ symbol - maybe let people change later)
         - ✅ ⭐️ Finish sections + units
             - ⭐️ Add ability to add each section to each unit (later --> come back to, reminder to make it account for 1-n number of sections no matter how that looks. add new stepping stones button is commented out for now)
+            - When a user adds a section, make sure its added for all users, like add it to section_user_state
         - ✅ ⭐️ (would like to implement visibility of different courses first or at least a many:one for non-owners in library model)
             - ⭐️ Delete sections requires entering the name of the unit / course just for accidental reasons)
             - ⭐️ Delete Units (requires entering the name of the unit / course just for accidental reasons)
@@ -144,6 +145,11 @@ TODO list:
                     - thing next to "Courses" that says Enter code to join
                         - already in = popup that says "you are already in this library!"
                         - new join = small popup that says the library was added and then fetch / update the courses list
+                            - create_library_membership
+                            - create library room states for user
+                            - create library favorites (if )
+                            - move create_library_membership out of create_library library handler and maybe make a function called 
+                            create_library that creates the library, creates the library membership, library favorite, and section room states
                         - incorrect code = incorrect code message
         
         medium (chip away at when tired / mentally exhausted from hard ones):
@@ -161,6 +167,9 @@ TODO list:
 
     general:
     study tool additions / ideas:
+        - when errors popup, prompt the user with a contact form (tell them we check this every hour or something)
+        - ⭐️ ability to leave a library
+        - voice mode based on textbook w/ knowledge bars of things you've covered so far and possibly quick lessons to make sure you know your stuff (insipired by gpt voice mode)
         - trending courses tab?
         - ⭐️ add leaderboard / game point tracking system (could be reworked later)once user base grows a bit (on every course, do all time and monthly)
             - ⭐️ implement some game "score" logic (if you get >80% #attemps:number of questions ratio) then you get more / less points or something, etc...
