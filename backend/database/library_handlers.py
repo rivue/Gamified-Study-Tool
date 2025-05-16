@@ -470,10 +470,38 @@ def add_user_to_library(user_id, library_id, join_code):
             library = Library.query.filter_by(join_code=join_code).first()
 
 
-        if library in user.joined_libraries and... TODO: COMPLETE WHEN I COME BACK THEN ASK GPT / CLAUDE TO MAKE SURE 
-        I CAUGHT ALL ERROR CASES / ORGANIZED IT WELL
-        if library already in user's joined libraries and there is a membership and library favorites and all room states:
-            return "already in library"
+        user = User.query.get(user_id)
+        if not user:
+            return jsonify({"status": 'User not found'}), 404
+        
+        membership = LibraryMembership.query.filter_by(
+            user_id=user_id,
+            library_id=library.id
+        ).first()
+        
+        library_favorite = LibraryFavorites.query.filter_by(
+            user_id=user_id,
+            library_id=library.id
+        ).first()
+
+        if library in user.joined_libraries and membership and library_favorite:
+            return jsonify({'error': 'User already in library'}), 400
+        
+        all_sections = []
+        for unit in library.units:
+            all_sections.extend(unit.sections)
+
+        all_section_ids = set(section.id for section in all_sections)
+
+        room_state_sections = LibraryRoomState.query.filter_by(
+            user_id=user_id,
+            library_id=library.id
+        ).all()
+
+        room_state_section_ids = set(room_state.section_id for room_state in room_state_sections)
+
+        if room_state_section_ids and room_state_section_ids == all_section_ids:
+            return jsonify({'error': 'User already in library'}), 400
 
         membership = LibraryMembership.query.filter_by(
             user_id=user_id,
