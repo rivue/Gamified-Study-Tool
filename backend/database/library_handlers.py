@@ -459,15 +459,10 @@ def retrieve_library_room_contents(library_id, section_id, user_id):
 def add_user_to_library(user_id, library_id, join_code):
     try:
         if library_id and not join_code: # public
-            print("something")
+            library = Library.filter_by(library_id=library_id).first()
 
-        elif join_code and not library_id: # private
-            library = Library.query.get(library_id)
             if library is None:
                 return jsonify({'error': 'Library not found'}), 404
-            
-            if library.join_code != join_code:
-                return jsonify({'error': 'Invalid join code'}), 400
 
             membership = LibraryMembership(
                 user_id=user_id,
@@ -489,7 +484,42 @@ def add_user_to_library(user_id, library_id, join_code):
 
             # add library room states
             num_lessons = 3
-            sections = LibrarySection.query.filter_by(library_id=library_id).all()
+            # fetch sections from unit
+            sections = library.query.filter_by(library_id=library.id).all() # not correct
+            for section in sections:
+                add_section_user_state(user_id, library_id, section.id, num_lessons)
+            db.session.commit()
+
+            return jsonify({"message": "User added to library successfully"}), 200
+
+        elif join_code and not library_id: # private
+            library = Library.filter_by(join_code=join_code).first()
+
+            if library is None:
+                return jsonify({'error': 'Library not found'}), 404
+
+            membership = LibraryMembership(
+                user_id=user_id,
+                library_id=library.id,
+                joined_at=datetime.utcnow()
+            )
+
+            db.session.add(membership)
+            db.session.flush()
+
+            library_favorite = LibraryFavorites(
+                user_id=user_id,
+                library_id=library.id,
+                is_favorited=False,
+            )
+
+            db.session.add(library_favorite)
+            db.session.flush()
+
+            # add library room states
+            num_lessons = 3
+            # fetch sections from unit
+            sections = library.query.filter_by(library_id=library.id).all() # not correct
             for section in sections:
                 add_section_user_state(user_id, library_id, section.id, num_lessons)
             db.session.commit()
