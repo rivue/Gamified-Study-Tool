@@ -499,6 +499,7 @@ def join_library(user_id: int, library_id: int, join_code: str = None):
         states = [
             LibraryRoomState(user_id=user.id,
                              library_id=library.id,
+                             room_name="placeholder",
                              section_id=section.id,
                              num_lessons=3,
                              lesson_state=1)

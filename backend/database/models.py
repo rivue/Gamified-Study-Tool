@@ -341,15 +341,13 @@ class LibraryRoomState(db.Model): # maps users to states of rooms they are in
     num_lessons = db.Column(db.Integer, nullable=False)
     lesson_state = db.Column(db.Integer, nullable=False)  # 1-state 1, 2-state 2, 3-state 3, 4-state 4, etc...
     
-    # __table_args__ = (
-    #     db.UniqueConstraint('user_id', 'factoid_id', name='uq_user_factoid'),
-    # )
     __table_args__ = (
         db.ForeignKeyConstraint(
             ['user_id', 'library_id'],
             ['library_membership.user_id', 'library_membership.library_id'],
             ondelete="CASCADE"          # removes room-states automatically if membership is removed
         ),
+        db.UniqueConstraint('user_id', 'section_id', name='uq_user_section'),  # Ensure one state per user per section
     )
 
     def as_dict(self):
@@ -358,6 +356,7 @@ class LibraryRoomState(db.Model): # maps users to states of rooms they are in
             "user_id": self.user_id,
             "library_id": self.library_id,
             "room_name": self.room_name,
+            "section_id": self.section_id,
             "num_lessons": self.num_lessons,
             "lesson_state": self.lesson_state,
         }
