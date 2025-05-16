@@ -470,7 +470,8 @@ def add_user_to_library(user_id, library_id, join_code):
             library = Library.query.filter_by(join_code=join_code).first()
 
 
-        if library in user.joined_libraries and... TODO: COMPLETE WHEN I COME BACK
+        if library in user.joined_libraries and... TODO: COMPLETE WHEN I COME BACK THEN ASK GPT / CLAUDE TO MAKE SURE 
+        I CAUGHT ALL ERROR CASES / ORGANIZED IT WELL
         if library already in user's joined libraries and there is a membership and library favorites and all room states:
             return "already in library"
 
