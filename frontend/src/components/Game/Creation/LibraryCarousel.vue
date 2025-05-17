@@ -11,11 +11,11 @@
                         type="text"
                         v-model="joinCode"
                         placeholder="Enter course code..."
-                        @keydown.enter="joinPrivateCourse"
+                        @keydown.enter="joinCourse"
                     />
                     <Button 
                         class="join-button" 
-                        @click="joinPrivateCourse"
+                        @click="joinCourse"
                         :disabled="joinLoading"
                         variant="destructive"
                     >
@@ -225,7 +225,7 @@ function goToLibrary(id: number) {
     router.push(`/lessons/${id}`);
 }
 
-async function joinPrivateCourse() {
+async function joinCourse() {
     if (!joinCode.value.trim()) return;
     
     joinLoading.value = true;
@@ -260,7 +260,7 @@ async function joinPrivateCourse() {
         console.log(error);
         console.error("Error updating favorite status:", error);
         joinMessageType.value = "error";
-        joinMessage.value = error.response.data.error;
+        joinMessage.value = error.response.data.message;
     
     })
     .finally(() => {

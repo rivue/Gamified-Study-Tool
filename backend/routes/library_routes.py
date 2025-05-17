@@ -286,23 +286,25 @@ def init_library_routes(app):
             print(join_code)
             print(f"library_id: {library_id}, join_code: {join_code}")
             
-            new_library = lbh.join_library(user_id, library_id, join_code)
+            new_library, _ = lbh.join_library(user_id, library_id, join_code)
+            new_library = new_library.get_json()
+            print(f"new_library: {new_library}")
 
             # return new library at some point?
             return jsonify(status="success", message="User added to library", library=new_library)
             
         except InvalidJoinCodeError:
-            return jsonify({"error": "Invalid join-code"}), 403
+            return jsonify(status="error", message="Invalid join-code"), 403
 
         except UserAlreadyMemberError:
-            return jsonify({"error": "User already a member"}), 400
+            return jsonify(status="error", message="User already a member"), 400
 
         except ValueError as e:
-            return jsonify({"error": str(e)}), 404
+          return jsonify(status="error", message=f"{str(e)}"), 404
 
         except Exception as e:
             app.logger.exception(e)
-            return jsonify({"error": "internal error"}), 500
+            return jsonify(status="error", message="internal error"), 500
         
     @app.route('/api/library/unit', methods=['POST'])
     def generate_unit():
