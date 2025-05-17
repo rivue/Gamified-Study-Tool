@@ -143,16 +143,7 @@ TODO list:
                 - ✅ private user has joined
                 - public user has not joined
                     - browse public library page
-                - private user has not joined <-- TODO NEXT
-                    - thing next to "Courses" that says Enter code to join
-                        - already in = popup that says "you are already in this library!"
-                        - new join = small popup that says the library was added and then fetch / update the courses list
-                            - create_library_membership
-                            - create library room states for user
-                            - create library favorites (if )
-                            - move create_library_membership out of create_library library handler and maybe make a function called 
-                            create_library that creates the library, creates the library membership, library favorite, and section room states
-                        - incorrect code = incorrect code message
+                - ✅ private user has not joined
         
         medium (chip away at when tired / mentally exhausted from hard ones):
         - ⭐️ add staging / pre-production environment that isn't localhost

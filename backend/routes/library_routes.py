@@ -566,6 +566,15 @@ def init_library_routes(app):
         user_id = current_user.id if not isinstance(current_user, AnonymousUserMixin) else None
         return lbh.get_libraries_info(user_id)
     
+    @app.route("/api/libraries/browse", methods=["GET"])
+    def get_libraries_browsse():
+        user_id = current_user.id if not isinstance(current_user, AnonymousUserMixin) else None
+        if not user_id:
+            return jsonify(status="error", message="Must be logged in to browse libraries."), 403
+        # get public libraries that the user isn't in
+        # TODO the route here
+        return lbh.get_libraries_info(user_id)
+    
     @app.route('/api/scores', methods=['GET'])
     def fetch_scores():
         completions = lbh.get_top_scores_by_unique_users(limit=5)
