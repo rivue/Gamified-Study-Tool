@@ -133,12 +133,12 @@ def init_library_routes(app):
                 join_code = library.join_code 
 
             
-            library_favorites_response, library_favorites_status_code = lbh.join_library(user_id, library_id, join_code)
-            
+            _, library_favorites_status_code = lbh.join_library(user_id, library_id, join_code)
+            print("after library generate")
             if library_favorites_status_code == 201:
                 process_document(selected_file, library_id) # extract embeddings + and upload to pinecone
             else:
-                return jsonify(status="error", message="Failed to create library favorites"), 500
+                return jsonify(status="error", message="Failed to process document"), 500
 
         else:
             return jsonify(status="error", message="Failed to create library"), 500

@@ -496,6 +496,8 @@ def join_library(user_id: int, library_id: int, join_code: str = None):
         db.session.add(membership)
         print("test1")
         # bulk-insert room states
+
+        # Note: redundant when generating library for first time - maybe move to after save_library_room_contents
         states = [
             LibraryRoomState(user_id=user.id,
                              library_id=library.id,
@@ -513,10 +515,17 @@ def join_library(user_id: int, library_id: int, join_code: str = None):
                                             is_favorited=False))
         print("test3")
         db.session.commit()
+        print("after commit")
+        return jsonify({"message": "User added to library successfully"}), 201
+    
     except IntegrityError as e:
+        print("integrity error join_library")
         db.session.rollback()
         print(f"{e}")
         raise UserAlreadyMemberError  # your custom error
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error in join_library: {e}")
     
 def leave_library(user: User, library: Library):
     # TODO: not implemented, in theory all I have to do is remove library_membership since the CASCADE FK will wipe states and favorites
