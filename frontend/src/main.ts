@@ -43,7 +43,7 @@ import axios from 'axios';
     const routes = [
         // Main routes
         { path: '/', component: defineAsyncComponent(() => import('./components/HomePage.vue')), meta: { title: 'Rivue.ai' } },
-        { path: '/explore', component: defineAsyncComponent(() => import('./components/Game/Creation/LibraryBrowser.vue')), meta: { title: 'Rivue.ai' } },
+        { path: '/explore', component: defineAsyncComponent(() => import('./components/Main/Explore.vue')), meta: { title: 'Rivue.ai' } },
         {
             name: 'GamePage',
             path: '/lessons/:id/:roomName',

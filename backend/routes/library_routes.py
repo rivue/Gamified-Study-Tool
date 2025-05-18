@@ -563,17 +563,17 @@ def init_library_routes(app):
         
     @app.route("/api/libraries", methods=["GET"])
     def get_libraries():
+        browse = request.args.get("browse", type=bool)
         user_id = current_user.id if not isinstance(current_user, AnonymousUserMixin) else None
-        return lbh.get_libraries_info(user_id)
-    
-    @app.route("/api/libraries/browse", methods=["GET"])
-    def get_libraries_browsse():
-        user_id = current_user.id if not isinstance(current_user, AnonymousUserMixin) else None
-        if not user_id:
-            return jsonify(status="error", message="Must be logged in to browse libraries."), 403
-        # get public libraries that the user isn't in
-        # TODO the route here
-        return lbh.get_libraries_info(user_id)
+        return lbh.get_libraries_info(user_id, browse=browse)
+    # @app.route("/api/libraries/browse", methods=["GET"])
+    # def get_libraries_browse():
+    #     user_id = current_user.id if not isinstance(current_user, AnonymousUserMixin) else None
+    #     if not user_id:
+    #         return jsonify(status="error", message="Must be logged in to browse libraries."), 403
+    #     # get public libraries that the user isn't in
+    #     # TODO the route here
+    #     return lbh.get_libraries_info(user_id, browse=True)
     
     @app.route('/api/scores', methods=['GET'])
     def fetch_scores():

@@ -32,6 +32,7 @@ onMounted(() => {
 function fetchLibraries() {
     axios
         .get("/api/libraries")
+
         .then((response) => {
             if (authStore.loggedIn) {
 

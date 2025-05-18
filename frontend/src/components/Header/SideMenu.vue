@@ -21,6 +21,13 @@
                         class="menu-button"
                     />
 
+                    <SideMenuButton
+                        label="Explore"
+                        :isSelected="isRouteActive('/explore')"
+                        @click="openRoute('/explore')"
+                        class="menu-button"
+                    />
+
                     
                     <SideMenuButton
                         v-if="loggedIn"

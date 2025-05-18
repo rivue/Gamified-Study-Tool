@@ -887,7 +887,7 @@ def update_game_end(user_id, library_id, section_id):
         db.session.rollback()
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
-def get_libraries_info(user_id=None):
+def get_libraries_info(user_id=None, browse=False):
 
     # top_liked_libraries = Library.query.order_by(Library.likes.desc()).limit(40).all()
 
@@ -901,33 +901,49 @@ def get_libraries_info(user_id=None):
     #     'latest': latest_dicts
     # }
     
-    response = {}
-
-    if user_id:
+    if browse:
         
-        my_libraries = (Library.query.filter_by(owner_id=user_id).order_by(Library.id.desc()).all())
-        response["mine"] = [model_to_dict(library, exclude=['room_names', 'factoids']) for library in my_libraries]
+        response = {}
 
-        joined_q = (
-            db.session.query(Library)
-            .join(LibraryMembership, 
-                  Library.id == LibraryMembership.library_id)
-                .filter(LibraryMembership.user_id == user_id,
-                        Library.owner_id != user_id)
-        )
-        joined_public  = joined_q.filter(Library.is_public.is_(True)).all()
+        # explore_libraries  = db.session.query(Library).filter_by(user_id not in Library.memberships).all()
+        explore_libraries = (Library.query
+            .filter(~Library.id.in_(
+                db.session.query(LibraryMembership.library_id)
+                .filter_by(user_id=user_id)
+            ))
+            .all())
 
-        joined_private = joined_q.filter(Library.is_public.is_(False)).all()
-
-        response["joined_public"]  = [model_to_dict(l, exclude=["room_names", "factoids"])
-                                      for l in joined_public]
-        response["joined_private"] = [model_to_dict(l, exclude=["room_names", "factoids"])
-                                      for l in joined_private]
+        response["explore_libraries"] = [model_to_dict(library, exclude=['room_names', 'factoids']) for library in explore_libraries]
         
-        favorited_map = {fav.library_id: fav.is_favorited for fav in LibraryFavorites.query.filter_by(user_id=user_id).all()}
-        response["favorites_map"] = favorited_map
+        return jsonify(response)
+    else:
+        response = {}
 
-    return jsonify(response)
+        if user_id:
+            
+            my_libraries = (Library.query.filter_by(owner_id=user_id).order_by(Library.id.desc()).all())
+            response["mine"] = [model_to_dict(library, exclude=['room_names', 'factoids']) for library in my_libraries]
+
+            joined_q = (
+                db.session.query(Library)
+                .join(LibraryMembership, 
+                    Library.id == LibraryMembership.library_id)
+                    .filter(LibraryMembership.user_id == user_id,
+                            Library.owner_id != user_id)
+            )
+            joined_public  = joined_q.filter(Library.is_public.is_(True)).all()
+
+            joined_private = joined_q.filter(Library.is_public.is_(False)).all()
+
+            response["joined_public"]  = [model_to_dict(l, exclude=["room_names", "factoids"])
+                                        for l in joined_public]
+            response["joined_private"] = [model_to_dict(l, exclude=["room_names", "factoids"])
+                                        for l in joined_private]
+            
+            favorited_map = {fav.library_id: fav.is_favorited for fav in LibraryFavorites.query.filter_by(user_id=user_id).all()}
+            response["favorites_map"] = favorited_map
+
+        return jsonify(response)
     
 def has_default_image(library_id):
     try:

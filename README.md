@@ -128,9 +128,10 @@ TODO list:
         hard probably (goal: 2 high level bullet points / wk):
         - ⭐️ remove alert message in library creator (not hard but have to remember)
         - ⭐️ add username (backfill username w/ 1st part of email before @ symbol - maybe let people change later)
+            - for this section, make sure you modify explore page owner_id and library leaderboard
         - ✅ ⭐️ Finish sections + units
             - ⭐️ Add ability to add each section to each unit (later --> come back to, reminder to make it account for 1-n number of sections no matter how that looks. add new stepping stones button is commented out for now)
-            - When a user adds a section, make sure its added for all users, like add it to section_user_state
+            - When a user adds a section, make sure its added for all users, like add it to section_user_state and stuff
         - ✅ ⭐️ (would like to implement visibility of different courses first or at least a many:one for non-owners in library model)
             - ⭐️ Delete sections requires entering the name of the unit / course just for accidental reasons)
             - ⭐️ Delete Units (requires entering the name of the unit / course just for accidental reasons)
@@ -143,6 +144,7 @@ TODO list:
                 - ✅ private user has joined
                 - public user has not joined
                     - browse public library page
+                    - filter out ones user has already joined and ones user created
                 - ✅ private user has not joined
         
         medium (chip away at when tired / mentally exhausted from hard ones):
