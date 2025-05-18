@@ -307,12 +307,10 @@ def save_library_room_contents(library_id, section_unit_map, section_contents_ma
                     print("create unit and add error")
                     message = response_obj.get_json()['message']
                     return jsonify(status="error", message=message.to_str()), 200
-                print("some error here")                
                 unit_id = response_obj.get_json()["unit"]
 
                 curr += 1
                 for section in sections:
-                    print("section error")
 
                     # 2.1 + 2.2) create sections and add to unit
                     response_obj, status_code = create_section_and_add(unit_id, section)
@@ -912,7 +910,7 @@ def get_libraries_info(user_id=None, browse=False):
                 db.session.query(LibraryMembership.library_id)
                 .filter_by(user_id=user_id)
                 ), 
-                Library.is_public.is_(False)
+                Library.is_public.is_(True)
                 )
             .all())
 
