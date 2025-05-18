@@ -291,7 +291,7 @@ def init_library_routes(app):
             print(f"new_library: {new_library}")
 
             # return new library at some point?
-            return jsonify(status="success", message="User added to library", library=new_library)
+            return jsonify(status="success", message="Successfully joined library", library=new_library)
             
         except InvalidJoinCodeError:
             return jsonify(status="error", message="Invalid join-code"), 403

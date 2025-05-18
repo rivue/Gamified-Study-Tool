@@ -76,7 +76,7 @@ TODO list:
 
 
         last / harder:
-
+        - ⭐️ obfuscate / minimize prod code
         - ⭐️ for LibraryCreator, outline the rules clearly somewhere, like in an i-card next to "create a course to explore" 
         or just put in text "rules for creating courses" or something
             - also, make room / course / unit / section consistent in frontend
@@ -145,6 +145,7 @@ TODO list:
                 - public user has not joined
                     - browse public library page
                     - filter out ones user has already joined and ones user created
+                        - join should turn into "already joined" and grayed out
                 - ✅ private user has not joined
         
         medium (chip away at when tired / mentally exhausted from hard ones):

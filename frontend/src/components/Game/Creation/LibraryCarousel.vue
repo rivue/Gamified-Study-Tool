@@ -260,7 +260,7 @@ async function joinCourse() {
         console.log(error);
         console.error("Error updating favorite status:", error);
         joinMessageType.value = "error";
-        joinMessage.value = error.response.data.message;
+        joinMessage.value = error.response?.data?.message || "Failed to join course";
     
     })
     .finally(() => {
