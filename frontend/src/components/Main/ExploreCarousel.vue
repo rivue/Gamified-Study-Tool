@@ -65,24 +65,23 @@
                             <span>{{ library.owner_id }}</span>
                         </div>
 
-                        <Button 
-                        v-if="!joinedCourses.has(library.id)"
-                        @click="joinSpecificCourse(library.id)" 
-                        :disabled="joinPublicLoading"
+                        <Button v-if="!joinedCourses.has(library.id)" 
+                            @click="joinSpecificCourse(library.id)"
+                            :disabled="joinPublicLoading.has(library.id)" 
                             class="join-card-button">
-                            <LoaderCircle v-if="joinPublicLoading" class="mr-2 h-4 w-4 animate-spin" />
+                            <LoaderCircle v-if="joinPublicLoading.has(library.id)" class="mr-2 h-4 w-4 animate-spin" />
                             Join
                         </Button>
-                        <Button
-                        v-else
-                        @click="goToCourse(library.id)"
-                        class="joined-card-button">
+                        <Button 
+                            v-else 
+                            @click="goToCourse(library.id)" 
+                            class="joined-card-button">
                             Go to Course
                         </Button>
                     </div>
                     <Transition name="fade">
-                        <div v-if="joinPublicMessage" :class="['join-message', joinPublicMessageType]">
-                            {{ joinPublicMessage }}
+                        <div v-if="joinPublicMessages.has(library.id)" :class="['join-message', joinPublicMessageTypes.get(library.id)]">
+                            {{ joinPublicMessages.get(library.id) }}
                         </div>
                     </Transition>
                 </div>
@@ -142,12 +141,17 @@ const searchQuery = ref("");
 const filteredLibraries = ref<Array<any>>([]);
 const displayedLibraries = ref<Array<any>>([]);
 const joinCode = ref("");
+
+// For Private library code button
 const joinPrivateMessage = ref("");
 const joinPrivateMessageType = ref("");
 const joinPrivateLoading = ref(false);
-const joinPublicMessage = ref("");
-const joinPublicMessageType = ref("");
-const joinPublicLoading = ref(false);
+
+// actual list of courses 
+const joinPublicMessages = ref(new Map());
+const joinPublicMessageTypes = ref(new Map());
+const joinPublicLoading = ref(new Map());
+
 const libraryContainer = ref<HTMLElement | null>(null);
 const joinedCourses = ref(new Set());
 
@@ -156,9 +160,6 @@ const itemsPerLoad = 6;
 const currentLoadIndex = ref(0);
 const isLoading = ref(false);
 const hasMoreToLoad = ref(true);
-
-// so parent can refresh list
-const emit = defineEmits(['libraryJoined']);
 
 // Filtering function
 function filterLibraries() {
@@ -267,9 +268,6 @@ async function joinCourse() {
                 joinPrivateMessage.value = "Successfully joined course!";
                 joinCode.value = "";
 
-                // Emit event to refresh libraries list
-                emit('libraryJoined', response.data.library);
-
                 // Add to local libraries array if needed
                 if (response.data.library) {
                     const newLibrary = response.data.library;
@@ -296,9 +294,9 @@ async function joinCourse() {
         });
 }
 
-function joinSpecificCourse(id: number) {
-    joinPublicLoading.value = true;
-    joinPublicMessage.value = "";
+async function joinSpecificCourse(id: number) {
+    joinPublicLoading.value.set(id, true);
+    joinPublicMessages.value.delete(id);
 
     axios
         .post('/api/library/join', {
@@ -307,27 +305,26 @@ function joinSpecificCourse(id: number) {
         .then((response) => {
             if (response.status === 200) {
                 // Update the local favorites map
-                joinPublicMessageType.value = "success";
-                joinPublicMessage.value = "Successfully joined course!";
+                joinPublicMessageTypes.value.set(id, "success");
+                joinPublicMessages.value.set(id, "Successfully joined course!");
 
                 joinedCourses.value.add(id);
-
-                // Emit event to refresh libraries list
-                emit('libraryJoined', response.data.library);
 
             }
         })
         .catch((error) => {
+
             console.error("Error updating favorite status:", error);
-            joinPublicMessageType.value = "error";
-            joinPublicMessage.value = error.response?.data?.message || "Failed to join course";
+            joinPublicMessageTypes.value.set(id, "error");
+            joinPublicMessages.value.set(id, error.response?.data?.message || "Failed to join course");
+
         })
         .finally(() => {
-            joinPublicLoading.value = false;
+            joinPublicLoading.value.delete(id);
 
             // Auto-hide message after 5 seconds
             setTimeout(() => {
-                joinPublicMessage.value = "";
+                joinPublicMessages.value.delete(id);
             }, 5000);
         });
 }
@@ -426,11 +423,11 @@ function handleSearchKeydown(event: KeyboardEvent) {
 }
 
 .join-message {
-    margin-top: 0.75rem;
-    padding: 0.5rem 1rem;
-    border-radius: 8px;
-    font-size: 0.875rem;
-    animation: fadeIn 0.3s ease;
+    margin-top: 0.5rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    white-space: nowrap;
 }
 
 .success {
@@ -724,17 +721,23 @@ function handleSearchKeydown(event: KeyboardEvent) {
 }
 
 .joined-card-button {
-  background-color: #16a34a;
-  color: white;
-  font-weight: 600;
-  border-radius: 8px;
-  padding: 0.5rem 1rem;
-  font-size: 0.875rem;
-  transition: all 0.2s;
-  cursor: pointer;
+    background-color: #16a34a;
+    color: white;
+    font-weight: 600;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    transition: all 0.2s;
+    cursor: pointer;
 }
 
 .joined-card-button:hover {
-  background-color: #15803d;
+    background-color: #15803d;
+}
+
+.join-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
 }
 </style>

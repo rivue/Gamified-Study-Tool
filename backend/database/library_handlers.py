@@ -907,10 +907,13 @@ def get_libraries_info(user_id=None, browse=False):
 
         # explore_libraries  = db.session.query(Library).filter_by(user_id not in Library.memberships).all()
         explore_libraries = (Library.query
-            .filter(~Library.id.in_(
+            .filter(
+                ~Library.id.in_(
                 db.session.query(LibraryMembership.library_id)
                 .filter_by(user_id=user_id)
-            ))
+                ), 
+                Library.is_public.is_(False)
+                )
             .all())
 
         response["explore_libraries"] = [model_to_dict(library, exclude=['room_names', 'factoids']) for library in explore_libraries]

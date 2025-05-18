@@ -35,13 +35,7 @@ function fetchLibraries() {
         .then((response) => {
             if (authStore.loggedIn) {
                 console.log(response)
-                // const combinedLibraries = [
-                //     ...response.data.explore_libraries,
-                // ];
-                
-                // myLibraries.value = combinedLibraries.sort((a, b) => 
-                //     a.library_topic.localeCompare(b.library_topic)
-                // );
+
                 myLibraries.value = response.data.explore_libraries.sort((a, b) => 
                     a.library_topic.localeCompare(b.library_topic)
                 );

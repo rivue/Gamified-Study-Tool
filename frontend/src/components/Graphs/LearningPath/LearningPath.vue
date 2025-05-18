@@ -6,7 +6,9 @@
         <!-- @click="toggleSettings" -->
         <div class="fixed top-20 right-6 flex gap-6 z-10">
 
-            <button @click="toggleEditMode"
+            <button 
+                v-if="isOwner"
+                @click="toggleEditMode"
                 class="bg-black/30 backdrop-blur-sm shadow-md rounded-full p-4 hover:bg-black/40"
                 style="color: var(--highlight-color);">
                 <PencilIcon class="w-12 h-12" />

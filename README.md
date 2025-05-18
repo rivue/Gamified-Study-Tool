@@ -6,16 +6,19 @@ Note: use npm audit --only=prod for this, 0 vulnerabilities = good
 
 IDEAS:
 
-    cleanup / maintenence:
+    cleanup / maintenence (files to break apart):
         - remove library difficulty, mentor, language, etc... from db course structure, backend, frontend course creation screen
         - note: easy to get rid of in the frontend, but have to remove lots of stuff in backend w/ various function calls and stuff
         - get rid of other stuff I'm not using / don't plan on using like stuff in User model with ai tutor, etc...
         - break up different files to make them smaller and more modular:
         - library_routes
         - library_handlers
+            - break into library level and section / unit level
+            - or other things like settings or something because this file is 1k lines long
         - Learning Path 
             - specifically settings and add node buttons
         - etc... (keep working on this list)
+        - Blueprints maybe
 
     ideas for grand plan / future:
         - Brain-Computer Interface (BCI) Integrations
@@ -129,6 +132,7 @@ TODO list:
         - ⭐️ remove alert message in library creator (not hard but have to remember)
         - ⭐️ add username (backfill username w/ 1st part of email before @ symbol - maybe let people change later)
             - for this section, make sure you modify explore page owner_id and library leaderboard
+            - also, add a "back" button to library even if its literally a router.push call
         - ✅ ⭐️ Finish sections + units
             - ⭐️ Add ability to add each section to each unit (later --> come back to, reminder to make it account for 1-n number of sections no matter how that looks. add new stepping stones button is commented out for now)
             - When a user adds a section, make sure its added for all users, like add it to section_user_state and stuff
@@ -146,6 +150,9 @@ TODO list:
                     - browse public library page
                     - filter out ones user has already joined and ones user created
                         - join should turn into "already joined" and grayed out
+                        - fix "successfully joined course" on every course
+                        - fix private libraries being displayed (for now at least)
+                        - fix pagination not working
                 - ✅ private user has not joined
         
         medium (chip away at when tired / mentally exhausted from hard ones):
@@ -165,6 +172,7 @@ TODO list:
     study tool additions / ideas:
         - when errors popup, prompt the user subtly with a contact form and discord (tell them we're constantly on Discord and check the contact form every hour or something)
         - ⭐️ ability to leave a library
+            - in explore courses page, add a "leave library" next to the "go to Course" button when a user joins the course
         - voice mode based on textbook w/ knowledge bars of things you've covered so far and possibly quick lessons to make sure you know your stuff (insipired by gpt voice mode)
         - trending courses tab?
         - ⭐️ add leaderboard / game point tracking system (could be reworked later)once user base grows a bit (on every course, do all time and monthly)
