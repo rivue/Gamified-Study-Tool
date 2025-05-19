@@ -60,7 +60,7 @@
                                     <div class="relative flex-shrink-0" :style="{
                                         transform: `translateY(${getNodeOffset(getGlobalSectionIndex(unitIndex, sectionIndex))}px)`
                                     }" @click="handleNodeClick(sectionId)">
-                                        <!-- THIS IS THE KEY CHANGE: Moved the tooltip outside the group element that controls hovering -->
+
                                         <!-- Tooltip -->
                                         <div v-if="selectedRoomId && selectedRoomId === sectionId"
                                             class="absolute -top-32 left-1/2 -translate-x-1/2 w-64 z-50"
@@ -199,7 +199,8 @@
                                 </template>
 
                                 <template v-else>
-                                    <div class="flex flex-col pt-10 pb-10 items-center justify-center p-6 min-w-64">
+                                    
+                                    <div v-if="isOwner" class="flex flex-col pt-10 pb-10 items-center justify-center p-6 min-w-64">
                                         <div class="text-center mb-4 mt-2" style="color: var(--light-text);">
                                             <p class="text-lg">No stepping stones yet</p>
                                             <p class="text-sm opacity-75">Add stepping stones to get started</p>
@@ -215,7 +216,8 @@
 
                                         </button>
                                     </div>
-                                    <!-- <div v-else class="flex flex-col pt-10 pb-10 items-center justify-center p-6 min-w-64">
+
+                                    <div v-else class="flex flex-col pt-10 pb-10 items-center justify-center p-6 min-w-64">
                                         <div class="text-center mb-4 mt-2" style="color: var(--light-text);">
                                             <p class="text-lg">No stepping stones yet</p>
                                             <p class="text-sm opacity-75">Add stepping stones to get started</p>
@@ -231,7 +233,7 @@
                                             <PlusIcon class="w-0 h-5 opacity-0" />
 
                                         </button>
-                                    </div> -->
+                                    </div>
 
                                 </template>
 

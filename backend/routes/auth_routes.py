@@ -3,7 +3,6 @@ from datetime import datetime
 from flask import request, jsonify, url_for, session, make_response
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_required, logout_user, current_user, login_user
-from sqlalchemy.exc import IntegrityError
 import pymysql.err as pymysql_err
 import os
 # from oauth2client import client, crypt
@@ -46,28 +45,33 @@ def init_auth_routes(app):
 
     @app.route('/api/login', methods=['POST'])
     def login():
-        email = request.form['email']
-        password = request.form['password']
-        timezone = request.form['timezone']
-        user = User.query.filter_by(email=email).first()
-        if not user:
-            return jsonify({'status': 'fail', 'message': 'Account not found, signup to use our site!'}), 400
-        
-        if user and check_password_hash(user.password, password):
-            # print(login_user(user, remember=True))
-            # print(current_user.is_authenticated)
-            if not user.confirmed:
-                return jsonify({'status': 'fail', 'message': 'Email not authenticated. Check your email inbox for a verification email. (it might also be in the spam folder!)'}), 400
+        try:
+            email = request.form['email']
+            password = request.form['password']
+            timezone = request.form['timezone']
+            user = User.query.filter_by(email=email).first()
+            if not user:
+                return jsonify({'status': 'fail', 'message': 'Account not found, signup to use our site!'}), 400
             
-            if timezone and timezone != user.timezone:
-                user.timezone = timezone
-                db.session.commit()
+            if user and check_password_hash(user.password, password):
+                # print(login_user(user, remember=True))
+                # print(current_user.is_authenticated)
+                if not user.confirmed:
+                    return jsonify({'status': 'fail', 'message': 'Email not authenticated. Check your email inbox for a verification email. (it might also be in the spam folder!)'}), 400
+                
+                if timezone and timezone != user.timezone:
+                    user.timezone = timezone
+                    db.session.commit()
 
-            login_result = login_user(user, remember=True)
+                login_result = login_user(user, remember=True)
 
-            return jsonify({'status': 'success'})
-        else:
-            return jsonify({'status': 'fail', 'message': 'Incorrect Password'}), 400
+                return jsonify({'status': 'success'})
+            else:
+                return jsonify({'status': 'fail', 'message': 'Incorrect Password'}), 400
+        except Exception as e:
+            print(f"{e}")
+            return jsonify({'status': 'fail', 'message': 'An unexpected error occurred. Please try again later.'}), 500
+    
 
     @app.route("/api/logout", methods=["GET"])
     @login_required

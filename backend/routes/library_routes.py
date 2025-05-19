@@ -16,7 +16,7 @@ import database.library_handlers as lbh
 import knowledge_net.library_generator as lgn
 from images.library_imager import generate_images_task, save_image
 from database.user_handler import increment_violations, is_within_limit, check_generation_allowed, mark_generation_done
-from database.models import Library, LibraryFactoid, LibraryQuestion, db
+from database.models import Library, LibrarySection, db
 from vector_processing.file_handler import process_document
 from vector_processing.retrieval import query_and_respond_pinecone
 import app
@@ -248,10 +248,6 @@ def init_library_routes(app):
                     return jsonify(status="error", message="Room not found"), 404
             else:
                 room_data = lbh.get_library_room_state(user_id, library_id)
-                # return a map of room names --> unit 
-                # room_data = room_data
-
-            test = library_data.get("room_names")
 
             library_data["show_settings"] = user_id == library_data.get("owner_id")
 
@@ -351,20 +347,17 @@ def init_library_routes(app):
             print(f"Failed to process request: {str(e)}")
             return jsonify(status="error"), 500
 
-    @app.route('/api/library/room', methods=['POST'])
+    @app.route('/api/library/section', methods=['POST'])
     def generate_section():
         user_id = current_user.id if not isinstance(current_user, AnonymousUserMixin) else None
         section_names = request.form.getlist("sectionNames")  # Get list of section names
         library_id = request.form.get("libraryId")
-        unit_id = request.form.get("unitId")
 
         # Validate inputs
         if not section_names:
             return jsonify(status="error", message="No section names provided"), 400
         if not library_id:
             return jsonify(status="error", message="No library ID provided"), 400
-        if not unit_id:
-            return jsonify(status="error", message="No unit ID provided"), 400
         if len(section_names) > 20:
             return jsonify(status="error", message="Too many section names provided (max 20)"), 400
         if len(section_names) < 1:
@@ -424,6 +417,9 @@ def init_library_routes(app):
                 section = futures_dict[future]
                 try: 
                     section_contents = future.result()
+
+                    # don't need to account for unit_id because Exception sets section value to false
+                    unit_id = LibrarySection.query.filter_by(section_id=section_id).first().unit_id
 
                     # Save the generated content
                     # why do we need section_to_unit map?

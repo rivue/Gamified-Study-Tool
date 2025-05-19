@@ -59,7 +59,7 @@ const isDataValid = computed(() => {
 
     // Validate that unit_to_section_map contains valid data
     const unitMap = library.value.data.unit_to_section_map;
-
+    console.log(library);
     // Check that it's not empty
     if (Object.keys(unitMap).length === 0) {
         console.warn("Unit to section map is empty");
@@ -67,7 +67,6 @@ const isDataValid = computed(() => {
     }
 
     // Additional validation if needed
-
     return true;
 });
 

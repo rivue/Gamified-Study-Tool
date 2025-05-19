@@ -216,7 +216,7 @@ const addNewNodes = async () => {
         if (selectedFile.value) {
             formData.append('file', selectedFile.value);
         }
-        const response = await axios.post('/api/library/room', formData, {
+        const response = await axios.post('/api/library/section', formData, {
             signal: currentAbortController.signal,
             headers: {
                 'Content-Type': 'multipart/form-data'

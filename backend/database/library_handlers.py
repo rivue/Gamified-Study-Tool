@@ -146,19 +146,31 @@ def create_unit_and_add(library_id, unit_name, position=-1):
         print(f"something: {str(e)}")
         return jsonify({"message": str(e)}), 400
     
-def create_section_and_add(unit_id, section_name):
+def create_section_and_add(unit_id, section_name, position=-1):
     try:
+
+        section = LibrarySection(
+            unit_id=unit_id,
+            section_name=section_name,
+            position=position
+        )
+
         unit = LibraryUnit.query.get(unit_id)
 
-        if not unit or not section_name:
+        if not unit or not section:
             return jsonify({"error": "Library or Section not found"}), 404
-
-        section = unit.add_section(section_name)
-
-        if not section:
-            return jsonify({"error": "Section failed to generate"}), 404
         
-        db.session.flush()
+        if len(unit.sections) >= 20:
+            return jsonify({"error": "Unit has reached maximum number of sections (20)"}), 400
+        
+        if position != -1:
+            unit.attach_section(section, position)
+        else:
+            unit.attach_section(section)
+            
+        db.session.add(section)
+        db.session.flush()  # Flush to get the section ID before commit
+        db.session.commit()
 
         return (
             jsonify(
@@ -386,7 +398,7 @@ def save_library_room_contents(library_id, section_unit_map, section_contents_ma
         return jsonify({"message": str(e)}), 400
     
 
-def save_section_contents(library_id, section, section_contents_map, user_id, unit_id):
+def save_section_contents(library_id, section, section_contents_map, unit_id):
 
     try:
         responses = []
