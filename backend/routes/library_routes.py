@@ -421,20 +421,20 @@ def init_library_routes(app):
 
             completed_subtopics = {}
             for future in concurrent.futures.as_completed(futures_dict):
-                subtopic = futures_dict[future]
+                section = futures_dict[future]
                 try: 
-                    subtopic_contents = future.result()
+                    section_contents = future.result()
 
                     # Save the generated content
                     # why do we need section_to_unit map?
                     # lbh.save_library_room_contents(library_id, library.get('section_to_unit_map'), subtopic_contents, user_id, unit_id)
-                    lbh.save_section_content(library_id, section, subtopic_contents, user_id, unit_id)
-                    results.append({"subtopic": subtopic, "status": "success", "data": subtopic_contents})
-                    completed_subtopics[subtopic] = True
+                    lbh.save_section_contents(library_id, section, section_contents, user_id, unit_id)
+                    results.append({"subtopic": section, "status": "success", "data": section_contents})
+                    completed_subtopics[section] = True
 
                 except Exception as e:
-                    print(f"Error generating content for subtopic {subtopic}: {str(e)}")
-                    completed_subtopics[subtopic] = False
+                    print(f"Error generating content for subtopic {section}: {str(e)}")
+                    completed_subtopics[section] = False
 
                         
             # Check if all subtopics failed

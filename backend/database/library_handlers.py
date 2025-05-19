@@ -386,7 +386,7 @@ def save_library_room_contents(library_id, section_unit_map, section_contents_ma
         return jsonify({"message": str(e)}), 400
     
 
-def save_section_content(library_id, section, section_contents_map, user_id, unit_id):
+def save_section_contents(library_id, section, section_contents_map, user_id, unit_id):
 
     try:
         responses = []
@@ -394,9 +394,9 @@ def save_section_content(library_id, section, section_contents_map, user_id, uni
 
         with db_transaction():
 
-            # 1.1 + 1.2) create sections and add to unit
+            # 1.1 + 1.2) create sections and add to parent unit
             response_obj, status_code = create_section_and_add(unit_id, section)
-            print("response from create section and add")
+            
             if status_code != 201:
                 print("create section and add error")
                 print(response_obj.get_json()['message'])
@@ -406,14 +406,20 @@ def save_section_content(library_id, section, section_contents_map, user_id, uni
             section_id = response_obj.get_json()["section"]
 
             
-            # 2) add room states (REMEMBER TO DO THIS FOR ALL MEMBERS IN LIBRARY)
-            add_section_user_state(user_id, library_id, section_id, num_lessons)
-            print("add section user state error")
+            # 2) add room states for every user in the library
+            library = Library.query.get(library_id)
+            for membership in library.memberships:
+                add_section_user_state(membership.user_id, library_id, section_id, num_lessons)
+
             
             if "factoids" not in section_contents_map[section]:
                 print(f"Warning: No factoids for section '{section}'")
             
-            # 3.1 + 3.2) create factoids and add to sections
+            print(f"Processing section: {section}")
+            print(f"Section content structure: {type(section_contents_map[section])}")
+            print(f"Keys in section content: {section_contents_map[section].keys()}")
+            
+            # 4.1 + 4.2) create factoids and add to sections
             factoids = section_contents_map[section]["factoids"]
             
             # 4) add factoids to sections
@@ -454,7 +460,6 @@ def save_section_content(library_id, section, section_contents_map, user_id, uni
                     }
                 )
 
-                     
         return jsonify(status="success", data=responses)
     
     except Exception as e:
