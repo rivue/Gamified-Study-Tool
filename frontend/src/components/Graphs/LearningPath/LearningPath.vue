@@ -200,43 +200,39 @@
 
                                 <template v-else>
                                     <div class="flex flex-col pt-10 pb-10 items-center justify-center p-6 min-w-64">
-                                        <div class="text-center mb-4 mt-2"
-                                            style="color: var(--light-text);">
-
+                                        <div class="text-center mb-4 mt-2" style="color: var(--light-text);">
                                             <p class="text-lg">No stepping stones yet</p>
                                             <p class="text-sm opacity-75">Add stepping stones to get started</p>
                                         </div>
                                         <button @click="showAddNodeModal = true" class="flex items-center gap-2 px-4 py-2 rounded-lg transition-all 
-                                         duration-200 hover:scale-105 active:scale-95" :style="{
-                                            background: getUnitColor(unitIndex),
-                                            color: 'var(--light-text)',
+                                            duration-200 hover:scale-105 active:scale-95" :style="{
+                                                background: getUnitColor(unitIndex),
+                                                color: 'var(--light-text)',
 
-                                            border: '2px solid var(--light-text)',
-                                        }">
+                                            }">
                                             <PlusIcon class="w-5 h-5" />
                                             <span>Add Stepping Stone</span>
-                                             TODO: un-disable button and uncomment out text, also add owner / not owner condition for showing this button or show a small modal / popup or something 
 
                                         </button>
                                     </div>
                                     <!-- <div v-else class="flex flex-col pt-10 pb-10 items-center justify-center p-6 min-w-64">
-                                        <div class="text-center mb-4 mt-2"
-                                            style="color: var(--light-text);">
-
+                                        <div class="text-center mb-4 mt-2" style="color: var(--light-text);">
                                             <p class="text-lg">No stepping stones yet</p>
                                             <p class="text-sm opacity-75">Add stepping stones to get started</p>
                                         </div>
-                                        <button :disabled="true" class="flex items-center gap-2 px-4 py-2 rounded-lg transition-all 
-                                         duration-200 hover:scale-105 active:scale-95" :style="{
-                                            background: getUnitColor(unitIndex),
-                                            color: 'var(--light-text)',
+                                        <button class="flex items-center gap-2 px-4 py-2 rounded-lg transition-all 
+                                            duration-200 hover:scale-105 active:scale-95" :style="{
+                                                background: getUnitColor(unitIndex),
+                                                color: 'var(--light-text)',
 
-                                            border: '2px solid var(--light-text)',
-                                        }">
-                                            <span class="w-64 h-5">You are not the owner!</span>
-                                             TODO: un-disable button and uncomment out text, also add owner / not owner condition for showing this button or show a small modal / popup or something
+                                            }">
+                                            <PlusIcon class="w-0 h-5 opacity-0" />
+                                            <span>Only Course owner can add stepping stones!</span>
+                                            <PlusIcon class="w-0 h-5 opacity-0" />
 
-                                        </button> -->
+                                        </button>
+                                    </div> -->
+
                                 </template>
 
                             </div>
