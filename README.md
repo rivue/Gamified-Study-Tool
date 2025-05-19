@@ -134,8 +134,11 @@ TODO list:
             - for this section, make sure you modify explore page owner_id and library leaderboard
             - also, add a "back" button to library even if its literally a router.push call
         - ✅ ⭐️ Finish sections + units <-- TODO NEXT (FOLLOWED BY DELETE SECTIONS --> UNITS --> COURSES)
+            - 
             - ⭐️ Add ability to add sections to specific units (later --> come back to, reminder to make it account for 1-n number of sections no matter how that looks. add new stepping stones button is commented out for now)
             - When a user adds a section, make sure its added for all users, like add it to section_user_state and stuff
+            - Make sure to account for duplicate section names, and make sure section names can have under scores, /&}}#@<, etc... and check for duplicate names for that unit or something
+            - come_back_to
         - ✅ ⭐️ (would like to implement visibility of different courses first or at least a many:one for non-owners in library model)
             - ⭐️ Delete sections requires entering the name of the unit / course just for accidental reasons)
             - ⭐️ Delete Units (requires entering the name of the unit / course just for accidental reasons)
@@ -159,6 +162,9 @@ TODO list:
 
     general:
     study tool additions / ideas:
+        - is there a tool to like visualize all the different calls / paths something takes in a given api call or function call or something?
+            - (important distinction: NOT debugging)
+        - research into ibm granite / aws bedrock, or other alternatives to AI rag / kag for accuracy or something
         - when errors popup, prompt the user subtly with a contact form and discord (tell them we're constantly on Discord and check the contact form every hour or something)
 
         - voice mode based on textbook w/ knowledge bars of things you've covered so far and possibly quick lessons to make sure you know your stuff (insipired by gpt voice mode)

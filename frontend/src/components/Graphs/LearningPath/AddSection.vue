@@ -14,8 +14,9 @@
                 <div class="space-y-4">
                     <!-- Dynamic list of node names -->
                     <div>
-                        <label class="block text-sm font-medium mb-1" style="color: var(--highlight-color);">Stepping
-                            Stone Names</label>
+                        <label class="block text-sm font-medium mb-1" style="color: var(--highlight-color);">
+                            Stepping Stone Names
+                        </label>
                         <div v-for="(node, index) in newNodeNames" :key="index" class="flex items-center gap-2 mb-2">
                             <input v-model="newNodeNames[index]" type="text" class="w-full p-2 border rounded-lg"
                                 style="background-color: var(--background-color-1t); color: var(--light-text); border-color: var(--color-primary-dark);"
@@ -25,42 +26,39 @@
                                 <XCircleIcon class="w-6 h-6" />
                             </button>
                         </div>
-                        <button @click="addNodeNameField" class="mt-2 text-sm font-medium flex items-center gap-1"
-                            style="color: var(--highlight-color);">
+                        <button @click="addNodeNameField"
+                            class="mt-2 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 flex items-center gap-1"
+                            style="background: var(--button-gradient); color: var(--light-text);">
                             <PlusIcon class="w-4 h-4" />
                             Add Another Node
                         </button>
-                        <p v-if="nodeNameErrors.length" class="mt-1 text-sm" style="color: var(--color-primary-light);">
+                        <p v-if="nodeNameErrors.length" class="mt-1 text-sm" style="color: var(--error-color);">
                             <span v-for="(error, index) in nodeNameErrors" :key="index">{{ error }}<br></span>
                         </p>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium mb-1" style="color: var(--highlight-color);">Upload
-                            Resource
-                            (optional)<br>Note: Stepping stone content is based on this resource and all
-                            previously uploaded resources in this library</label>
+                        <label class="block text-sm font-medium mb-1" style="color: var(--highlight-color);">
+                            Upload Resource (optional)<br>
+                            <p class="opacity-65">Note: Stepping stone content is based on this resource and all previously uploaded resources in this library</p>
+                        </label>
                         <div class="border border-dashed rounded-lg p-4 text-center"
                             style="background-color: var(--background-color-1t); border-color: var(--color-primary-light);">
                             <input type="file" ref="fileInput" @change="handleFileSelection" class="hidden"
                                 accept=".pdf,.doc,.docx,.txt" />
                             <div v-if="!selectedFile" @click="$refs.fileInput.click()" class="cursor-pointer">
-                                <DocumentPlusIcon class="w-12 h-12 mx-auto"
-                                    style="color: var(--color-primary-light);" />
-                                <p class="mt-2 text-sm" style="color: var(--highlight-color);">Click to upload (max
-                                    500KB)</p>
-                                <p class="mt-1 text-xs" style="color: var(--color-primary-light);">PDF, DOC, DOCX, TXT
-                                </p>
+                                <DocumentPlusIcon class="w-12 h-12 mx-auto" style="color: var(--color-primary-light);" />
+                                <p class="mt-2 text-sm" style="color: var(--highlight-color);">Click to upload (max 500KB)</p>
+                                <p class="mt-1 text-xs" style="color: var(--color-primary-light);">PDF, DOC, DOCX, TXT</p>
                             </div>
                             <div v-else class="text-left">
                                 <div class="flex items-center justify-between">
                                     <div class="flex items-center">
                                         <DocumentIcon class="w-8 h-8 mr-2" style="color: var(--color-primary-light);" />
                                         <div>
-                                            <p class="text-sm font-medium truncate"
-                                                style="color: var(--highlight-color);">
-                                                {{ selectedFile.name }}</p>
-                                            <p class="text-xs" style="color: var(--color-primary-light);">{{
-                                                formatFileSize(selectedFile.size) }}</p>
+                                            <p class="text-sm font-medium truncate" style="color: var(--highlight-color);">
+                                                {{ selectedFile.name }}
+                                            </p>
+                                            <p class="text-xs" style="color: var(--color-primary-light);">{{ formatFileSize(selectedFile.size) }}</p>
                                         </div>
                                     </div>
                                     <button @click.prevent="removeFile" class="text-red-400 hover:text-red-300">
@@ -71,6 +69,12 @@
                             <p v-if="fileError" class="mt-2 text-sm text-red-400">{{ fileError }}</p>
                         </div>
                     </div>
+
+                    <!-- API call error message -->
+                    <p v-if="apiError" class="mt-2 text-sm" style="color: var(--error-color);">
+                        {{ apiError }}
+                    </p>
+
                     <div class="flex gap-3 justify-end mt-6">
                         <button @click="closeModal" class="px-4 py-2 border rounded-lg"
                             style="border-color: var(--color-primary); color: var(--highlight-color);">
@@ -118,6 +122,7 @@ const newNodeNames = ref(['']);
 const selectedFile = ref(null);
 const nodeNameErrors = ref([]);
 const fileError = ref('');
+const apiError = ref('');
 const isAddingNode = ref(false);
 const fileInput = ref(null);
 
@@ -176,6 +181,9 @@ const removeNodeName = (index) => {
 
 // Function to add a new node
 const addNewNodes = async () => {
+    // Reset the API error each attempt
+    apiError.value = '';
+
     // Validate node name
     nodeNameErrors.value = new Array(newNodeNames.value.length).fill('');
     let hasError = false;
@@ -202,8 +210,8 @@ const addNewNodes = async () => {
         // Add each node
         const formData = new FormData();
         formData.append('libraryId', props.libraryId);
-        // Append all room names with the same key name
-        trimmedNames.forEach(room => formData.append("roomNames", room));
+        // Append all node names with the same key name
+        trimmedNames.forEach(name => formData.append("sectionNames", name));
         // Add file if present (same file for all nodes)
         if (selectedFile.value) {
             formData.append('file', selectedFile.value);
@@ -223,7 +231,8 @@ const addNewNodes = async () => {
         }
     } catch (error) {
         console.error('Error adding nodes:', error);
-        nodeNameErrors.value[0] = error.message || 'Failed to add nodes. Please try again.';
+        // Set a distinct error message for API call failure
+        apiError.value = error.response?.data?.message || error.message || 'Failed to add nodes. Please try again.';
     } finally {
         isAddingNode.value = false;
     }
@@ -233,5 +242,6 @@ const resetForm = () => {
     newNodeNames.value = [''];
     removeFile();
     nodeNameErrors.value = [];
+    apiError.value = '';
 }
 </script>

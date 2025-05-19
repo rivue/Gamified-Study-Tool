@@ -20,6 +20,7 @@ from database.models import Library, LibraryFactoid, LibraryQuestion, db
 from vector_processing.file_handler import process_document
 from vector_processing.retrieval import query_and_respond_pinecone
 import app
+from sqlalchemy.exc import IntegrityError
 
 def init_library_routes(app):
 
@@ -351,35 +352,30 @@ def init_library_routes(app):
             return jsonify(status="error"), 500
 
     @app.route('/api/library/room', methods=['POST'])
-    def generate_room():
+    def generate_section():
         user_id = current_user.id if not isinstance(current_user, AnonymousUserMixin) else None
-        section_names = request.form.getlist("roomNames")  # Get list of section names
+        section_names = request.form.getlist("sectionNames")  # Get list of section names
         library_id = request.form.get("libraryId")
 
         # Validate inputs
         if not section_names:
-            return jsonify(status="error", message="No subtopics provided"), 400
+            return jsonify(status="error", message="No section names provided"), 400
         if not library_id:
             return jsonify(status="error", message="No library ID provided"), 400
 
         try:
-
             # Check if "file" is in request.files
             selected_file = None
             if "file" in request.files:
                 file = request.files["file"]
-                if file.filename == "":
-                    return jsonify(status="error", message="No file selected"), 400
-                selected_file = file.read()
+                if not (file.filename == ""):
+                    # return jsonify(status="error", message="No file selected"), 400
+                    selected_file = file.read()
 
             # If no user is logged in, return an error
             if not user_id:
                 return jsonify(status="error", message="Must be signed in."), 403
             
-        except Exception as e:
-            return jsonify(status="error", message=f"Failed to process request: {str(e)}"), 500
-    
-        try:
             library_response = get_library(library_id)
             if not library_response or library_response.status_code == "error":
                 return jsonify(status="error", message="Can only generate library rooms for valid libraries"), 400
@@ -394,7 +390,11 @@ def init_library_routes(app):
 
             futures_dict = {}
             for subtopic in section_names:
-                # Check for existing content
+
+                # IF this subtopic already exists in the library (it shouldn't because duplicate room names should not be allowed)
+                # add its library factoid text and questions to results for additional rag context
+                # come_back_to: maybe get rid of later bc duplicates are not allowed,
+                # or check for dupe section names in a unit or something
                 unit_id, section_id = library.get('section_to_unit_map').get(subtopic)
                 existing_content = lbh.retrieve_library_room_contents(library_id, section_id, user_id)
                 if existing_content:
@@ -419,6 +419,7 @@ def init_library_routes(app):
                     subtopic_contents = future.result()
 
                     # Save the generated content
+                    # why do we need section_to_unit map?
                     lbh.save_library_room_contents(library_id, library.get('section_to_unit_map'), subtopic_contents, user_id)
                     results.append({"subtopic": subtopic, "status": "success", "data": subtopic_contents})
                     completed_subtopics[subtopic] = True
@@ -436,7 +437,8 @@ def init_library_routes(app):
             return jsonify(status="success", results=results)
 
         except Exception as e:
-            return jsonify(status="error", message=f"Failed to process request: {str(e)}"), 500
+            print(f"Exception in generate_section: {str(e)}")
+            return jsonify(status="error", message="Section Add Failed"), 500
         
     @app.route('/api/library/available-generated-rooms', methods=['POST'])
     def get_available_generated_rooms():
