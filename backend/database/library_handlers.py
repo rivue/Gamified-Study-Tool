@@ -314,7 +314,7 @@ def save_library_room_contents(library_id, section_unit_map, section_contents_ma
 
                     # 2.1 + 2.2) create sections and add to unit
                     response_obj, status_code = create_section_and_add(unit_id, section)
-                    print("response from create section and add")
+                    print("response from create section and add") 
                     if status_code != 201:
                         print("create section and add error")
                         print(response_obj.get_json()['message'])
@@ -384,6 +384,84 @@ def save_library_room_contents(library_id, section_unit_map, section_contents_ma
         print("Exception save_library_room_contents")
         print("message: ", str(e))
         return jsonify({"message": str(e)}), 400
+    
+
+def save_section_content(library_id, section, section_contents_map, user_id, unit_id):
+
+    try:
+        responses = []
+        num_lessons = 3
+
+        with db_transaction():
+
+            # 1.1 + 1.2) create sections and add to unit
+            response_obj, status_code = create_section_and_add(unit_id, section)
+            print("response from create section and add")
+            if status_code != 201:
+                print("create section and add error")
+                print(response_obj.get_json()['message'])
+                message = response_obj.get_json()['message']
+                return jsonify(status="error", message=message.to_str()), 200
+            
+            section_id = response_obj.get_json()["section"]
+
+            
+            # 2) add room states (REMEMBER TO DO THIS FOR ALL MEMBERS IN LIBRARY)
+            add_section_user_state(user_id, library_id, section_id, num_lessons)
+            print("add section user state error")
+            
+            if "factoids" not in section_contents_map[section]:
+                print(f"Warning: No factoids for section '{section}'")
+            
+            # 3.1 + 3.2) create factoids and add to sections
+            factoids = section_contents_map[section]["factoids"]
+            
+            # 4) add factoids to sections
+            for index, item in enumerate(factoids):
+                lesson_name = "factoid_set_" + str(math.floor(index/9) + 1)
+                
+                factoid_content = item["factoid_text"]
+                question_data = item["question"]
+                
+                section = LibrarySection.query.get(section_id)
+                
+                # Add factoid to library
+                factoid_response, status_code = add_factoid_to_section(
+                    section_id, factoid_content, lesson_name
+                )
+
+                if status_code != 201:
+                    return factoid_response
+                factoid_id = factoid_response.get_json()["factoid_id"]
+
+                # Add question to factoid
+                question_type = question_data["type"]
+                question_text = question_data["text"]
+                correct_choice = question_data["correct_choice"]
+                
+                # wrong_choices = question_data["wrong_choices"]
+                wrong_choices = question_data.get("wrong_choices", [])
+
+                question_response, status_code = add_question_to_factoid(
+                    factoid_id, question_text, correct_choice, wrong_choices, question_type
+                )
+                if status_code != 201:
+                    return question_response
+                responses.append(
+                    {
+                        "factoid_response": factoid_response.json,
+                        "question_response": question_response.json,
+                    }
+                )
+
+                     
+        return jsonify(status="success", data=responses)
+    
+    except Exception as e:
+        print("Exception save_section_content")
+        print("message: ", str(e))
+        return jsonify({"message": str(e)}), 400
+    
 
 
 def retrieve_library_room_contents(library_id, section_id, user_id):

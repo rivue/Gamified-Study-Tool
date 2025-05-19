@@ -356,12 +356,19 @@ def init_library_routes(app):
         user_id = current_user.id if not isinstance(current_user, AnonymousUserMixin) else None
         section_names = request.form.getlist("sectionNames")  # Get list of section names
         library_id = request.form.get("libraryId")
+        unit_id = request.form.get("unitId")
 
         # Validate inputs
         if not section_names:
             return jsonify(status="error", message="No section names provided"), 400
         if not library_id:
             return jsonify(status="error", message="No library ID provided"), 400
+        if not unit_id:
+            return jsonify(status="error", message="No unit ID provided"), 400
+        if len(section_names) > 20:
+            return jsonify(status="error", message="Too many section names provided (max 20)"), 400
+        if len(section_names) < 1:
+            return jsonify(status="error", message="No section names provided"), 400
 
         try:
             # Check if "file" is in request.files
@@ -420,7 +427,8 @@ def init_library_routes(app):
 
                     # Save the generated content
                     # why do we need section_to_unit map?
-                    lbh.save_library_room_contents(library_id, library.get('section_to_unit_map'), subtopic_contents, user_id)
+                    # lbh.save_library_room_contents(library_id, library.get('section_to_unit_map'), subtopic_contents, user_id, unit_id)
+                    lbh.save_section_content(library_id, section, subtopic_contents, user_id, unit_id)
                     results.append({"subtopic": subtopic, "status": "success", "data": subtopic_contents})
                     completed_subtopics[subtopic] = True
 
