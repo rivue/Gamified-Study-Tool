@@ -149,6 +149,7 @@ TODO list:
                 - make sure current section_id and unit_id is communicated to section generation call
             - make sure + section buttons are styled the same for middle ones and ones on the end
             - make sure either positions are correctly accounted for or we drop the ability to add multiple sections
+            - fix inability to enter stepping stone name
             - when you come back do positions and ^^^ above
         - ✅ ⭐️ (would like to implement visibility of different courses first or at least a many:one for non-owners in library model)
             - ⭐️ Delete sections requires entering the name of the unit / course just for accidental reasons)
@@ -174,7 +175,7 @@ TODO list:
     general:
     study tool additions / ideas:
         - for feedback / input / suggestions, 1) link to discord / X account and 2) display a "testimonies" of a suggestion / idea (anonymous) and the time it took me to implement something / respond to (30 minutes, 15 minutes, etc...) encourage people to send me feedback and stuff
-        - instead of having one opanai function, have a parent function which rolls how many and what type of game will be rolled ('true_false': 4, 'multiple_choice': 6, 'image': 2, etc... and then a suite of small agents which are each responsible for one (1) type of game (ex: true_false agent, multiple choice agent, image agent (might have to break up further maybe idk), etc..)) --> do all this so I can put "suite of agents" on my resume
+        - instead of having one opanai function, have a parent function which rolls how many and what type of game will be rolled ('true_false': 4, 'multiple_choice': 6, 'image': 2, etc... and then a suite of small agents which are each responsible for one (1) type of game (ex: true_false agent, multiple choice agent, image agent (might have to break up further maybe idk), etc..)) --> do all this so I can put "suite of ai agents" on my resume
         - is there a tool to like visualize all the different calls / paths something takes in a given api call or function call or something?
             - (important distinction: NOT debugging)
         - research into ibm granite / aws bedrock, or other alternatives to AI rag / kag for accuracy or something
