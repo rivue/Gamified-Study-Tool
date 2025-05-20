@@ -59,7 +59,7 @@
                                     :key="sectionIndex">
 
                                     <AddSection v-if="editModeEnabled && isOwner" class="-mx-8" :library-id="libraryId"
-                                        :unit-id="props.unitPositionMap[unitName][1]" :position="0"
+                                        :unit-id="props.unitPositionMap[unitName][1]" :position="sectionIndex"
                                         :unit-color="getUnitColor(unitIndex)" @nodes-added="onSectionAdd" />
 
 

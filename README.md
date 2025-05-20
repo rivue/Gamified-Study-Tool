@@ -148,11 +148,10 @@ TODO list:
             - make sure to add a way to add sections in a library not just on empty units
                 - make sure current section_id and unit_id is communicated to section generation call
             - make sure + section buttons are styled the same for middle ones and ones on the end
-            - make sure either positions are correctly accounted for or we drop the ability to add multiple sections
-            - fix inability to enter stepping stone name
             - when you come back do positions and ^^^ above
             - experiment w/ timings a little bit for future reference
             - make add section buttons curve w/ sections
+            - make play button pop up thing display above add section button
         - ✅ ⭐️ (would like to implement visibility of different courses first or at least a many:one for non-owners in library model)
             - ⭐️ Delete sections requires entering the name of the unit / course just for accidental reasons)
             - ⭐️ Delete Units (requires entering the name of the unit / course just for accidental reasons)

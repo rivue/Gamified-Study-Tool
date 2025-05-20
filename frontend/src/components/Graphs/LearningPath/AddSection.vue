@@ -53,7 +53,7 @@
                                 Add Another Node
                             </button>
                             <p v-if="nodeNameErrors.length" class="mt-1 text-sm" style="color: var(--error-color);">
-                                <span v-for="(error, index) in nodeNameErrors" :key="index">{{ error }}<br></span>
+                                <span v-for="(error, index) in nodeNameErrors" :key="index">{{ error }}<br v-if="index < nodeNameErrors.length - 1"></span>
                             </p>
                         </div>
                         <div>
@@ -227,7 +227,6 @@ const removeNodeName = (index) => {
 const addNewNodes = async () => {
     // Reset the API error each attempt
     apiError.value = '';
-    console.log(props.position);
     // Validate node name
     nodeNameErrors.value = new Array(newNodeNames.value.length).fill('');
     let hasError = false;
@@ -248,6 +247,7 @@ const addNewNodes = async () => {
     if (hasError) return;
     isAddingNode.value = true;
     const currentAbortController = new AbortController();
+    isAddingNode.value = false;
 
     try {
 
@@ -256,7 +256,7 @@ const addNewNodes = async () => {
         formData.append('libraryId', props.libraryId);
         formData.append('unitId', props.unitId);
         formData.append('position', props.position);
-
+        console.log("position: ", props.position);
         // Append all node names with the same key name
         trimmedNames.forEach(name => formData.append("sectionNames", name));
         // Add file if present (same file for all nodes)
@@ -284,6 +284,7 @@ const addNewNodes = async () => {
     } finally {
         isAddingNode.value = false;
     }
+
 }
 
 const resetForm = () => {

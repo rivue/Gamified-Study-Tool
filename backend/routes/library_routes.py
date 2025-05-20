@@ -429,7 +429,8 @@ def init_library_routes(app):
                     section_contents = future.result()
                     print(f"{section_contents}")
                     section_position = section_names.index(section) # grabs order of section_names
-                    relative_position = section_position + section_position
+                    print(position)
+                    relative_position = section_position + int(position)
                     lbh.save_section_contents(library_id, section, section_contents, unit_id, relative_position)
                     results.append({"subtopic": section, "status": "success", "data": section_contents})
                     completed_subtopics[section] = True
