@@ -208,22 +208,41 @@
                                 </template>
 
                                 <template v-else>
+                                    <div class="flex flex-col pt-10 pb-10 items-center justify-center p-6 min-w-64">
+                                        <!-- keep your “no stones yet” message -->
+                                        <div v-if="isOwner" class="text-center mb-4 mt-2" style="color: var(--light-text);">
+                                            <p class="text-lg">No stepping stones yet</p>
+                                            <p class="text-sm opacity-75">Add stepping stones to get started</p>
+                                        </div>
 
-                                    <div class="relative flex-shrink-0">
-                                        <!-- use the same AddSection trigger you already wired up -->
+                                        <!-- owner sees the AddSection bubble -->
                                         <AddSection v-if="editModeEnabled && isOwner" :library-id="libraryId"
                                             :unit-id="props.unitPositionMap[unitName][1]" :position="0"
-                                            :unit-color="getUnitColor(unitIndex)" v-model:showModal="showAddNodeModal"
-                                            @nodes-added="onSectionAdd" />
-                                    </div>
+                                            :unit-color="getUnitColor(unitIndex)" @nodes-added="onSectionAdd" />
 
+                                        <!-- non-owners still get the “only owner” hint -->
+                                        <!-- <div v-if="!isOwner" class="text-sm opacity-50 italic" style="color: var(--light-text);">
+                                            Only course owner can add stepping stones.
+                                        </div> -->
+                                        <button v-if="!isOwner" class="flex items-center gap-2 px-4 py-2 rounded-lg transition-all 
+                                            duration-200 hover:scale-105 active:scale-95" :style="{
+                                                background: getUnitColor(unitIndex),
+                                                color: 'var(--light-text)',
+
+                                            }">
+                                            <PlusIcon class="w-0 h-5 opacity-0" />
+                                            <span>Only Course owner can add stepping stones!</span>
+                                            <PlusIcon class="w-0 h-5 opacity-0" />
+
+                                        </button>
+                                    </div>
                                 </template>
 
                             </div>
                         </div>
 
                         <AddUnit v-if="editModeEnabled" :library-id="libraryId" :position="unitIndex + 1"
-                            :existing-units="Object.keys(rawUnitData)" :can-add-unit="isOwner"
+                            :existing-units="Object.keys(rawUnitData)" :can-add-unit="isOwner" :empty-unit="true"
                             @unit-added="handleUnitAdded" />
 
                     </template>
@@ -420,12 +439,6 @@ const getUnitGradient = (unitIndex) => {
     ${adjustColor(baseColor, 20)} 0%, 
     ${baseColor} 50%, 
     ${adjustColor(baseColor, -20)} 100%)`;
-}
-
-function addNewSteppingStoneSetup(unitName) {
-    showAddNodeModal.value = true;
-    addSectionUnitId.value = props.unitPositionMap[unitName][1]; // id of unit
-
 }
 
 // Helper function to lighten/darken colors

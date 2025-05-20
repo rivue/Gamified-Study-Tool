@@ -1,9 +1,14 @@
 <template>
     <div class="relative flex-shrink-0">
         <!-- trigger button (replaces AddSectionButton) -->
-        <div class="w-16 h-16 rounded-full flex items-center justify-center cursor-pointer transition-all duration-300 hover:scale-110 hover:shadow-lg active:scale-95"
-            :style="{ backgroundColor: unitColor, opacity: 0.7 }" @click="showModal = true"
-            >
+        <div v-if="emptyUnit" class="w-16 h-16 rounded-full flex items-center justify-center cursor-pointer transition-all duration-300 hover:scale-110 hover:shadow-lg active:scale-95"
+            :style="{ backgroundColor: unitColor, opacity: 0.7 }" @click="showModal = true">
+            <XCircleIcon class="w-8 h-8" style="color: var(--light-text)" />
+        </div>
+
+
+        <div v-else class="w-16 h-16 rounded-full flex items-center justify-center cursor-pointer transition-all duration-300 hover:scale-110 hover:shadow-lg active:scale-95"
+            :style="{ backgroundColor: unitColor, opacity: 0.7 }" @click="showModal = true">
             <PlusIcon class="w-8 h-8" style="color: var(--light-text)" />
         </div>
 
@@ -137,6 +142,10 @@ const props = defineProps({
     unitColor: {
         type: String,
         required: true
+    },
+    emptyUnit: {
+        type: Boolean,
+        default: false
     }
 });
 
