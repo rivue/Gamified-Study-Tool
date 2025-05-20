@@ -1,96 +1,113 @@
 <template>
-    <!-- Add Section Modal -->
-    <Transition name="modal">
-        <div v-if="showAddNodeModal" class="fixed inset-0 flex items-center justify-center z-50 p-4"
-            style="background-color: var(--background-haze);">
-            <div class="rounded-2xl p-6 w-full max-w-md shadow-xl border"
-                style="background-color: var(--background-color); color: var(--light-text); border-color: var(--color-primary-dark);">
-                <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-xl font-semibold" style="color: var(--light-text);">Add New Stepping Stones</h2>
-                    <button @click="closeModal" style="color: var(--highlight-color);">
-                        <XMarkIcon class="w-6 h-6" />
-                    </button>
-                </div>
-                <div class="space-y-4">
-                    <!-- Dynamic list of node names -->
-                    <div>
-                        <label class="block text-sm font-medium mb-1" style="color: var(--highlight-color);">
-                            Stepping Stone Names
-                        </label>
-                        <div v-for="(node, index) in newNodeNames" :key="index" class="flex items-center gap-2 mb-2">
-                            <input v-model="newNodeNames[index]" type="text" class="w-full p-2 border rounded-lg"
-                                style="background-color: var(--background-color-1t); color: var(--light-text); border-color: var(--color-primary-dark);"
-                                placeholder="Enter Stepping Stone name" maxlength="40" />
-                            <button v-if="newNodeNames.length > 1" @click="removeNodeName(index)"
-                                class="text-red-400 hover:text-red-300">
-                                <XCircleIcon class="w-6 h-6" />
+    <div class="relative flex-shrink-0">
+        <!-- trigger button (replaces AddSectionButton) -->
+        <div class="w-16 h-16 rounded-full flex items-center justify-center cursor-pointer transition-all duration-300 hover:scale-110 hover:shadow-lg active:scale-95"
+            :style="{ backgroundColor: unitColor, opacity: 0.7 }" @click="showModal = true"
+            >
+            <PlusIcon class="w-8 h-8" style="color: var(--light-text)" />
+        </div>
+
+        <!-- the modal itself -->
+        <Transition name="modal">
+            <div v-if="showModal" class="fixed inset-0 flex items-center justify-center z-50 p-4"
+                style="background-color: var(--background-haze)">
+                <div class="rounded-2xl p-6 w-full max-w-md shadow-xl border"
+                    style="background-color: var(--background-color); color: var(--light-text); border-color: var(--color-primary-dark);">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-semibold" style="color: var(--light-text);">Add New Stepping Stones</h2>
+                        <button @click="closeModal" style="color: var(--highlight-color);">
+                            <XMarkIcon class="w-6 h-6" />
+                        </button>
+                    </div>
+                    <div class="space-y-4">
+                        <!-- Dynamic list of node names -->
+                        <div>
+                            <label class="block text-sm font-medium mb-1" style="color: var(--highlight-color);">
+                                Stepping Stone Names
+                            </label>
+                            <div v-for="(node, index) in newNodeNames" :key="index"
+                                class="flex items-center gap-2 mb-2">
+                                <input v-model="newNodeNames[index]" type="text" class="w-full p-2 border rounded-lg"
+                                    style="background-color: var(--background-color-1t); color: var(--light-text); border-color: var(--color-primary-dark);"
+                                    placeholder="Enter Stepping Stone name" maxlength="40" />
+                                <button v-if="newNodeNames.length > 1" @click="removeNodeName(index)"
+                                    class="text-red-400 hover:text-red-300">
+                                    <XCircleIcon class="w-6 h-6" />
+                                </button>
+                            </div>
+                            <button @click="addNodeNameField"
+                                class="mt-2 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 flex items-center gap-1"
+                                style="background: var(--button-gradient); color: var(--light-text);">
+                                <PlusIcon class="w-4 h-4" />
+                                Add Another Node
+                            </button>
+                            <p v-if="nodeNameErrors.length" class="mt-1 text-sm" style="color: var(--error-color);">
+                                <span v-for="(error, index) in nodeNameErrors" :key="index">{{ error }}<br></span>
+                            </p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1" style="color: var(--highlight-color);">
+                                Upload Resource (optional)<br>
+                                <span class="opacity-65">Note: Stepping stone content is based on this resource and all
+                                    previously uploaded resources in this library</span>
+                            </label>
+                            <div class="border border-dashed rounded-lg p-4 text-center"
+                                style="background-color: var(--background-color-1t); border-color: var(--color-primary-light);">
+                                <input type="file" ref="fileInput" @change="handleFileSelection" class="hidden"
+                                    accept=".pdf,.doc,.docx,.txt" />
+                                <div v-if="!selectedFile" @click="$refs.fileInput.click()" class="cursor-pointer">
+                                    <DocumentPlusIcon class="w-12 h-12 mx-auto"
+                                        style="color: var(--color-primary-light);" />
+                                    <p class="mt-2 text-sm" style="color: var(--highlight-color);">Click to upload (max
+                                        500KB)</p>
+                                    <p class="mt-1 text-xs" style="color: var(--color-primary-light);">PDF, DOC, DOCX,
+                                        TXT</p>
+                                </div>
+                                <div v-else class="text-left">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center">
+                                            <DocumentIcon class="w-8 h-8 mr-2"
+                                                style="color: var(--color-primary-light);" />
+                                            <div>
+                                                <p class="text-sm font-medium truncate"
+                                                    style="color: var(--highlight-color);">
+                                                    {{ selectedFile.name }}
+                                                </p>
+                                                <p class="text-xs" style="color: var(--color-primary-light);">{{
+                                                    formatFileSize(selectedFile.size) }}</p>
+                                            </div>
+                                        </div>
+                                        <button @click.prevent="removeFile" class="text-red-400 hover:text-red-300">
+                                            <XCircleIcon class="w-6 h-6" />
+                                        </button>
+                                    </div>
+                                </div>
+                                <p v-if="fileError" class="mt-2 text-sm text-red-400">{{ fileError }}</p>
+                            </div>
+                        </div>
+
+                        <!-- API call error message -->
+                        <p v-if="apiError" class="mt-2 text-sm" style="color: var(--error-color);">
+                            {{ apiError }}
+                        </p>
+
+                        <div class="flex gap-3 justify-end mt-6">
+                            <button @click="closeModal" class="px-4 py-2 border rounded-lg"
+                                style="border-color: var(--color-primary); color: var(--highlight-color);">
+                                Cancel
+                            </button>
+                            <button @click="addNewNodes" class="px-4 py-2 rounded-lg focus:outline-none focus:ring-2"
+                                style="background: var(--button-gradient); color: var(--light-text);"
+                                :disabled="isAddingNode">
+                                <span v-if="isAddingNode">Adding...</span>
+                                <span v-else>Add Stepping Stone</span>
                             </button>
                         </div>
-                        <button @click="addNodeNameField"
-                            class="mt-2 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 flex items-center gap-1"
-                            style="background: var(--button-gradient); color: var(--light-text);">
-                            <PlusIcon class="w-4 h-4" />
-                            Add Another Node
-                        </button>
-                        <p v-if="nodeNameErrors.length" class="mt-1 text-sm" style="color: var(--error-color);">
-                            <span v-for="(error, index) in nodeNameErrors" :key="index">{{ error }}<br></span>
-                        </p>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium mb-1" style="color: var(--highlight-color);">
-                            Upload Resource (optional)<br>
-                            <p class="opacity-65">Note: Stepping stone content is based on this resource and all previously uploaded resources in this library</p>
-                        </label>
-                        <div class="border border-dashed rounded-lg p-4 text-center"
-                            style="background-color: var(--background-color-1t); border-color: var(--color-primary-light);">
-                            <input type="file" ref="fileInput" @change="handleFileSelection" class="hidden"
-                                accept=".pdf,.doc,.docx,.txt" />
-                            <div v-if="!selectedFile" @click="$refs.fileInput.click()" class="cursor-pointer">
-                                <DocumentPlusIcon class="w-12 h-12 mx-auto" style="color: var(--color-primary-light);" />
-                                <p class="mt-2 text-sm" style="color: var(--highlight-color);">Click to upload (max 500KB)</p>
-                                <p class="mt-1 text-xs" style="color: var(--color-primary-light);">PDF, DOC, DOCX, TXT</p>
-                            </div>
-                            <div v-else class="text-left">
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center">
-                                        <DocumentIcon class="w-8 h-8 mr-2" style="color: var(--color-primary-light);" />
-                                        <div>
-                                            <p class="text-sm font-medium truncate" style="color: var(--highlight-color);">
-                                                {{ selectedFile.name }}
-                                            </p>
-                                            <p class="text-xs" style="color: var(--color-primary-light);">{{ formatFileSize(selectedFile.size) }}</p>
-                                        </div>
-                                    </div>
-                                    <button @click.prevent="removeFile" class="text-red-400 hover:text-red-300">
-                                        <XCircleIcon class="w-6 h-6" />
-                                    </button>
-                                </div>
-                            </div>
-                            <p v-if="fileError" class="mt-2 text-sm text-red-400">{{ fileError }}</p>
-                        </div>
-                    </div>
-
-                    <!-- API call error message -->
-                    <p v-if="apiError" class="mt-2 text-sm" style="color: var(--error-color);">
-                        {{ apiError }}
-                    </p>
-
-                    <div class="flex gap-3 justify-end mt-6">
-                        <button @click="closeModal" class="px-4 py-2 border rounded-lg"
-                            style="border-color: var(--color-primary); color: var(--highlight-color);">
-                            Cancel
-                        </button>
-                        <button @click="addNewNodes" class="px-4 py-2 rounded-lg focus:outline-none focus:ring-2"
-                            style="background: var(--button-gradient); color: var(--light-text);"
-                            :disabled="isAddingNode">
-                            <span v-if="isAddingNode">Adding...</span>
-                            <span v-else>Add Stepping Stone</span>
-                        </button>
                     </div>
                 </div>
             </div>
-        </div>
-    </Transition>
+        </Transition>
+    </div>
 </template>
 
 <script setup lang="ts">
@@ -109,22 +126,23 @@ const props = defineProps({
         type: Number,
         required: true
     },
-    showAddNodeModal: {
-        type: Boolean,
-        required: true
-    },
     unitId: {
-        type: [null, Number],
+        type: [Number, String],
         required: true
     },
     position: {
         type: Number,
         required: true
+    },
+    unitColor: {
+        type: String,
+        required: true
     }
 });
 
-const emit = defineEmits(['update:showAddNodeModal', 'nodes-added']);
+const emit = defineEmits(['nodes-added']);
 
+const showModal = ref(false);
 // State for adding new nodes
 const newNodeNames = ref(['']);
 const selectedFile = ref(null);
@@ -134,8 +152,8 @@ const apiError = ref('');
 const isAddingNode = ref(false);
 const fileInput = ref(null);
 
-const closeModal = () => {
-    emit('update:showAddNodeModal', false);
+function closeModal() {
+    showModal.value = false;
     resetForm();
 }
 
