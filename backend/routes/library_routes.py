@@ -21,6 +21,7 @@ from vector_processing.file_handler import process_document
 from vector_processing.retrieval import query_and_respond_pinecone
 import app
 from sqlalchemy.exc import IntegrityError
+import time
 
 def init_library_routes(app):
 
@@ -385,7 +386,8 @@ def init_library_routes(app):
                 return jsonify(status="error", message="Can only generate library rooms for valid libraries"), 400
 
             library = library_response.get_json()
-
+            # Start the stopwatch
+           
             # Process each subtopic
             results = []
             rag_context = None
@@ -410,8 +412,8 @@ def init_library_routes(app):
 
                 # Generate new content for this subtopic
                 try:
-                    print(f"{subtopic} {library_id}")
                     rag_context = query_and_respond_pinecone(subtopic, library_id)
+
                     print(f"rag context: {rag_context}")
                     # TODO: figure out why rag context is E M P T Y
                     future = executor.submit(lgn.generate_libroom_content, user_id, subtopic, library_id, rag_context)
@@ -427,7 +429,8 @@ def init_library_routes(app):
                     section_contents = future.result()
                     print(f"{section_contents}")
                     section_position = section_names.index(section) # grabs order of section_names
-                    lbh.save_section_contents(library_id, section, section_contents, unit_id, section_position)
+                    relative_position = section_position + section_position
+                    lbh.save_section_contents(library_id, section, section_contents, unit_id, relative_position)
                     results.append({"subtopic": section, "status": "success", "data": section_contents})
                     completed_subtopics[section] = True
 
