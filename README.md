@@ -129,16 +129,17 @@ TODO list:
             - note: for main page, add two / 3 simple boxes, class you want, school, and possibly professor, and it gives you classes close to you like quizlet / rate my professor along with option for creating your own
                 maybe it shows private ones with a "lock" icon and prompts you to enter a password. this way it would be like more of a network, which would differentiate us from a copy paste ai study tool (turbolearn) / NotebookLM
         
-        glitches / 
+        glitches / small stuff
+            - make sure adding a unit actually refreshes the page and stuff
             - why do different pages flicker on the screen when I am on a page and I hit refresh?
             - why is public generating a code on library creation? 
             - current streak in lesson complete displays current streak not current streak + 1 (maybe just refetch it?)
             - improve question generation eventually, like make all answers similar length, use similar answer choices, utilize SAT / ACT / MCAT style questions, maybe tailor the answer style for each course, like MCAT = premed, SAT / ACT = SAT / ACT prep, college style = college final exam style / quiz, etc...
             - when creating library for first time, maybe move join_library call to right below or IN save_library_room_states so theres no duplicate call to add users to library room states - might have to move db.session.commit logic though
             - on user login, make sure streak resets if last streak is more then a day ago or something like that
+            - when the user finishes a lesson and it adds to their streak, make sure the streak in the section completion page displays the updated streak
             - why does the "add unit" button extend the course length a little bit --> it shouldn't for now
             - play popup menu currently displays below unit name --> it should not be that way
-            - make a back button in leaderboard that goes back to the library.
 
         hard probably (goal: 2 high level bullet points / wk):
         - ⭐️ remove alert message in library creator (not hard but have to remember)
@@ -147,8 +148,7 @@ TODO list:
             - also, add a "back" button to library even if its literally a router.push call
         - ✅ ⭐️ Finish sections + units
             - ⭐️ Add ability to add sections to specific units (later --> come back to, reminder to make it account for 1-n number of sections no matter how that looks. add new stepping stones button is commented out for now)
-            - When a user adds a section, make sure its added for all users, like add it to section_user_state and stuff
-            - Make sure to account for duplicate section names, and make sure section names can have under scores, /&}}#@<, etc... and check for duplicate names for that unit or something
+            - Make sure to account for duplicate section names, and other error checking etc... and check for duplicate names for that unit or something
             - go back to come_back_to
             - why is this empty? --> rag_context:
             - enable db.rollback for section generation
