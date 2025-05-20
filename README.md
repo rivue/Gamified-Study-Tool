@@ -154,7 +154,8 @@ TODO list:
             - enable db.rollback for section generation
             - make sure + section buttons are styled the same for middle ones and ones on the end
             - make add section buttons curve w/ sections
-            - make play button pop up thing display above add section button
+            - TODO when I come backdisable the sections when in edit mode
+                - and add a shadcn style popup when the user tries clicking it
             - make sure add stepping stone button displays like a loading bar or something to prevent users from leaving while api call is still generating
         - ✅ ⭐️ (would like to implement visibility of different courses first or at least a many:one for non-owners in library model)
             - ⭐️ Delete sections requires entering the name of the unit / course just for accidental reasons)
