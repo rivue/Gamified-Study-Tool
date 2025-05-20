@@ -334,10 +334,11 @@ def save_library_room_contents(library_id, section_unit_map, section_contents_ma
                 unit_id = response_obj.get_json()["unit"]
 
                 curr += 1
+                section_position = 0
                 for section in sections:
 
                     # 2.1 + 2.2) create sections and add to unit
-                    response_obj, status_code = create_section_and_add(unit_id, section)
+                    response_obj, status_code = create_section_and_add(unit_id, section, section_position)
                     print("response from create section and add") 
                     if status_code != 201:
                         print("create section and add error")
@@ -364,6 +365,7 @@ def save_library_room_contents(library_id, section_unit_map, section_contents_ma
                     factoids = section_contents_map[section]["factoids"]
                     
                     # 4) add factoids to sections
+                    section_position += 1
                     for index, item in enumerate(factoids):
                         lesson_name = "factoid_set_" + str(math.floor(index/9) + 1)
                         
@@ -410,7 +412,7 @@ def save_library_room_contents(library_id, section_unit_map, section_contents_ma
         return jsonify({"message": str(e)}), 400
     
 
-def save_section_contents(library_id, section, section_contents_map, unit_id):
+def save_section_contents(library_id, section, section_contents_map, unit_id, position):
 
     try:
         responses = []
@@ -419,7 +421,7 @@ def save_section_contents(library_id, section, section_contents_map, unit_id):
         with db_transaction():
 
             # 1.1 + 1.2) create sections and add to parent unit
-            response_obj, status_code = create_section_and_add(unit_id, section)
+            response_obj, status_code = create_section_and_add(unit_id, section, position)
             print("after add_section")
             if status_code != 201:
                 print("create section and add error")

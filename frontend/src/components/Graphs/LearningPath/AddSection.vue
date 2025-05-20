@@ -1,7 +1,7 @@
 <template>
     <div class="relative flex-shrink-0">
         <div v-if="emptyUnit" class="flex items-center gap-2 px-4 py-2 rounded-lg transition-all 
-                                            duration-200 hover:scale-105 active:scale-95" @click="showModal = true"
+                                            duration-200 hover:scale-105 active:scale-95 cursor-pointer" @click="showModal = true"
             :style="{
                 background: unitColor,
                 color: 'var(--light-text)'
@@ -17,13 +17,15 @@
         </div>
 
         <!-- the modal itself -->
+        <teleport to="body">
+
         <Transition name="modal">
             <div v-if="showModal" class="fixed inset-0 flex items-center justify-center z-50 p-4"
-                style="background-color: var(--background-haze)">
-                <div class="rounded-2xl p-6 w-full max-w-md shadow-xl border"
+                style="background-color: var(--background-haze); pointer-events: auto;">
+                <div class="rounded-2xl p-6 w-full max-w-md shadow-xl border pointer-events-auto"
                     style="background-color: var(--background-color); color: var(--light-text); border-color: var(--color-primary-dark);">
                     <div class="flex justify-between items-center mb-4">
-                        <h2 class="text-xl font-semibold" style="color: var(--light-text);">Add New Stepping Stones</h2>
+                        <h2 class="text-xl font-semibold">Add New Stepping Stones</h2>
                         <button @click="closeModal" style="color: var(--highlight-color);">
                             <XMarkIcon class="w-6 h-6" />
                         </button>
@@ -31,7 +33,7 @@
                     <div class="space-y-4">
                         <!-- Dynamic list of node names -->
                         <div>
-                            <label class="block text-sm font-medium mb-1" style="color: var(--highlight-color);">
+                            <label class="block text-sm font-medium mb-1">
                                 Stepping Stone Names
                             </label>
                             <div v-for="(node, index) in newNodeNames" :key="index"
@@ -44,7 +46,7 @@
                                     <XCircleIcon class="w-6 h-6" />
                                 </button>
                             </div>
-                            <button @click="addNodeNameField"
+                            <button v-if="emptyUnit" @click="addNodeNameField"
                                 class="mt-2 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 flex items-center gap-1"
                                 style="background: var(--button-gradient); color: var(--light-text);">
                                 <PlusIcon class="w-4 h-4" />
@@ -100,7 +102,7 @@
                             {{ apiError }}
                         </p>
 
-                        <div class="flex gap-3 justify-end mt-6">
+                        <div class="flex justify-end gap-3 mt-6">
                             <button @click="closeModal" class="px-4 py-2 border rounded-lg"
                                 style="border-color: var(--color-primary); color: var(--highlight-color);">
                                 Cancel
@@ -116,6 +118,7 @@
                 </div>
             </div>
         </Transition>
+        </teleport>
     </div>
 </template>
 
@@ -241,42 +244,46 @@ const addNewNodes = async () => {
             hasError = true;
         }
     });
+    
     if (hasError) return;
     isAddingNode.value = true;
-    isAddingNode.value = false;
-    // const currentAbortController = new AbortController();
-    // try {
-    //     // Add each node
-    //     const formData = new FormData();
-    //     formData.append('libraryId', props.libraryId);
-    //     formData.append('unitId', props.unitId);
-    //     formData.append('position', props.position);
-    //     // Append all node names with the same key name
-    //     trimmedNames.forEach(name => formData.append("sectionNames", name));
-    //     // Add file if present (same file for all nodes)
-    //     if (selectedFile.value) {
-    //         formData.append('file', selectedFile.value);
-    //     }
-    //     const response = await axios.post('/api/library/section', formData, {
-    //         signal: currentAbortController.signal,
-    //         headers: {
-    //             'Content-Type': 'multipart/form-data'
-    //         }
-    //     });
-    //     if (currentAbortController.signal.aborted) return; // Don't proceed if aborted
-    //     if (response.data && response.data.status === "success") {
-    //         // Clear form and emit success event
-    //         resetForm();
-    //         closeModal();
-    //         emit('nodes-added');
-    //     }
-    // } catch (error) {
-    //     console.error('Error adding nodes:', error);
-    //     // Set a distinct error message for API call failure
-    //     apiError.value = error.response?.data?.message || error.message || 'Failed to add nodes. Please try again.';
-    // } finally {
-    //     isAddingNode.value = false;
-    // }
+    const currentAbortController = new AbortController();
+
+    try {
+
+        // Add each node
+        const formData = new FormData();
+        formData.append('libraryId', props.libraryId);
+        formData.append('unitId', props.unitId);
+        formData.append('position', props.position);
+
+        // Append all node names with the same key name
+        trimmedNames.forEach(name => formData.append("sectionNames", name));
+        // Add file if present (same file for all nodes)
+        if (selectedFile.value) {
+            formData.append('file', selectedFile.value);
+        }
+        const response = await axios.post('/api/library/section', formData, {
+            signal: currentAbortController.signal,
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        });
+        if (currentAbortController.signal.aborted) return; // Don't proceed if aborted
+        if (response.data && response.data.status === "success") {
+            // Clear form and emit success event
+            resetForm();
+            closeModal();
+            emit('nodes-added');
+        }
+    } catch (error) {
+        console.error('Error adding nodes:', error);
+        // Set a distinct error message for API call failure
+        apiError.value = error.response?.data?.message || error.message || 'Failed to add nodes. Please try again.';
+
+    } finally {
+        isAddingNode.value = false;
+    }
 }
 
 const resetForm = () => {

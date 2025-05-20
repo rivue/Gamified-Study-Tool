@@ -351,6 +351,7 @@ def init_library_routes(app):
         section_names = request.form.getlist("sectionNames")  # Get list of section names
         library_id = request.form.get("libraryId")
         unit_id = request.form.get("unitId")
+        position = request.form.get("position")
 
         # Validate inputs
         if not section_names:
@@ -359,6 +360,8 @@ def init_library_routes(app):
             return jsonify(status="error", message="No library ID provided"), 400
         if not unit_id:
             return jsonify(status="error", message="No unit ID provided"), 400
+        if not position:
+            return jsonify(status="error", message="No position provided"), 400
         if len(section_names) > 20:
             return jsonify(status="error", message="Too many section names provided (max 20)"), 400
         if len(section_names) < 1:
@@ -422,12 +425,9 @@ def init_library_routes(app):
                 section = futures_dict[future]
                 try: 
                     section_contents = future.result()
-                    print("almost here")
-                    # Save the generated content
-                    # why do we need section_to_unit map?
                     print(f"{section_contents}")
-                    # lbh.save_library_room_contents(library_id, library.get('section_to_unit_map'), subtopic_contents, user_id, unit_id)
-                    lbh.save_section_contents(library_id, section, section_contents, unit_id)
+                    section_position = section_names.index(section) # grabs order of section_names
+                    lbh.save_section_contents(library_id, section, section_contents, unit_id, section_position)
                     results.append({"subtopic": section, "status": "success", "data": section_contents})
                     completed_subtopics[section] = True
 
