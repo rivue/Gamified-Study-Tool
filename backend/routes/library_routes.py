@@ -395,11 +395,13 @@ def init_library_routes(app):
                 # add its library factoid text and questions to results for additional rag context
                 # come_back_to: maybe get rid of later bc duplicates are not allowed,
                 # or check for dupe section names in a unit or something
-                unit_id, section_id = library.get('section_to_unit_map').get(subtopic)
-                existing_content = lbh.retrieve_library_room_contents(library_id, section_id, user_id)
-                if existing_content:
-                    results.append({"subtopic": subtopic, "status": "success", "data": existing_content})
-                    continue
+                # print("here")
+                # unit_id, section_id = library.get('section_to_unit_map').get(subtopic)
+                # print("here")
+                # existing_content = lbh.retrieve_library_room_contents(library_id, section_id, user_id)
+                # if existing_content:
+                #     results.append({"subtopic": subtopic, "status": "success", "data": existing_content})
+                #     continue
 
                 # Generate new content for this subtopic
                 try:
@@ -418,8 +420,8 @@ def init_library_routes(app):
                 try: 
                     section_contents = future.result()
 
-                    # don't need to account for unit_id because Exception sets section value to false
-                    unit_id = LibrarySection.query.filter_by(section_id=section_id).first().unit_id
+                    # don't need to account for missing / error unit_id because Exception sets section value to false
+                    unit_id = LibrarySection.query.filter_by(section_id=section).first().unit_id
 
                     # Save the generated content
                     # why do we need section_to_unit map?

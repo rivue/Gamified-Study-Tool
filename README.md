@@ -168,7 +168,7 @@ TODO list:
 
     general:
     study tool additions / ideas:
-        - instead of having one opanai function, have a parent function which rolls how many and what type of game will be rolled ('true_false': 4, 'multiple_choice': 6, 'image': 2, etc... and then a suite of small agents which are each responsible for one (1) type of game (ex: true_false agent, multiple choice agent, image agent (might have to break up further maybe idk), etc..))
+        - instead of having one opanai function, have a parent function which rolls how many and what type of game will be rolled ('true_false': 4, 'multiple_choice': 6, 'image': 2, etc... and then a suite of small agents which are each responsible for one (1) type of game (ex: true_false agent, multiple choice agent, image agent (might have to break up further maybe idk), etc..)) --> do all this so I can put "suite of agents" on my resume
         - is there a tool to like visualize all the different calls / paths something takes in a given api call or function call or something?
             - (important distinction: NOT debugging)
         - research into ibm granite / aws bedrock, or other alternatives to AI rag / kag for accuracy or something
