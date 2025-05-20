@@ -1,5 +1,7 @@
 <template>
     <div class="rounded-2xl p-6">
+        <!-- Back Button -->
+        
         <h2 class="text-xl font-semibold mb-4" style="color: var(--highlight-color);">Leaderboard</h2>
         
         <!-- Leaderboard Table -->
@@ -19,25 +21,29 @@
             <!-- Leaderboard Entries -->
             <div v-else class="divide-y" style="border-color: var(--color-primary-dark);">
                 <div v-for="(entry, index) in leaderboardData.members" :key="entry.user_id"
-                         class="grid grid-cols-12 gap-2 p-3 items-center transition-colors"
-                         :class="{'opacity-85': highlightCurrentUser && entry.user_id !== currentUserId}"
-                         :style="{
-                             backgroundColor: entry.user_id === currentUserId ? 'var(--background-color-2t)' : 'var(--background-color)',
-                         }">
+                class="grid grid-cols-12 gap-2 p-3 items-center transition-colors"
+                :class="{'opacity-85': highlightCurrentUser && entry.user_id !== currentUserId}"
+                :style="{
+                    backgroundColor: entry.user_id === currentUserId ? 'var(--background-color-2t)' : 'var(--background-color)',
+                }">
                          {{ entry.user_id }}
-                    
-                    <!-- User Info -->
-                    <div class="col-span-7 flex items-center">
-                        <div class="truncate">
-                            <span :class="{ 'font-semibold': entry.user_id === currentUserId }">{{ entry.name }}</span>
-                            <span v-if="entry.user_id === currentUserId" class="ml-2 text-xs px-1 rounded"
-                                        style="background-color: var(--highlight-color); color: var(--background-color);">You</span>
+                         
+                         <!-- User Info -->
+                         <div class="col-span-7 flex items-center">
+                             <div class="truncate">
+                                 <span :class="{ 'font-semibold': entry.user_id === currentUserId }">{{ entry.name }}</span>
+                                 <span v-if="entry.user_id === currentUserId" class="ml-2 text-xs px-1 rounded"
+                                 style="background-color: var(--highlight-color); color: var(--background-color);">You</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-        
+                
+                <router-link :to="`/library/${libraryId}`" class="inline-flex items-center mb-4 mt-16 px-4 py-2 rounded-lg text-base font-medium transition-colors" style="background-color: var(--background-color-2t); color: var(--highlight-color);">
+                <span class="mr-2">←</span> Back to Library
+            </router-link>
+
     </div>
 </template>
 

@@ -1,120 +1,86 @@
 <template>
-    <!-- Add Section Modal -->
-    <Transition name="modal">
-        <div v-if="showAddNodeModal" class="fixed inset-0 flex items-center justify-center z-50 p-4"
-            style="background-color: var(--background-haze);">
-            <div class="rounded-2xl p-6 w-full max-w-md shadow-xl border"
-                style="background-color: var(--background-color); color: var(--light-text); border-color: var(--color-primary-dark);">
-                <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-xl font-semibold" style="color: var(--light-text);">Add New Stepping Stones</h2>
-                    <button @click="closeModal" style="color: var(--highlight-color);">
-                        <XMarkIcon class="w-6 h-6" />
+    <!-- Button View -->
+    <div v-if="!showModal" class="relative flex-shrink-0 mx-6">
+        <div class="w-16 h-16 rounded-full flex items-center justify-center cursor-pointer transition-all duration-300 hover:scale-110 hover:shadow-lg active:scale-95"
+            :style="{
+                backgroundColor: unitColor,
+                opacity: 0.7,
+            }" @click="openModal">
+            <PlusIcon class="w-8 h-8" style="color: var(--light-text);" />
+        </div>
+    </div>
+
+    <!-- Modal View -->
+    <div v-if="showModal" class="fixed inset-0 flex items-center justify-center z-50">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" @click="closeModal"></div>
+
+        <!-- Modal Content -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md relative">
+            <button @click="closeModal" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                <XMarkIcon class="w-6 h-6" />
+            </button>
+
+            <h2 class="text-xl font-bold mb-4">Add Stepping Stone</h2>
+
+            <form @submit.prevent="submitForm">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium mb-2">Name</label>
+                    <input v-model="sectionName" type="text"
+                        class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="Enter stepping stone name" required>
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-sm font-medium mb-2">Description (optional)</label>
+                    <textarea v-model="description"
+                        class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="Enter description" rows="3"></textarea>
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-sm font-medium mb-2">Number of Lessons</label>
+                    <input v-model.number="numLessons" type="number" min="1"
+                        class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        required>
+                </div>
+
+                <div class="flex justify-end gap-3 mt-6">
+                    <button type="button" @click="closeModal"
+                        class="px-4 py-2 border rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                        Cancel
+                    </button>
+                    <button type="submit" class="px-4 py-2 rounded-lg"
+                        :style="{ backgroundColor: unitColor, color: 'var(--light-text)' }" :disabled="loading">
+                        <span v-if="loading">Creating...</span>
+                        <span v-else>Create</span>
                     </button>
                 </div>
-                <div class="space-y-4">
-                    <!-- Dynamic list of node names -->
-                    <div>
-                        <label class="block text-sm font-medium mb-1" style="color: var(--highlight-color);">
-                            Stepping Stone Names
-                        </label>
-                        <div v-for="(node, index) in newNodeNames" :key="index" class="flex items-center gap-2 mb-2">
-                            <input v-model="newNodeNames[index]" type="text" class="w-full p-2 border rounded-lg"
-                                style="background-color: var(--background-color-1t); color: var(--light-text); border-color: var(--color-primary-dark);"
-                                placeholder="Enter Stepping Stone name" maxlength="40" />
-                            <button v-if="newNodeNames.length > 1" @click="removeNodeName(index)"
-                                class="text-red-400 hover:text-red-300">
-                                <XCircleIcon class="w-6 h-6" />
-                            </button>
-                        </div>
-                        <button @click="addNodeNameField"
-                            class="mt-2 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 flex items-center gap-1"
-                            style="background: var(--button-gradient); color: var(--light-text);">
-                            <PlusIcon class="w-4 h-4" />
-                            Add Another Node
-                        </button>
-                        <p v-if="nodeNameErrors.length" class="mt-1 text-sm" style="color: var(--error-color);">
-                            <span v-for="(error, index) in nodeNameErrors" :key="index">{{ error }}<br></span>
-                        </p>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium mb-1" style="color: var(--highlight-color);">
-                            Upload Resource (optional)<br>
-                            <p class="opacity-65">Note: Stepping stone content is based on this resource and all previously uploaded resources in this library</p>
-                        </label>
-                        <div class="border border-dashed rounded-lg p-4 text-center"
-                            style="background-color: var(--background-color-1t); border-color: var(--color-primary-light);">
-                            <input type="file" ref="fileInput" @change="handleFileSelection" class="hidden"
-                                accept=".pdf,.doc,.docx,.txt" />
-                            <div v-if="!selectedFile" @click="$refs.fileInput.click()" class="cursor-pointer">
-                                <DocumentPlusIcon class="w-12 h-12 mx-auto" style="color: var(--color-primary-light);" />
-                                <p class="mt-2 text-sm" style="color: var(--highlight-color);">Click to upload (max 500KB)</p>
-                                <p class="mt-1 text-xs" style="color: var(--color-primary-light);">PDF, DOC, DOCX, TXT</p>
-                            </div>
-                            <div v-else class="text-left">
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center">
-                                        <DocumentIcon class="w-8 h-8 mr-2" style="color: var(--color-primary-light);" />
-                                        <div>
-                                            <p class="text-sm font-medium truncate" style="color: var(--highlight-color);">
-                                                {{ selectedFile.name }}
-                                            </p>
-                                            <p class="text-xs" style="color: var(--color-primary-light);">{{ formatFileSize(selectedFile.size) }}</p>
-                                        </div>
-                                    </div>
-                                    <button @click.prevent="removeFile" class="text-red-400 hover:text-red-300">
-                                        <XCircleIcon class="w-6 h-6" />
-                                    </button>
-                                </div>
-                            </div>
-                            <p v-if="fileError" class="mt-2 text-sm text-red-400">{{ fileError }}</p>
-                        </div>
-                    </div>
+            </form>
 
-                    <!-- API call error message -->
-                    <p v-if="apiError" class="mt-2 text-sm" style="color: var(--error-color);">
-                        {{ apiError }}
-                    </p>
-
-                    <div class="flex gap-3 justify-end mt-6">
-                        <button @click="closeModal" class="px-4 py-2 border rounded-lg"
-                            style="border-color: var(--color-primary); color: var(--highlight-color);">
-                            Cancel
-                        </button>
-                        <button @click="addNewNodes" class="px-4 py-2 rounded-lg focus:outline-none focus:ring-2"
-                            style="background: var(--button-gradient); color: var(--light-text);"
-                            :disabled="isAddingNode">
-                            <span v-if="isAddingNode">Adding...</span>
-                            <span v-else>Add Stepping Stone</span>
-                        </button>
-                    </div>
-                </div>
+            <div v-if="error" class="mt-4 p-3 bg-red-100 text-red-700 rounded-lg">
+                {{ error }}
             </div>
         </div>
-    </Transition>
+    </div>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { ref } from 'vue';
-import {
-    XMarkIcon,
-    DocumentPlusIcon,
-    DocumentIcon,
-    XCircleIcon,
-    PlusIcon,
-} from '@heroicons/vue/24/solid';
-import axios from 'axios';
+import { PlusIcon, XMarkIcon } from '@heroicons/vue/24/solid';
+import { useApiService } from '@/services/apiService'; // Adjust to your API service import
 
 const props = defineProps({
     libraryId: {
         type: Number,
         required: true
     },
-    showAddNodeModal: {
-        type: Boolean,
+    unitId: {
+        type: [Number, String],
         required: true
     },
-    unitId: {
-        type: [null, Number],
+    unitColor: {
+        type: String,
         required: true
     },
     position: {
@@ -123,136 +89,96 @@ const props = defineProps({
     }
 });
 
-const emit = defineEmits(['update:showAddNodeModal', 'nodes-added']);
+const emit = defineEmits(['section-added']);
 
-// State for adding new nodes
-const newNodeNames = ref(['']);
-const selectedFile = ref(null);
-const nodeNameErrors = ref([]);
-const fileError = ref('');
-const apiError = ref('');
-const isAddingNode = ref(false);
-const fileInput = ref(null);
+// Form state
+const showModal = ref(false);
+const sectionName = ref('');
+const description = ref('');
+const numLessons = ref(1);
+const loading = ref(false);
+const error = ref('');
+const apiService = useApiService(); // Adjust based on your API service setup
+// For empty unit modal
+const showEmptyUnitModal = ref(false)
+const emptyUnitSectionName = ref('')
+const emptyUnitDescription = ref('')
+const emptyUnitNumLessons = ref(1)
+const emptyUnitLoading = ref(false)
+const emptyUnitError = ref('')
+const emptyUnitId = ref(null)
+const emptyUnitColor = ref('')
+
+const openEmptyUnitModal = (unitName) => {
+    emptyUnitId.value = props.unitPositionMap[unitName][1]
+    emptyUnitColor.value = getUnitColor(Object.keys(rawUnitData.value).indexOf(unitName))
+    showEmptyUnitModal.value = true
+}
+
+const submitEmptyUnitForm = async () => {
+    try {
+        emptyUnitLoading.value = true
+        emptyUnitError.value = ''
+        
+        const response = await apiService.post('/api/sections', {
+            name: emptyUnitSectionName.value,
+            description: emptyUnitDescription.value,
+            num_lessons: emptyUnitNumLessons.value,
+            unit_id: emptyUnitId.value,
+            library_id: props.libraryId,
+            position: 0
+        })
+        
+        if (response.status === 201) {
+            showEmptyUnitModal.value = false
+            onSectionAdd()
+        } else {
+            emptyUnitError.value = 'Failed to create stepping stone'
+        }
+    } catch (err) {
+        console.error('Error creating section:', err)
+        emptyUnitError.value = 'An error occurred while creating the stepping stone'
+    } finally {
+        emptyUnitLoading.value = false
+    }
+}
+const openModal = () => {
+    showModal.value = true;
+};
 
 const closeModal = () => {
-    emit('update:showAddNodeModal', false);
-    resetForm();
-}
+    showModal.value = false;
+    sectionName.value = '';
+    description.value = '';
+    numLessons.value = 1;
+    error.value = '';
+};
 
-const handleFileSelection = (event) => {
-    const file = event.target.files[0];
-    if (!file) return;
-    fileError.value = '';
-    // Check file size (500KB limit)
-    if (file.size > 512000) {
-        fileError.value = 'File size exceeds 500KB limit';
-        return;
-    }
-    // Check file type
-    const allowedTypes = [
-        'application/pdf',
-        'application/msword',
-        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-        'text/plain'
-    ];
-    if (!allowedTypes.includes(file.type)) {
-        fileError.value = 'Only PDF, DOC, DOCX, and TXT files are allowed';
-        return;
-    }
-    selectedFile.value = file;
-}
-
-const removeFile = () => {
-    selectedFile.value = null;
-    fileError.value = '';
-    if (fileInput.value) {
-        fileInput.value.value = '';
-    }
-}
-
-const formatFileSize = (bytes) => {
-    if (bytes < 1024) return bytes + ' B';
-    if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
-    return (bytes / 1048576).toFixed(1) + ' MB';
-}
-
-// Add a new node name field
-const addNodeNameField = () => {
-    newNodeNames.value.push('');
-    nodeNameErrors.value.push('');
-}
-
-// Remove a node name field
-const removeNodeName = (index) => {
-    newNodeNames.value.splice(index, 1);
-    nodeNameErrors.value.splice(index, 1);
-}
-
-// Function to add a new node
-const addNewNodes = async () => {
-    // Reset the API error each attempt
-    apiError.value = '';
-
-    // Validate node name
-    nodeNameErrors.value = new Array(newNodeNames.value.length).fill('');
-    let hasError = false;
-    const trimmedNames = newNodeNames.value.map(name => name.trim());
-    trimmedNames.forEach((name, index) => {
-        if (!name) {
-            nodeNameErrors.value[index] = 'Please enter a node name';
-            hasError = true;
-        } else if (!/^[a-zA-Z ]+$/.test(name)) {
-            nodeNameErrors.value[index] = 'Node name can only contain letters and spaces';
-            hasError = true;
-        } else if (name.length > 40) {
-            nodeNameErrors.value[index] = 'Node name must be 40 characters or less';
-            hasError = true;
-        } else if (trimmedNames.indexOf(name) !== index) {
-            nodeNameErrors.value[index] = 'Duplicate node name in this form';
-            hasError = true;
-        }
-    });
-    if (hasError) return;
-    isAddingNode.value = true;
-    const currentAbortController = new AbortController();
+const submitForm = async () => {
     try {
-        // Add each node
-        const formData = new FormData();
-        formData.append('libraryId', props.libraryId);
-        formData.append('unitId', props.unitId);
-        formData.append('position', props.position);
-        // Append all node names with the same key name
-        trimmedNames.forEach(name => formData.append("sectionNames", name));
-        // Add file if present (same file for all nodes)
-        if (selectedFile.value) {
-            formData.append('file', selectedFile.value);
-        }
-        const response = await axios.post('/api/library/section', formData, {
-            signal: currentAbortController.signal,
-            headers: {
-                'Content-Type': 'multipart/form-data'
-            }
-        });
-        if (currentAbortController.signal.aborted) return; // Don't proceed if aborted
-        if (response.data && response.data.status === "success") {
-            // Clear form and emit success event
-            resetForm();
-            closeModal();
-            emit('nodes-added');
-        }
-    } catch (error) {
-        console.error('Error adding nodes:', error);
-        // Set a distinct error message for API call failure
-        apiError.value = error.response?.data?.message || error.message || 'Failed to add nodes. Please try again.';
-    } finally {
-        isAddingNode.value = false;
-    }
-}
+        loading.value = true;
+        error.value = '';
 
-const resetForm = () => {
-    newNodeNames.value = [''];
-    removeFile();
-    nodeNameErrors.value = [];
-    apiError.value = '';
-}
+        const response = await apiService.post('/api/sections', {
+            name: sectionName.value,
+            description: description.value,
+            num_lessons: numLessons.value,
+            unit_id: props.unitId,
+            library_id: props.libraryId,
+            position: props.position
+        });
+
+        if (response.status === 201) {
+            emit('section-added');
+            closeModal();
+        } else {
+            error.value = 'Failed to create stepping stone';
+        }
+    } catch (err) {
+        console.error('Error creating section:', err);
+        error.value = 'An error occurred while creating the stepping stone';
+    } finally {
+        loading.value = false;
+    }
+};
 </script>

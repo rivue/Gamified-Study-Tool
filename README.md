@@ -131,6 +131,7 @@ TODO list:
             - on user login, make sure streak resets if last streak is more then a day ago or something like that
             - why does the "add unit" button extend the course length a little bit --> it shouldn't for now
             - play popup menu currently displays below unit name --> it should not be that way
+            - make a back button in leaderboard that goes back to the library.
 
         hard probably (goal: 2 high level bullet points / wk):
         - ⭐️ remove alert message in library creator (not hard but have to remember)

@@ -14,9 +14,26 @@
 </template>
 
 <script setup lang="ts">
-import { PlusIcon } from '@heroicons/vue/24/solid';
+import { ref } from 'vue';
+import {
+    XMarkIcon,
+    DocumentPlusIcon,
+    DocumentIcon,
+    XCircleIcon,
+    PlusIcon,
+} from '@heroicons/vue/24/solid';
+import axios from 'axios';
+
 
 const props = defineProps({
+  libraryId: {
+    type: Number,
+    required: true
+  },
+  showAddNodeModal: {
+    type: Boolean,
+    required: true,
+  },
   unitId: {
     type: [Number, String],
     required: true
@@ -32,6 +49,7 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['add-section']);
+
 
 const openAddSectionModal = () => {
   emit('add-section', {
