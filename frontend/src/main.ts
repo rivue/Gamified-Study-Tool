@@ -141,7 +141,6 @@ router.beforeEach(async (to, from, next) => {
 
     const loading = useLoadingStore()
     if (!from.matched.length) loading.start()
-    console.debug("idk")
 
     const publicPaths = [
         '/',
@@ -178,10 +177,10 @@ router.beforeEach(async (to, from, next) => {
                 const response = await axios.get(`/api/library/${to.params.id}`);
                 if (response.data && 
                     response.data.data && 
-                    (response.data.data.owner_id == user || response.data.data.is_public)) {
-                        // User is the creator, continues as per usual
+                    response.data.data.membership_status) { // membership_status is true / false
                         return next();
-                } else { // invalid data 
+                } else {
+                    console.log(response.data.data.membership_status)
                     return next('/library');
                 }
                     

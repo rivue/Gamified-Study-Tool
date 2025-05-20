@@ -129,14 +129,15 @@ TODO list:
             - improve question generation eventually, like make all answers similar length, use similar answer choices, utilize SAT / ACT / MCAT style questions, maybe tailor the answer style for each course, like MCAT = premed, SAT / ACT = SAT / ACT prep, college style = college final exam style / quiz, etc...
             - when creating library for first time, maybe move join_library call to right below or IN save_library_room_states so theres no duplicate call to add users to library room states - might have to move db.session.commit logic though
             - on user login, make sure streak resets if last streak is more then a day ago or something like that
+            - why does the "add unit" button extend the course length a little bit --> it shouldn't for now
+            - play popup menu currently displays below unit name --> it should not be that way
 
         hard probably (goal: 2 high level bullet points / wk):
         - ⭐️ remove alert message in library creator (not hard but have to remember)
         - ⭐️ add username (backfill username w/ 1st part of email before @ symbol - maybe let people change later)
             - for this section, make sure you modify explore page owner_id and library leaderboard
             - also, add a "back" button to library even if its literally a router.push call
-        - ✅ ⭐️ Finish sections + units <-- TODO NEXT (FOLLOWED BY DELETE SECTIONS --> UNITS --> COURSES)
-            - 
+        - ✅ ⭐️ Finish sections + units
             - ⭐️ Add ability to add sections to specific units (later --> come back to, reminder to make it account for 1-n number of sections no matter how that looks. add new stepping stones button is commented out for now)
             - When a user adds a section, make sure its added for all users, like add it to section_user_state and stuff
             - Make sure to account for duplicate section names, and make sure section names can have under scores, /&}}#@<, etc... and check for duplicate names for that unit or something
@@ -145,7 +146,6 @@ TODO list:
             - enable db.rollback for section generation
             - make sure to add a way to add sections in a library not just on empty units
                 - make sure current section_id and unit_id is communicated to section generation call
-           - account for isOwner --> make it propagate to child or somethinf
         - ✅ ⭐️ (would like to implement visibility of different courses first or at least a many:one for non-owners in library model)
             - ⭐️ Delete sections requires entering the name of the unit / course just for accidental reasons)
             - ⭐️ Delete Units (requires entering the name of the unit / course just for accidental reasons)

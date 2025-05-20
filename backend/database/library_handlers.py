@@ -241,7 +241,17 @@ def get_library(library_id, user_id=None, click=True):
     ).first()
 
     library_data["favorited_status"] = favorited_status.is_favorited
+
+    membership_status = LibraryMembership.query.filter_by(
+        user_id=user_id,
+        library_id=library_id
+    ).first()
     
+    if membership_status:
+        library_data["membership_status"] = True
+    else:
+        library_data["membership_status"] = False
+
     return jsonify(library_data)
 
 def get_library_scores(library_id):
@@ -301,7 +311,7 @@ def get_library_room_state(user_id, library_id, section_id=None):
             section_id=section_id,
         ).first()
         print(f"{state}")
-        
+
         return state.as_dict() if state else None
 
 def save_library_room_contents(library_id, section_unit_map, section_contents_map, user_id):

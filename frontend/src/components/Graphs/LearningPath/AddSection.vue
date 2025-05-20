@@ -116,6 +116,10 @@ const props = defineProps({
     unitId: {
         type: [null, Number],
         required: true
+    },
+    position: {
+        type: Number,
+        required: true
     }
 });
 
@@ -216,6 +220,7 @@ const addNewNodes = async () => {
         const formData = new FormData();
         formData.append('libraryId', props.libraryId);
         formData.append('unitId', props.unitId);
+        formData.append('position', props.position);
         // Append all node names with the same key name
         trimmedNames.forEach(name => formData.append("sectionNames", name));
         // Add file if present (same file for all nodes)

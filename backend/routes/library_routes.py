@@ -220,7 +220,6 @@ def init_library_routes(app):
 
             user_id = current_user.id if not isinstance(current_user, AnonymousUserMixin) else None
             library = lbh.get_library(library_id, user_id)
-            print("after start")
             if not library:
                 return jsonify(status="error", message="Library not found"), 404
 
@@ -250,10 +249,8 @@ def init_library_routes(app):
                 room_data = lbh.get_library_room_state(user_id, library_id)
 
             library_data["show_settings"] = user_id == library_data.get("owner_id")
-            print("before end")
             return jsonify(status="success", data=library_data, room_data=room_data)
         except: 
-            print("hi")
             return jsonify(status="error", message="Failed to retrieve library data"), 500
         
     @app.route("/api/library/<int:library_id>/scores", methods=["GET"])

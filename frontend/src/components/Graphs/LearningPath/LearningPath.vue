@@ -39,7 +39,7 @@
 
                     <!-- Unit Headers -->
                     <template v-for="([unit], unitName, unitIndex) in rawUnitData" :key="unitIndex">
-                        <div class="relative -mx-12 my-12 px-12 pt-40 pb-36 border-t-2 border-b-2 flex-shrink-0"
+                        <div class="relative -mx-12 my-12 px-16 pt-40 pb-36 border-t-2 border-b-2 flex-shrink-0"
                             :class="['unit-box', { 'unit--first': unitIndex === 0, 'unit--last': unitIndex === Object.keys(rawUnitData).length - 1 }]"
                             :style="{
                                 borderColor: getUnitColor(unitIndex),
@@ -53,11 +53,19 @@
                             </div>
 
                             <!-- Sections container -->
-                            <div class="flex items-center gap-24">
+                            <div class="flex items-center">
                                 <template v-if="rawUnitData[unitName].length > 0"
                                     v-for="([sectionId, sectionName], sectionIndex) in rawUnitData[unitName]"
                                     :key="sectionIndex">
-                                    <div class="relative flex-shrink-0" :style="{
+
+                                    <AddSectionButton v-if="editModeEnabled && isOwner && sectionIndex === 0"
+                                        class="-mx-8"
+                                        :unit-id="props.unitPositionMap[unitName][1]"
+                                        :unit-color="getUnitColor(unitIndex)" :position="sectionIndex"
+                                        @add-section="handleAddSectionAtPosition" />
+
+
+                                    <div class="relative flex-shrink-0 mx-12" :style="{
                                         transform: `translateY(${getNodeOffset(getGlobalSectionIndex(unitIndex, sectionIndex))}px)`
                                     }" @click="handleNodeClick(sectionId)">
 
@@ -196,11 +204,17 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <AddSectionButton v-if="editModeEnabled && isOwner"
+                                        class="-mx-8"
+                                        :unit-id="props.unitPositionMap[unitName][1]"
+                                        :unit-color="getUnitColor(unitIndex)" :position="sectionIndex + 1"
+                                        @add-section="handleAddSectionAtPosition" />
                                 </template>
 
                                 <template v-else>
-                                    
-                                    <div v-if="isOwner" class="flex flex-col pt-10 pb-10 items-center justify-center p-6 min-w-64">
+
+                                    <div v-if="isOwner"
+                                        class="flex flex-col pt-10 pb-10 items-center justify-center p-6 min-w-64">
                                         <div class="text-center mb-4 mt-2" style="color: var(--light-text);">
                                             <p class="text-lg">No stepping stones yet</p>
                                             <p class="text-sm opacity-75">Add stepping stones to get started</p>
@@ -217,7 +231,8 @@
                                         </button>
                                     </div>
 
-                                    <div v-else class="flex flex-col pt-10 pb-10 items-center justify-center p-6 min-w-64">
+                                    <div v-else
+                                        class="flex flex-col pt-10 pb-10 items-center justify-center p-6 min-w-64">
                                         <div class="text-center mb-4 mt-2" style="color: var(--light-text);">
                                             <p class="text-lg">No stepping stones yet</p>
                                             <p class="text-sm opacity-75">Add stepping stones to get started</p>
@@ -286,9 +301,9 @@
         </div>
     </div>
 
-    <!-- Add Node Modal -->
-    <AddSection v-model:showAddNodeModal="showAddNodeModal" :library-id="libraryId" :unit-id="addSectionUnitId" @close="showAddNodeModal = false"
-        @nodes-added="onSectionAdd" />
+    <!-- Modal for adding a section -->
+    <AddSection v-model:showAddNodeModal="showAddNodeModal" :library-id="libraryId" :unit-id="addSectionUnitId" :position="addSectionPosition"
+        @close="showAddNodeModal = false; addSectionPosition.value = null;" @nodes-added="onSectionAdd" />
 
     <LibrarySettings v-model:showSettingsModal="showSettingsModal" :library-id="libraryId"
         :library-is-public="libraryIsPublic" :library-join-code="libraryJoinCode" :can-modify="isOwner" />
@@ -322,6 +337,7 @@ import { useRouter } from 'vue-router';
 import LibrarySettings from "./LibrarySettings.vue";
 import AddUnit from "./AddUnit.vue";
 import AddSection from "./AddSection.vue"
+import AddSectionButton from "./AddSectionButton.vue";
 
 const props = defineProps({
     libraryId: {
@@ -379,6 +395,7 @@ const selectedRoomId = ref(null)
 const scrollPosition = ref(0)
 
 const addSectionUnitId = ref(null)
+const addSectionPosition = ref(null)
 
 // Color schemes for units
 const unitColors = [
@@ -490,7 +507,8 @@ const getGlobalSectionIndex = (unitIndex: number, sectionIndex: number) => {
 // Function to add a new node
 const onSectionAdd = async () => {
     // try to get rid of in the future
-    window.location.reload();
+    addSectionPosition.value = null;
+    // window.location.reload();
 }
 
 // Function to get the corresponding room data by section ID
@@ -557,6 +575,12 @@ onUnmounted(() => {
         console.debug("LearningPath unmounting, cleared initial scroll timeout.");
     }
 });
+
+const handleAddSectionAtPosition = (data) => {
+    showAddNodeModal.value = true;
+    addSectionUnitId.value = data.unitId;
+    addSectionPosition.value = data.position;
+}
 
 // Add to your script section
 const handleUnitAdded = (unitData) => {
