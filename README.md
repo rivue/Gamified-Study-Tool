@@ -151,6 +151,7 @@ TODO list:
             - make sure either positions are correctly accounted for or we drop the ability to add multiple sections
             - fix inability to enter stepping stone name
             - when you come back do positions and ^^^ above
+            - continue experimenting w/ timings just for future reference
         - ✅ ⭐️ (would like to implement visibility of different courses first or at least a many:one for non-owners in library model)
             - ⭐️ Delete sections requires entering the name of the unit / course just for accidental reasons)
             - ⭐️ Delete Units (requires entering the name of the unit / course just for accidental reasons)
