@@ -40,7 +40,7 @@
                     </div>
                 </div>
                 
-                <router-link :to="`/library/${libraryId}`" class="inline-flex items-center mb-4 mt-16 px-4 py-2 rounded-lg text-base font-medium transition-colors" style="background-color: var(--background-color-2t); color: var(--highlight-color);">
+                <router-link :to="`/lessons/${libraryId}`" class="inline-flex items-center mb-4 mt-16 px-4 py-2 rounded-lg text-base font-medium transition-colors" style="background-color: var(--background-color-2t); color: var(--highlight-color);">
                 <span class="mr-2">←</span> Back to Library
             </router-link>
 

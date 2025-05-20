@@ -58,10 +58,11 @@
                                     v-for="([sectionId, sectionName], sectionIndex) in rawUnitData[unitName]"
                                     :key="sectionIndex">
 
-                                    <AddSection v-if="editModeEnabled && isOwner && sectionIndex === 0"
-                                        :library-id="libraryId" :unit-id="props.unitPositionMap[unitName][1]"
+                                    <AddSectionButton v-if="editModeEnabled && isOwner && sectionIndex === 0"
+                                        class="-mx-8"
+                                        :unit-id="props.unitPositionMap[unitName][1]"
                                         :unit-color="getUnitColor(unitIndex)" :position="sectionIndex"
-                                        @section-added="onSectionAdd" />
+                                        @add-section="handleAddSectionAtPosition" />
 
 
                                     <div class="relative flex-shrink-0 mx-12" :style="{
@@ -203,50 +204,52 @@
                                             </div>
                                         </div>
                                     </div>
-
-                                    <AddSection v-if="editModeEnabled && isOwner && sectionIndex === 0"
-                                        :library-id="libraryId" :unit-id="props.unitPositionMap[unitName][1]"
-                                        :unit-color="getUnitColor(unitIndex)" :position="sectionIndex"
-                                        @section-added="onSectionAdd" />
-
+                                    <AddSectionButton v-if="editModeEnabled && isOwner"
+                                        class="-mx-8"
+                                        :unit-id="props.unitPositionMap[unitName][1]"
+                                        :unit-color="getUnitColor(unitIndex)" :position="sectionIndex + 1"
+                                        @add-section="handleAddSectionAtPosition" />
                                 </template>
 
                                 <template v-else>
+
                                     <div v-if="isOwner"
                                         class="flex flex-col pt-10 pb-10 items-center justify-center p-6 min-w-64">
                                         <div class="text-center mb-4 mt-2" style="color: var(--light-text);">
                                             <p class="text-lg">No stepping stones yet</p>
                                             <p class="text-sm opacity-75">Add stepping stones to get started</p>
                                         </div>
+                                        <button @click="addNewSteppingStoneSetup(unitName)" class="flex items-center gap-2 px-4 py-2 rounded-lg transition-all 
+                                            duration-200 hover:scale-105 active:scale-95" :style="{
+                                                background: getUnitColor(unitIndex),
+                                                color: 'var(--light-text)',
 
-                                        <!-- Button that opens the AddSection modal directly -->
-                                        <button @click="openEmptyUnitModal(unitName)" class="flex items-center gap-2 px-4 py-2 rounded-lg transition-all 
-                                                duration-200 hover:scale-105 active:scale-95" :style="{
-                                                    background: getUnitColor(unitIndex),
-                                                    color: 'var(--light-text)',
-                                                }">
+                                            }">
                                             <PlusIcon class="w-5 h-5" />
                                             <span>Add Stepping Stone</span>
+
                                         </button>
                                     </div>
 
                                     <div v-else
                                         class="flex flex-col pt-10 pb-10 items-center justify-center p-6 min-w-64">
-                                        <!-- Non-owner view remains unchanged -->
                                         <div class="text-center mb-4 mt-2" style="color: var(--light-text);">
                                             <p class="text-lg">No stepping stones yet</p>
                                             <p class="text-sm opacity-75">Add stepping stones to get started</p>
                                         </div>
                                         <button class="flex items-center gap-2 px-4 py-2 rounded-lg transition-all 
-                                                duration-200 hover:scale-105 active:scale-95" :style="{
-                                                    background: getUnitColor(unitIndex),
-                                                    color: 'var(--light-text)',
-                                                }">
+                                            duration-200 hover:scale-105 active:scale-95" :style="{
+                                                background: getUnitColor(unitIndex),
+                                                color: 'var(--light-text)',
+
+                                            }">
                                             <PlusIcon class="w-0 h-5 opacity-0" />
                                             <span>Only Course owner can add stepping stones!</span>
                                             <PlusIcon class="w-0 h-5 opacity-0" />
+
                                         </button>
                                     </div>
+
                                 </template>
 
                             </div>
@@ -297,6 +300,10 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal for adding a section -->
+    <AddSection v-model:showAddNodeModal="showAddNodeModal" :library-id="libraryId" :unit-id="addSectionUnitId" :position="addSectionPosition"
+        @close="showAddNodeModal = false; addSectionPosition.value = null;" @nodes-added="onSectionAdd" />
 
     <LibrarySettings v-model:showSettingsModal="showSettingsModal" :library-id="libraryId"
         :library-is-public="libraryIsPublic" :library-join-code="libraryJoinCode" :can-modify="isOwner" />
@@ -375,6 +382,7 @@ watch(() => props.unitSectionMap, async (newVal) => {
 }, { deep: true, immediate: true })
 
 // State for adding new nodes
+const showAddNodeModal = ref(false)
 const gameStore = useGameStore()
 const showSettingsModal = ref(false)
 const isOwner = ref(false)
@@ -386,6 +394,7 @@ const selectedRoomId = ref(null)
 // File input handling
 const scrollPosition = ref(0)
 
+const addSectionUnitId = ref(null)
 const addSectionPosition = ref(null)
 
 // Color schemes for units
@@ -455,6 +464,12 @@ const getUnitGradient = (unitIndex) => {
     ${adjustColor(baseColor, -20)} 100%)`;
 }
 
+function addNewSteppingStoneSetup(unitName) {
+    showAddNodeModal.value = true;
+    addSectionUnitId.value = props.unitPositionMap[unitName][1]; // id of unit
+
+}
+
 // Helper function to lighten/darken colors
 function adjustColor(color, percent) {
     // Convert hex to RGB
@@ -492,8 +507,8 @@ const getGlobalSectionIndex = (unitIndex: number, sectionIndex: number) => {
 // Function to add a new node
 const onSectionAdd = async () => {
     // try to get rid of in the future
-    // addSectionPosition.value = null;
-    window.location.reload();
+    addSectionPosition.value = null;
+    // window.location.reload();
 }
 
 // Function to get the corresponding room data by section ID
