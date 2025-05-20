@@ -21,6 +21,13 @@ IDEAS:
         - Blueprints maybe
 
     ideas for grand plan / future:
+        - Youtube Comment AI Bot —> intern idea for next summer?
+            Would involve fine tuning a model to do something, maybe grok or something, to train it on high performing comments and
+            train it to go on youtube videos to write a snarky reply / comment to rack up likes, or use gemini to reply in the way that the 
+            company would reply  —-> the bot would be for like a company, Rivue.ai or Duolingo or whatever so they could generate 
+            traction / sales or whatever
+            This bot could be fine tuned to scrape relevant channels, like a design company for other design companies YouTube channels / very 
+            well known design youtube channels, or grammerly for study channels or something, etc...
         - Brain-Computer Interface (BCI) Integrations
             For researchers with EEG headsets: detect attention lapses or cognitive overload and adapt content pacing in real time.
 
@@ -142,13 +149,10 @@ TODO list:
             - ⭐️ Add ability to add sections to specific units (later --> come back to, reminder to make it account for 1-n number of sections no matter how that looks. add new stepping stones button is commented out for now)
             - When a user adds a section, make sure its added for all users, like add it to section_user_state and stuff
             - Make sure to account for duplicate section names, and make sure section names can have under scores, /&}}#@<, etc... and check for duplicate names for that unit or something
-            - come_back_to
+            - go back to come_back_to
             - why is this empty? --> rag_context:
             - enable db.rollback for section generation
-            - make sure to add a way to add sections in a library not just on empty units
-                - make sure current section_id and unit_id is communicated to section generation call
             - make sure + section buttons are styled the same for middle ones and ones on the end
-            - experiment w/ timings a little bit for future reference
             - make add section buttons curve w/ sections
             - make play button pop up thing display above add section button
             - make sure add stepping stone button displays like a loading bar or something to prevent users from leaving while api call is still generating
