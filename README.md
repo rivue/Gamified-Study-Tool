@@ -149,7 +149,7 @@ TODO list:
                 - make sure current section_id and unit_id is communicated to section generation call
             - make sure + section buttons are styled the same for middle ones and ones on the end
             - make sure either positions are correctly accounted for or we drop the ability to add multiple sections
-            - style the empty unit button like it was in the past
+            - when you come back do positions and ^^^ above
         - ✅ ⭐️ (would like to implement visibility of different courses first or at least a many:one for non-owners in library model)
             - ⭐️ Delete sections requires entering the name of the unit / course just for accidental reasons)
             - ⭐️ Delete Units (requires entering the name of the unit / course just for accidental reasons)
