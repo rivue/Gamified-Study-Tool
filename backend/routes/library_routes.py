@@ -220,7 +220,7 @@ def init_library_routes(app):
 
             user_id = current_user.id if not isinstance(current_user, AnonymousUserMixin) else None
             library = lbh.get_library(library_id, user_id)
-
+            print("after start")
             if not library:
                 return jsonify(status="error", message="Library not found"), 404
 
@@ -250,9 +250,10 @@ def init_library_routes(app):
                 room_data = lbh.get_library_room_state(user_id, library_id)
 
             library_data["show_settings"] = user_id == library_data.get("owner_id")
-
+            print("before end")
             return jsonify(status="success", data=library_data, room_data=room_data)
         except: 
+            print("hi")
             return jsonify(status="error", message="Failed to retrieve library data"), 500
         
     @app.route("/api/library/<int:library_id>/scores", methods=["GET"])
@@ -352,12 +353,15 @@ def init_library_routes(app):
         user_id = current_user.id if not isinstance(current_user, AnonymousUserMixin) else None
         section_names = request.form.getlist("sectionNames")  # Get list of section names
         library_id = request.form.get("libraryId")
+        unit_id = request.form.get("unitId")
 
         # Validate inputs
         if not section_names:
             return jsonify(status="error", message="No section names provided"), 400
         if not library_id:
             return jsonify(status="error", message="No library ID provided"), 400
+        if not unit_id:
+            return jsonify(status="error", message="No unit ID provided"), 400
         if len(section_names) > 20:
             return jsonify(status="error", message="Too many section names provided (max 20)"), 400
         if len(section_names) < 1:
@@ -391,6 +395,7 @@ def init_library_routes(app):
             futures_dict = {}
             for subtopic in section_names:
 
+                # TODO: fix later:
                 # IF this subtopic already exists in the library (it shouldn't because duplicate room names should not be allowed)
                 # add its library factoid text and questions to results for additional rag context
                 # come_back_to: maybe get rid of later bc duplicates are not allowed,
@@ -405,9 +410,10 @@ def init_library_routes(app):
 
                 # Generate new content for this subtopic
                 try:
-
+                    print(f"{subtopic} {library_id}")
                     rag_context = query_and_respond_pinecone(subtopic, library_id)
                     print(f"rag context: {rag_context}")
+                    # TODO: figure out why rag context is E M P T Y
                     future = executor.submit(lgn.generate_libroom_content, user_id, subtopic, library_id, rag_context)
                     futures_dict[future] = subtopic
                      
@@ -419,14 +425,12 @@ def init_library_routes(app):
                 section = futures_dict[future]
                 try: 
                     section_contents = future.result()
-
-                    # don't need to account for missing / error unit_id because Exception sets section value to false
-                    unit_id = LibrarySection.query.filter_by(section_id=section).first().unit_id
-
+                    print("almost here")
                     # Save the generated content
                     # why do we need section_to_unit map?
+                    print(f"{section_contents}")
                     # lbh.save_library_room_contents(library_id, library.get('section_to_unit_map'), subtopic_contents, user_id, unit_id)
-                    lbh.save_section_contents(library_id, section, section_contents, user_id, unit_id)
+                    lbh.save_section_contents(library_id, section, section_contents, unit_id)
                     results.append({"subtopic": section, "status": "success", "data": section_contents})
                     completed_subtopics[section] = True
 

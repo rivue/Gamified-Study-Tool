@@ -222,6 +222,8 @@ const displayedPages = computed(() => {
 
 // Methods
 function goToLibrary(id: number) {
+    console.log("a;lskdjfasdf");
+    console.log(id);
     router.push(`/lessons/${id}`);
 }
 

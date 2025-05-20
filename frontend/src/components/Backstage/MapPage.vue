@@ -5,7 +5,7 @@
             <LearningPath :libraryId="Number(library.data.id)" :room-names="library.data.room_names"
                 :room-data="library.room_data" :library-is-public="library.data.is_public"
                 :unit-section-map="processedUnitSectionMap" :library-join-code="library.data.join_code" 
-                :is-owner="library.data.show_settings"/>
+                :is-owner="library.data.show_settings" :unit-position-map="library.data.unit_to_position_map"/>
         </div>
         <div v-else-if="loading">
             <p>Loading...</p>
@@ -101,8 +101,8 @@ const processedUnitSectionMap = computed(() => {
     // Get all entries and sort them by position
     const entries = Object.entries(unitMap);
     entries.sort((a, b) => {
-        const posA = library.value.data.unit_to_position_map?.[a[0]] || 0;
-        const posB = library.value.data.unit_to_position_map?.[b[0]] || 0;
+        const posA = library.value.data.unit_to_position_map?.[a[0]]?.[0] || 0;
+        const posB = library.value.data.unit_to_position_map?.[b[0]]?.[0] || 0;
         return posA - posB;
     });
 

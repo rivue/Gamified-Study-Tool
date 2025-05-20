@@ -205,7 +205,7 @@
                                             <p class="text-lg">No stepping stones yet</p>
                                             <p class="text-sm opacity-75">Add stepping stones to get started</p>
                                         </div>
-                                        <button @click="showAddNodeModal = true" class="flex items-center gap-2 px-4 py-2 rounded-lg transition-all 
+                                        <button @click="addNewSteppingStoneSetup(unitName)" class="flex items-center gap-2 px-4 py-2 rounded-lg transition-all 
                                             duration-200 hover:scale-105 active:scale-95" :style="{
                                                 background: getUnitColor(unitIndex),
                                                 color: 'var(--light-text)',
@@ -287,7 +287,7 @@
     </div>
 
     <!-- Add Node Modal -->
-    <AddSection v-model:showAddNodeModal="showAddNodeModal" :library-id="libraryId" @close="showAddNodeModal = false"
+    <AddSection v-model:showAddNodeModal="showAddNodeModal" :library-id="libraryId" :unit-id="addSectionUnitId" @close="showAddNodeModal = false"
         @nodes-added="onSectionAdd" />
 
     <LibrarySettings v-model:showSettingsModal="showSettingsModal" :library-id="libraryId"
@@ -351,6 +351,10 @@ const props = defineProps({
     isOwner: {
         type: Boolean,
         required: true
+    },
+    unitPositionMap: {
+        type: Object,
+        required: true
     }
 })
 
@@ -370,9 +374,12 @@ const editModeEnabled = ref(false);
 
 // Track selected room for tooltip
 const selectedRoomId = ref(null)
+
 // File input handling
-const fileInput = ref(null)
 const scrollPosition = ref(0)
+
+const addSectionUnitId = ref(null)
+
 // Color schemes for units
 const unitColors = [
     '#2ecc71', // green
@@ -438,6 +445,12 @@ const getUnitGradient = (unitIndex) => {
     ${adjustColor(baseColor, 20)} 0%, 
     ${baseColor} 50%, 
     ${adjustColor(baseColor, -20)} 100%)`;
+}
+
+function addNewSteppingStoneSetup(unitName) {
+    showAddNodeModal.value = true;
+    addSectionUnitId.value = props.unitPositionMap[unitName][1]; // id of unit
+
 }
 
 // Helper function to lighten/darken colors

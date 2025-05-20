@@ -141,6 +141,7 @@ TODO list:
             - When a user adds a section, make sure its added for all users, like add it to section_user_state and stuff
             - Make sure to account for duplicate section names, and make sure section names can have under scores, /&}}#@<, etc... and check for duplicate names for that unit or something
             - come_back_to
+            - why is this empty? --> rag_context:
             - enable db.rollback for section generation
             - make sure to add a way to add sections in a library not just on empty units
                 - make sure current section_id and unit_id is communicated to section generation call

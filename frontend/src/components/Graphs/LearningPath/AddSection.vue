@@ -112,6 +112,10 @@ const props = defineProps({
     showAddNodeModal: {
         type: Boolean,
         required: true
+    },
+    unitId: {
+        type: [null, Number],
+        required: true
     }
 });
 
@@ -128,6 +132,7 @@ const fileInput = ref(null);
 
 const closeModal = () => {
     emit('update:showAddNodeModal', false);
+    resetForm();
 }
 
 const handleFileSelection = (event) => {
@@ -210,6 +215,7 @@ const addNewNodes = async () => {
         // Add each node
         const formData = new FormData();
         formData.append('libraryId', props.libraryId);
+        formData.append('unitId', props.unitId);
         // Append all node names with the same key name
         trimmedNames.forEach(name => formData.append("sectionNames", name));
         // Add file if present (same file for all nodes)

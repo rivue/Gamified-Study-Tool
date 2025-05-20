@@ -221,7 +221,7 @@ def get_library(library_id, user_id=None, click=True):
     if user_id:
         room_names = []
         for unit in library.units:
-            unit_to_position_map[unit.unit_name] = unit.position
+            unit_to_position_map[unit.unit_name] = (unit.position, unit.id)
             unit_to_section_map[unit.unit_name] = []
             for section in unit.sections:
                 room_names.append((section.section_name, section.id))
@@ -300,6 +300,8 @@ def get_library_room_state(user_id, library_id, section_id=None):
             # room_name="placeholderlrs1234",
             section_id=section_id,
         ).first()
+        print(f"{state}")
+        
         return state.as_dict() if state else None
 
 def save_library_room_contents(library_id, section_unit_map, section_contents_map, user_id):
@@ -408,7 +410,7 @@ def save_section_contents(library_id, section, section_contents_map, unit_id):
 
             # 1.1 + 1.2) create sections and add to parent unit
             response_obj, status_code = create_section_and_add(unit_id, section)
-            
+            print("after add_section")
             if status_code != 201:
                 print("create section and add error")
                 print(response_obj.get_json()['message'])
@@ -416,23 +418,23 @@ def save_section_contents(library_id, section, section_contents_map, unit_id):
                 return jsonify(status="error", message=message.to_str()), 200
             
             section_id = response_obj.get_json()["section"]
-
+            print("after section_id")
             
             # 2) add room states for every user in the library
             library = Library.query.get(library_id)
             for membership in library.memberships:
                 add_section_user_state(membership.user_id, library_id, section_id, num_lessons)
-
+                print(f"{membership}")
             
-            if "factoids" not in section_contents_map[section]:
+            if "factoids" not in section_contents_map:
                 print(f"Warning: No factoids for section '{section}'")
             
             print(f"Processing section: {section}")
-            print(f"Section content structure: {type(section_contents_map[section])}")
-            print(f"Keys in section content: {section_contents_map[section].keys()}")
+            print(f"Section content structure: {type(section_contents_map)}")
+            print(f"Keys in section content: {section_contents_map.keys()}")
             
             # 4.1 + 4.2) create factoids and add to sections
-            factoids = section_contents_map[section]["factoids"]
+            factoids = section_contents_map["factoids"]
             
             # 4) add factoids to sections
             for index, item in enumerate(factoids):
