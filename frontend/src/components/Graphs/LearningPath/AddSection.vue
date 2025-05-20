@@ -38,7 +38,7 @@
                                 class="flex items-center gap-2 mb-2">
                                 <input v-model="newNodeNames[index]" type="text" class="w-full p-2 border rounded-lg"
                                     style="background-color: var(--background-color-1t); color: var(--light-text); border-color: var(--color-primary-dark);"
-                                    placeholder="Enter Stepping Stone name" maxlength="40" />
+                                    placeholder="Enter Stepping Stone name" maxlength="25" />
                                 <button v-if="newNodeNames.length > 1" @click="removeNodeName(index)"
                                     class="text-red-400 hover:text-red-300">
                                     <XCircleIcon class="w-6 h-6" />
@@ -141,7 +141,8 @@ const props = defineProps({
     },
     position: {
         type: Number,
-        required: true
+        required: true,
+        default: -1
     },
     unitColor: {
         type: String,
@@ -223,7 +224,7 @@ const removeNodeName = (index) => {
 const addNewNodes = async () => {
     // Reset the API error each attempt
     apiError.value = '';
-
+    console.log(props.position);
     // Validate node name
     nodeNameErrors.value = new Array(newNodeNames.value.length).fill('');
     let hasError = false;
@@ -232,52 +233,50 @@ const addNewNodes = async () => {
         if (!name) {
             nodeNameErrors.value[index] = 'Please enter a node name';
             hasError = true;
-        } else if (!/^[a-zA-Z ]+$/.test(name)) {
-            nodeNameErrors.value[index] = 'Node name can only contain letters and spaces';
-            hasError = true;
-        } else if (name.length > 40) {
-            nodeNameErrors.value[index] = 'Node name must be 40 characters or less';
+        } else if (name.length > 25 || name.length < 4) {
+            nodeNameErrors.value[index] = 'Section name must be between 4 and 25 characters';
             hasError = true;
         } else if (trimmedNames.indexOf(name) !== index) {
-            nodeNameErrors.value[index] = 'Duplicate node name in this form';
+            nodeNameErrors.value[index] = 'Duplicate section names are not allowed';
             hasError = true;
         }
     });
     if (hasError) return;
     isAddingNode.value = true;
-    const currentAbortController = new AbortController();
-    try {
-        // Add each node
-        const formData = new FormData();
-        formData.append('libraryId', props.libraryId);
-        formData.append('unitId', props.unitId);
-        formData.append('position', props.position);
-        // Append all node names with the same key name
-        trimmedNames.forEach(name => formData.append("sectionNames", name));
-        // Add file if present (same file for all nodes)
-        if (selectedFile.value) {
-            formData.append('file', selectedFile.value);
-        }
-        const response = await axios.post('/api/library/section', formData, {
-            signal: currentAbortController.signal,
-            headers: {
-                'Content-Type': 'multipart/form-data'
-            }
-        });
-        if (currentAbortController.signal.aborted) return; // Don't proceed if aborted
-        if (response.data && response.data.status === "success") {
-            // Clear form and emit success event
-            resetForm();
-            closeModal();
-            emit('nodes-added');
-        }
-    } catch (error) {
-        console.error('Error adding nodes:', error);
-        // Set a distinct error message for API call failure
-        apiError.value = error.response?.data?.message || error.message || 'Failed to add nodes. Please try again.';
-    } finally {
-        isAddingNode.value = false;
-    }
+    isAddingNode.value = false;
+    // const currentAbortController = new AbortController();
+    // try {
+    //     // Add each node
+    //     const formData = new FormData();
+    //     formData.append('libraryId', props.libraryId);
+    //     formData.append('unitId', props.unitId);
+    //     formData.append('position', props.position);
+    //     // Append all node names with the same key name
+    //     trimmedNames.forEach(name => formData.append("sectionNames", name));
+    //     // Add file if present (same file for all nodes)
+    //     if (selectedFile.value) {
+    //         formData.append('file', selectedFile.value);
+    //     }
+    //     const response = await axios.post('/api/library/section', formData, {
+    //         signal: currentAbortController.signal,
+    //         headers: {
+    //             'Content-Type': 'multipart/form-data'
+    //         }
+    //     });
+    //     if (currentAbortController.signal.aborted) return; // Don't proceed if aborted
+    //     if (response.data && response.data.status === "success") {
+    //         // Clear form and emit success event
+    //         resetForm();
+    //         closeModal();
+    //         emit('nodes-added');
+    //     }
+    // } catch (error) {
+    //     console.error('Error adding nodes:', error);
+    //     // Set a distinct error message for API call failure
+    //     apiError.value = error.response?.data?.message || error.message || 'Failed to add nodes. Please try again.';
+    // } finally {
+    //     isAddingNode.value = false;
+    // }
 }
 
 const resetForm = () => {
