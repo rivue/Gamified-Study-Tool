@@ -6,7 +6,6 @@
             <XCircleIcon class="w-8 h-8" style="color: var(--light-text)" />
         </div>
 
-
         <div v-else class="w-16 h-16 rounded-full flex items-center justify-center cursor-pointer transition-all duration-300 hover:scale-110 hover:shadow-lg active:scale-95"
             :style="{ backgroundColor: unitColor, opacity: 0.7 }" @click="showModal = true">
             <PlusIcon class="w-8 h-8" style="color: var(--light-text)" />

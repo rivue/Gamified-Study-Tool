@@ -217,7 +217,7 @@
 
                                         <!-- owner sees the AddSection bubble -->
                                         <AddSection v-if="editModeEnabled && isOwner" :library-id="libraryId"
-                                            :unit-id="props.unitPositionMap[unitName][1]" :position="0"
+                                            :unit-id="props.unitPositionMap[unitName][1]" :position="0" :empty-unit="true"
                                             :unit-color="getUnitColor(unitIndex)" @nodes-added="onSectionAdd" />
 
                                         <!-- non-owners still get the “only owner” hint -->
@@ -242,7 +242,7 @@
                         </div>
 
                         <AddUnit v-if="editModeEnabled" :library-id="libraryId" :position="unitIndex + 1"
-                            :existing-units="Object.keys(rawUnitData)" :can-add-unit="isOwner" :empty-unit="true"
+                            :existing-units="Object.keys(rawUnitData)" :can-add-unit="isOwner"
                             @unit-added="handleUnitAdded" />
 
                     </template>
