@@ -148,10 +148,10 @@ TODO list:
             - make sure to add a way to add sections in a library not just on empty units
                 - make sure current section_id and unit_id is communicated to section generation call
             - make sure + section buttons are styled the same for middle ones and ones on the end
-            - when you come back do positions and ^^^ above
             - experiment w/ timings a little bit for future reference
             - make add section buttons curve w/ sections
             - make play button pop up thing display above add section button
+            - make sure add stepping stone button displays like a loading bar or something to prevent users from leaving while api call is still generating
         - ✅ ⭐️ (would like to implement visibility of different courses first or at least a many:one for non-owners in library model)
             - ⭐️ Delete sections requires entering the name of the unit / course just for accidental reasons)
             - ⭐️ Delete Units (requires entering the name of the unit / course just for accidental reasons)
@@ -175,6 +175,7 @@ TODO list:
 
     general:
     study tool additions / ideas:
+        - break up library / section generation into smaller chunks --> utilized opanai functions to build an LLM workflow, decreasing library and section processing time by 60% or whatever
         - for feedback / input / suggestions, 1) link to discord / X account and 2) display a "testimonies" of a suggestion / idea (anonymous) and the time it took me to implement something / respond to (30 minutes, 15 minutes, etc...) encourage people to send me feedback and stuff
         - instead of having one opanai function, have a parent function which rolls how many and what type of game will be rolled ('true_false': 4, 'multiple_choice': 6, 'image': 2, etc... and then a suite of small agents which are each responsible for one (1) type of game (ex: true_false agent, multiple choice agent, image agent (might have to break up further maybe idk), etc..)) --> do all this so I can put "suite of ai agents" on my resume
         - is there a tool to like visualize all the different calls / paths something takes in a given api call or function call or something?

@@ -411,19 +411,24 @@ def init_library_routes(app):
                 #     continue
 
                 # Generate new content for this subtopic
+                last_section = None
                 try:
                     rag_context = query_and_respond_pinecone(subtopic, library_id)
 
                     print(f"rag context: {rag_context}")
                     # TODO: figure out why rag context is E M P T Y
+                    
                     future = executor.submit(lgn.generate_libroom_content, user_id, subtopic, library_id, rag_context)
+
                     futures_dict[future] = subtopic
-                     
+                    last_section = time.time()
                 except Exception as e:
                     results.append({"subtopic": subtopic, "status": "error", "message": f"Failed to generate content: {str(e)}"})
 
             completed_subtopics = {}
             for future in concurrent.futures.as_completed(futures_dict):
+                print(f"last_section time: {time.time() - last_section}")
+
                 section = futures_dict[future]
                 try: 
                     section_contents = future.result()
@@ -431,7 +436,9 @@ def init_library_routes(app):
                     section_position = section_names.index(section) # grabs order of section_names
                     print(position)
                     relative_position = section_position + int(position)
+                    
                     lbh.save_section_contents(library_id, section, section_contents, unit_id, relative_position)
+
                     results.append({"subtopic": section, "status": "success", "data": section_contents})
                     completed_subtopics[section] = True
 
