@@ -1,12 +1,17 @@
 <template>
     <div class="relative flex-shrink-0">
-        <!-- trigger button (replaces AddSectionButton) -->
-        <div v-if="emptyUnit" class="w-16 h-16 rounded-full flex items-center justify-center cursor-pointer transition-all duration-300 hover:scale-110 hover:shadow-lg active:scale-95"
-            :style="{ backgroundColor: unitColor, opacity: 0.7 }" @click="showModal = true">
-            <XCircleIcon class="w-8 h-8" style="color: var(--light-text)" />
+        <div v-if="emptyUnit" class="flex items-center gap-2 px-4 py-2 rounded-lg transition-all 
+                                            duration-200 hover:scale-105 active:scale-95" @click="showModal = true"
+            :style="{
+                background: unitColor,
+                color: 'var(--light-text)'
+            }">
+            <PlusIcon class="w-5 h-5" />
+            <span>Add Stepping Stone</span>
         </div>
 
-        <div v-else class="w-16 h-16 rounded-full flex items-center justify-center cursor-pointer transition-all duration-300 hover:scale-110 hover:shadow-lg active:scale-95"
+        <div v-else
+            class="w-16 h-16 rounded-full flex items-center justify-center cursor-pointer transition-all duration-300 hover:scale-110 hover:shadow-lg active:scale-95"
             :style="{ backgroundColor: unitColor, opacity: 0.7 }" @click="showModal = true">
             <PlusIcon class="w-8 h-8" style="color: var(--light-text)" />
         </div>
