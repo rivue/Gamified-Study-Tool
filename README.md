@@ -150,7 +150,6 @@ TODO list:
                     - (maybe?) ⭐️ add ability to see uploaded files in library (list of their names) and maybe even file preview (would require nosql db or something maybe)
                         - should I limit file size for this? like can only display files < 50 MB or something?
 
-            - add ui ability to "join" private libraries / public libraries that you didn't create maybe in like a seperate page or list or maybe I could add a box for putting in library codes or something
             - ⭐️ after user submits something and is waiting, display a loading bar or wheel or different rotating facts (maybe relevant to the library?) letting the user know that it is generating
             - also note: ask gemini / grok / gpt / claude for some ui design tips like adding a menu bar, or ui tips / tricks / helpful websites / youtube videos, etc...
             use this maybe: https://www.shadcn-vue.com/docs/components/stepper.html
@@ -180,7 +179,7 @@ TODO list:
             - go back to come_back_to
             - why is this empty? --> rag_context:
             - enable db.rollback for section generation
-            - make popups disappear for edit mode
+            - make popups disappear for edit mode <-- next
             - make sure add stepping stone button displays like a loading bar or something to prevent users from leaving while api call is still generating
         - ✅ ⭐️ (would like to implement visibility of different courses first or at least a many:one for non-owners in library model)
             - ⭐️ Delete sections requires entering the name of the unit / course just for accidental reasons)
