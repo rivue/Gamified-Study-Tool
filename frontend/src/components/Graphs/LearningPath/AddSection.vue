@@ -26,7 +26,10 @@
                     style="background-color: var(--background-color); color: var(--light-text); border-color: var(--color-primary-dark);">
                     <div class="flex justify-between items-center mb-4">
                         <h2 class="text-xl font-semibold">Add New Stepping Stones</h2>
-                        <button @click="closeModal" style="color: var(--highlight-color);">
+                        <!-- <button @click="closeModal" style="color: var(--highlight-color);"> -->
+                                  <button @click="closeModal" style="color: var(--highlight-color);"
+                                :disabled="isAddingNode"
+                                :class="{ 'opacity-50 cursor-not-allowed': isAddingNode }">
                             <XMarkIcon class="w-6 h-6" />
                         </button>
                     </div>
@@ -102,7 +105,7 @@
                             {{ apiError }}
                         </p>
 
-                        <div class="flex justify-end gap-3 mt-6">
+                        <!-- <div class="flex justify-end gap-3 mt-6">
                             <button @click="closeModal" class="px-4 py-2 border rounded-lg"
                                 style="border-color: var(--color-primary); color: var(--highlight-color);">
                                 Cancel
@@ -111,6 +114,25 @@
                                 style="background: var(--button-gradient); color: var(--light-text);"
                                 :disabled="isAddingNode">
                                 <span v-if="isAddingNode">Adding...</span>
+                                <span v-else>Add Stepping Stone</span>
+                            </button>
+                        </div> -->
+                        <div class="flex justify-end gap-3 mt-6">
+                            <button @click="closeModal" class="px-4 py-2 border rounded-lg"
+                                style="border-color: var(--color-primary); color: var(--highlight-color);"
+                                :disabled="isAddingNode"
+                                :class="{ 'opacity-50 cursor-not-allowed': isAddingNode }">
+                                Cancel
+                            </button>
+                            <button @click="addNewNodes" class="px-4 py-2 rounded-lg focus:outline-none focus:ring-2 flex items-center justify-center"
+                                style="background: var(--button-gradient); color: var(--light-text);"
+                                :disabled="isAddingNode">
+                                <span v-if="isAddingNode">
+                                    <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                </span>
                                 <span v-else>Add Stepping Stone</span>
                             </button>
                         </div>
@@ -130,7 +152,8 @@ import {
     DocumentIcon,
     XCircleIcon,
     PlusIcon,
-} from '@heroicons/vue/24/solid';
+} from '@heroicons/vue/24/solid'
+import { toast } from 'vue-sonner';
 import axios from 'axios';
 
 const props = defineProps({
@@ -173,6 +196,10 @@ const isAddingNode = ref(false);
 const fileInput = ref(null);
 
 function closeModal() {
+    if (isAddingNode.value) {
+        toast.error('Please wait for the section to be added.');
+        return;
+    }
     showModal.value = false;
     resetForm();
 }
@@ -228,6 +255,9 @@ const removeNodeName = (index) => {
 
 // Function to add a new node
 const addNewNodes = async () => {
+    if (isAddingNode.value) {
+        return;
+    }
     // Reset the API error each attempt
     apiError.value = '';
     // Validate node name
@@ -248,9 +278,9 @@ const addNewNodes = async () => {
     });
     
     if (hasError) return;
+    const toastId = toast.loading('Creating Stepping Stone...');
     isAddingNode.value = true;
     const currentAbortController = new AbortController();
-    isAddingNode.value = false;
 
     try {
 
@@ -278,12 +308,19 @@ const addNewNodes = async () => {
             resetForm();
             closeModal();
             emit('nodes-added');
-        }
+         } else {
+            // Handle cases where response.data or response.data.status is not as expected
+            // but it's not a network error caught by the catch block.
+            const errorMessage = response.data?.message || 'An unexpected error occurred when creating section.';
+            apiError.value = errorMessage;
+            toast.error(errorMessage, { id: toastId });
+         }
     } catch (error) {
         console.error('Error adding nodes:', error);
         // Set a distinct error message for API call failure
-        apiError.value = error.response?.data?.message || error.message || 'Failed to add nodes. Please try again.';
-
+        const errorMessage = error.response?.data?.message || error.message || 'Failed to add section. Please try again.';
+        apiError.value = errorMessage;
+        toast.error(errorMessage, { id: toastId });
     } finally {
         isAddingNode.value = false;
     }

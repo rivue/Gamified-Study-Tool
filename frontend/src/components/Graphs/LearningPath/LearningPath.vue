@@ -115,8 +115,8 @@
                                                     </div>
                                                 </div>
                                                 <!-- Triangle pointer -->
-                                                <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 transform rotate-45"
-                                                    style="background-color: var(--element-color-1);" />
+                                                <div class="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-b-[8px]"
+                                                style="border-bottom-color: var(--element-color-1);" />
                                             </div>
                                         </div>
 
