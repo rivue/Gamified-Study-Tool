@@ -1,4 +1,5 @@
 <template>
+      
     <div class="fixed left-8 right-8 top-0 bottom-0 overflow-hidden">
         <div class="fixed top-20 right-6 flex gap-6 z-10">
 
@@ -20,31 +21,31 @@
                 <CogIcon class="w-12 h-12" />
             </button>
         </div>
-
         <div class="relative flex flex-col w-full h-full">
-
+            
             <div ref="scrollContainer"
-                class="scrollContainer flex-1 overflow-x-auto overflow-y-hidden cursor-grab active:cursor-grabbing"
-                @mousedown="startDragging" @mousemove="drag" @mouseup="stopDragging" @mouseleave="stopDragging"
-                @touchstart="startDragging" @touchmove="drag" @touchend="stopDragging" @scroll="handleScroll">
-                <div class="flex items-center gap-24 min-h-screen py-24 relative">
-
-                    <!-- Left padding so first node is visible -->
-                    <div class="w-24 flex-shrink-0"></div>
-
-                    <!-- Add Unit at the beginning -->
-                    <AddUnit v-if="editModeEnabled" :library-id="libraryId" :position="0"
-                        :existing-units="Object.keys(rawUnitData)" :can-add-unit="isOwner"
-                        @unit-added="handleUnitAdded" />
-
-                    <!-- Unit Headers -->
-                    <template v-for="([unit], unitName, unitIndex) in rawUnitData" :key="unitIndex">
-                        <div class="relative -mx-12 my-12 px-16 pt-40 pb-36 border-t-2 border-b-2 flex-shrink-0"
-                            :class="['unit-box', { 'unit--first': unitIndex === 0, 'unit--last': unitIndex === Object.keys(rawUnitData).length - 1 }]"
-                            :style="{
+            class="scrollContainer flex-1 overflow-x-auto overflow-y-hidden cursor-grab active:cursor-grabbing"
+            @mousedown="startDragging" @mousemove="drag" @mouseup="stopDragging" @mouseleave="stopDragging"
+            @touchstart="startDragging" @touchmove="drag" @touchend="stopDragging" @scroll="handleScroll">
+            <div class="flex items-center gap-24 min-h-screen py-24 relative">
+                
+                <!-- Left padding so first node is visible -->
+                <div class="w-24 flex-shrink-0"></div>
+                
+                <!-- Add Unit at the beginning -->
+                <AddUnit v-if="editModeEnabled" :library-id="libraryId" :position="0"
+                :existing-units="Object.keys(rawUnitData)" :can-add-unit="isOwner"
+                @unit-added="handleUnitAdded" />
+                
+                <!-- Unit Headers -->
+                <template v-for="([unit], unitName, unitIndex) in rawUnitData" :key="unitIndex">
+                    <div class="relative -mx-12 my-12 px-16 pt-40 pb-36 border-t-2 border-b-2 flex-shrink-0"
+                    :class="['unit-box', { 'unit--first': unitIndex === 0, 'unit--last': unitIndex === Object.keys(rawUnitData).length - 1 }]"
+                    :style="{
                                 borderColor: getUnitColor(unitIndex),
                                 backgroundColor: 'var(--background-color-1t)',
                             }">
+                             
 
                             <!-- Unit name header -->
                             <div class="absolute -top-5 left-1/2 transform -translate-x-1/2 px-6 py-2 rounded-lg font-bold text-xl whitespace-nowrap shadow-md z-10"
@@ -62,10 +63,13 @@
                                         :unit-id="props.unitPositionMap[unitName][1]" :position="sectionIndex"
                                         :unit-color="getUnitColor(unitIndex)" @nodes-added="onSectionAdd" />
 
-
-                                    <div class="relative flex-shrink-0 mx-12" :style="{
-                                        transform: `translateY(${getNodeOffset(getGlobalSectionIndex(unitIndex, sectionIndex))}px)`
-                                    }" @click="handleNodeClick(sectionId)">
+                                        <div class="relative flex-shrink-0 mx-12" 
+                                            :style="{
+                                                transform: `translateY(${getNodeOffset(getGlobalSectionIndex(unitIndex, sectionIndex))}px)`,
+                                                filter: editModeEnabled ? 'grayscale(1) brightness(0.9)' : 'none',
+                                                transition: 'filter 0.3s ease'
+                                            }" 
+                                            @click="editModeEnabled ? handleEditNodeClick() : handleNodeClick(sectionId)">
 
                                         <!-- Tooltip -->
                                         <div v-if="selectedRoomId && selectedRoomId === sectionId"
@@ -310,6 +314,7 @@ import {
 } from '@heroicons/vue/24/solid';
 import { useGameStore } from '@/store/gameStore'
 import { useRouter } from 'vue-router';
+import { toast } from 'vue-sonner'
 import LibrarySettings from "./LibrarySettings.vue";
 import AddUnit from "./AddUnit.vue";
 import AddSection from "./AddSection.vue"
@@ -410,7 +415,41 @@ function toggleSettings() {
 }
 
 function toggleEditMode() {
+
     editModeEnabled.value = !editModeEnabled.value
+
+    if (!editModeEnabled.value) {
+        toast.success('Edit Mode Disabled', {
+            description: 'You can now interact with the nodes.',
+            duration: 3000,
+            position: 'bottom-right',
+            style: {
+                background: 'var(--element-color-1)', // A slightly different background for success
+                color: 'var(--light-text)',
+                border: '1px solid var(--highlight-color)',
+                borderRadius: '8px',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+            },
+            // Consider adding a relevant icon if available in your icon set
+            // icon: '✔️' // Example: Checkmark icon
+        });
+    }
+    // If edit mode is disabled, enable it and show a toast
+    else {
+        toast.success('Edit Mode Enabled', {
+            description: 'Node interaction is disabled in edit mode.',
+            duration: 3000,
+            position: 'bottom-right',
+            style: {
+                background: 'var(--element-color-2)', // A slightly different background for error
+                color: 'var(--light-text)',
+                border: '1px solid var(--highlight-color)',
+                borderRadius: '8px',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+            },
+        });
+    }
+
 }
 
 function goToLeaderboard() {
@@ -617,6 +656,24 @@ const handleNodeClick = (sectionId) => {
         selectedRoomId.value = selectedRoomId.value && selectedRoomId.value === sectionId ? null : sectionId
     }
 }
+
+const handleEditNodeClick = () => {
+    toast.warning('Edit Mode Active', {
+        description: 'Node interaction is disabled in edit mode.',
+        duration: 3000,
+        position: 'bottom-right',
+        style: {
+            background: 'var(--element-color-2)', // A slightly different background for info
+            color: 'var(--light-text)',
+            border: '1px solid var(--highlight-color)',
+            borderRadius: '8px',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+        },
+        // Consider adding a relevant icon if available in your icon set
+        // icon: 'ℹ️' // Example: Information icon
+    });
+}
+
 const getNodeOffset = (index) => {
     const amplitude = 75;
     // Add a slight phase shift for more natural movement
@@ -730,4 +787,5 @@ const handleScroll = () => {
     border-top-right-radius: 0.625rem;
     border-bottom-right-radius: 0.625rem;
 }
+
 </style>
