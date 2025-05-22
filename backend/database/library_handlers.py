@@ -8,7 +8,7 @@ import math
 import string
 import time
 import secrets
-from app import InvalidJoinCodeError, UserAlreadyMemberError
+from app import InvalidJoinCodeError, UserAlreadyMemberError, MaxUnitsReachedError, NotFoundError
 from sqlalchemy import or_
 from database.models import (
     db,
@@ -120,12 +120,15 @@ def create_unit_and_add(library_id, unit_name, position=-1):
         db.session.add(unit)
 
         if len(library.units) >= 20:
-            print("length")
-            return jsonify({"error": "Library has reached maximum number of units"}), 400
+            print("Warning: Library has reached maximum number of units.")
+            raise MaxUnitsReachedError
 
-        if not unit or not library:
-            print("not unit")
-            return jsonify({"error": "Library or Unit not found"}), 404
+        if not unit:
+            print("Warning: not unit in create_unit_and_add.")
+            raise NotFoundError
+        if  not library:
+            print("Warning: not library in create_unit_and_add.")
+            raise NotFoundError
 
         if position != -1:
             library.attach_unit(unit, position)
@@ -133,7 +136,6 @@ def create_unit_and_add(library_id, unit_name, position=-1):
             library.attach_unit(unit)
 
         db.session.flush()  # Flush to get the unit ID before commit
-        db.session.commit()
 
         return (
             jsonify(
@@ -143,8 +145,14 @@ def create_unit_and_add(library_id, unit_name, position=-1):
         )
     except Exception as e:
         print("something else")
-        print(f"something: {str(e)}")
+        print(f"Exception in create_unit_and_add: {str(e)}")
         return jsonify({"message": str(e)}), 400
+    except MaxUnitsReachedError as e:
+        print(f"Library has reached max amounts of units in create unit: {str(e)}")
+        raise
+    except NotFoundError as e:
+        print(f"Library or Unit not found error in create_unit_and_add: {str(e)}")
+        raise
     
 def create_section_and_add(unit_id, section_name, position=-1):
     try:
@@ -157,8 +165,13 @@ def create_section_and_add(unit_id, section_name, position=-1):
 
         unit = LibraryUnit.query.get(unit_id)
 
-        if not unit or not section:
-            return jsonify({"error": "Library or Section not found"}), 404
+        if not unit:
+            print("Warning: not unit in create_section_and_add.")
+            raise NotFoundError
+        if not section:
+            print("Warning: not section in create_section_and_add.")
+            raise NotFoundError
+
         
         if len(unit.sections) >= 20:
             return jsonify({"error": "Unit has reached maximum number of sections (20)"}), 400
@@ -170,7 +183,6 @@ def create_section_and_add(unit_id, section_name, position=-1):
             
         db.session.add(section)
         db.session.flush()  # Flush to get the section ID before commit
-        db.session.commit()
 
         return (
             jsonify(
@@ -180,6 +192,9 @@ def create_section_and_add(unit_id, section_name, position=-1):
         )
     except Exception as e:
         return jsonify({"message": str(e)}), 400
+    except NotFoundError as e:
+        print(f"Library or Section not found error in create_unit_and_add: {str(e)}")
+        raise
 
 def get_library_id(library_topic, difficulty, language, language_difficulty, guide):
     try:
@@ -339,6 +354,7 @@ def save_library_room_contents(library_id, section_unit_map, section_contents_ma
 
                     # 2.1 + 2.2) create sections and add to unit
                     response_obj, status_code = create_section_and_add(unit_id, section, section_position)
+
                     print("response from create section and add") 
                     if status_code != 201:
                         print("create section and add error")
@@ -663,7 +679,6 @@ def add_section_user_state(user_id, library_id, section_id, num_lessons, initial
     
     # Add to database and commit
     db.session.add(new_state)
-    db.session.commit()
     
     return new_state
 
@@ -814,7 +829,8 @@ def add_factoid_to_section(section_id, factoid_content, lesson_name):
             section_id=section_id, lesson_name=lesson_name, factoid_content=factoid_content
         )
         db.session.add(factoid)
-        db.session.commit()
+        db.session.flush()  # Flush to get the factoid ID before commit
+        
         return (
             jsonify(
                 {"message": "Factoid added successfully", "factoid_id": factoid.id}
@@ -822,8 +838,8 @@ def add_factoid_to_section(section_id, factoid_content, lesson_name):
             201,
         )
     except Exception as e:
-        db.session.rollback()
-        return jsonify({"message": str(e)}), 400
+        print(f"Error in add_factoid_to_section: {str(e)}")
+        raise
 
 def add_question_to_factoid(factoid_id, question_text, correct_choice, wrong_choices, question_type):
     try:
@@ -834,12 +850,11 @@ def add_question_to_factoid(factoid_id, question_text, correct_choice, wrong_cho
             question_type=question_type,
         )
         db.session.add(question)
-        db.session.flush()  # Flush to get the question_id before commit
+        db.session.flush()
 
         # Add choices to the question
         add_choices_to_question(question.id, correct_choice, wrong_choices)
 
-        db.session.commit()
         return (
             jsonify(
                 {
@@ -850,8 +865,8 @@ def add_question_to_factoid(factoid_id, question_text, correct_choice, wrong_cho
             201,
         )
     except Exception as e:
-        db.session.rollback()
-        return jsonify({"message": str(e)}), 400
+        print(f"Error in add_question_to_factoid: {str(e)}")
+        raise
 
 def get_factoid(factoid_id):
     factoid = LibraryFactoid.query.get(factoid_id)
@@ -890,11 +905,10 @@ def add_choices_to_question(question_id, correct_choice, wrong_choices):
             )
             db.session.add(wrong)
 
-        db.session.commit()
         return jsonify({"message": "Choices added successfully"}), 201
     except Exception as e:
-        db.session.rollback()
-        return jsonify({"message": str(e)}), 400
+        print(f"Error in add_choices_to_question: {str(e)}")
+        raise
 
 def get_library_room_names(library_id):
     library = Library.query.get(library_id)

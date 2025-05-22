@@ -165,8 +165,9 @@ TODO list:
             - when creating library for first time, maybe move join_library call to right below or IN save_library_room_states so theres no duplicate call to add users to library room states - might have to move db.session.commit logic though
             - on user login, make sure streak resets if last streak is more then a day ago or something like that
             - when the user finishes a lesson and it adds to their streak, make sure the streak in the section completion page displays the updated streak
-            - why does the "add unit" button extend the course length a little bit --> it shouldn't for now - jules(?)
-            - play popup menu currently displays below unit name --> it should not be that way
+            - why does the "add unit" button extend the course length a little bit --> it shouldn't for now - jules
+            - make it so that if the user either generates a library or adds a section / unit then navigates away, it kills the request so the other parts of the libray load and it doesn't get stuck in a hanging state
+            - do the loading disabling thing and toast thing for add unit as well, although that should be much faster
 
         hard probably (goal: 2 high level bullet points / wk):
         - ⭐️ remove alert message in library creator (not hard but have to remember)
@@ -178,8 +179,6 @@ TODO list:
             - Make sure to account for duplicate section names, and other error checking etc... and check for duplicate names for that unit or something
             - go back to come_back_to
             - why is this empty? --> rag_context:
-            - enable db.rollback for section generation - jules (?)
-            - make popups disappear for edit mode <-- next - jules
 
         - ✅ ⭐️ (would like to implement visibility of different courses first or at least a many:one for non-owners in library model)
             - ⭐️ Delete sections requires entering the name of the unit / course just for accidental reasons)

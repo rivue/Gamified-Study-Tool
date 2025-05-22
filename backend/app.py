@@ -114,6 +114,14 @@ class InvalidJoinCodeError(Exception):
     """Raised when a private library’s join-code is wrong."""
     pass
 
+class MaxUnitsReachedError(Exception):
+    """Raised when a user tries to join a library that has reached its max units."""
+    pass
+
+class NotFoundError(Exception):
+    """Raised when a library is not found."""
+    pass
+
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
