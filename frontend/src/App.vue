@@ -1,6 +1,6 @@
 <!-- App.vue -->
 <template>
-    <Toaster />
+    <!-- <Toaster /> -->
     <div class="app-container" :class="themeClass">
         <TopBar />
         <SubHeader v-if="loggedIn && shouldShowChat && subheaderExists" :key="forceUpdateKey" />

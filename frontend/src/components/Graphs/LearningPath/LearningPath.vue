@@ -208,6 +208,7 @@
                                     </div>
                                     <AddSection v-if="editModeEnabled && isOwner" class="-mx-8" :library-id="libraryId"
                                         :unit-id="props.unitPositionMap[unitName][1]" :position="sectionIndex + 1"
+                                        :offset="getNodeOffset(getGlobalSectionIndex(unitIndex, sectionIndex))"
                                         :unit-color="getUnitColor(unitIndex)" @nodes-added="onSectionAdd" />
                                 </template>
 
@@ -222,6 +223,7 @@
                                         <!-- owner sees the AddSection bubble -->
                                         <AddSection v-if="isOwner" :library-id="libraryId"
                                             :unit-id="props.unitPositionMap[unitName][1]" :position="0" :empty-unit="true"
+                                            :offset="getNodeOffset(getGlobalSectionIndex(unitIndex, 20))"
                                             :unit-color="getUnitColor(unitIndex)" @nodes-added="onSectionAdd" />
 
                                         <div v-if="!isOwner" class="flex items-center gap-2 px-4 py-2 rounded-lg transition-all 

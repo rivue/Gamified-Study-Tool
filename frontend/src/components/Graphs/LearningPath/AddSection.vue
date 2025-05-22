@@ -1,6 +1,6 @@
 <template>
     <div class="relative flex-shrink-0">
-        <div v-if="emptyUnit" class="flex items-center gap-2 px-4 py-2 rounded-lg transition-all 
+        <!-- <div v-if="emptyUnit" class="flex items-center gap-2 px-4 py-2 rounded-lg transition-all 
                                             duration-200 hover:scale-105 active:scale-95 cursor-pointer" @click="showModal = true"
             :style="{
                 background: unitColor,
@@ -12,9 +12,10 @@
 
         <div v-else
             class="w-16 h-16 rounded-full flex items-center justify-center cursor-pointer transition-all duration-300 hover:scale-110 hover:shadow-lg active:scale-95"
-            :style="{ backgroundColor: unitColor }" @click="showModal = true">
+            :style="{ backgroundColor: unitColor, transform: `translateY(${offset}px)` }" @click="showModal = true">
+            {{ offset }}
             <PlusIcon class="w-8 h-8" style="color: var(--light-text)" />
-        </div>
+        </div> -->
 
         <!-- the modal itself -->
         <teleport to="body">
@@ -154,6 +155,9 @@ const props = defineProps({
     emptyUnit: {
         type: Boolean,
         default: false
+    },
+    offset: {
+        type: Number,
     }
 });
 
