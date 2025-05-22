@@ -61,6 +61,7 @@
 
                                     <AddSection v-if="editModeEnabled && isOwner" class="-mx-8" :library-id="libraryId"
                                         :unit-id="props.unitPositionMap[unitName][1]" :position="sectionIndex"
+                                        :offset="getNodeOffset(getGlobalSectionIndex(unitIndex, sectionIndex)-.6)"
                                         :unit-color="getUnitColor(unitIndex)" @nodes-added="onSectionAdd" />
 
                                         <div class="relative flex-shrink-0 mx-12" 
@@ -206,9 +207,9 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <AddSection v-if="editModeEnabled && isOwner" class="-mx-8" :library-id="libraryId"
+                                    <AddSection v-if="editModeEnabled && isOwner && sectionIndex === rawUnitData[unitName].length - 1" class="-mx-8" :library-id="libraryId"
                                         :unit-id="props.unitPositionMap[unitName][1]" :position="sectionIndex + 1"
-                                        :offset="getNodeOffset(getGlobalSectionIndex(unitIndex, sectionIndex))"
+                                        :offset="getNodeOffset(getGlobalSectionIndex(unitIndex, sectionIndex)+.5)"
                                         :unit-color="getUnitColor(unitIndex)" @nodes-added="onSectionAdd" />
                                 </template>
 

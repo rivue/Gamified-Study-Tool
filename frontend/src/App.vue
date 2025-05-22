@@ -1,7 +1,8 @@
 <!-- App.vue -->
 <template>
-    <!-- <Toaster /> -->
+    <Toaster />
     <div class="app-container" :class="themeClass">
+        <div v-if="!hideHeaderFooter">
         <TopBar />
         <SubHeader v-if="loggedIn && shouldShowChat && subheaderExists" :key="forceUpdateKey" />
         <SideMenu />
@@ -10,7 +11,6 @@
     
     <div class="main-content">
         <div class="another" @scroll="onScroll">
-                <div v-if="!hideHeaderFooter">
                 <!-- Routes -->
                 <router-view v-if="shouldShowRouterView"></router-view>
                 <home-page v-else />
