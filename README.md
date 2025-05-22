@@ -26,6 +26,29 @@ IDEAS:
     ideas for grand plan / future:
         - can we generalize this studying tool for other industries? like corporate learning events, e-learning courses, etc...?
             - online learning platform - would need to be at a deep level though, not sure how this could be done?
+                - other industries:
+                    - corporate training
+                    - medical training
+                    - technical fields
+                    - safety training
+                    - product / policy manuals
+                    - healthcare
+                    - human resources / compliance
+                    - languages
+                    - tech
+                    - healthcare
+                    - finance
+                    - engineering
+                    - business
+                    - education - might be harder, start w/ other areas first
+                    - manufacturing
+                    - retail
+                    - legal
+                    - arts
+                    - cooking
+                    - diy
+                    - music
+                    - etc...
         - Youtube Comment AI Bot —> intern idea for next summer?
             Would involve fine tuning a model to do something, maybe grok or something, to train it on high performing comments and
             train it to go on youtube videos to write a snarky reply / comment to rack up likes, or use gemini to reply in the way that the 
