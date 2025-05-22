@@ -6,6 +6,9 @@ Note: use npm audit --only=prod for this, 0 vulnerabilities = good
 
 IDEAS:
 
+    resume:
+        - add resend api "build email sending list using resend api" or whatever
+
     cleanup / maintenence (files to break apart):
         - remove library difficulty, mentor, language, etc... from db course structure, backend, frontend course creation screen
         - note: easy to get rid of in the frontend, but have to remove lots of stuff in backend w/ various function calls and stuff
@@ -21,6 +24,8 @@ IDEAS:
         - Blueprints maybe
 
     ideas for grand plan / future:
+        - can we generalize this studying tool for other industries? like corporate learning events, e-learning courses, etc...?
+            - online learning platform - would need to be at a deep level though, not sure how this could be done?
         - Youtube Comment AI Bot —> intern idea for next summer?
             Would involve fine tuning a model to do something, maybe grok or something, to train it on high performing comments and
             train it to go on youtube videos to write a snarky reply / comment to rack up likes, or use gemini to reply in the way that the 
@@ -180,6 +185,7 @@ TODO list:
 
     general:
     study tool additions / ideas:
+        - for library creation, experiment w/ 3 tab structure like wava 
         - break up library / section generation into smaller chunks --> utilized opanai functions to build an LLM workflow, decreasing library and section processing time by 60% or whatever
         - for feedback / input / suggestions, 1) link to discord / X account and 2) display a "testimonies" of a suggestion / idea (anonymous) and the time it took me to implement something / respond to (30 minutes, 15 minutes, etc...) encourage people to send me feedback and stuff
         - instead of having one opanai function, have a parent function which rolls how many and what type of game will be rolled ('true_false': 4, 'multiple_choice': 6, 'image': 2, etc... and then a suite of small agents which are each responsible for one (1) type of game (ex: true_false agent, multiple choice agent, image agent (might have to break up further maybe idk), etc..)) --> do all this so I can put "suite of ai agents" on my resume
@@ -203,6 +209,15 @@ TODO list:
             - would probably be pretty easy: https://classic.yarnpkg.com/en/package/ratemyprofessor-api
             - https://github.com/tisuela/ratemyprof-api
         - ability to verify by school email which helps with filtering results? 
+        - add riddles to minigames
+        - for jack in the box style games, add a concept box in the middle and give users the ability to drag / drop / add small boxes with a name / concept and longer description and allow them to point to another box, maybe allow them to be saved and for multiplayer, save all of theirs in one place or something - each game takes like a few minutes or so then time for review
+        - logo (for now): lowercase r w/ the left side aligned with the app box and the top sprinkling knowledge down to a person reading a book
+        - pomodoro mode - either a timer that the user can see on the screen that goes for 25 or whatever minutes or a specific mode the user can go into where it displays a timer for 25 minutes while giving them games to play / learn in its own environment / screen and then breaks for 5 or whatever minutes
+        - timeline mega games - like 20 or whatever blocks, or slight variation - x is caused by or causes y, etc...
+        - analogy mini / mega games - have to get like 20 right or whatever
+
+        - add ability change font and how it speaks to library generator (cursive = harder to read and higher learning rates, or apply font at user's' setting level), it could speak like gen z, like a pirate, etc...
+        - catch phrase for now: studying, nade 
         - (later) add support for links / pdfs / other things and get rid of things like difficulty, tutor, etc... then actually start generating stuff to study
         - (later) add support for multiple file upload as well
         - add logic for multiple flame emojis w/ streaks of 1, 5, 10, 25, 50, 100
