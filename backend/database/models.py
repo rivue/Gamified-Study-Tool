@@ -369,7 +369,7 @@ class LibrarySection(db.Model):
     position = db.Column(db.Integer, nullable=False, index=True) 
     
     # Link factoids to a section
-    factoids = db.relationship('LibraryFactoid', backref='section', cascade="all, delete-orphan", lazy=True)
+    factoids = db.relationship('LibraryFactoid', backref='section', cascade='all, delete-orphan', passive_deletes=True)
 
     __table_args__ = (
         db.UniqueConstraint('unit_id', 'position',
@@ -456,7 +456,7 @@ class LibraryFactoid(db.Model):
     lesson_name = db.Column(db.String(200), nullable=False)
     factoid_content = db.Column(db.Text, nullable=False)
 
-    questions = db.relationship('LibraryQuestion', backref='factoid')
+    questions = db.relationship('LibraryQuestion', backref='factoid', cascade="all, delete-orphan", passive_deletes=True)
 
 class LibraryQuestion(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -465,7 +465,7 @@ class LibraryQuestion(db.Model):
     correct_choice = db.Column(db.JSON, nullable=False)
     question_type = db.Column(db.String(50), nullable=False, default="multiple_choice")
 
-    choices = db.relationship('LibraryQuestionChoice', backref='question', lazy='dynamic')
+    choices = db.relationship('LibraryQuestionChoice', backref='question', cascade="all, delete-orphan", passive_deletes=True)
 
 class LibraryQuestionChoice(db.Model):
     id = db.Column(db.Integer, primary_key=True)
