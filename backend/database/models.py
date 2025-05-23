@@ -370,6 +370,22 @@ class LibrarySection(db.Model):
     
     # Link factoids to a section
     factoids = db.relationship('LibraryFactoid', backref='section', cascade='all, delete-orphan', passive_deletes=True)
+ 
+    def delete_and_reindex(self):
+            """
+            Deletes this section (cascading factoids→questions→choices and
+            room-states via configured cascades/FKs) and then renumbers its
+            siblings so positions stay 0…n-1.
+            """
+            parent_unit = self.unit
+
+            # delete me (SQLAlchemy will cascade all the way down)
+            db.session.delete(self)
+
+            # reindex the remaining sections
+            siblings = sorted(parent_unit.sections, key=lambda s: s.position)
+            for idx, sec in enumerate(siblings):
+                sec.position = idx
 
     __table_args__ = (
         db.UniqueConstraint('unit_id', 'position',

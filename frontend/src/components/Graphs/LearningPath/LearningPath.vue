@@ -81,6 +81,10 @@
                                                 filter: editModeEnabled ? 'grayscale(1) brightness(0.9)' : 'none',
                                             }" 
                                             @click="editModeEnabled ? handleEditNodeClick() : handleNodeClick(sectionId)">
+                                        
+
+
+                                        <DeleteSection v-if="editModeEnabled && isOwner" :section-id="sectionId" :section-name="sectionName"/>
 
                                         <!-- Tooltip -->
                                         <div v-if="selectedRoomId && selectedRoomId === sectionId"
@@ -332,6 +336,7 @@ import { toast } from 'vue-sonner'
 import LibrarySettings from "./LibrarySettings.vue";
 import AddUnit from "./AddUnit.vue";
 import AddSection from "./AddSection.vue"
+import DeleteSection from "./DeleteSection.vue"
 
 const props = defineProps({
     libraryId: {

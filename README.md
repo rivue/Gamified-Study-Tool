@@ -173,6 +173,7 @@ TODO list:
             - make it so that if the user either generates a library or adds a section / unit then navigates away, it kills the request so the other parts of the libray load and it doesn't get stuck in a hanging state
             - do the loading disabling thing and toast thing for add unit as well, although that should be much faster
             - account for duplicate unit names when user is adding a unit
+            - go through library_routes and make sure routes that require login actual have @login_required decorator
 
         hard probably (goal: 2 high level bullet points / wk):
         - ⭐️ remove alert message in library creator (not hard but have to remember)

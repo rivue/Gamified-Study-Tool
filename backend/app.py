@@ -122,6 +122,10 @@ class NotFoundError(Exception):
     """Raised when a library is not found."""
     pass
 
+class PermissionError(Exception):
+    """Raised when a user does not have permission to access a resource."""
+    pass
+
 # Error handlers for custom exceptions
 @app.errorhandler(UserAlreadyMemberError)
 def handle_user_already_member(e):
@@ -138,6 +142,10 @@ def handle_max_units_reached(e):
 @app.errorhandler(NotFoundError)
 def handle_not_found(e):
     return jsonify({"error": "Not found", "message": str(e) or "Resource not found"}), 404
+
+@app.errorhandler(PermissionError)
+def handle_permission_error(e):
+    return jsonify({"error": "Invalid Permissions", "message": str(e) or "You do not have permission to do that"}), 403
 
 login_manager = LoginManager()
 login_manager.init_app(app)

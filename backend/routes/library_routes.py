@@ -2,7 +2,7 @@
 
 import random
 from flask import request, jsonify
-from flask_login import current_user, AnonymousUserMixin
+from flask_login import current_user, login_required, AnonymousUserMixin
 from bleach import clean
 from flask_executor import Executor
 import concurrent.futures
@@ -487,8 +487,16 @@ def init_library_routes(app):
             return jsonify(status="error", message="Section Add Failed"), 500
     
     @app.route("/api/library/section/<int:section_id>", methods=['DELETE'])
-    def delete_section():
-        user_id = current_user.id if not isinstance(current_user, AnonymousUserMixin) else None
+    @login_required
+    def delete_section(section_id):
+        
+        section = LibrarySection.query.get_or_404(section_id)
+        
+        if section.unit.library.owner_id != current_user.id:
+           raise PermissionError("You do not own this library.")
+        
+        
+        section.delete_and_reindex()
         
         # user_id needs to point to a user, 
         # user needs to be owner of the library (section = section_id; section.unit_id = unit_id; unit.library_id = library_id)
@@ -504,12 +512,14 @@ def init_library_routes(app):
             # AND FOR CASCADE IN LIBRARY ROOM STATE AS WELL!!!
 
         try:
-            # some function in library_handlers or something
-            # either id of deleted thing or just a success message or something
-            return jsonify(status="success", results=results)
-
+            db.session.commit()
+        except PermissionError as e:
+            return jsonify(status="error", message=f"{str(e)}"), 403
         except Exception as e:
+            db.session.rollback()
             return jsonify(status="error", message="No section names provided"), 400
+
+        return jsonify(status="success", message="Section successfully deleted")
         
     @app.route('/api/library/available-generated-rooms', methods=['POST'])
     def get_available_generated_rooms():
