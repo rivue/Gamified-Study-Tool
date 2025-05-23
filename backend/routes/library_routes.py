@@ -510,6 +510,7 @@ def init_library_routes(app):
         # SEE CLAUDE!!!
         # SEE CHATGPT FOR BACKREF THINGS!!!
             # AND FOR CASCADE IN LIBRARY ROOM STATE AS WELL!!!
+            # SEE delete_and_reindex IN LIBRARYSECTION AND GO TO CLAUDE IF THAT DOESN'T WORK
 
         try:
             db.session.commit()
@@ -517,7 +518,7 @@ def init_library_routes(app):
             return jsonify(status="error", message=f"{str(e)}"), 403
         except Exception as e:
             db.session.rollback()
-            return jsonify(status="error", message="No section names provided"), 400
+            return jsonify(status="error", message="An Error occurred"), 400
 
         return jsonify(status="success", message="Section successfully deleted")
         
