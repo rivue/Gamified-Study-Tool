@@ -24,6 +24,7 @@ IDEAS:
         - Blueprints maybe
 
     ideas for grand plan / future:
+       
         - can we generalize this studying tool for other industries? like corporate learning events, e-learning courses, etc...?
             - online learning platform - would need to be at a deep level though, not sure how this could be done?
                 - other industries:
@@ -49,6 +50,7 @@ IDEAS:
                     - diy
                     - music
                     - etc...
+            - for bigger pivot (ai duolingo for everything) change studying to rotating text: studying, corporate training, learning guitar, cooking, arts, etc...
         - Youtube Comment AI Bot —> intern idea for next summer?
             Would involve fine tuning a model to do something, maybe grok or something, to train it on high performing comments and
             train it to go on youtube videos to write a snarky reply / comment to rack up likes, or use gemini to reply in the way that the 
@@ -201,7 +203,9 @@ TODO list:
 
     general:
     study tool additions / ideas:
+        - tasks which optimize containers and stuff, like startup latency, cpu / memory utilization, etc.. could be really good for resume (optimized billable container instance time leading to 4.5k in monthly cost savings, etc...)
         - for library creation, experiment w/ 3 tab structure like wava 
+            - eventually break up library creation from library list, and add lots of advanced customizability maybe
         - break up library / section generation into smaller chunks --> utilized opanai functions to build an LLM workflow, decreasing library and section processing time by 60% or whatever
         - for feedback / input / suggestions, 1) link to discord / X account and 2) display a "testimonies" of a suggestion / idea (anonymous) and the time it took me to implement something / respond to (30 minutes, 15 minutes, etc...) encourage people to send me feedback and stuff
         - instead of having one opanai function, have a parent function which rolls how many and what type of game will be rolled ('true_false': 4, 'multiple_choice': 6, 'image': 2, etc... and then a suite of small agents which are each responsible for one (1) type of game (ex: true_false agent, multiple choice agent, image agent (might have to break up further maybe idk), etc..)) --> do all this so I can put "suite of ai agents" on my resume
