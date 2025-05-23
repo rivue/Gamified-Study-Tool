@@ -3,6 +3,12 @@
     <div class="fixed left-8 right-8 top-0 bottom-0 overflow-hidden">
         <div class="fixed top-20 right-6 flex gap-6 z-10">
 
+            <button @click="goToHome"
+                class="bg-black/30 backdrop-blur-sm shadow-md rounded-full p-4 hover:bg-black/40"
+                style="color: var(--highlight-color);">
+                <HomeIcon class="w-12 h-12" />
+            </button>
+
             <button v-if="isOwner" @click="toggleEditMode"
                 class="bg-black/30 backdrop-blur-sm shadow-md rounded-full p-4 hover:bg-black/40"
                 style="color: var(--highlight-color);">
@@ -312,7 +318,8 @@ import {
     ChevronDoubleRightIcon,
     ChartBarIcon,
     PencilIcon,
-    PlusIcon
+    PlusIcon,
+    HomeIcon
 } from '@heroicons/vue/24/solid';
 import { useGameStore } from '@/store/gameStore'
 import { useRouter } from 'vue-router';
@@ -457,6 +464,10 @@ function toggleEditMode() {
 
 function goToLeaderboard() {
     router.push(`/lessons/${props.libraryId}/leaderboard`)
+}
+
+function goToHome() {
+    router.push("/library");
 }
 
 // Get color for a unit based on its index

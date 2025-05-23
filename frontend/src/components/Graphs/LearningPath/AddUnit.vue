@@ -160,7 +160,6 @@ const addNewUnit = async () => {
             })
         }
     } catch (error) {
-        console.error('Error adding unit:', error)
         unitNameError.value = error.response?.data?.message || 'Failed to add unit. Please try again.'
     } finally {
         isAddingUnit.value = false

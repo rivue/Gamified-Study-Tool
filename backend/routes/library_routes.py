@@ -423,9 +423,6 @@ def init_library_routes(app):
             if not library_response or library_response.status_code == "error":
                 return jsonify(status="error", message="Can only generate library rooms for valid libraries"), 400
 
-            library = library_response.get_json()
-            # Start the stopwatch
-           
             # Process each subtopic
             results = []
             rag_context = None
@@ -434,19 +431,6 @@ def init_library_routes(app):
 
             futures_dict = {}
             for subtopic in section_names:
-
-                # TODO: fix later:
-                # IF this subtopic already exists in the library (it shouldn't because duplicate room names should not be allowed)
-                # add its library factoid text and questions to results for additional rag context
-                # come_back_to: maybe get rid of later bc duplicates are not allowed,
-                # or check for dupe section names in a unit or something
-                # print("here")
-                # unit_id, section_id = library.get('section_to_unit_map').get(subtopic)
-                # print("here")
-                # existing_content = lbh.retrieve_library_room_contents(library_id, section_id, user_id)
-                # if existing_content:
-                #     results.append({"subtopic": subtopic, "status": "success", "data": existing_content})
-                #     continue
 
                 # Generate new content for this subtopic
                 last_section = None
