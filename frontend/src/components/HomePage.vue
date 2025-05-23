@@ -2,7 +2,7 @@
     <div class="landing-container">
         <div class="landing-page-1">
             <div class="landing-titles-container">
-                <div class="landing-title">Learning. Gamified.</div>
+                <div class="landing-title">Studying. Made. Simple.</div>
                 <div class="landing-subtitle">Revolutionize your study routine with our gamified lesson creator.</div>
             </div>
         </div>
@@ -41,7 +41,6 @@
                     </a>
                 </div>
             </div>
-            <img :src="openaiPath" alt="Powered by OpenAI" class="openai" />
             <div class="faq-container">
                 <FaqComponent />
             </div>

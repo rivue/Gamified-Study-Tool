@@ -1,15 +1,16 @@
 <!-- App.vue -->
 <template>
+    <Toaster />
     <div class="app-container" :class="themeClass">
         <div v-if="!hideHeaderFooter">
-            <TopBar />
-            <SubHeader v-if="loggedIn && shouldShowChat && subheaderExists" :key="forceUpdateKey" />
-            <SideMenu />
-            <MentorSelection />
-        </div>
-
-        <div class="main-content">
-            <div class="another" @scroll="onScroll">
+        <TopBar />
+        <SubHeader v-if="loggedIn && shouldShowChat && subheaderExists" :key="forceUpdateKey" />
+        <SideMenu />
+        <MentorSelection />
+    </div>
+    
+    <div class="main-content">
+        <div class="another" @scroll="onScroll">
                 <!-- Routes -->
                 <router-view v-if="shouldShowRouterView"></router-view>
                 <home-page v-else />
@@ -38,13 +39,13 @@ import { useScrollStore } from "@/store/scrollStore";
 import { useMentorStore } from "@/store/mentorStore";
 import { useLoadingStore } from "@/store/loadingStore";
 import { useUserStatsStore } from "@/store/userStatsStore";
-import LoadingComponent from "./components/Backstage/LoadingComponent.vue";
+import { Toaster } from '@/components/ui/sonner'
+import 'vue-sonner/style.css' // vue-sonner v2 requires this import
 
 const router = useRouter();
 const route = useRoute();
 const lastVisible = ref(new Date());
 const loadingStore = useLoadingStore();
-const isLoading = computed(() => loadingStore.isLoading);
 
 // Computed properties
 const hideHeaderFooter = computed(() => route.meta.hideHeaderFooter);

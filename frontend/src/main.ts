@@ -42,8 +42,8 @@ import axios from 'axios';
 
     const routes = [
         // Main routes
-        { path: '/asdf', component: defineAsyncComponent(() => import('./components/Game/NewGame/LibraryCompletion.vue')), meta: { title: 'Rivue.ai' } },
         { path: '/', component: defineAsyncComponent(() => import('./components/HomePage.vue')), meta: { title: 'Rivue.ai' } },
+        { path: '/explore', component: defineAsyncComponent(() => import('./components/Main/Explore.vue')), meta: { title: 'Rivue.ai' } },
         {
             name: 'GamePage',
             path: '/lessons/:id/:roomName',
@@ -115,6 +115,7 @@ import axios from 'axios';
         // Redirects
         // { path: '/lessons', redirect: '/' },
         { path: '/lessons/:pathMatch(.*)*', redirect: '/' },
+        { path: '/explore/:pathMatch(.*)*', redirect: '/explore' },
         { path: '/library/:pathMatch(.*)*', redirect: '/library' },
         // { path: '/progress/:pathMatch(.*)*', redirect: '/progress' },
         { path: '/contact/:pathMatch(.*)*', redirect: '/contact' },
@@ -140,7 +141,6 @@ router.beforeEach(async (to, from, next) => {
 
     const loading = useLoadingStore()
     if (!from.matched.length) loading.start()
-    console.debug("idk")
 
     const publicPaths = [
         '/',
@@ -177,10 +177,10 @@ router.beforeEach(async (to, from, next) => {
                 const response = await axios.get(`/api/library/${to.params.id}`);
                 if (response.data && 
                     response.data.data && 
-                    (response.data.data.owner_id == user || response.data.data.is_public)) {
-                        // User is the creator, continues as per usual
+                    response.data.data.membership_status) { // membership_status is true / false
                         return next();
-                } else { // invalid data 
+                } else {
+                    console.log(response.data.data.membership_status)
                     return next('/library');
                 }
                     

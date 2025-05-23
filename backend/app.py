@@ -106,6 +106,38 @@ def forbidden(e):
 @app.errorhandler(400)
 def bad_request(e):
     return jsonify({"error": "Bad request", "message": str(e)}), 400
+    
+class UserAlreadyMemberError(Exception):
+    pass
+
+class InvalidJoinCodeError(Exception):
+    """Raised when a private library's join-code is wrong."""
+    pass
+
+class MaxUnitsReachedError(Exception):
+    """Raised when a user tries to join a library that has reached its max units."""
+    pass
+
+class NotFoundError(Exception):
+    """Raised when a library is not found."""
+    pass
+
+# Error handlers for custom exceptions
+@app.errorhandler(UserAlreadyMemberError)
+def handle_user_already_member(e):
+    return jsonify({"error": "Conflict", "message": str(e) or "User is already a member"}), 409
+
+@app.errorhandler(InvalidJoinCodeError)
+def handle_invalid_join_code(e):
+    return jsonify({"error": "Bad request", "message": str(e) or "Invalid join code"}), 400
+
+@app.errorhandler(MaxUnitsReachedError)
+def handle_max_units_reached(e):
+    return jsonify({"error": "Forbidden", "message": str(e) or "Maximum units reached"}), 403
+
+@app.errorhandler(NotFoundError)
+def handle_not_found(e):
+    return jsonify({"error": "Not found", "message": str(e) or "Resource not found"}), 404
 
 login_manager = LoginManager()
 login_manager.init_app(app)

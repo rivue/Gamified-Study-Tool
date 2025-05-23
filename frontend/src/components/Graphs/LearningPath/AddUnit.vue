@@ -1,7 +1,7 @@
 <template>
     <div v-if="canAddUnit" class="relative -mx-12 my-12 flex-shrink-0 w-0 flex items-center justify-center" :class="[
-        (position === 0 || position === existingUnits.length) ? 'pt-72 pb-48' : 'pt-72 pb-52 border-dashed border-2'
-    ]" :style="{
+        (position === 0 || position === existingUnits.length) ? 'pt-72 pb-52' : 'pt-72 pb-52 border-dashed border-2'
+         ]" :style="{
             borderColor: 'var(--background-color-1t)',
             backgroundColor: 'var(--background-color-1t)',
             borderRight: 'none',
@@ -160,7 +160,6 @@ const addNewUnit = async () => {
             })
         }
     } catch (error) {
-        console.error('Error adding unit:', error)
         unitNameError.value = error.response?.data?.message || 'Failed to add unit. Please try again.'
     } finally {
         isAddingUnit.value = false

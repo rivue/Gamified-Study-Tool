@@ -33,9 +33,8 @@ export const useAuthStore = defineStore('auth', {
         if (response.data.loggedIn) {
           this.userTier = response.data.userTier;
           this.cloudTokens = response.data.requestCount;
-        //   this.userId = response.data.userId;
+          this.userId = response.data.userId;
         //   localStorage.setItem('userId', this.userId);
-        //   console.log(this.userId);
           this.login();
         }
         else {

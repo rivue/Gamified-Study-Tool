@@ -6,18 +6,56 @@ Note: use npm audit --only=prod for this, 0 vulnerabilities = good
 
 IDEAS:
 
-    cleanup / maintenence:
+    resume:
+        - add resend api "build email sending list using resend api" or whatever
+
+    cleanup / maintenence (files to break apart):
         - remove library difficulty, mentor, language, etc... from db course structure, backend, frontend course creation screen
         - note: easy to get rid of in the frontend, but have to remove lots of stuff in backend w/ various function calls and stuff
         - get rid of other stuff I'm not using / don't plan on using like stuff in User model with ai tutor, etc...
         - break up different files to make them smaller and more modular:
         - library_routes
         - library_handlers
+            - break into library level and section / unit level
+            - or other things like settings or something because this file is 1k lines long
         - Learning Path 
             - specifically settings and add node buttons
         - etc... (keep working on this list)
+        - Blueprints maybe
 
     ideas for grand plan / future:
+        - can we generalize this studying tool for other industries? like corporate learning events, e-learning courses, etc...?
+            - online learning platform - would need to be at a deep level though, not sure how this could be done?
+                - other industries:
+                    - corporate training
+                    - medical training
+                    - technical fields
+                    - safety training
+                    - product / policy manuals
+                    - healthcare
+                    - human resources / compliance
+                    - languages
+                    - tech
+                    - healthcare
+                    - finance
+                    - engineering
+                    - business
+                    - education - might be harder, start w/ other areas first
+                    - manufacturing
+                    - retail
+                    - legal
+                    - arts
+                    - cooking
+                    - diy
+                    - music
+                    - etc...
+        - Youtube Comment AI Bot —> intern idea for next summer?
+            Would involve fine tuning a model to do something, maybe grok or something, to train it on high performing comments and
+            train it to go on youtube videos to write a snarky reply / comment to rack up likes, or use gemini to reply in the way that the 
+            company would reply  —-> the bot would be for like a company, Rivue.ai or Duolingo or whatever so they could generate 
+            traction / sales or whatever
+            This bot could be fine tuned to scrape relevant channels, like a design company for other design companies YouTube channels / very 
+            well known design youtube channels, or grammerly for study channels or something, etc...
         - Brain-Computer Interface (BCI) Integrations
             For researchers with EEG headsets: detect attention lapses or cognitive overload and adapt content pacing in real time.
 
@@ -76,8 +114,12 @@ TODO list:
 
 
         last / harder:
-
-
+        - ⭐️ obfuscate / minimize prod code
+        - ⭐️ for LibraryCreator, outline the rules clearly somewhere, like in an i-card next to "create a course to explore" 
+        or just put in text "rules for creating courses" or something
+            - also, make room / course / unit / section consistent in frontend
+        - ⭐️ vvvmaybe ask for feedback before doing vvv
+            - also make sure it works well(ish) for mobile
         - ⭐️ add google auth
         - ⭐️ Terms of use / Policy Page legal agreement thing - ask gpt if I actually need, maybe ask jake how to do but maybe not
             - ⭐️ There are probably websites and stuff for this --> do this before Stripe
@@ -99,53 +141,57 @@ TODO list:
                 - also, maybe change it to vertical
                 - ⭐️ add ability to leave libraries (later)
                 - ⭐️ move dropdown menu to left + make dropdown menu permanant, replace w/ profile picture --> hover menu for to see profile settings or something
+                - for course creation, make a "advanced settings" toggle for t/f, mcq, other questions, max users, etc... maybe other stuff as well
                 - ⭐️ all the other routes and stuff (terms & policies, buying subscription, can't think of others?)
-            - add ui ability to "join" private libraries / public libraries that you didn't create maybe in like a seperate page or list or maybe I could add a box for putting in library codes or something
+                - ⭐️ add i-card for all users, maybe description about the library along with a preview of the files used in the library and maybe also users who are members of the library or something 
+                    - make description visible right below library card I think, maybe i card has more detail information, maybe when it was created or current owner or something
+                    - also displays number of members of the library
+                    - should I replace the proposed "i-card" with some icon that links to library details like discord has with their profile page where I would put files, members, and everything else in the menu, or should I keep it as is?
+                    - (maybe?) ⭐️ add ability to see uploaded files in library (list of their names) and maybe even file preview (would require nosql db or something maybe)
+                        - should I limit file size for this? like can only display files < 50 MB or something?
+
             - ⭐️ after user submits something and is waiting, display a loading bar or wheel or different rotating facts (maybe relevant to the library?) letting the user know that it is generating
             - also note: ask gemini / grok / gpt / claude for some ui design tips like adding a menu bar, or ui tips / tricks / helpful websites / youtube videos, etc...
             use this maybe: https://www.shadcn-vue.com/docs/components/stepper.html
             - note: for main page, add two / 3 simple boxes, class you want, school, and possibly professor, and it gives you classes close to you like quizlet / rate my professor along with option for creating your own
                 maybe it shows private ones with a "lock" icon and prompts you to enter a password. this way it would be like more of a network, which would differentiate us from a copy paste ai study tool (turbolearn) / NotebookLM
         
-        glitches / things
+        glitches / small stuff
+            - make sure adding a unit actually refreshes the page and stuff
+            - why do different pages flicker on the screen when I am on a page and I hit refresh?
             - why is public generating a code on library creation? 
             - current streak in lesson complete displays current streak not current streak + 1 (maybe just refetch it?)
             - improve question generation eventually, like make all answers similar length, use similar answer choices, utilize SAT / ACT / MCAT style questions, maybe tailor the answer style for each course, like MCAT = premed, SAT / ACT = SAT / ACT prep, college style = college final exam style / quiz, etc...
+            - when creating library for first time, maybe move join_library call to right below or IN save_library_room_states so theres no duplicate call to add users to library room states - might have to move db.session.commit logic though
+            - on user login, make sure streak resets if last streak is more then a day ago or something like that
+            - when the user finishes a lesson and it adds to their streak, make sure the streak in the section completion page displays the updated streak
+            - why does the "add unit" button extend the course length a little bit --> it shouldn't for now
+            - make it so that if the user either generates a library or adds a section / unit then navigates away, it kills the request so the other parts of the libray load and it doesn't get stuck in a hanging state
+            - do the loading disabling thing and toast thing for add unit as well, although that should be much faster
+            - account for duplicate unit names when user is adding a unit
 
         hard probably (goal: 2 high level bullet points / wk):
         - ⭐️ remove alert message in library creator (not hard but have to remember)
-        - ⭐️ Add "edit mode" for library creator - toggle for: delete sections / units / courses and also add sections / units and would keep editing isolated from actually playing the course
+        - ⭐️ add username (backfill username w/ 1st part of email before @ symbol - maybe let people change later)
+            - for this section, make sure you modify explore page owner_id and library leaderboard
         - ✅ ⭐️ Finish sections + units
-            - ⭐️ Add ability to add each section to each unit (later --> come back to, reminder to make it account for 1-n number of sections no matter how that looks. add new stepping stones button is commented out for now)
-            - ⭐️ third idea) for course owner, add an "edit" button and "delete / trash can" button when you hover over the course or click it or something, maybe add an "edit mode" in the main bar thing I'm going to add?
-        - ⭐️ (would like to implement visibility of different courses first or at least a many:one for non-owners in library model)
+            - ⭐️ Add ability to add sections to specific units (later --> come back to, reminder to make it account for 1-n number of sections no matter how that looks. add new stepping stones button is commented out for now)
+                - why is this empty? --> rag_context:
+
+        - ✅ ⭐️ (would like to implement visibility of different courses first or at least a many:one for non-owners in library model)
             - ⭐️ Delete sections requires entering the name of the unit / course just for accidental reasons)
-            - ⭐️ Delete Units( requires entering the name of the unit / course just for accidental reasons)
+            - ⭐️ Delete Units (requires entering the name of the unit / course just for accidental reasons)
             - ⭐️ Delete courses / libraries (whatever they're called) (requires entering the name of the unit / course just for accidental reasons)
-            - ⭐️ Remember to delete from both DB and pinecone as well, as well as respective child / parent courses / units / sections / libraries, roomNameState, LibraryFavorites, question, question_choice, LibraryMembership, etc...
-        - ⭐️ (courses need ability to add multiple people first) leaderboard / game point tracking system (could be reworked later)
-        - ⭐️ let units / sections / courses have duplicate values as others in db
-        - ⭐️ add ability to see uploaded files in library (list of their names) and maybe even file preview (would require nosql db or something maybe)
+               - ⭐️ Remember to delete from both DB and pinecone as well, as well as respective child / parent courses / units / sections / libraries, roomNameState, LibraryFavorites, question, question_choice, LibraryMembership, etc...
+        - ⭐️ (NOTE: do AFTER deleting sections / units / courses and adding sections) ability to leave a library
+            - in explore courses page, add a "leave library" next to the "go to Course" button when a user joins the course
 
         medium (chip away at when tired / mentally exhausted from hard ones):
-        - implement game "score" logic (if you get >80% #attemps:number of questions ratio) then you get more / less points or something, etc...
-
-        - ⭐️ add some other types of games / questions (ex: true / false, very detailed / specific questions, sorting, compare / contrast, analogies, image based stuff (not sure how to implement) 6 options choose 1-6, etc... see list below)
-        - ⭐️ add i-card for all users, maybe description about the library along with a preview of the files used in the library and maybe also users who are members of the library or something 
-            - make description visible right below library card I think, maybe i card has more detail information, maybe when it was created or current owner or something
-            - also displays number of members of the library
-            - should I replace the proposed "i-card" with some icon that links to library details like discord has with their profile page where I would put files, members, and everything else in the menu, or should I keep it as is?
-        - ⭐️ make library description editable by owner
-            - maybe this would be near leaderboard or something
         - ⭐️ add staging / pre-production environment that isn't localhost
-            - figure out if 1) what I do to migrate the database is safe (swapping uri string and running flask db ugprade) and 2) how I should do it if it is not ideal
+            - also figure out if 1) what I do to migrate the database is safe (swapping uri string and running flask db ugprade) and 2) how I should do it if it is not ideal
         
         easy (same as medium):
-        - ⭐️ fix Aryan's problem with viewing it on his phone - some samsung variation?
-        - ⭐️ users SHOULD be able to create libraries with duplicate names because of how generic some courses can be (philosophy, biology, math, calculus, etc...)
-        - ⭐️ handle weird thing in production where new library code displays null for like half a second, just make it look good basically
-        - ⭐️ make redirect smooth, like make it not show other pages or whatever (use repomix + gpt)
-        - ⭐️ get rid of powered by openai logo thing
+        - ⭐️ eventually fix Aryan's problem with viewing it on his phone - some samsung variation?
 
     OTHER PAGES:
         - terms and policies page
@@ -155,13 +201,39 @@ TODO list:
 
     general:
     study tool additions / ideas:
-    
+        - for library creation, experiment w/ 3 tab structure like wava 
+        - break up library / section generation into smaller chunks --> utilized opanai functions to build an LLM workflow, decreasing library and section processing time by 60% or whatever
+        - for feedback / input / suggestions, 1) link to discord / X account and 2) display a "testimonies" of a suggestion / idea (anonymous) and the time it took me to implement something / respond to (30 minutes, 15 minutes, etc...) encourage people to send me feedback and stuff
+        - instead of having one opanai function, have a parent function which rolls how many and what type of game will be rolled ('true_false': 4, 'multiple_choice': 6, 'image': 2, etc... and then a suite of small agents which are each responsible for one (1) type of game (ex: true_false agent, multiple choice agent, image agent (might have to break up further maybe idk), etc..)) --> do all this so I can put "suite of ai agents" on my resume
+        - is there a tool to like visualize all the different calls / paths something takes in a given api call or function call or something?
+            - (important distinction: NOT debugging)
+        - research into ibm granite / aws bedrock, or other alternatives to AI rag / kag for accuracy or something
+        - when errors popup, prompt the user subtly with a contact form and discord (tell them we're constantly on Discord and check the contact form every hour or something)
+
+        - voice mode based on textbook w/ knowledge bars of things you've covered so far and possibly quick lessons to make sure you know your stuff (insipired by gpt voice mode)
+        - trending courses tab?
+        - ⭐️ add leaderboard / game point tracking system (could be reworked later)once user base grows a bit (on every course, do all time and monthly)
+            - ⭐️ implement some game "score" logic (if you get >80% #attemps:number of questions ratio) then you get more / less points or something, etc...
+            - would need num_points for each user in a library - maybe in library membership data structure?
+        - ⭐️ ask for feedback / look at how people are joining public / private libraries / give users a school variable / track users joining libraries across different timezones to see if I should add descripitions or not
+        - ⭐️ for various buttons / other things, when you hover over them, make them display what they do / their names (edit button, toggles edit mode, etc...)
+        - ⭐️ replace chevron / double chevron with arrows (copy openai / grok / claude, etc...)
+        - ⭐️ add some other types of games / questions (ex: true / false, very detailed / specific questions, sorting, compare / contrast, analogies, image based stuff (not sure how to implement) 6 options choose 1-6, etc... see list below)
         - ⭐️ In creating a new library, add checkboxes for different types of modes (fill-in-the-blank, t/f, mcq, etc…)
             - maybe add it in settings for owner as well (enable / disable for future lesson content generation)
         - integrate with teacher / school list from rate my professors 
             - would probably be pretty easy: https://classic.yarnpkg.com/en/package/ratemyprofessor-api
             - https://github.com/tisuela/ratemyprof-api
         - ability to verify by school email which helps with filtering results? 
+        - add riddles to minigames
+        - for jack in the box style games, add a concept box in the middle and give users the ability to drag / drop / add small boxes with a name / concept and longer description and allow them to point to another box, maybe allow them to be saved and for multiplayer, save all of theirs in one place or something - each game takes like a few minutes or so then time for review
+        - logo (for now): lowercase r w/ the left side aligned with the app box and the top sprinkling knowledge down to a person reading a book
+        - pomodoro mode - either a timer that the user can see on the screen that goes for 25 or whatever minutes or a specific mode the user can go into where it displays a timer for 25 minutes while giving them games to play / learn in its own environment / screen and then breaks for 5 or whatever minutes
+        - timeline mega games - like 20 or whatever blocks, or slight variation - x is caused by or causes y, etc...
+        - analogy mini / mega games - have to get like 20 right or whatever
+
+        - add ability change font and how it speaks to library generator (cursive = harder to read and higher learning rates, or apply font at user's' setting level), it could speak like gen z, like a pirate, etc...
+        - catch phrase for now: studying, nade 
         - (later) add support for links / pdfs / other things and get rid of things like difficulty, tutor, etc... then actually start generating stuff to study
         - (later) add support for multiple file upload as well
         - add logic for multiple flame emojis w/ streaks of 1, 5, 10, 25, 50, 100
@@ -237,7 +309,9 @@ TODO list:
             - we could also section it off, like load part of it at a time, or load it in the background 
                 while the user it playing an already unlocked game or something
         - make a better loading screen / bar / wheel while the courses are being created
+            - make it like not able to navigate away or something idk
             - maybe even tell users not to navigate away from the page or something
+            - for improving textbook loading, maybe make textbook take a long time, but load users with similar sections / libraries while it still loads - like just direct them to actual section games of public libraries while they wait, or do a survey or something while they wait like who it is for or something
         - improve prompt generation a great fold (make sure as many of the quesitons relate to the section name as possible)
         - eventually combine library_question model with library_factoid model (why are they seperate to begin with?)
         - get student verification on Mobbin pro (UI library)
@@ -256,6 +330,11 @@ TODO list:
             1) video button where a manim video is generated about the subject possibly
             2) other resources button where other youtube videos / articles are researched in relation to the topic (grab the resources based on content, not necessarily the name of the section)
 
+        - in “pomodoro / focus mode” dim out the corners of the screen like in minecraft
+        bigger idea —> make the library super customizable like with sdks and images, backgrounds, pictures, etc… just like discord and make it easy to make it super long or super short
+        so that way ppl can make courses on like say the entire bible or five decades of cooking experience or tutorials on a car or something, literally anything
+        for corporate stuff, make it multi-tenant… possibly depending on user feedback ofc
+        for mini-games, instead of making the “right” answer, find the one “incorrect” answer, also do metaphors, and analogies, or synonyms and antonyms, or with googles textfx api or something
         - make a constants file for discord links, twitter / x links, any backend urls, etc...
             - make it available for both frontend and backend like for api routes
             - max_number of libraries

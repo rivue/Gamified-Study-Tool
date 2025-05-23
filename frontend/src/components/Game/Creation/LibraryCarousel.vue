@@ -1,8 +1,36 @@
 <template>
     <div class="library-list px-16 py-12">
-        <div class="list-header">
-            <h1>My Courses</h1>
+        <div class="list-header-container">
+            <div class="list-header">
+                <h1>Courses</h1>
+            </div>
+            <div class="join-private-course">
+                <div class="join-form">
+                    <Input
+                        class="join-input"
+                        type="text"
+                        v-model="joinCode"
+                        placeholder="Enter course code..."
+                        @keydown.enter="joinCourse"
+                    />
+                    <Button 
+                        class="join-button" 
+                        @click="joinCourse"
+                        :disabled="joinLoading"
+                        variant="destructive"
+                    >
+                        <LoaderCircle v-if="joinLoading" class="mr-2 h-4 w-4 animate-spin" />
+                        Join
+                    </Button>
+                </div>
+                <Transition name="fade">
+                    <div v-if="joinMessage" :class="['join-message', joinMessageType]">
+                        {{ joinMessage }}
+                    </div>
+                </Transition>
+            </div>
         </div>
+
         <Input
             class="mb-4 text-lg bg-transparent border-[1px] border-solid border-[var(--text-color)] rounded-[4px] placeholder-[var(--text-color)] text-[var(--text-color)]"
             type="text" v-model="searchQuery" @input="filterLibraries" @keydown="handleSearchKeydown"
@@ -37,6 +65,9 @@
                                 </button>
                             </TableCell>
                             <TableCell class="text-xl text-center p-4 w-full">{{ library.library_topic }}</TableCell>
+                            <TableCell class="text-xs text-right italic opacity-70 pr-4">
+                                <span v-if="library.owner_id == authStore.user.id" class="px-2 py-1 rounded-md bg-[var(--background-color-2t)]">Owner</span>
+                            </TableCell>
                         </TableRow>
                     </template>
                     <TableRow v-else class="border-[1px] border-solid border-[var(--text-color)]">
@@ -83,7 +114,11 @@ import { Input } from "@/components/ui/input";
 import { StarIcon } from "@heroicons/vue/24/solid";
 import { Table, TableRow, TableBody, TableCell } from "@/components/ui/table";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { LoaderCircle } from "lucide-vue-next";
+import { useAuthStore } from "@/store/authStore";
 import axios from "axios";
+
 // Props
 const props = defineProps<{
     libraries: Array<{ clicks: number; context: any; difficulty: string; guide: string; id: number; image_url: string, language: string; language_difficulty: string; likes: number; library_topic: string }>;
@@ -96,8 +131,15 @@ const itemsPerPage = 5;
 const router = useRouter();
 const searchQuery = ref("");
 const filteredLibraries = ref<Array<any>>([]);
-// Create a reactive reference to libraryFavoritesMap
 const libraryFavoritesMap = computed(() => props.libraryFavoritesMap);
+const joinCode = ref("");
+const joinMessage = ref("");
+const joinMessageType = ref("");
+const joinLoading = ref(false);
+const authStore = useAuthStore();
+
+// so parent can refresh list
+const emit = defineEmits(['libraryJoined']);
 
 // Filtering function
 function filterLibraries() {
@@ -180,13 +222,65 @@ const displayedPages = computed(() => {
 
 // Methods
 function goToLibrary(id: number) {
+    console.log("a;lskdjfasdf");
+    console.log(id);
     router.push(`/lessons/${id}`);
+}
+
+async function joinCourse() {
+    if (!joinCode.value.trim()) return;
+    
+    joinLoading.value = true;
+    joinMessage.value = "";
+        
+    axios
+    .post('/api/library/join', {
+        joinCode: joinCode.value.trim(),
+    })
+    .then((response) => {
+        if (response.status === 200) {
+            // Update the local favorites map
+            joinMessageType.value = "success";
+            joinMessage.value = "Successfully joined course!";
+            joinCode.value = "";
+            
+            // Emit event to refresh libraries list
+            emit('libraryJoined', response.data.library);
+    
+            // Add to local libraries array if needed
+            if (response.data.library) {
+                const newLibrary = response.data.library;
+                const libraryExists = props.libraries.some(lib => lib.id === newLibrary.id);
+                if (!libraryExists) {
+                    filteredLibraries.value.unshift(newLibrary);
+                    filterLibraries();
+                }
+            }
+        }
+    })
+    .catch((error) => {
+        console.log(error);
+        console.error("Error updating favorite status:", error);
+        joinMessageType.value = "error";
+        joinMessage.value = error.response?.data?.message || "Failed to join course";
+    
+    })
+    .finally(() => {
+        joinLoading.value = false;
+    
+        // Auto-hide message after 5 seconds
+        setTimeout(() => {
+            joinMessage.value = "";
+        }, 5000);
+
+    });
+       
 }
 
 function updateFavoritedStatus(libraryId: number, oldStatus: boolean) {
     const newStatus = oldStatus === true ? false : true;
     axios
-        .post(`/api/library/favorited_status/${libraryId}`, {
+        .put(`/api/library/favorited_status/${libraryId}`, {
             newStatus: newStatus,
         })
         .then((response) => {
@@ -196,6 +290,7 @@ function updateFavoritedStatus(libraryId: number, oldStatus: boolean) {
             }
         })
         .catch((error) => {
+            console.log(error);
             console.error("Error updating favorite status:", error);
         });
 }
@@ -599,5 +694,93 @@ function goToPage(page: number) {
     --success-color-bg: rgba(42, 87, 66, 0.1);
     --primary-color: #4361ee;
     --primary-hover: #3d55d5;
+}
+
+
+.list-header-container {
+    display: flex;
+    flex-direction: column;
+}
+
+@media (min-width: 768px) {
+    .list-header-container {
+        flex-direction: row;
+        align-items: flex-start;
+        justify-content: space-between;
+    }
+}
+
+.join-private-course {
+    width: 100%;
+    max-width: 400px;
+}
+
+.join-form {
+    display: flex;
+    gap: 8px;
+}
+
+.join-input {
+    flex: 1;
+    background-color: var(--background-color-2t);
+    border: 1px solid var(--text-color);
+    border-radius: 4px;
+    color: var(--text-color);
+    height: 40px;
+    padding: 0 12px;
+}
+
+.join-button {
+    background-color: var(--element-color-1);
+    color: var(--text-color);
+    border: 1px solid var(--text-color);
+    border-radius: 4px;
+    height: 40px;
+    padding: 0 16px;
+    transition: all 0.2s ease;
+}
+
+.join-button:hover:not(:disabled) {
+    background-color: var(--element-color-2);
+}
+
+.join-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.join-message {
+    margin-top: 8px;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 14px;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.success {
+    background-color: rgba(34, 197, 94, 0.2);
+    color: #15803d;
+    border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.error {
+    background-color: rgba(239, 68, 68, 0.3);
+    color: #dc2626;
+    border: 1px solid rgba(239, 68, 68, 0.4);
+}
+
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 </style>

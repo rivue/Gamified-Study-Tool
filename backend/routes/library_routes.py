@@ -6,6 +6,7 @@ from flask_login import current_user, AnonymousUserMixin
 from bleach import clean
 from flask_executor import Executor
 import concurrent.futures
+from app import InvalidJoinCodeError, UserAlreadyMemberError, UserAlreadyMemberError, InvalidJoinCodeError, MaxUnitsReachedError, NotFoundError
 
 from io import BytesIO
 
@@ -15,9 +16,12 @@ import database.library_handlers as lbh
 import knowledge_net.library_generator as lgn
 from images.library_imager import generate_images_task, save_image
 from database.user_handler import increment_violations, is_within_limit, check_generation_allowed, mark_generation_done
-from database.models import Library, LibraryFactoid, LibraryQuestion, db
+from database.models import Library, LibrarySection, LibraryUnit, db
 from vector_processing.file_handler import process_document
 from vector_processing.retrieval import query_and_respond_pinecone
+import app
+from sqlalchemy.exc import IntegrityError
+import time
 
 def init_library_routes(app):
 
@@ -123,13 +127,20 @@ def init_library_routes(app):
         if library_response_status_code == 201:
             
             library_id = library_response.get_json().get("library_id")
+
+            join_code = None
+            if not is_public:
+                # fetches join code if new library is private
+                library = Library.query.filter_by(id=library_id).first()
+                join_code = library.join_code 
+
             
-            library_favorites_response, library_favorites_status_code = lbh.create_library_favorite(user_id, library_id)
-            
+            _, library_favorites_status_code = lbh.join_library(user_id, library_id, join_code)
+            print("after library generate")
             if library_favorites_status_code == 201:
                 process_document(selected_file, library_id) # extract embeddings + and upload to pinecone
             else:
-                return jsonify(status="error", message="Failed to create library favorites"), 500
+                return jsonify(status="error", message="Failed to process document"), 500
 
         else:
             return jsonify(status="error", message="Failed to create library"), 500
@@ -210,7 +221,6 @@ def init_library_routes(app):
 
             user_id = current_user.id if not isinstance(current_user, AnonymousUserMixin) else None
             library = lbh.get_library(library_id, user_id)
-
             if not library:
                 return jsonify(status="error", message="Library not found"), 404
 
@@ -238,13 +248,8 @@ def init_library_routes(app):
                     return jsonify(status="error", message="Room not found"), 404
             else:
                 room_data = lbh.get_library_room_state(user_id, library_id)
-                # return a map of room names --> unit 
-                # room_data = room_data
-
-            test = library_data.get("room_names")
 
             library_data["show_settings"] = user_id == library_data.get("owner_id")
-
             return jsonify(status="success", data=library_data, room_data=room_data)
         except: 
             return jsonify(status="error", message="Failed to retrieve library data"), 500
@@ -258,13 +263,44 @@ def init_library_routes(app):
                 return jsonify(status="error", message="Failed to retrieve library data"), 500
             
             members = lbh.get_library_scores(library_id).get_json()
-            print(members)
               
             return jsonify(status="success", members=members)
 
         except:
             return jsonify(status="error", message="Failed to retrieve library data"), 500
         
+    @app.route("/api/library/join", methods=["POST"])
+    def add_user_to_library():
+        try:
+            user_id = current_user.id if not isinstance(current_user, AnonymousUserMixin) else None
+            if not user_id:
+                return jsonify(status="error", message="Can't find user"), 500
+            data = request.get_json()
+            library_id = data.get("libraryId")
+            print(library_id)
+            join_code = data.get("joinCode")
+            print(join_code)
+            print(f"library_id: {library_id}, join_code: {join_code}")
+            
+            new_library, _ = lbh.join_library(user_id, library_id, join_code)
+            new_library = new_library.get_json()
+            print(f"new_library: {new_library}")
+
+            # return new library at some point?
+            return jsonify(status="success", message="Successfully joined library", library=new_library)
+            
+        except InvalidJoinCodeError:
+            return jsonify(status="error", message="Invalid join-code"), 403
+
+        except UserAlreadyMemberError:
+            return jsonify(status="error", message="User already a member"), 400
+
+        except ValueError as e:
+          return jsonify(status="error", message=f"{str(e)}"), 404
+
+        except Exception as e:
+            app.logger.exception(e)
+            return jsonify(status="error", message="internal error"), 500
         
     @app.route('/api/library/unit', methods=['POST'])
     def generate_unit():
@@ -310,41 +346,82 @@ def init_library_routes(app):
             print(f"Failed to process request: {str(e)}")
             return jsonify(status="error"), 500
 
-    @app.route('/api/library/room', methods=['POST'])
-    def generate_room():
+    @app.route('/api/library/section', methods=['POST'])
+    def generate_section():
         user_id = current_user.id if not isinstance(current_user, AnonymousUserMixin) else None
-        section_names = request.form.getlist("roomNames")  # Get list of section names
+        section_names = request.form.getlist("sectionNames")  # Get list of section names
         library_id = request.form.get("libraryId")
+        unit_id = request.form.get("unitId")
+        position = request.form.get("position")
 
         # Validate inputs
         if not section_names:
-            return jsonify(status="error", message="No subtopics provided"), 400
+            return jsonify(status="error", message="No section names provided"), 400
         if not library_id:
             return jsonify(status="error", message="No library ID provided"), 400
+        if not unit_id:
+            return jsonify(status="error", message="No unit ID provided"), 400
+        if not position:
+            return jsonify(status="error", message="No position provided"), 400
+        if len(section_names) > 20:
+            return jsonify(status="error", message="Too many section names provided (max 20)"), 400
+        if len(section_names) < 1:
+            return jsonify(status="error", message="No section names provided"), 400
 
         try:
-
             # Check if "file" is in request.files
             selected_file = None
             if "file" in request.files:
                 file = request.files["file"]
-                if file.filename == "":
-                    return jsonify(status="error", message="No file selected"), 400
-                selected_file = file.read()
+                if not (file.filename == ""):
+                    # return jsonify(status="error", message="No file selected"), 400
+                    selected_file = file.read()
 
             # If no user is logged in, return an error
             if not user_id:
                 return jsonify(status="error", message="Must be signed in."), 403
+
+            # Note to future: if this query starts taking forever, move duplicate name logic to add section / add unit frontend (or equivalent future component)
+            unit = LibraryUnit.query.get(unit_id)
+            if not unit:
+                print("Warning: not unit in create_section_and_add.")
+                raise NotFoundError("Unit not found")
             
-        except Exception as e:
-            return jsonify(status="error", message=f"Failed to process request: {str(e)}"), 500
-    
-        try:
+            if not unit:
+                raise ValueError(f"Unit with ID {unit_id} not found.")
+            
+            library = unit.library
+            if not library:
+                raise ValueError(f"Library not found for unit {unit_id}.")
+        
+            for section_name in section_names:
+                if not section_name or not section_name.strip():
+                    raise ValueError("Section name cannot be empty.")
+
+                # Note to future: if this query starts taking forever, move duplicate name logic to add section / add unit frontend (or equivalent future component)
+                existing_section_in_unit = LibrarySection.query.filter_by(unit_id=unit_id, section_name=section_name).first()
+                if existing_section_in_unit:
+                    raise ValueError(f"Error: Section name '{section_name}' already exists in this unit.")
+
+                # Note to future: if this query starts taking forever, move duplicate name logic to add section / add unit frontend (or equivalent future component)
+                existing_section_in_library = LibrarySection.query.join(LibraryUnit).filter(
+                    LibraryUnit.library_id == library.id,
+                    LibrarySection.section_name == section_name
+                ).first()
+                if existing_section_in_library:
+                    # This error message helps distinguish it from the unit-specific duplicate.
+                    raise ValueError(f"Error: Section name '{section_name}' already exists in this library in a different unit.")
+
+            if len(unit.sections) >= 20:
+                return jsonify({"error": "Unit has reached maximum number of sections (20)"}), 400
+            
+            units_library = unit.library
+            if not units_library:
+                raise ValueError(f"Library not found for unit {unit_id}.")
+            
             library_response = get_library(library_id)
             if not library_response or library_response.status_code == "error":
                 return jsonify(status="error", message="Can only generate library rooms for valid libraries"), 400
-
-            library = library_response.get_json()
 
             # Process each subtopic
             results = []
@@ -354,38 +431,42 @@ def init_library_routes(app):
 
             futures_dict = {}
             for subtopic in section_names:
-                # Check for existing content
-                unit_id, section_id = library.get('section_to_unit_map').get(subtopic)
-                existing_content = lbh.retrieve_library_room_contents(library_id, section_id, user_id)
-                if existing_content:
-                    results.append({"subtopic": subtopic, "status": "success", "data": existing_content})
-                    continue
 
                 # Generate new content for this subtopic
+                last_section = None
                 try:
-
                     rag_context = query_and_respond_pinecone(subtopic, library_id)
+
                     print(f"rag context: {rag_context}")
+                    # TODO: figure out why rag context is E M P T Y
+                    
                     future = executor.submit(lgn.generate_libroom_content, user_id, subtopic, library_id, rag_context)
+
                     futures_dict[future] = subtopic
-                     
+                    last_section = time.time()
                 except Exception as e:
                     results.append({"subtopic": subtopic, "status": "error", "message": f"Failed to generate content: {str(e)}"})
 
             completed_subtopics = {}
             for future in concurrent.futures.as_completed(futures_dict):
-                subtopic = futures_dict[future]
-                try: 
-                    subtopic_contents = future.result()
+                print(f"last_section time: {time.time() - last_section}")
 
-                    # Save the generated content
-                    lbh.save_library_room_contents(library_id, library.get('section_to_unit_map'), subtopic_contents, user_id)
-                    results.append({"subtopic": subtopic, "status": "success", "data": subtopic_contents})
-                    completed_subtopics[subtopic] = True
+                section = futures_dict[future]
+                try: 
+                    section_contents = future.result()
+                    print(f"{section_contents}")
+                    section_position = section_names.index(section) # grabs order of section_names
+                    print(position)
+                    relative_position = section_position + int(position)
+                    
+                    lbh.save_section_contents(library_id, section, section_contents, unit_id, relative_position)
+
+                    results.append({"subtopic": section, "status": "success", "data": section_contents})
+                    completed_subtopics[section] = True
 
                 except Exception as e:
-                    print(f"Error generating content for subtopic {subtopic}: {str(e)}")
-                    completed_subtopics[subtopic] = False
+                    print(f"Error generating content for subtopic {section}: {str(e)}")
+                    completed_subtopics[section] = False
 
                         
             # Check if all subtopics failed
@@ -395,8 +476,15 @@ def init_library_routes(app):
             # Return results for all subtopics
             return jsonify(status="success", results=results)
 
+        except ValueError as e:
+            print(f"ValueError in generate_section: {str(e)}")
+            return jsonify(status="error", message=str(e)), 400
+        except NotFoundError as e:
+            print(f"NotFoundError in generate_section: {str(e)}")
+            return jsonify(status="error", message=str(e)), 400
         except Exception as e:
-            return jsonify(status="error", message=f"Failed to process request: {str(e)}"), 500
+            print(f"Exception in generate_section: {str(e)}")
+            return jsonify(status="error", message="Section Add Failed"), 500
         
     @app.route('/api/library/available-generated-rooms', methods=['POST'])
     def get_available_generated_rooms():
@@ -445,10 +533,10 @@ def init_library_routes(app):
         except Exception as e:
             return jsonify({'status': 'error', 'message': str(e)}), 500
 
-    @app.route("/api/library/favorited_status/<int:library_id>", methods=["POST", "GET"])
+    @app.route("/api/library/favorited_status/<int:library_id>", methods=["PUT", "GET"])
     def library_favorited_status(library_id):
         try:
-            if request.method == "POST":    
+            if request.method == "PUT":    
                 data = request.get_json()
                 new_status = data.get('newStatus')
                 user_id = current_user.id if not isinstance(current_user, AnonymousUserMixin) else None
@@ -520,11 +608,20 @@ def init_library_routes(app):
                 return jsonify(status="error", message="Method not allowed"), 405
         except Exception as e:
             return jsonify(status="error", message=f"Failed to update library visibility status: {str(e)}"), 500
-    
+        
     @app.route("/api/libraries", methods=["GET"])
     def get_libraries():
+        browse = request.args.get("browse", type=bool)
         user_id = current_user.id if not isinstance(current_user, AnonymousUserMixin) else None
-        return lbh.get_libraries_info(user_id)
+        return lbh.get_libraries_info(user_id, browse=browse)
+    # @app.route("/api/libraries/browse", methods=["GET"])
+    # def get_libraries_browse():
+    #     user_id = current_user.id if not isinstance(current_user, AnonymousUserMixin) else None
+    #     if not user_id:
+    #         return jsonify(status="error", message="Must be logged in to browse libraries."), 403
+    #     # get public libraries that the user isn't in
+    #     # TODO the route here
+    #     return lbh.get_libraries_info(user_id, browse=True)
     
     @app.route('/api/scores', methods=['GET'])
     def fetch_scores():

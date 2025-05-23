@@ -1,61 +1,82 @@
 <template>
+      
     <div class="fixed left-8 right-8 top-0 bottom-0 overflow-hidden">
+        <div class="fixed top-20 right-6 flex gap-6 z-10">
 
+            <button @click="goToHome"
+                class="bg-black/30 backdrop-blur-sm shadow-md rounded-full p-4 hover:bg-black/40"
+                style="color: var(--highlight-color);">
+                <HomeIcon class="w-12 h-12" />
+            </button>
 
-        <!-- Settings Button -->
-        <!-- @click="toggleSettings" -->
-        <button @click="goToLeaderboard"
-            class="fixed top-20 right-36 bg-black/30 backdrop-blur-sm shadow-md rounded-full p-4 hover:bg-black/40 z-10"
-            style="color: var(--highlight-color);">
-            <ChartBarIcon class="w-12 h-12" />
-        </button>
+            <button v-if="isOwner" @click="toggleEditMode"
+                class="bg-black/30 backdrop-blur-sm shadow-md rounded-full p-4 hover:bg-black/40"
+                style="color: var(--highlight-color);">
+                <PencilIcon class="w-12 h-12" />
+            </button>
 
-        <!-- Settings Button -->
-        <button v-if="canModify" @click="toggleSettings"
-            class="fixed top-20 right-6 bg-black/30 backdrop-blur-sm shadow-md rounded-full p-4 hover:bg-black/40 z-10"
-            style="color: var(--highlight-color);">
-            <CogIcon class="w-12 h-12" />
-        </button>
+            <button @click="goToLeaderboard"
+                class="bg-black/30 backdrop-blur-sm shadow-md rounded-full p-4 hover:bg-black/40"
+                style="color: var(--highlight-color);">
+                <ChartBarIcon class="w-12 h-12" />
+            </button>
 
+            <button v-if="isOwner" @click="toggleSettings"
+                class="bg-black/30 backdrop-blur-sm shadow-md rounded-full p-4 hover:bg-black/40"
+                style="color: var(--highlight-color);">
+                <CogIcon class="w-12 h-12" />
+            </button>
+        </div>
         <div class="relative flex flex-col w-full h-full">
-
+            
             <div ref="scrollContainer"
-                class="scrollContainer flex-1 overflow-x-auto overflow-y-hidden cursor-grab active:cursor-grabbing"
-                @mousedown="startDragging" @mousemove="drag" @mouseup="stopDragging" @mouseleave="stopDragging"
-                @touchstart="startDragging" @touchmove="drag" @touchend="stopDragging" @scroll="handleScroll">
-                <div class="flex items-center gap-24 min-h-screen py-24 relative">
-
-                    <!-- Left padding so first node is visible -->
-                    <div class="w-24 flex-shrink-0"></div>
-
-                    <!-- Add Unit at the beginning -->
-                    <AddUnit :library-id="libraryId" :position="0" :existing-units="Object.keys(rawUnitData)"
-                        :can-add-unit="canModify" @unit-added="handleUnitAdded" />
-
-                    <!-- Unit Headers -->
-                    <template v-for="([unit], unitName, unitIndex) in rawUnitData" :key="unitIndex">
-                        <div class="relative -mx-12 my-12 px-12 pt-40 pb-36 border-t-2 border-b-2 flex-shrink-0"
-                            :class="['unit-box', { 'unit--first': unitIndex === 0, 'unit--last': unitIndex === Object.keys(rawUnitData).length - 1 }]"
-                            :style="{
+            class="scrollContainer flex-1 overflow-x-auto overflow-y-hidden cursor-grab active:cursor-grabbing"
+            @mousedown="startDragging" @mousemove="drag" @mouseup="stopDragging" @mouseleave="stopDragging"
+            @touchstart="startDragging" @touchmove="drag" @touchend="stopDragging" @scroll="handleScroll">
+            <div class="flex items-center gap-24 min-h-screen py-24 relative">
+                
+                <!-- Left padding so first node is visible -->
+                <div class="w-24 flex-shrink-0"></div>
+                
+                <!-- Add Unit at the beginning -->
+                <AddUnit v-if="editModeEnabled" :library-id="libraryId" :position="0"
+                :existing-units="Object.keys(rawUnitData)" :can-add-unit="isOwner"
+                @unit-added="handleUnitAdded" />
+                
+                <!-- Unit Headers -->
+                <template v-for="([unit], unitName, unitIndex) in rawUnitData" :key="unitIndex">
+                    <div class="relative -mx-12 my-12 px-16 pt-40 pb-36 border-t-2 border-b-2 flex-shrink-0"
+                    :class="['unit-box', { 'unit--first': unitIndex === 0, 'unit--last': unitIndex === Object.keys(rawUnitData).length - 1 }]"
+                    :style="{
                                 borderColor: getUnitColor(unitIndex),
                                 backgroundColor: 'var(--background-color-1t)',
                             }">
+                             
 
                             <!-- Unit name header -->
-                            <div class="absolute -top-5 left-1/2 transform -translate-x-1/2 px-6 py-2 rounded-lg font-bold text-xl whitespace-nowrap shadow-md z-10"
+                            <div class="absolute -top-5 left-1/2 transform -translate-x-1/2 px-6 py-2 rounded-lg font-bold text-xl whitespace-nowrap shadow-md"
                                 :style="{ backgroundColor: getUnitColor(unitIndex), color: 'var(--light-text)' }">
                                 {{ unitName }}
                             </div>
 
                             <!-- Sections container -->
-                            <div class="flex items-center gap-24">
+                            <div class="flex items-center">
                                 <template v-if="rawUnitData[unitName].length > 0"
                                     v-for="([sectionId, sectionName], sectionIndex) in rawUnitData[unitName]"
                                     :key="sectionIndex">
-                                    <div class="relative flex-shrink-0" :style="{
-                                        transform: `translateY(${getNodeOffset(getGlobalSectionIndex(unitIndex, sectionIndex))}px)`
-                                    }" @click="handleNodeClick(sectionId)">
-                                        <!-- THIS IS THE KEY CHANGE: Moved the tooltip outside the group element that controls hovering -->
+
+                                    <AddSection v-if="editModeEnabled && isOwner" class="-mx-8" :library-id="libraryId"
+                                        :unit-id="props.unitPositionMap[unitName][1]" :position="sectionIndex"
+                                        :offset="getNodeOffset(getGlobalSectionIndex(unitIndex, sectionIndex)-.6)"
+                                        :unit-color="getUnitColor(unitIndex)" @nodes-added="onSectionAdd" />
+
+                                        <div class="relative flex-shrink-0 mx-12" 
+                                            :style="{
+                                                transform: `translateY(${getNodeOffset(getGlobalSectionIndex(unitIndex, sectionIndex))}px)`,
+                                                filter: editModeEnabled ? 'grayscale(1) brightness(0.9)' : 'none',
+                                            }" 
+                                            @click="editModeEnabled ? handleEditNodeClick() : handleNodeClick(sectionId)">
+
                                         <!-- Tooltip -->
                                         <div v-if="selectedRoomId && selectedRoomId === sectionId"
                                             class="absolute -top-32 left-1/2 -translate-x-1/2 w-64 z-50"
@@ -100,7 +121,7 @@
                                                 </div>
                                                 <!-- Triangle pointer -->
                                                 <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 transform rotate-45"
-                                                    style="background-color: var(--element-color-1);" />
+                                                style="background-color: var(--element-color-1);" />
                                             </div>
                                         </div>
 
@@ -191,34 +212,43 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <AddSection v-if="editModeEnabled && isOwner && sectionIndex === rawUnitData[unitName].length - 1" class="-mx-8" :library-id="libraryId"
+                                        :unit-id="props.unitPositionMap[unitName][1]" :position="sectionIndex + 1"
+                                        :offset="getNodeOffset(getGlobalSectionIndex(unitIndex, sectionIndex)+.5)"
+                                        :unit-color="getUnitColor(unitIndex)" @nodes-added="onSectionAdd" />
                                 </template>
 
                                 <template v-else>
                                     <div class="flex flex-col pt-10 pb-10 items-center justify-center p-6 min-w-64">
+
                                         <div class="text-center mb-4 mt-2" style="color: var(--light-text);">
                                             <p class="text-lg">No stepping stones yet</p>
                                             <p class="text-sm opacity-75">Add stepping stones to get started</p>
                                         </div>
-                                        <button @click="showAddNodeModal = true" disabled="true" class="flex items-center gap-2 px-4 py-2 rounded-lg transition-all 
-                               duration-200 hover:scale-105 active:scale-95" :style="{
-                                background: getUnitColor(unitIndex),
-                                color: 'var(--light-text)',
 
-                            }">
-                                            <!-- <PlusIcon class="w-5 h-5" /> -->
-                                            <!-- <span>Add Stepping Stone</span> -->
-                                            <!-- TODO: un-disable button and uncomment out text, also add owner / not owner condition for showing this button or show a small modal / popup or something -->
-                                            <span>Can't add stepping stones yet - we're still building!</span>
+                                        <!-- owner sees the AddSection bubble -->
+                                        <AddSection v-if="isOwner" :library-id="libraryId"
+                                            :unit-id="props.unitPositionMap[unitName][1]" :position="0" :empty-unit="true"
+                                            :offset="getNodeOffset(getGlobalSectionIndex(unitIndex, 20))"
+                                            :unit-color="getUnitColor(unitIndex)" @nodes-added="onSectionAdd" />
 
-                                        </button>
+                                        <div v-if="!isOwner" class="flex items-center gap-2 px-4 py-2 rounded-lg transition-all 
+                                            duration-200 hover:scale-105 active:scale-95" :style="{
+                                                background: getUnitColor(unitIndex),
+                                                color: 'var(--light-text)',
+
+                                            }">
+                                            <PlusIcon class="w-0 h-5 opacity-0" />
+                                            <span>Only Course owner can add stepping stones!</span>
+                                            <PlusIcon class="w-0 h-5 opacity-0" />
+                                        </div>
                                     </div>
                                 </template>
-
                             </div>
                         </div>
 
-                        <AddUnit :library-id="libraryId" :position="unitIndex + 1"
-                            :existing-units="Object.keys(rawUnitData)" :can-add-unit="canModify"
+                        <AddUnit v-if="editModeEnabled" :library-id="libraryId" :position="unitIndex + 1"
+                            :existing-units="Object.keys(rawUnitData)" :can-add-unit="isOwner"
                             @unit-added="handleUnitAdded" />
 
                     </template>
@@ -263,110 +293,8 @@
         </div>
     </div>
 
-    <!-- Add Node Modal -->
-    <Transition name="modal">
-        <div v-if="showAddNodeModal" class="fixed inset-0 flex items-center justify-center z-50 p-4"
-            style="background-color: var(--background-haze);">
-            <div class="rounded-2xl p-6 w-full max-w-md shadow-xl border"
-                style="background-color: var(--background-color); color: var(--light-text); border-color: var(--color-primary-dark);">
-                <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-xl font-semibold" style="color: var(--light-text);">Add New Stepping
-                        Stones</h2>
-                    <button @click="showAddNodeModal = false" style="color: var(--highlight-color);">
-                        <XMarkIcon class="w-6 h-6" />
-                    </button>
-                </div>
-                <div class="space-y-4">
-                    <!-- Dynamic list of node names -->
-                    <div>
-                        <label class="block text-sm font-medium mb-1" style="color: var(--highlight-color);">Stepping
-                            Stone
-                            Names</label>
-                        <div v-for="(node, index) in newNodeNames" :key="index" class="flex items-center gap-2 mb-2">
-                            <input v-model="newNodeNames[index]" type="text" class="w-full p-2 border rounded-lg"
-                                style="background-color: var(--background-color-1t); color: var(--light-text); border-color: var(--color-primary-dark);"
-                                placeholder="Enter Stepping Stone name" maxlength="40" />
-                            <button v-if="newNodeNames.length > 1" @click="removeNodeName(index)"
-                                class="text-red-400 hover:text-red-300">
-                                <XCircleIcon class="w-6 h-6" />
-                            </button>
-                            <p v-if="nodeNameErrors.length" class="mt-1 text-sm"
-                                style="color: var(--color-primary-light);">
-                                <!-- {{ nodeNameErrors }} -->
-                                <span v-for="(error, index) in nodeNameErrors" :key="index">{{ error
-                                }}<br></span>
-                            </p>
-                        </div>
-                        <button @click="addNodeNameField" class="mt-2 text-sm font-medium flex items-center gap-1"
-                            style="color: var(--highlight-color);">
-                            <PlusIcon class="w-4 h-4" />
-                            Add Another Node
-                        </button>
-                        <p v-if="nodeNameErrors.length" class="mt-1 text-sm" style="color: var(--color-primary-light);">
-                            <!-- {{ nodeNameErrors }} -->
-                            <span v-for="(error, index) in nodeNameErrors" :key="index">{{ error }}<br></span>
-                        </p>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium mb-1" style="color: var(--highlight-color);">Upload
-                            Resource
-                            (optional)<br>Note: Stepping stone content is based on this resource and all
-                            previously
-                            uploaded resources in this library </label>
-                        <div class="border border-dashed rounded-lg p-4 text-center"
-                            style="background-color: var(--background-color-1t); border-color: var(--color-primary-light);">
-                            <input type="file" ref="fileInput" @change="handleFileSelection" class="hidden"
-                                accept=".pdf,.doc,.docx,.txt" />
-                            <div v-if="!selectedFile" @click="$refs.fileInput.click()" class="cursor-pointer">
-                                <DocumentPlusIcon class="w-12 h-12 mx-auto"
-                                    style="color: var(--color-primary-light);" />
-                                <p class="mt-2 text-sm" style="color: var(--highlight-color);">Click to
-                                    upload (max
-                                    500KB)
-                                </p>
-                                <p class="mt-1 text-xs" style="color: var(--color-primary-light);">PDF, DOC,
-                                    DOCX,
-                                    TXT</p>
-                            </div>
-                            <div v-else class="text-left">
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center">
-                                        <DocumentIcon class="w-8 h-8 mr-2" style="color: var(--color-primary-light);" />
-                                        <div>
-                                            <p class="text-sm font-medium truncate"
-                                                style="color: var(--highlight-color);">
-                                                {{ selectedFile.name }}</p>
-                                            <p class="text-xs" style="color: var(--color-primary-light);">{{
-                                                formatFileSize(selectedFile.size) }}</p>
-                                        </div>
-                                    </div>
-                                    <button @click.prevent="removeFile" class="text-red-400 hover:text-red-300">
-                                        <XCircleIcon class="w-6 h-6" />
-                                    </button>
-                                </div>
-                            </div>
-                            <p v-if="fileError" class="mt-2 text-sm text-red-400">{{ fileError }}</p>
-                        </div>
-                    </div>
-                    <div class="flex gap-3 justify-end mt-6">
-                        <button @click="showAddNodeModal = false" class="px-4 py-2 border rounded-lg"
-                            style="border-color: var(--color-primary); color: var(--highlight-color);">
-                            Cancel
-                        </button>
-                        <button @click="addNewNodes" class="px-4 py-2 rounded-lg focus:outline-none focus:ring-2"
-                            style="background: var(--button-gradient); color: var(--light-text);"
-                            :disabled="isAddingNode">
-                            <span v-if="isAddingNode">Adding...</span>
-                            <span v-else>Add Stepping Stone</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </Transition>
-
     <LibrarySettings v-model:showSettingsModal="showSettingsModal" :library-id="libraryId"
-        :library-is-public="libraryIsPublic" :library-join-code="libraryJoinCode" :can-modify="canModify" />
+        :library-is-public="libraryIsPublic" :library-join-code="libraryJoinCode" :can-modify="isOwner" />
 
 </template>
 
@@ -384,21 +312,21 @@ import {
     PuzzlePieceIcon,
     RocketLaunchIcon,
     SparklesIcon,
-    PlusIcon,
     CogIcon,
     XMarkIcon,
-    DocumentPlusIcon,
-    DocumentIcon,
-    XCircleIcon,
     ChevronDoubleLeftIcon,
     ChevronDoubleRightIcon,
-    ChartBarIcon
+    ChartBarIcon,
+    PencilIcon,
+    PlusIcon,
+    HomeIcon
 } from '@heroicons/vue/24/solid';
 import { useGameStore } from '@/store/gameStore'
 import { useRouter } from 'vue-router';
-import axios from 'axios';
+import { toast } from 'vue-sonner'
 import LibrarySettings from "./LibrarySettings.vue";
 import AddUnit from "./AddUnit.vue";
+import AddSection from "./AddSection.vue"
 
 const props = defineProps({
     libraryId: {
@@ -425,8 +353,12 @@ const props = defineProps({
         type: [String, null],
         required: true
     },
-    canModify: {
+    isOwner: {
         type: Boolean,
+        required: true
+    },
+    unitPositionMap: {
+        type: Object,
         required: true
     }
 })
@@ -439,21 +371,17 @@ watch(() => props.unitSectionMap, async (newVal) => {
 }, { deep: true, immediate: true })
 
 // State for adding new nodes
-const showAddNodeModal = ref(false)
-const newNodeNames = ref([''])
-const selectedFile = ref(null)
-const nodeNameErrors = ref([])
-const fileError = ref('')
-const isAddingNode = ref(false)
 const gameStore = useGameStore()
 const showSettingsModal = ref(false)
-const canModify = ref(false)
+const isOwner = ref(false)
+const editModeEnabled = ref(false);
 
 // Track selected room for tooltip
 const selectedRoomId = ref(null)
+
 // File input handling
-const fileInput = ref(null)
 const scrollPosition = ref(0)
+
 // Color schemes for units
 const unitColors = [
     '#2ecc71', // green
@@ -495,9 +423,51 @@ function toggleSettings() {
     showSettingsModal.value = !showSettingsModal.value
 }
 
+function toggleEditMode() {
+    selectedRoomId.value = null;
+
+    editModeEnabled.value = !editModeEnabled.value
+
+    if (!editModeEnabled.value) {
+        toast.success('Edit Mode Disabled', {
+            description: 'You can now interact with the nodes.',
+            duration: 3000,
+            position: 'bottom-right',
+            style: {
+                background: 'var(--element-color-1)', // A slightly different background for success
+                color: 'var(--light-text)',
+                border: '1px solid var(--highlight-color)',
+                borderRadius: '8px',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+            },
+            // Consider adding a relevant icon if available in your icon set
+            // icon: '✔️' // Example: Checkmark icon
+        });
+    }
+    // If edit mode is disabled, enable it and show a toast
+    else {
+        toast.success('Edit Mode Enabled', {
+            description: 'Node interaction is disabled in edit mode.',
+            duration: 3000,
+            position: 'bottom-right',
+            style: {
+                background: 'var(--element-color-2)', // A slightly different background for error
+                color: 'var(--light-text)',
+                border: '1px solid var(--highlight-color)',
+                borderRadius: '8px',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+            },
+        });
+    }
+
+}
+
 function goToLeaderboard() {
-    console.log(props.libraryId)
     router.push(`/lessons/${props.libraryId}/leaderboard`)
+}
+
+function goToHome() {
+    router.push("/library");
 }
 
 // Get color for a unit based on its index
@@ -552,110 +522,10 @@ const getGlobalSectionIndex = (unitIndex: number, sectionIndex: number) => {
     return count + sectionIndex;
 }
 
-const handleFileSelection = (event) => {
-    const file = event.target.files[0]
-    if (!file) return
-    fileError.value = ''
-    // Check file size (500KB limit)
-    if (file.size > 512000) {
-        fileError.value = 'File size exceeds 500KB limit'
-        return
-    }
-    // Check file type
-    const allowedTypes = [
-        'application/pdf',
-        'application/msword',
-        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-        'text/plain'
-    ]
-    if (!allowedTypes.includes(file.type)) {
-        fileError.value = 'Only PDF, DOC, DOCX, and TXT files are allowed'
-        return
-    }
-    selectedFile.value = file
-}
-
-const removeFile = () => {
-    selectedFile.value = null
-    fileError.value = ''
-    if (fileInput.value) {
-        fileInput.value.value = ''
-    }
-}
-
-const formatFileSize = (bytes) => {
-    if (bytes < 1024) return bytes + ' B'
-    if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB'
-    return (bytes / 1048576).toFixed(1) + ' MB'
-}
-
-// Add a new node name field
-const addNodeNameField = () => {
-    newNodeNames.value.push('')
-    nodeNameErrors.value.push('')
-}
-
-// Remove a node name field
-const removeNodeName = (index) => {
-    newNodeNames.value.splice(index, 1)
-    nodeNameErrors.value.splice(index, 1)
-}
-
 // Function to add a new node
-const addNewNodes = async () => {
-    // Validate node name
-    nodeNameErrors.value = new Array(newNodeNames.value.length).fill('')
-    let hasError = false
-    const trimmedNames = newNodeNames.value.map(name => name.trim())
-    trimmedNames.forEach((name, index) => {
-        if (!name) {
-            nodeNameErrors.value[index] = 'Please enter a node name'
-            hasError = true
-        } else if (!/^[a-zA-Z ]+$/.test(name)) {
-            nodeNameErrors.value[index] = 'Node name can only contain letters and spaces'
-            hasError = true
-        } else if (name.length > 40) {
-            nodeNameErrors.value[index] = 'Node name must be 40 characters or less'
-            hasError = true
-        } else if (trimmedNames.indexOf(name) !== index) {
-            nodeNameErrors.value[index] = 'Duplicate node name in this form'
-            hasError = true
-        }
-    })
-    if (hasError) return
-    isAddingNode.value = true
-    const currentAbortController = new AbortController();
-    try {
-        // Add each node
-        const formData = new FormData()
-        formData.append('libraryId', props.libraryId)
-        // Append all room names with the same key name
-        trimmedNames.forEach(room => formData.append("roomNames", room));
-        // Add file if present (same file for all nodes)
-        if (selectedFile.value) {
-            console.debug(selectedFile.value)
-            formData.append('file', selectedFile.value)
-        }
-        const response = await axios.post('/api/library/room', formData, {
-            signal: currentAbortController.signal,
-            headers: {
-                'Content-Type': 'multipart/form-data'
-            }
-        })
-        if (currentAbortController.signal.aborted) return; // Don't proceed if aborted
-        if (response.data && response.data.status === "success") {
-            // Clear form and refresh to show new nodes
-            newNodeNames.value = [''] // Reset to one empty field
-            removeFile()
-            showAddNodeModal.value = false
-            window.location.reload();
-        }
-    } catch (error) {
-        console.error('Error adding nodes:', error)
-        nodeNameErrors.value[0] = error.message || 'Failed to add nodes. Please try again.'
-    } finally {
-        isAddingNode.value = false
-    }
+const onSectionAdd = async () => {
+    // try to get rid of in the future
+    window.location.reload();
 }
 
 // Function to get the corresponding room data by section ID
@@ -696,7 +566,7 @@ let scrollTimeoutId = null;
 // Scroll to center on first load
 onMounted(() => {
 
-    canModify.value = props.canModify
+    isOwner.value = props.isOwner
 
     recalcMaxLeft()
     // If there are nodes and the container exists, scroll to position
@@ -753,12 +623,6 @@ const handleUnitAdded = (unitData) => {
     rawUnitData.value = updatedUnitData;
 
     recalcMaxLeft()
-
-    // Force a UI update by refreshing the page
-    // This is a temporary solution - ideally you'd use reactive updates
-    // setTimeout(() => {
-    //     window.location.reload();
-    // }, 500);
 }
 
 // Add these variables
@@ -806,6 +670,24 @@ const handleNodeClick = (sectionId) => {
         selectedRoomId.value = selectedRoomId.value && selectedRoomId.value === sectionId ? null : sectionId
     }
 }
+
+const handleEditNodeClick = () => {
+    toast.warning('Edit Mode Active', {
+        description: 'Node interaction is disabled in edit mode.',
+        duration: 3000,
+        position: 'bottom-right',
+        style: {
+            background: 'var(--element-color-2)', // A slightly different background for info
+            color: 'var(--light-text)',
+            border: '1px solid var(--highlight-color)',
+            borderRadius: '8px',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+        },
+        // Consider adding a relevant icon if available in your icon set
+        // icon: 'ℹ️' // Example: Information icon
+    });
+}
+
 const getNodeOffset = (index) => {
     const amplitude = 75;
     // Add a slight phase shift for more natural movement
@@ -919,4 +801,5 @@ const handleScroll = () => {
     border-top-right-radius: 0.625rem;
     border-bottom-right-radius: 0.625rem;
 }
+
 </style>

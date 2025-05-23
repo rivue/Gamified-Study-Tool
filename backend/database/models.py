@@ -31,10 +31,10 @@ class User(db.Model, UserMixin):
     experience_points = db.Column(db.Integer, default=0)
     achievements = db.relationship('UserAchievement', backref='user', cascade="all, delete-orphan")
 
-    actions = db.relationship('UserAction', backref='user', cascade="all, delete-orphan")
+    actions = db.relationship('UserAction', backref='user', cascade="all, delete-orphan") # TODO: not using
 
-    chats = db.relationship('ChatHistory', backref='user', cascade="all, delete-orphan")
-    lessons = db.relationship('Lesson', backref='user', cascade="all, delete-orphan")
+    chats = db.relationship('ChatHistory', backref='user', cascade="all, delete-orphan") # TODO: not using
+    lessons = db.relationship('Lesson', backref='user', cascade="all, delete-orphan") # TODO: not using
 
     tier = db.Column(db.String(50), default='free')  # 'free', 'paid', 'pro'
     daily_request_count = db.Column(db.Integer, default=0) # TODO: I am not using
@@ -315,20 +315,66 @@ class LibraryUnit(db.Model):
                             name='uq_library_unit_position'),
     )
 
-    def add_section(self, section_name):
+    def attach_section(self, section: 'LibrarySection', position=None):
         """Add a new section to this unit"""
-        section = LibrarySection(unit_id=self.id, section_name=section_name)
-        db.session.add(section)
-        return section
+        try:
+
+            if not isinstance(section, LibrarySection):
+                raise ValueError("section must be an instance of LibrarySection")
+                
+            with db.session.no_autoflush:
+            
+                # Get current maximum position if we need to append
+                if position is None:
+                    
+                    max_position = db.session.query(db.func.max(LibrarySection.position))\
+                                    .filter(LibrarySection.unit_id == self.id).scalar() or -1
+                    
+                    section.position = max_position + 1
+                    
+                    # Make sure the unit is added to the session if it's not already
+                    db.session.add(section)
+                        
+                else:
+
+                    # Instead of a single update statement
+                    positions = db.session.query(LibrarySection.id, LibrarySection.position)\
+                        .filter(LibrarySection.unit_id == self.id, LibrarySection.position >= position)\
+                        .order_by(LibrarySection.position.desc()).all()
+                        
+                    for id, current_position in positions:
+                        db.session.query(LibrarySection).filter(LibrarySection.id == id)\
+                            .update({LibrarySection.position: current_position + 1})
+                    
+                    section.position = position
+
+                    # Make sure the unit is added to the session if it's not already
+                    db.session.add(section)
+                        
+                section.unit_id = self.id # attach after position is set
+
+                return section
+        
+        except SQLAlchemyError as e:
+            print(f"error: {e}")
+            db.session.rollback() # keep the DB clean
+            raise
 
 class LibrarySection(db.Model):
     __tablename__ = "library_section"
     id = db.Column(db.Integer, primary_key=True)
     unit_id = db.Column(db.Integer, db.ForeignKey('library_unit.id'), nullable=False)
     section_name = db.Column(db.String(200), nullable=False)
+
+    position = db.Column(db.Integer, nullable=False, index=True) 
     
     # Link factoids to a section
     factoids = db.relationship('LibraryFactoid', backref='section', cascade="all, delete-orphan", lazy=True)
+
+    __table_args__ = (
+        db.UniqueConstraint('unit_id', 'position',
+                            name='uq_unit_section_position'),
+    )
 
 class LibraryRoomState(db.Model): # maps users to states of rooms they are in
     id = db.Column(db.Integer, primary_key=True)
@@ -341,9 +387,14 @@ class LibraryRoomState(db.Model): # maps users to states of rooms they are in
     num_lessons = db.Column(db.Integer, nullable=False)
     lesson_state = db.Column(db.Integer, nullable=False)  # 1-state 1, 2-state 2, 3-state 3, 4-state 4, etc...
     
-    # __table_args__ = (
-    #     db.UniqueConstraint('user_id', 'factoid_id', name='uq_user_factoid'),
-    # )
+    __table_args__ = (
+        db.ForeignKeyConstraint(
+            ['user_id', 'library_id'],
+            ['library_membership.user_id', 'library_membership.library_id'],
+            ondelete="CASCADE"          # removes room-states automatically if membership is removed
+        ),
+        db.UniqueConstraint('user_id', 'section_id', name='uq_user_section'),  # Ensure one state per user per section
+    )
 
     def as_dict(self):
         return {
@@ -351,6 +402,7 @@ class LibraryRoomState(db.Model): # maps users to states of rooms they are in
             "user_id": self.user_id,
             "library_id": self.library_id,
             "room_name": self.room_name,
+            "section_id": self.section_id,
             "num_lessons": self.num_lessons,
             "lesson_state": self.lesson_state,
         }

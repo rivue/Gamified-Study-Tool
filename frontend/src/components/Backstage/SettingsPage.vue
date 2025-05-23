@@ -46,8 +46,8 @@ interface Profile {
     tutor: string;
     email: string;
     tier: string;
-    timezone: string; // New property for time zone
-    joined_at: string; // Optional property for joined date
+    timezone: string;
+    joined_at: string;
 }
 
 const profile = ref<Profile>({

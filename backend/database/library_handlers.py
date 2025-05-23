@@ -1,12 +1,15 @@
 from datetime import datetime
-from flask import jsonify
+from flask import jsonify, current_app as app
 from sqlalchemy import func, distinct
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from contextlib import contextmanager
 import random
 import math
 import string
 import time
 import secrets
+from app import InvalidJoinCodeError, UserAlreadyMemberError, MaxUnitsReachedError, NotFoundError
+from sqlalchemy import or_
 from database.models import (
     db,
     User,
@@ -21,6 +24,7 @@ from database.models import (
     LibraryFavorites,
     LibraryCompletion
 )
+
 
 @contextmanager
 def db_transaction():
@@ -62,10 +66,9 @@ def create_library(
             is_public=is_public,
         )
         db.session.add(library)
+        db.session.flush()
         db.session.commit()
-        membership, status = create_library_membership(user_id, library.id)
-        if status != 200:
-            return jsonify({"message": f"Library error creating: + {membership}"}), status
+
         return (
             jsonify(
                 {"message": "Library created successfully", "library_id": library.id}
@@ -93,6 +96,13 @@ def create_library_favorite(
             ),
             201,
         )
+    except IntegrityError:
+        db.session.rollback()
+        return (
+            jsonify(
+                {"message": "Library Favorites object already exists"}
+            ),
+            400)
     except Exception as e:
         db.session.rollback()
         return jsonify({"message": str(e)}), 400
@@ -110,20 +120,22 @@ def create_unit_and_add(library_id, unit_name, position=-1):
         db.session.add(unit)
 
         if len(library.units) >= 20:
-            print("length")
-            return jsonify({"error": "Library has reached maximum number of units"}), 400
+            print("Warning: Library has reached maximum number of units.")
+            raise MaxUnitsReachedError
 
-        if not unit or not library:
-            print("not unit")
-            return jsonify({"error": "Library or Unit not found"}), 404
+        if not unit:
+            print("Warning: not unit in create_unit_and_add.")
+            raise NotFoundError
+        if  not library:
+            print("Warning: not library in create_unit_and_add.")
+            raise NotFoundError
 
-        if position is not -1:
+        if position != -1:
             library.attach_unit(unit, position)
         else:
             library.attach_unit(unit)
 
         db.session.flush()  # Flush to get the unit ID before commit
-        db.session.commit()
 
         return (
             jsonify(
@@ -133,22 +145,68 @@ def create_unit_and_add(library_id, unit_name, position=-1):
         )
     except Exception as e:
         print("something else")
-        print(f"something: {str(e)}")
+        print(f"Exception in create_unit_and_add: {str(e)}")
         return jsonify({"message": str(e)}), 400
+    except MaxUnitsReachedError as e:
+        print(f"Library has reached max amounts of units in create unit: {str(e)}")
+        raise
+    except NotFoundError as e:
+        print(f"Library or Unit not found error in create_unit_and_add: {str(e)}")
+        raise
     
-def create_section_and_add(unit_id, section_name):
+def create_section_and_add(unit_id, section_name, position=-1):
     try:
+
+        if not section_name or not section_name.strip():
+            raise ValueError("Section name cannot be empty.")
+
+        # Note to future: if this query starts taking forever, move duplicate name logic to add section / add unit frontend (or equivalent future component)
         unit = LibraryUnit.query.get(unit_id)
+        if not unit:
+            print("Warning: not unit in create_section_and_add.")
+            raise NotFoundError
 
-        if not unit or not section_name:
-            return jsonify({"error": "Library or Section not found"}), 404
-
-        section = unit.add_section(section_name)
-
-        if not section:
-            return jsonify({"error": "Section failed to generate"}), 404
+        if len(unit.sections) >= 20:
+            return jsonify({"error": "Unit has reached maximum number of sections (20)"}), 400
         
-        db.session.flush()
+        if not unit:
+            raise ValueError(f"Unit with ID {unit_id} not found.")
+        
+        library = unit.library
+        if not library:
+            raise ValueError(f"Library not found for unit {unit_id}.")
+        
+        # Note to future: if this query starts taking forever, move duplicate name logic to add section / add unit frontend (or equivalent future component)
+        existing_section_in_unit = LibrarySection.query.filter_by(unit_id=unit_id, section_name=section_name).first()
+        if existing_section_in_unit:
+            raise ValueError(f"Error: Section name '{section_name}' already exists in this unit.")
+
+        # Note to future: if this join method starts taking forever, move duplicate name logic to add section / add unit frontend (or equivalent future component)
+        existing_section_in_library = LibrarySection.query.join(LibraryUnit).filter(
+            LibraryUnit.library_id == library.id,
+            LibrarySection.section_name == section_name
+        ).first()
+        if existing_section_in_library:
+            # This error message helps distinguish it from the unit-specific duplicate.
+            raise ValueError(f"Error: Section name '{section_name}' already exists in this library in a different unit.")
+
+        section = LibrarySection(
+            unit_id=unit_id,
+            section_name=section_name,
+            position=position
+        )
+       
+        if not section:
+            print("Warning: not section in create_section_and_add.")
+            raise NotFoundError(f"Section creation failed for section name '{section_name}' in unit {unit_id} via unit.add_section. The method may have returned None.")
+        
+        if position != -1:
+            unit.attach_section(section, position)
+        else:
+            unit.attach_section(section)
+            
+        db.session.add(section)
+        db.session.flush()  # Flush to get the section ID before commit
 
         return (
             jsonify(
@@ -158,6 +216,11 @@ def create_section_and_add(unit_id, section_name):
         )
     except Exception as e:
         return jsonify({"message": str(e)}), 400
+    except NotFoundError as e:
+        print(f"Library or Section not found error in create_unit_and_add: {str(e)}")
+        raise
+    except ValueError as e:
+        raise
 
 def get_library_id(library_topic, difficulty, language, language_difficulty, guide):
     try:
@@ -199,7 +262,7 @@ def get_library(library_id, user_id=None, click=True):
     if user_id:
         room_names = []
         for unit in library.units:
-            unit_to_position_map[unit.unit_name] = unit.position
+            unit_to_position_map[unit.unit_name] = (unit.position, unit.id)
             unit_to_section_map[unit.unit_name] = []
             for section in unit.sections:
                 room_names.append((section.section_name, section.id))
@@ -219,7 +282,17 @@ def get_library(library_id, user_id=None, click=True):
     ).first()
 
     library_data["favorited_status"] = favorited_status.is_favorited
+
+    membership_status = LibraryMembership.query.filter_by(
+        user_id=user_id,
+        library_id=library_id
+    ).first()
     
+    if membership_status:
+        library_data["membership_status"] = True
+    else:
+        library_data["membership_status"] = False
+
     return jsonify(library_data)
 
 def get_library_scores(library_id):
@@ -278,6 +351,8 @@ def get_library_room_state(user_id, library_id, section_id=None):
             # room_name="placeholderlrs1234",
             section_id=section_id,
         ).first()
+        print(f"{state}")
+
         return state.as_dict() if state else None
 
 def save_library_room_contents(library_id, section_unit_map, section_contents_map, user_id):
@@ -297,16 +372,16 @@ def save_library_room_contents(library_id, section_unit_map, section_contents_ma
                     print("create unit and add error")
                     message = response_obj.get_json()['message']
                     return jsonify(status="error", message=message.to_str()), 200
-                print("some error here")                
                 unit_id = response_obj.get_json()["unit"]
 
                 curr += 1
+                section_position = 0
                 for section in sections:
-                    print("section error")
 
                     # 2.1 + 2.2) create sections and add to unit
-                    response_obj, status_code = create_section_and_add(unit_id, section)
-                    print("response from create section and add")
+                    response_obj, status_code = create_section_and_add(unit_id, section, section_position)
+
+                    print("response from create section and add") 
                     if status_code != 201:
                         print("create section and add error")
                         print(response_obj.get_json()['message'])
@@ -332,6 +407,7 @@ def save_library_room_contents(library_id, section_unit_map, section_contents_ma
                     factoids = section_contents_map[section]["factoids"]
                     
                     # 4) add factoids to sections
+                    section_position += 1
                     for index, item in enumerate(factoids):
                         lesson_name = "factoid_set_" + str(math.floor(index/9) + 1)
                         
@@ -376,6 +452,89 @@ def save_library_room_contents(library_id, section_unit_map, section_contents_ma
         print("Exception save_library_room_contents")
         print("message: ", str(e))
         return jsonify({"message": str(e)}), 400
+    
+
+def save_section_contents(library_id, section, section_contents_map, unit_id, position):
+
+    try:
+        responses = []
+        num_lessons = 3
+
+        with db_transaction():
+
+            # 1.1 + 1.2) create sections and add to parent unit
+            response_obj, status_code = create_section_and_add(unit_id, section, position)
+            print("after add_section")
+            if status_code != 201:
+                print("create section and add error")
+                print(response_obj.get_json()['message'])
+                message = response_obj.get_json()['message']
+                return jsonify(status="error", message=message.to_str()), 200
+            
+            section_id = response_obj.get_json()["section"]
+            print("after section_id")
+            
+            # 2) add room states for every user in the library
+            library = Library.query.get(library_id)
+            for membership in library.memberships:
+                add_section_user_state(membership.user_id, library_id, section_id, num_lessons)
+                print(f"{membership}")
+            
+            if "factoids" not in section_contents_map:
+                print(f"Warning: No factoids for section '{section}'")
+            
+            print(f"Processing section: {section}")
+            print(f"Section content structure: {type(section_contents_map)}")
+            print(f"Keys in section content: {section_contents_map.keys()}")
+            
+            # 4.1 + 4.2) create factoids and add to sections
+            factoids = section_contents_map["factoids"]
+            
+            # 4) add factoids to sections
+            for index, item in enumerate(factoids):
+                lesson_name = "factoid_set_" + str(math.floor(index/9) + 1)
+                
+                factoid_content = item["factoid_text"]
+                question_data = item["question"]
+                
+                section = LibrarySection.query.get(section_id)
+                
+                # Add factoid to library
+                factoid_response, status_code = add_factoid_to_section(
+                    section_id, factoid_content, lesson_name
+                )
+
+                if status_code != 201:
+                    return factoid_response
+                factoid_id = factoid_response.get_json()["factoid_id"]
+
+                # Add question to factoid
+                question_type = question_data["type"]
+                question_text = question_data["text"]
+                correct_choice = question_data["correct_choice"]
+                
+                # wrong_choices = question_data["wrong_choices"]
+                wrong_choices = question_data.get("wrong_choices", [])
+
+                question_response, status_code = add_question_to_factoid(
+                    factoid_id, question_text, correct_choice, wrong_choices, question_type
+                )
+                if status_code != 201:
+                    return question_response
+                responses.append(
+                    {
+                        "factoid_response": factoid_response.json,
+                        "question_response": question_response.json,
+                    }
+                )
+
+        return jsonify(status="success", data=responses)
+    
+    except Exception as e:
+        print("Exception save_section_content")
+        print("message: ", str(e))
+        return jsonify({"message": str(e)}), 400
+    
 
 
 def retrieve_library_room_contents(library_id, section_id, user_id):
@@ -450,6 +609,79 @@ def retrieve_library_room_contents(library_id, section_id, user_id):
 
     return {"factoids": room_contents}
 
+def join_library(user_id: int, library_id: int, join_code: str = None):
+    """
+    Atomically:
+      • add membership (or raise IntegrityError if already member)
+      • pre-populate room states
+      • create favorite row
+    """
+    user = User.query.get(user_id)
+    if not user:
+        raise ValueError(f"User {user_id} not found")
+
+    library = Library.query.filter(Library.id == library_id).first()
+    if not library:
+
+        if not join_code:
+            raise ValueError(f"Library {library_id} not found")
+        else:
+            library = Library.query.filter(
+                (Library.join_code == join_code) and 
+                (not Library.is_public)
+                ).first()
+            if not library:
+                raise InvalidJoinCodeError("Invalid join code")
+
+    already_exists = db.session.query(LibraryMembership) \
+        .filter_by(user_id=user_id, library_id=library_id) \
+        .first()
+    if already_exists:
+        raise UserAlreadyMemberError("user already in this library")
+
+    try:
+        print("test")
+        membership = LibraryMembership(user_id=user.id, library_id=library.id, joined_at=datetime.now())
+        db.session.add(membership)
+        print("test1")
+        # bulk-insert room states
+
+        # Note: redundant when generating library for first time - maybe move to after save_library_room_contents
+        states = [
+            LibraryRoomState(user_id=user.id,
+                             library_id=library.id,
+                             room_name="placeholder",
+                             section_id=section.id,
+                             num_lessons=3,
+                             lesson_state=1)
+            for unit in library.units for section in unit.sections
+        ]
+        db.session.bulk_save_objects(states)
+        print("test2")
+
+        db.session.add(LibraryFavorites(user_id=user.id,
+                                            library_id=library.id,
+                                            is_favorited=False))
+        print("test3")
+        db.session.commit()
+        print("after commit")
+        return jsonify({"message": "User added to library successfully"}), 201
+    
+    except IntegrityError as e:
+        print("integrity error join_library")
+        db.session.rollback()
+        print(f"{e}")
+        raise UserAlreadyMemberError  # your custom error
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error in join_library: {e}")
+    
+def leave_library(user: User, library: Library):
+    # TODO: not implemented, in theory all I have to do is remove library_membership since the CASCADE FK will wipe states and favorites
+    # automatically
+    pass
+    
+
 def add_section_user_state(user_id, library_id, section_id, num_lessons, initial_lesson_state=1):
 
     # Check if a record already exists for this user, library, and room
@@ -473,7 +705,6 @@ def add_section_user_state(user_id, library_id, section_id, num_lessons, initial
     
     # Add to database and commit
     db.session.add(new_state)
-    db.session.commit()
     
     return new_state
 
@@ -624,7 +855,8 @@ def add_factoid_to_section(section_id, factoid_content, lesson_name):
             section_id=section_id, lesson_name=lesson_name, factoid_content=factoid_content
         )
         db.session.add(factoid)
-        db.session.commit()
+        db.session.flush()  # Flush to get the factoid ID before commit
+        
         return (
             jsonify(
                 {"message": "Factoid added successfully", "factoid_id": factoid.id}
@@ -632,8 +864,8 @@ def add_factoid_to_section(section_id, factoid_content, lesson_name):
             201,
         )
     except Exception as e:
-        db.session.rollback()
-        return jsonify({"message": str(e)}), 400
+        print(f"Error in add_factoid_to_section: {str(e)}")
+        raise
 
 def add_question_to_factoid(factoid_id, question_text, correct_choice, wrong_choices, question_type):
     try:
@@ -644,12 +876,11 @@ def add_question_to_factoid(factoid_id, question_text, correct_choice, wrong_cho
             question_type=question_type,
         )
         db.session.add(question)
-        db.session.flush()  # Flush to get the question_id before commit
+        db.session.flush()
 
         # Add choices to the question
         add_choices_to_question(question.id, correct_choice, wrong_choices)
 
-        db.session.commit()
         return (
             jsonify(
                 {
@@ -660,8 +891,8 @@ def add_question_to_factoid(factoid_id, question_text, correct_choice, wrong_cho
             201,
         )
     except Exception as e:
-        db.session.rollback()
-        return jsonify({"message": str(e)}), 400
+        print(f"Error in add_question_to_factoid: {str(e)}")
+        raise
 
 def get_factoid(factoid_id):
     factoid = LibraryFactoid.query.get(factoid_id)
@@ -700,11 +931,10 @@ def add_choices_to_question(question_id, correct_choice, wrong_choices):
             )
             db.session.add(wrong)
 
-        db.session.commit()
         return jsonify({"message": "Choices added successfully"}), 201
     except Exception as e:
-        db.session.rollback()
-        return jsonify({"message": str(e)}), 400
+        print(f"Error in add_choices_to_question: {str(e)}")
+        raise
 
 def get_library_room_names(library_id):
     library = Library.query.get(library_id)
@@ -804,31 +1034,66 @@ def update_game_end(user_id, library_id, section_id):
         db.session.rollback()
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
-def get_libraries_info(user_id=None):
-    top_liked_libraries = Library.query.order_by(Library.likes.desc()).limit(40).all()
+def get_libraries_info(user_id=None, browse=False):
 
-    latest_libraries = Library.query.order_by(Library.id.desc()).limit(40).all()
+    # top_liked_libraries = Library.query.order_by(Library.likes.desc()).limit(40).all()
 
-    top_liked_dicts = [model_to_dict(library, exclude=['room_names', 'factoids']) for library in top_liked_libraries]
-    latest_dicts = [model_to_dict(library, exclude=['room_names', 'factoids']) for library in latest_libraries]
+    # latest_libraries = Library.query.order_by(Library.id.desc()).limit(40).all()
 
-    response_data = {
-        'most_liked': top_liked_dicts,
-        'latest': latest_dicts
-    }
+    # top_liked_dicts = [model_to_dict(library, exclude=['room_names', 'factoids']) for library in top_liked_libraries]
+    # latest_dicts = [model_to_dict(library, exclude=['room_names', 'factoids']) for library in latest_libraries]
 
-    if user_id is not None:
+    # response_data = {
+    #     'most_liked': top_liked_dicts,
+    #     'latest': latest_dicts
+    # }
+    
+    if browse:
         
-        my_libraries = Library.query.filter_by(owner_id=user_id).order_by(Library.id.desc()).all()
+        response = {}
 
-        favorited_map = {fav.library_id: fav.is_favorited for fav in LibraryFavorites.query.filter_by(user_id=user_id).all()}
-        my_libraries = [lib for lib in my_libraries if len(lib.room_names) == 0]  # Filter for empty room_names
-        my_libraries = my_libraries[:40]
-        my_dicts = [model_to_dict(library, exclude=['room_names', 'factoids']) for library in my_libraries]
-        response_data['mine'] = my_dicts
-        response_data["favorites_map"] = favorited_map
+        # explore_libraries  = db.session.query(Library).filter_by(user_id not in Library.memberships).all()
+        explore_libraries = (Library.query
+            .filter(
+                ~Library.id.in_(
+                db.session.query(LibraryMembership.library_id)
+                .filter_by(user_id=user_id)
+                ), 
+                Library.is_public.is_(True)
+                )
+            .all())
 
-    return jsonify(response_data)
+        response["explore_libraries"] = [model_to_dict(library, exclude=['room_names', 'factoids']) for library in explore_libraries]
+        
+        return jsonify(response)
+    else:
+        response = {}
+
+        if user_id:
+            
+            my_libraries = (Library.query.filter_by(owner_id=user_id).order_by(Library.id.desc()).all())
+            response["mine"] = [model_to_dict(library, exclude=['room_names', 'factoids']) for library in my_libraries]
+
+            joined_q = (
+                db.session.query(Library)
+                .join(LibraryMembership, 
+                    Library.id == LibraryMembership.library_id)
+                    .filter(LibraryMembership.user_id == user_id,
+                            Library.owner_id != user_id)
+            )
+            joined_public  = joined_q.filter(Library.is_public.is_(True)).all()
+
+            joined_private = joined_q.filter(Library.is_public.is_(False)).all()
+
+            response["joined_public"]  = [model_to_dict(l, exclude=["room_names", "factoids"])
+                                        for l in joined_public]
+            response["joined_private"] = [model_to_dict(l, exclude=["room_names", "factoids"])
+                                        for l in joined_private]
+            
+            favorited_map = {fav.library_id: fav.is_favorited for fav in LibraryFavorites.query.filter_by(user_id=user_id).all()}
+            response["favorites_map"] = favorited_map
+
+        return jsonify(response)
     
 def has_default_image(library_id):
     try:

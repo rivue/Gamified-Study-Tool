@@ -65,8 +65,7 @@ def init_pinecone():
         try:
             # Try to get the existing index directly
             index = pc.Index(index_name)
-            # index_host = pc.describe_index(index_name).host
-            # index = pc.Index(host=index_host, grpc_config=GRPCClientConfig(secure=False))
+
             print(f"Connected to existing index: {index_name}")
             return index
             

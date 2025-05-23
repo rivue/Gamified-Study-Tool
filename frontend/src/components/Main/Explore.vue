@@ -1,12 +1,12 @@
 <template>
-    <div class="library-browser pb-8">
-        <div v-if="isLoading" class="loading">
-            <span>Loading Your Libraries</span>
+    <div class="library-explorer pb-8 pt-8">
+        <div v-if="isLoading" class="loading-explorer">
+            <span>Loading Public Libraries</span>
             <LoadingComponent />
         </div>
 
         <template v-else>
-            <LibraryCarousel v-if="loggedIn && browsingLibraries" :libraries="myLibraries" :library-favorites-map="favoritesMap"/>
+            <ExploreCarousel v-if="loggedIn" :libraries="myLibraries"/>
         </template>
     </div>
 </template>
@@ -17,42 +17,36 @@ import { useRoute } from "vue-router";
 import axios from "axios";
 import { useAuthStore } from "@/store/authStore";
 import LoadingComponent from "@/components/Backstage/LoadingComponent.vue";
-import LibraryCarousel from "./LibraryCarousel.vue";
+import ExploreCarousel from "@/components/Main/ExploreCarousel.vue";
 
 const authStore = useAuthStore();
 const route = useRoute();
 const isLoading = ref(true);
 const myLibraries = ref([]);
-const favoritesMap = ref({});
 
 onMounted(() => {
+
     fetchLibraries();
 });
 
 function fetchLibraries() {
     axios
-        .get("/api/libraries")
-
+        .get("/api/libraries", { params: { browse: true } })
         .then((response) => {
             if (authStore.loggedIn) {
+                console.log(response)
 
-                const combinedLibraries = [
-                    ...response.data.mine,
-                    ...response.data.joined_public,
-                    ...response.data.joined_private
-                ];
-                
-                myLibraries.value = combinedLibraries.sort((a, b) => 
+                myLibraries.value = response.data.explore_libraries.sort((a, b) => 
                     a.library_topic.localeCompare(b.library_topic)
                 );
-
-                favoritesMap.value = response.data.favorites_map;
             }
         })
         .catch((error) => {
+
             console.error("Failed to fetch libraries", error);
         })
         .finally(() => {
+
             isLoading.value = false;
         });
 }
@@ -64,14 +58,14 @@ const browsingLibraries = computed(() => route.path === "/library");
 </script>
 
 <style scoped>
-.library-browser {
+.library-explorer {
     width: 98%;
     height: 100%;
     justify-content: center;
     align-items: center;
 }
 
-.loading {
+.loading-explorer {
     font-size: 1.5em;
     color: var(--text-color);
     display: flex;
