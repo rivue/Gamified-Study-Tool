@@ -157,24 +157,48 @@ def create_unit_and_add(library_id, unit_name, position=-1):
 def create_section_and_add(unit_id, section_name, position=-1):
     try:
 
+        if not section_name or not section_name.strip():
+            raise ValueError("Section name cannot be empty.")
+
+        # Note to future: if this query starts taking forever, move duplicate name logic to add section / add unit frontend (or equivalent future component)
+        unit = LibraryUnit.query.get(unit_id)
+        if not unit:
+            print("Warning: not unit in create_section_and_add.")
+            raise NotFoundError
+
+        if len(unit.sections) >= 20:
+            return jsonify({"error": "Unit has reached maximum number of sections (20)"}), 400
+        
+        if not unit:
+            raise ValueError(f"Unit with ID {unit_id} not found.")
+        
+        library = unit.library
+        if not library:
+            raise ValueError(f"Library not found for unit {unit_id}.")
+        
+        # Note to future: if this query starts taking forever, move duplicate name logic to add section / add unit frontend (or equivalent future component)
+        existing_section_in_unit = LibrarySection.query.filter_by(unit_id=unit_id, section_name=section_name).first()
+        if existing_section_in_unit:
+            raise ValueError(f"Error: Section name '{section_name}' already exists in this unit.")
+
+        # Note to future: if this join method starts taking forever, move duplicate name logic to add section / add unit frontend (or equivalent future component)
+        existing_section_in_library = LibrarySection.query.join(LibraryUnit).filter(
+            LibraryUnit.library_id == library.id,
+            LibrarySection.section_name == section_name
+        ).first()
+        if existing_section_in_library:
+            # This error message helps distinguish it from the unit-specific duplicate.
+            raise ValueError(f"Error: Section name '{section_name}' already exists in this library in a different unit.")
+
         section = LibrarySection(
             unit_id=unit_id,
             section_name=section_name,
             position=position
         )
-
-        unit = LibraryUnit.query.get(unit_id)
-
-        if not unit:
-            print("Warning: not unit in create_section_and_add.")
-            raise NotFoundError
+       
         if not section:
             print("Warning: not section in create_section_and_add.")
-            raise NotFoundError
-
-        
-        if len(unit.sections) >= 20:
-            return jsonify({"error": "Unit has reached maximum number of sections (20)"}), 400
+            raise NotFoundError(f"Section creation failed for section name '{section_name}' in unit {unit_id} via unit.add_section. The method may have returned None.")
         
         if position != -1:
             unit.attach_section(section, position)
@@ -194,6 +218,8 @@ def create_section_and_add(unit_id, section_name, position=-1):
         return jsonify({"message": str(e)}), 400
     except NotFoundError as e:
         print(f"Library or Section not found error in create_unit_and_add: {str(e)}")
+        raise
+    except ValueError as e:
         raise
 
 def get_library_id(library_topic, difficulty, language, language_difficulty, guide):

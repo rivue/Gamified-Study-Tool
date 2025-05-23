@@ -165,9 +165,10 @@ TODO list:
             - when creating library for first time, maybe move join_library call to right below or IN save_library_room_states so theres no duplicate call to add users to library room states - might have to move db.session.commit logic though
             - on user login, make sure streak resets if last streak is more then a day ago or something like that
             - when the user finishes a lesson and it adds to their streak, make sure the streak in the section completion page displays the updated streak
-            - why does the "add unit" button extend the course length a little bit --> it shouldn't for now - jules
+            - why does the "add unit" button extend the course length a little bit --> it shouldn't for now
             - make it so that if the user either generates a library or adds a section / unit then navigates away, it kills the request so the other parts of the libray load and it doesn't get stuck in a hanging state
             - do the loading disabling thing and toast thing for add unit as well, although that should be much faster
+            - account for duplicate unit names when user is adding a unit
 
         hard probably (goal: 2 high level bullet points / wk):
         - ⭐️ remove alert message in library creator (not hard but have to remember)
@@ -176,9 +177,8 @@ TODO list:
             - also, add a "back" button to library even if its literally a router.push call
         - ✅ ⭐️ Finish sections + units
             - ⭐️ Add ability to add sections to specific units (later --> come back to, reminder to make it account for 1-n number of sections no matter how that looks. add new stepping stones button is commented out for now)
-            - Make sure to account for duplicate section names, and other error checking etc... and check for duplicate names for that unit or something
-            - go back to come_back_to
-            - why is this empty? --> rag_context:
+                - go back to come_back_to
+                - why is this empty? --> rag_context:
 
         - ✅ ⭐️ (would like to implement visibility of different courses first or at least a many:one for non-owners in library model)
             - ⭐️ Delete sections requires entering the name of the unit / course just for accidental reasons)
@@ -332,6 +332,11 @@ TODO list:
             1) video button where a manim video is generated about the subject possibly
             2) other resources button where other youtube videos / articles are researched in relation to the topic (grab the resources based on content, not necessarily the name of the section)
 
+        - in “pomodoro / focus mode” dim out the corners of the screen like in minecraft
+        bigger idea —> make the library super customizable like with sdks and images, backgrounds, pictures, etc… just like discord and make it easy to make it super long or super short
+        so that way ppl can make courses on like say the entire bible or five decades of cooking experience or tutorials on a car or something, literally anything
+        for corporate stuff, make it multi-tenant… possibly depending on user feedback ofc
+        for mini-games, instead of making the “right” answer, find the one “incorrect” answer, also do metaphors, and analogies, or synonyms and antonyms, or with googles textfx api or something
         - make a constants file for discord links, twitter / x links, any backend urls, etc...
             - make it available for both frontend and backend like for api routes
             - max_number of libraries

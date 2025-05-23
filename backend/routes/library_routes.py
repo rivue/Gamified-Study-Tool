@@ -6,7 +6,7 @@ from flask_login import current_user, AnonymousUserMixin
 from bleach import clean
 from flask_executor import Executor
 import concurrent.futures
-from app import InvalidJoinCodeError, UserAlreadyMemberError
+from app import InvalidJoinCodeError, UserAlreadyMemberError, UserAlreadyMemberError, InvalidJoinCodeError, MaxUnitsReachedError, NotFoundError
 
 from io import BytesIO
 
@@ -16,7 +16,7 @@ import database.library_handlers as lbh
 import knowledge_net.library_generator as lgn
 from images.library_imager import generate_images_task, save_image
 from database.user_handler import increment_violations, is_within_limit, check_generation_allowed, mark_generation_done
-from database.models import Library, LibrarySection, db
+from database.models import Library, LibrarySection, LibraryUnit, db
 from vector_processing.file_handler import process_document
 from vector_processing.retrieval import query_and_respond_pinecone
 import app
@@ -380,6 +380,44 @@ def init_library_routes(app):
             # If no user is logged in, return an error
             if not user_id:
                 return jsonify(status="error", message="Must be signed in."), 403
+
+            # Note to future: if this query starts taking forever, move duplicate name logic to add section / add unit frontend (or equivalent future component)
+            unit = LibraryUnit.query.get(unit_id)
+            if not unit:
+                print("Warning: not unit in create_section_and_add.")
+                raise NotFoundError("Unit not found")
+            
+            if not unit:
+                raise ValueError(f"Unit with ID {unit_id} not found.")
+            
+            library = unit.library
+            if not library:
+                raise ValueError(f"Library not found for unit {unit_id}.")
+        
+            for section_name in section_names:
+                if not section_name or not section_name.strip():
+                    raise ValueError("Section name cannot be empty.")
+
+                # Note to future: if this query starts taking forever, move duplicate name logic to add section / add unit frontend (or equivalent future component)
+                existing_section_in_unit = LibrarySection.query.filter_by(unit_id=unit_id, section_name=section_name).first()
+                if existing_section_in_unit:
+                    raise ValueError(f"Error: Section name '{section_name}' already exists in this unit.")
+
+                # Note to future: if this query starts taking forever, move duplicate name logic to add section / add unit frontend (or equivalent future component)
+                existing_section_in_library = LibrarySection.query.join(LibraryUnit).filter(
+                    LibraryUnit.library_id == library.id,
+                    LibrarySection.section_name == section_name
+                ).first()
+                if existing_section_in_library:
+                    # This error message helps distinguish it from the unit-specific duplicate.
+                    raise ValueError(f"Error: Section name '{section_name}' already exists in this library in a different unit.")
+
+            if len(unit.sections) >= 20:
+                return jsonify({"error": "Unit has reached maximum number of sections (20)"}), 400
+            
+            units_library = unit.library
+            if not units_library:
+                raise ValueError(f"Library not found for unit {unit_id}.")
             
             library_response = get_library(library_id)
             if not library_response or library_response.status_code == "error":
@@ -454,6 +492,12 @@ def init_library_routes(app):
             # Return results for all subtopics
             return jsonify(status="success", results=results)
 
+        except ValueError as e:
+            print(f"ValueError in generate_section: {str(e)}")
+            return jsonify(status="error", message=str(e)), 400
+        except NotFoundError as e:
+            print(f"NotFoundError in generate_section: {str(e)}")
+            return jsonify(status="error", message=str(e)), 400
         except Exception as e:
             print(f"Exception in generate_section: {str(e)}")
             return jsonify(status="error", message="Section Add Failed"), 500
