@@ -122,11 +122,13 @@ TODO list:
             - also, make room / course / unit / section consistent in frontend
         - ⭐️ vvvmaybe ask for feedback before doing vvv
             - also make sure it works well(ish) for mobile
-        - ⭐️ add google auth
+        - ⭐️ add google 
+            - note: probably has to make rivue email work first
         - ⭐️ Terms of use / Policy Page legal agreement thing - ask gpt if I actually need, maybe ask jake how to do but maybe not
             - ⭐️ There are probably websites and stuff for this --> do this before Stripe
         - ⭐️ Stripe implementation
             - have to think abt what different payment levels mean / how I want to do it
+            - maybe think of business profit levels given llm api costs or something
         - ⭐️ ⭐️ ⭐️ (might take at least a couple weeks) UI redesign / rehaul *** --> kinnu, duolingo, saved instagram design reels etc...) --> ask nc state entreprenuership ppl for tips while i'm designing
             - Note: 1) try to see what horizontal --> vertical learning path looks like, and possibly make a vertical bar on the side for settings, i-card, files list, adding a new stepping stone, etc... but maybe keep lesson name and current unit name at the top?
             - COPY QUIZLET???
@@ -158,7 +160,7 @@ TODO list:
             - note: for main page, add two / 3 simple boxes, class you want, school, and possibly professor, and it gives you classes close to you like quizlet / rate my professor along with option for creating your own
                 maybe it shows private ones with a "lock" icon and prompts you to enter a password. this way it would be like more of a network, which would differentiate us from a copy paste ai study tool (turbolearn) / NotebookLM
         
-        glitches / small stuff
+        glitches / small stuffi7u6 763 =--- == asdlfja;sldkfjasdfasdfasdfasdfavadf vlj;lkj]2-e0woie-vasd-0i,knlkjasdfasdfasdfasdf
             - make sure adding a unit actually refreshes the page and stuff
             - why do different pages flicker on the screen when I am on a page and I hit refresh?
             - why is public generating a code on library creation? 
@@ -181,7 +183,7 @@ TODO list:
                 - why is this empty? --> rag_context:
 
         - ✅ ⭐️ (would like to implement visibility of different courses first or at least a many:one for non-owners in library model)
-            - ⭐️ Delete sections requires entering the name of the unit / course just for accidental reasons)
+            - ⭐️ Delete sections (requires entering the name of the unit / course just for accidental reasons)
             - ⭐️ Delete Units (requires entering the name of the unit / course just for accidental reasons)
             - ⭐️ Delete courses / libraries (whatever they're called) (requires entering the name of the unit / course just for accidental reasons)
                - ⭐️ Remember to delete from both DB and pinecone as well, as well as respective child / parent courses / units / sections / libraries, roomNameState, LibraryFavorites, question, question_choice, LibraryMembership, etc...
@@ -203,6 +205,8 @@ TODO list:
 
     general:
     study tool additions / ideas:
+        - complete feedback / user email dashboard detailing 1) feedback data 2) ai summaries / insights on what feedback I might have, maybe even broken up by user groups, age, location, etc... 3) list of user emails maybe? - might even be on a private url which calls my api - look into admin_routes if you know what I mean
+            - contact / support pipeline?
         - tasks which optimize containers and stuff, like startup latency, cpu / memory utilization, etc.. could be really good for resume (optimized billable container instance time leading to 4.5k in monthly cost savings, etc...)
         - for library creation, experiment w/ 3 tab structure like wava 
             - eventually break up library creation from library list, and add lots of advanced customizability maybe

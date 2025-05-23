@@ -485,6 +485,31 @@ def init_library_routes(app):
         except Exception as e:
             print(f"Exception in generate_section: {str(e)}")
             return jsonify(status="error", message="Section Add Failed"), 500
+    
+    @app.route("/api/library/section/<int:section_id>", methods=['DELETE'])
+    def delete_section():
+        user_id = current_user.id if not isinstance(current_user, AnonymousUserMixin) else None
+        
+        # user_id needs to point to a user, 
+        # user needs to be owner of the library (section = section_id; section.unit_id = unit_id; unit.library_id = library_id)
+        # verify owner in frontend as well as here, don't send library_id bc thats not RESTful
+        # library = db.session.query(Library).filter_by(id=library_id).first()  
+        # position reordering
+        # delete:
+        # factoid --> questions --> question choices
+        # room state
+        # factoid
+        # SEE CLAUDE!!!
+        # SEE CHATGPT FOR BACKREF THINGS!!!
+            # AND FOR CASCADE IN LIBRARY ROOM STATE AS WELL!!!
+
+        try:
+            # some function in library_handlers or something
+            # either id of deleted thing or just a success message or something
+            return jsonify(status="success", results=results)
+
+        except Exception as e:
+            return jsonify(status="error", message="No section names provided"), 400
         
     @app.route('/api/library/available-generated-rooms', methods=['POST'])
     def get_available_generated_rooms():
