@@ -15,6 +15,7 @@
                                 placeholder="Mrs. Frizzle's science class, Biology 272, etc..." maxlength="100"
                                 @focus="selectInputText" @paste="handlePaste" />
                         </div>
+                        <div class="helper-text text-xs opacity-70 mt-1">🐙 Note: Course name must be 4-25 characters.</div>
                         <div v-if="formattedErrors.topic?._errors?.length" class="error-message">
                             {{ formattedErrors.topic._errors[0] }}
                         </div>
@@ -39,7 +40,7 @@
                                     {{ formattedErrors.selectedFile._errors[0] }}
                                 </div>
                                 <div class="helper-text">
-                                    🐙 Only accepting .pdf files that are 500kb or less for now - we're still building!
+                                    🐙 Required. PDF files only, max 500kb.
                                 </div>
                             </div>
                         </div>
@@ -50,6 +51,9 @@
                     <div class="form-group room-names">
                         <div class="libgen-title">
                             Course Structure
+                        </div>
+                        <div class="helper-text text-sm opacity-80 mt-1 mb-3 text-center">
+                            Define the structure of your course. Each course requires at least one Unit, and each Unit requires at least one Section. All names should be 4-25 characters long without leading or trailing spaces.
                         </div>
                         <div class="room-input-container">
                             <!-- Group controls -->
@@ -63,6 +67,7 @@
                                         Add Unit
                                     </button>
                                 </div>
+                                <div class="helper-text text-xs opacity-70 mt-1">🐙 Unit names must be unique.</div>
 
                                 <div v-if="formattedErrors.groups?._errors?.length" class="error-message">
                                     {{ formattedErrors.groups._errors[0] }}
@@ -106,6 +111,7 @@
                                                 Add Section
                                             </button>
                                         </div>
+                                        <div class="helper-text text-xs opacity-70 mt-1">🐙 Note: Section names must be unique within this unit and the entire course.</div>
                                         <div v-if="formattedErrors.groups?.[groupIndex]?.name?._errors?.length"
                                             class="error-message">
                                             {{ formattedErrors.groups[groupIndex].name._errors[0] }}
