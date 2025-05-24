@@ -680,23 +680,25 @@ def join_library(user_id: int, library_id: int, join_code: str = None):
 def leave_library(user_id: int, library_id: int):
         
         try:
-            membership = LibraryMembership.query.filter_by(user_id=user_id, library_id=library_id).first()
-            if not membership:
-                return jsonify(status="error", message="You are not a member of this course."), 403
-            print("after membership")
-            # Delete LibraryMembership (LibraryRoomState should cascade delete)
-            db.session.delete(membership)
-            print("after delete membership")
-            # Delete LibraryFavorites if exists
-            favorite = LibraryFavorites.query.filter_by(user_id=user_id, library_id=library_id).first()
-            if favorite:
-                db.session.delete(favorite)
-            print("after library favorices")
-            # Explicitly delete LibraryRoomState as a fallback, though cascade should handle it.
-            # This is more of a verification step or a safeguard.
-            # If cascade is confirmed to work reliably, this explicit delete can be removed.
-            # LibraryRoomState.query.filter_by(user_id=user_id, library_id=library_id).delete()
-            print("after delete library room state")
+            with db_transaction():
+                membership = LibraryMembership.query.filter_by(user_id=user_id, library_id=library_id).first()
+                if not membership:
+                    return jsonify(status="error", message="You are not a member of this course."), 403
+                print("after membership")
+                # Delete LibraryMembership (LibraryRoomState should cascade delete)
+                db.session.delete(membership)
+                print("after delete membership")
+                # Delete LibraryFavorites if exists
+                favorite = LibraryFavorites.query.filter_by(user_id=user_id, library_id=library_id).first()
+                if favorite:
+                    db.session.delete(favorite)
+                print("after library favorices")
+                # NOTE: add cascade effect to library room state
+                # Explicitly delete LibraryRoomState as a fallback, though cascade should handle it.
+                # This is more of a verification step or a safeguard.
+                # If cascade is confirmed to work reliably, this explicit delete can be removed.
+                # LibraryRoomState.query.filter_by(user_id=user_id, library_id=library_id).delete()
+                print("after delete library room state")
         except NotFoundError as e:
             db.session.rollback()
             raise
