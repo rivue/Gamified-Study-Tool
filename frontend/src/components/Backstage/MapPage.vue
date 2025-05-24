@@ -5,7 +5,8 @@
             <LearningPath :libraryId="Number(library.data.id)" :room-names="library.data.room_names"
                 :room-data="library.room_data" :library-is-public="library.data.is_public"
                 :unit-section-map="processedUnitSectionMap" :library-join-code="library.data.join_code" 
-                :is-owner="library.data.show_settings" :unit-position-map="library.data.unit_to_position_map"/>
+                :is-owner="library.data.show_settings" :unit-position-map="library.data.unit_to_position_map"
+                :library-topic="library.data.library_topic"/>
         </div>
         <div v-else-if="loading">
             <p>Loading...</p>

@@ -495,9 +495,10 @@ def init_library_routes(app):
         if section.unit.library.owner_id != current_user.id:
            raise PermissionError("You do not own this library.")
         
+        print("before delete")
         
         section.delete_and_reindex()
-        
+        print("after delete")
         # user_id needs to point to a user, 
         # user needs to be owner of the library (section = section_id; section.unit_id = unit_id; unit.library_id = library_id)
         # verify owner in frontend as well as here, don't send library_id bc thats not RESTful

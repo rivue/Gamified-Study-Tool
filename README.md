@@ -120,6 +120,7 @@ TODO list:
         - ⭐️ for LibraryCreator, outline the rules clearly somewhere, like in an i-card next to "create a course to explore" 
         or just put in text "rules for creating courses" or something
             - also, make room / course / unit / section consistent in frontend
+                - not sure exactly where it is inconsistent
         - ⭐️ vvvmaybe ask for feedback before doing vvv
             - also make sure it works well(ish) for mobile
         - ⭐️ add google 
@@ -160,8 +161,8 @@ TODO list:
             - note: for main page, add two / 3 simple boxes, class you want, school, and possibly professor, and it gives you classes close to you like quizlet / rate my professor along with option for creating your own
                 maybe it shows private ones with a "lock" icon and prompts you to enter a password. this way it would be like more of a network, which would differentiate us from a copy paste ai study tool (turbolearn) / NotebookLM
         
-        glitches / small stuffi7u6 763 =--- == asdlfja;sldkfjasdfasdfasdfasdfavadf vlj;lkj]2-e0woie-vasd-0i,knlkjasdfasdfasdfasdf
-            - make sure adding a unit actually refreshes the page and stuff
+        glitches / small stuff
+            - make sure adding a unit actually refreshes on the page and stuff ideally w/ out refresh
             - why do different pages flicker on the screen when I am on a page and I hit refresh?
             - why is public generating a code on library creation? 
             - current streak in lesson complete displays current streak not current streak + 1 (maybe just refetch it?)
@@ -175,6 +176,9 @@ TODO list:
             - account for duplicate unit names when user is adding a unit
             - go through library_routes and make sure routes that require login actual have @login_required decorator
 
+        TODO when I get back:
+            - last 5 jules tasks then delete something
+
         hard probably (goal: 2 high level bullet points / wk):
         - ⭐️ remove alert message in library creator (not hard but have to remember)
         - ⭐️ add username (backfill username w/ 1st part of email before @ symbol - maybe let people change later)
@@ -185,11 +189,13 @@ TODO list:
 
         - ✅ ⭐️ (would like to implement visibility of different courses first or at least a many:one for non-owners in library model)
             - ⭐️ Delete sections (requires entering the name of the unit / course just for accidental reasons)
+                - DELETE SECTION MIGRATION c7209aac4ac0
             - ⭐️ Delete Units (requires entering the name of the unit / course just for accidental reasons)
             - ⭐️ Delete courses / libraries (whatever they're called) (requires entering the name of the unit / course just for accidental reasons)
                - ⭐️ Remember to delete from both DB and pinecone as well, as well as respective child / parent courses / units / sections / libraries, roomNameState, LibraryFavorites, question, question_choice, LibraryMembership, etc...
-        - ⭐️ (NOTE: do AFTER deleting sections / units / courses and adding sections) ability to leave a library
+        - ⭐️ (NOTE: do AFTER deleting sections / units / courses and adding sections) ability to leave a library <-- jules
             - in explore courses page, add a "leave library" next to the "go to Course" button when a user joins the course
+            - for course owner, it is replaced by delete library, which erases everything
 
         medium (chip away at when tired / mentally exhausted from hard ones):
         - ⭐️ add staging / pre-production environment that isn't localhost
@@ -200,14 +206,16 @@ TODO list:
 
     OTHER PAGES:
         - terms and policies page
-        - about page (?)
         - somewhere to link to X / discord (might be on an existing page, idk) (see mvp cleanup list)
         (currently all 4 were in BottomBar.vue) --> (BASICALLY MAKE BottomBar.vue SMALLER)
 
     general:
     study tool additions / ideas:
+        - handle delete account (eventually)
+        - when the course owner adds / deletes a section, broadcast it via webhooks to the other members in the form of alert toasts so they can see it live
         - complete feedback / user email dashboard detailing 1) feedback data 2) ai summaries / insights on what feedback I might have, maybe even broken up by user groups, age, location, etc... 3) list of user emails maybe? - might even be on a private url which calls my api - look into admin_routes if you know what I mean
             - contact / support pipeline?
+            - use this in some private version of rivue url, not the main one
         - tasks which optimize containers and stuff, like startup latency, cpu / memory utilization, etc.. could be really good for resume (optimized billable container instance time leading to 4.5k in monthly cost savings, etc...)
         - for library creation, experiment w/ 3 tab structure like wava 
             - eventually break up library creation from library list, and add lots of advanced customizability maybe
