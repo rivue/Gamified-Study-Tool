@@ -302,6 +302,27 @@ def init_library_routes(app):
             app.logger.exception(e)
             return jsonify(status="error", message="internal error"), 500
         
+    
+    @app.route('/api/library/<int:library_id>/leave', methods=['DELETE'])
+    @login_required
+    def leave_library(library_id):
+        try:
+            library = Library.query.get(library_id)
+            if not library:
+                return jsonify(status="error", message="Library not found"), 404
+
+            if library.owner_id == current_user.id:
+                return jsonify(status="error", message="Owners cannot leave their own course. Please delete the course or transfer ownership instead."), 403
+            print("before library")
+            lbh.leave_library(current_user.id, library_id)
+            print("after library")
+            return jsonify(status="success", message="Successfully left the course."), 200
+
+        except Exception as e:
+            db.session.rollback()
+            app.logger.error(f"Error leaving library: {e}")
+            return jsonify(status="error", message="An internal error occurred. Please try again."), 500
+        
     @app.route('/api/library/unit', methods=['POST'])
     def generate_unit():
         user_id = current_user.id if not isinstance(current_user, AnonymousUserMixin) else None

@@ -676,10 +676,33 @@ def join_library(user_id: int, library_id: int, join_code: str = None):
         db.session.rollback()
         print(f"Error in join_library: {e}")
     
-def leave_library(user: User, library: Library):
-    # TODO: not implemented, in theory all I have to do is remove library_membership since the CASCADE FK will wipe states and favorites
-    # automatically
-    pass
+
+def leave_library(user_id: int, library_id: int):
+        
+        try:
+            membership = LibraryMembership.query.filter_by(user_id=user_id, library_id=library_id).first()
+            if not membership:
+                return jsonify(status="error", message="You are not a member of this course."), 403
+            print("after membership")
+            # Delete LibraryMembership (LibraryRoomState should cascade delete)
+            db.session.delete(membership)
+            print("after delete membership")
+            # Delete LibraryFavorites if exists
+            favorite = LibraryFavorites.query.filter_by(user_id=user_id, library_id=library_id).first()
+            if favorite:
+                db.session.delete(favorite)
+            print("after library favorices")
+            # Explicitly delete LibraryRoomState as a fallback, though cascade should handle it.
+            # This is more of a verification step or a safeguard.
+            # If cascade is confirmed to work reliably, this explicit delete can be removed.
+            # LibraryRoomState.query.filter_by(user_id=user_id, library_id=library_id).delete()
+            print("after delete library room state")
+        except NotFoundError as e:
+            db.session.rollback()
+            raise
+        except Exception as e:
+            db.session.rollback()
+            raise
     
 
 def add_section_user_state(user_id, library_id, section_id, num_lessons, initial_lesson_state=1):

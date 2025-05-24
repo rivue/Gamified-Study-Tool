@@ -145,7 +145,7 @@ async function handleLeaveCourse() {
 
     try {
         const response = await axios.delete(`/api/library/${props.libraryId}/leave`);
-
+        console.log(response)
         if (response.status === 200 && response.data?.status === "success") {
             toast.success(`Successfully left "${props.libraryTopic}".`, { id: toastId });
             emit('course-left');
@@ -161,6 +161,7 @@ async function handleLeaveCourse() {
         const errorMessage = error.response?.data?.message || error.message || 'Failed to leave course. Please try again.';
         apiError.value = errorMessage;
         toast.error(errorMessage, { id: toastId });
+       
     } finally {
         isLeaving.value = false;
     }
