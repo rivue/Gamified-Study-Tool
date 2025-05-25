@@ -178,6 +178,7 @@ TODO list:
 
         TODO when I get back:
             - last 5 jules tasks then delete something
+            - TODO: 😏😏😏😏TEST LEAVE LIBRARY AGAIN AND LOOK THROUGH NEW MIGRATION e27dc8bcfa88😏😏😏😏😏
 
         hard probably (goal: 2 high level bullet points / wk):
         - ⭐️ remove alert message in library creator (not hard but have to remember)

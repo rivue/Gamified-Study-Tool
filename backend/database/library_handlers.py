@@ -676,7 +676,6 @@ def join_library(user_id: int, library_id: int, join_code: str = None):
         db.session.rollback()
         print(f"Error in join_library: {e}")
     
-
 def leave_library(user_id: int, library_id: int):
         
         try:
@@ -705,7 +704,6 @@ def leave_library(user_id: int, library_id: int):
         except Exception as e:
             db.session.rollback()
             raise
-    
 
 def add_section_user_state(user_id, library_id, section_id, num_lessons, initial_lesson_state=1):
 

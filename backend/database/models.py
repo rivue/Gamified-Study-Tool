@@ -394,11 +394,11 @@ class LibrarySection(db.Model):
 
 class LibraryRoomState(db.Model): # maps users to states of rooms they are in
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    library_id = db.Column(db.Integer, db.ForeignKey('library.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), nullable=False)
+    library_id = db.Column(db.Integer, db.ForeignKey('library.id', ondelete='CASCADE'), nullable=False)
 
     room_name = db.Column(db.String(200), nullable=False)
-    section_id = db.Column(db.Integer, db.ForeignKey('library_section.id'), nullable=True)
+    section_id = db.Column(db.Integer, db.ForeignKey('library_section.id', ondelete='CASCADE'), nullable=True)
 
     num_lessons = db.Column(db.Integer, nullable=False)
     lesson_state = db.Column(db.Integer, nullable=False)  # 1-state 1, 2-state 2, 3-state 3, 4-state 4, etc...
@@ -409,7 +409,7 @@ class LibraryRoomState(db.Model): # maps users to states of rooms they are in
             ['library_membership.user_id', 'library_membership.library_id'],
             ondelete="CASCADE"          # removes room-states automatically if membership is removed
         ),
-        db.UniqueConstraint('user_id', 'section_id', name='uq_user_section'),  # Ensure one state per user per section
+        # db.UniqueConstraint('user_id', 'section_id', name='uq_user_section'),  # Ensure one state per user per section
     )
 
     def as_dict(self):
@@ -439,8 +439,8 @@ class LibraryMembership(db.Model):
     __tablename__ = 'library_membership' # Explicit table name is good practice
 
     # Composite primary key ensures a user can only be a member of a library once
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
-    library_id = db.Column(db.Integer, db.ForeignKey('library.id'), primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), primary_key=True)
+    library_id = db.Column(db.Integer, db.ForeignKey('library.id', ondelete='CASCADE'), primary_key=True)
 
     # extra information (just joined_at for now)
     joined_at = db.Column(db.DateTime, default=datetime.utcnow, server_default=db.func.now())

@@ -11,9 +11,11 @@ from flask_migrate import Migrate
 from flask_cors import CORS
 import logging
 import sys
-
+from sqlalchemy.engine import Engine
+from sqlalchemy import event
 from database.models import db, User
 from database.upgrade_db import run_upgrades
+
 load_dotenv()
 app = Flask(__name__, static_folder='../frontend/dist')
 app.secret_key = os.getenv('FLASK_SECRET_KEY')
@@ -79,6 +81,11 @@ else:
     origins = "*"
 CORS(app, origins=origins, supports_credentials=True)
 
+@event.listens_for(Engine, "connect")
+def _enable_sqlite_fk(dbapi_conn, conn_record):
+    # Turn on enforcement of FOREIGN KEY constraints in SQLite
+    dbapi_conn.execute("PRAGMA foreign_keys = ON;")
+    
 # Global error handler for all unhandled exceptions
 @app.errorhandler(Exception)
 def handle_exception(e):
