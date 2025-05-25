@@ -24,6 +24,7 @@ IDEAS:
         - Blueprints maybe
 
     ideas for grand plan / future:
+       
         - can we generalize this studying tool for other industries? like corporate learning events, e-learning courses, etc...?
             - online learning platform - would need to be at a deep level though, not sure how this could be done?
                 - other industries:
@@ -49,6 +50,7 @@ IDEAS:
                     - diy
                     - music
                     - etc...
+            - for bigger pivot (ai duolingo for everything) change studying to rotating text: studying, corporate training, learning guitar, cooking, arts, etc...
         - Youtube Comment AI Bot —> intern idea for next summer?
             Would involve fine tuning a model to do something, maybe grok or something, to train it on high performing comments and
             train it to go on youtube videos to write a snarky reply / comment to rack up likes, or use gemini to reply in the way that the 
@@ -118,13 +120,16 @@ TODO list:
         - ⭐️ for LibraryCreator, outline the rules clearly somewhere, like in an i-card next to "create a course to explore" 
         or just put in text "rules for creating courses" or something
             - also, make room / course / unit / section consistent in frontend
+                - not sure exactly where it is inconsistent
         - ⭐️ vvvmaybe ask for feedback before doing vvv
             - also make sure it works well(ish) for mobile
-        - ⭐️ add google auth
+        - ⭐️ add google 
+            - note: probably has to make rivue email work first
         - ⭐️ Terms of use / Policy Page legal agreement thing - ask gpt if I actually need, maybe ask jake how to do but maybe not
             - ⭐️ There are probably websites and stuff for this --> do this before Stripe
         - ⭐️ Stripe implementation
             - have to think abt what different payment levels mean / how I want to do it
+            - maybe think of business profit levels given llm api costs or something
         - ⭐️ ⭐️ ⭐️ (might take at least a couple weeks) UI redesign / rehaul *** --> kinnu, duolingo, saved instagram design reels etc...) --> ask nc state entreprenuership ppl for tips while i'm designing
             - Note: 1) try to see what horizontal --> vertical learning path looks like, and possibly make a vertical bar on the side for settings, i-card, files list, adding a new stepping stone, etc... but maybe keep lesson name and current unit name at the top?
             - COPY QUIZLET???
@@ -157,7 +162,7 @@ TODO list:
                 maybe it shows private ones with a "lock" icon and prompts you to enter a password. this way it would be like more of a network, which would differentiate us from a copy paste ai study tool (turbolearn) / NotebookLM
         
         glitches / small stuff
-            - make sure adding a unit actually refreshes the page and stuff
+            - make sure adding a unit actually refreshes on the page and stuff ideally w/ out refresh
             - why do different pages flicker on the screen when I am on a page and I hit refresh?
             - why is public generating a code on library creation? 
             - current streak in lesson complete displays current streak not current streak + 1 (maybe just refetch it?)
@@ -169,6 +174,11 @@ TODO list:
             - make it so that if the user either generates a library or adds a section / unit then navigates away, it kills the request so the other parts of the libray load and it doesn't get stuck in a hanging state
             - do the loading disabling thing and toast thing for add unit as well, although that should be much faster
             - account for duplicate unit names when user is adding a unit
+            - go through library_routes and make sure routes that require login actual have @login_required decorator
+
+        TODO when I get back:
+            - last 5 jules tasks then delete something
+            - TODO: 😏😏😏😏TEST LEAVE LIBRARY AGAIN AND LOOK THROUGH NEW MIGRATION e27dc8bcfa88😏😏😏😏😏
 
         hard probably (goal: 2 high level bullet points / wk):
         - ⭐️ remove alert message in library creator (not hard but have to remember)
@@ -179,12 +189,14 @@ TODO list:
                 - why is this empty? --> rag_context:
 
         - ✅ ⭐️ (would like to implement visibility of different courses first or at least a many:one for non-owners in library model)
-            - ⭐️ Delete sections requires entering the name of the unit / course just for accidental reasons)
+            - ⭐️ Delete sections (requires entering the name of the unit / course just for accidental reasons)
+                - DELETE SECTION MIGRATION c7209aac4ac0
             - ⭐️ Delete Units (requires entering the name of the unit / course just for accidental reasons)
             - ⭐️ Delete courses / libraries (whatever they're called) (requires entering the name of the unit / course just for accidental reasons)
                - ⭐️ Remember to delete from both DB and pinecone as well, as well as respective child / parent courses / units / sections / libraries, roomNameState, LibraryFavorites, question, question_choice, LibraryMembership, etc...
-        - ⭐️ (NOTE: do AFTER deleting sections / units / courses and adding sections) ability to leave a library
+        - ⭐️ (NOTE: do AFTER deleting sections / units / courses and adding sections) ability to leave a library <-- jules
             - in explore courses page, add a "leave library" next to the "go to Course" button when a user joins the course
+            - for course owner, it is replaced by delete library, which erases everything
 
         medium (chip away at when tired / mentally exhausted from hard ones):
         - ⭐️ add staging / pre-production environment that isn't localhost
@@ -195,13 +207,19 @@ TODO list:
 
     OTHER PAGES:
         - terms and policies page
-        - about page (?)
         - somewhere to link to X / discord (might be on an existing page, idk) (see mvp cleanup list)
         (currently all 4 were in BottomBar.vue) --> (BASICALLY MAKE BottomBar.vue SMALLER)
 
     general:
     study tool additions / ideas:
+        - handle delete account (eventually)
+        - when the course owner adds / deletes a section, broadcast it via webhooks to the other members in the form of alert toasts so they can see it live
+        - complete feedback / user email dashboard detailing 1) feedback data 2) ai summaries / insights on what feedback I might have, maybe even broken up by user groups, age, location, etc... 3) list of user emails maybe? - might even be on a private url which calls my api - look into admin_routes if you know what I mean
+            - contact / support pipeline?
+            - use this in some private version of rivue url, not the main one
+        - tasks which optimize containers and stuff, like startup latency, cpu / memory utilization, etc.. could be really good for resume (optimized billable container instance time leading to 4.5k in monthly cost savings, etc...)
         - for library creation, experiment w/ 3 tab structure like wava 
+            - eventually break up library creation from library list, and add lots of advanced customizability maybe
         - break up library / section generation into smaller chunks --> utilized opanai functions to build an LLM workflow, decreasing library and section processing time by 60% or whatever
         - for feedback / input / suggestions, 1) link to discord / X account and 2) display a "testimonies" of a suggestion / idea (anonymous) and the time it took me to implement something / respond to (30 minutes, 15 minutes, etc...) encourage people to send me feedback and stuff
         - instead of having one opanai function, have a parent function which rolls how many and what type of game will be rolled ('true_false': 4, 'multiple_choice': 6, 'image': 2, etc... and then a suite of small agents which are each responsible for one (1) type of game (ex: true_false agent, multiple choice agent, image agent (might have to break up further maybe idk), etc..)) --> do all this so I can put "suite of ai agents" on my resume

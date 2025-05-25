@@ -2,7 +2,7 @@
 
 import random
 from flask import request, jsonify
-from flask_login import current_user, AnonymousUserMixin
+from flask_login import current_user, login_required, AnonymousUserMixin
 from bleach import clean
 from flask_executor import Executor
 import concurrent.futures
@@ -302,6 +302,27 @@ def init_library_routes(app):
             app.logger.exception(e)
             return jsonify(status="error", message="internal error"), 500
         
+    
+    @app.route('/api/library/<int:library_id>/leave', methods=['DELETE'])
+    @login_required
+    def leave_library(library_id):
+        try:
+            library = Library.query.get(library_id)
+            if not library:
+                return jsonify(status="error", message="Library not found"), 404
+
+            if library.owner_id == current_user.id:
+                return jsonify(status="error", message="Owners cannot leave their own course. Please delete the course or transfer ownership instead."), 403
+            print("before library")
+            lbh.leave_library(current_user.id, library_id)
+            print("after library")
+            return jsonify(status="success", message="Successfully left the course."), 200
+
+        except Exception as e:
+            db.session.rollback()
+            app.logger.error(f"Error leaving library: {e}")
+            return jsonify(status="error", message="An internal error occurred. Please try again."), 500
+        
     @app.route('/api/library/unit', methods=['POST'])
     def generate_unit():
         user_id = current_user.id if not isinstance(current_user, AnonymousUserMixin) else None
@@ -485,6 +506,43 @@ def init_library_routes(app):
         except Exception as e:
             print(f"Exception in generate_section: {str(e)}")
             return jsonify(status="error", message="Section Add Failed"), 500
+    
+    @app.route("/api/library/section/<int:section_id>", methods=['DELETE'])
+    @login_required
+    def delete_section(section_id):
+        
+        section = LibrarySection.query.get_or_404(section_id)
+        
+        if section.unit.library.owner_id != current_user.id:
+           raise PermissionError("You do not own this library.")
+        
+        print("before delete")
+        
+        section.delete_and_reindex()
+        print("after delete")
+        # user_id needs to point to a user, 
+        # user needs to be owner of the library (section = section_id; section.unit_id = unit_id; unit.library_id = library_id)
+        # verify owner in frontend as well as here, don't send library_id bc thats not RESTful
+        # library = db.session.query(Library).filter_by(id=library_id).first()  
+        # position reordering
+        # delete:
+        # factoid --> questions --> question choices
+        # room state
+        # factoid
+        # SEE CLAUDE!!!
+        # SEE CHATGPT FOR BACKREF THINGS!!!
+            # AND FOR CASCADE IN LIBRARY ROOM STATE AS WELL!!!
+            # SEE delete_and_reindex IN LIBRARYSECTION AND GO TO CLAUDE IF THAT DOESN'T WORK
+
+        try:
+            db.session.commit()
+        except PermissionError as e:
+            return jsonify(status="error", message=f"{str(e)}"), 403
+        except Exception as e:
+            db.session.rollback()
+            return jsonify(status="error", message="An Error occurred"), 400
+
+        return jsonify(status="success", message="Section successfully deleted")
         
     @app.route('/api/library/available-generated-rooms', methods=['POST'])
     def get_available_generated_rooms():

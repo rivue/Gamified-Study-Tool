@@ -3,12 +3,6 @@
     <div class="fixed left-8 right-8 top-0 bottom-0 overflow-hidden">
         <div class="fixed top-20 right-6 flex gap-6 z-10">
 
-            <button @click="goToHome"
-                class="bg-black/30 backdrop-blur-sm shadow-md rounded-full p-4 hover:bg-black/40"
-                style="color: var(--highlight-color);">
-                <HomeIcon class="w-12 h-12" />
-            </button>
-
             <button v-if="isOwner" @click="toggleEditMode"
                 class="bg-black/30 backdrop-blur-sm shadow-md rounded-full p-4 hover:bg-black/40"
                 style="color: var(--highlight-color);">
@@ -27,6 +21,23 @@
                 <CogIcon class="w-12 h-12" />
             </button>
         </div>
+        
+        <div class="fixed top-20 left-6 flex gap-6 z-10">
+
+            <button @click="goToHome"
+                class="bg-black/30 backdrop-blur-sm shadow-md rounded-full p-4 hover:bg-black/40"
+                style="color: var(--highlight-color);">
+                <HomeIcon class="w-12 h-12" />
+            </button>
+
+            <button v-if="!isOwner" @click="handleLeaveCourseClick"
+                class="bg-black/30 backdrop-blur-sm shadow-md rounded-full p-4 hover:bg-black/40"
+                style="color: var(--highlight-color);">
+                <ArrowLeftOnRectangleIcon class="w-12 h-12" />
+            </button>
+
+        </div>
+
         <div class="relative flex flex-col w-full h-full">
             
             <div ref="scrollContainer"
@@ -76,6 +87,10 @@
                                                 filter: editModeEnabled ? 'grayscale(1) brightness(0.9)' : 'none',
                                             }" 
                                             @click="editModeEnabled ? handleEditNodeClick() : handleNodeClick(sectionId)">
+                                        
+
+
+                                        <DeleteSection v-if="editModeEnabled && isOwner" :section-id="sectionId" :section-name="sectionName"/>
 
                                         <!-- Tooltip -->
                                         <div v-if="selectedRoomId && selectedRoomId === sectionId"
@@ -296,6 +311,11 @@
     <LibrarySettings v-model:showSettingsModal="showSettingsModal" :library-id="libraryId"
         :library-is-public="libraryIsPublic" :library-join-code="libraryJoinCode" :can-modify="isOwner" />
 
+    <LeaveCourse
+        v-model:showModal="showLeaveCourseModal" 
+        :library-id="props.libraryId"
+        :library-topic="props.libraryTopic" />
+
 </template>
 
 <script setup lang="ts">
@@ -319,7 +339,8 @@ import {
     ChartBarIcon,
     PencilIcon,
     PlusIcon,
-    HomeIcon
+    HomeIcon,
+    ArrowLeftOnRectangleIcon
 } from '@heroicons/vue/24/solid';
 import { useGameStore } from '@/store/gameStore'
 import { useRouter } from 'vue-router';
@@ -327,6 +348,8 @@ import { toast } from 'vue-sonner'
 import LibrarySettings from "./LibrarySettings.vue";
 import AddUnit from "./AddUnit.vue";
 import AddSection from "./AddSection.vue"
+import DeleteSection from "./DeleteSection.vue"
+import LeaveCourse from './LeaveCourse.vue'; // Import the new modal
 
 const props = defineProps({
     libraryId: {
@@ -360,6 +383,10 @@ const props = defineProps({
     unitPositionMap: {
         type: Object,
         required: true
+    },
+    libraryTopic: {
+        type: String,
+        required: true
     }
 })
 
@@ -373,6 +400,7 @@ watch(() => props.unitSectionMap, async (newVal) => {
 // State for adding new nodes
 const gameStore = useGameStore()
 const showSettingsModal = ref(false)
+const showLeaveCourseModal = ref(false); // State for the leave course modal
 const isOwner = ref(false)
 const editModeEnabled = ref(false);
 
@@ -468,6 +496,10 @@ function goToLeaderboard() {
 
 function goToHome() {
     router.push("/library");
+}
+
+function handleLeaveCourseClick() {
+    showLeaveCourseModal.value = true;
 }
 
 // Get color for a unit based on its index
@@ -570,7 +602,7 @@ onMounted(() => {
 
     recalcMaxLeft()
     // If there are nodes and the container exists, scroll to position
-    if (rawUnitData.value.length > 0 && scrollContainer.value) {
+    if (rawUnitData.value.length > 0 && rawUnitData.value.length > 0 && scrollContainer.value) {
         // Calculate an appropriate starting position based on available width
         scrollTimeoutId = setTimeout(() => {
             // This gives time for the layout to render before scrolling

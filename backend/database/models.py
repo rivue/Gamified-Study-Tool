@@ -369,7 +369,23 @@ class LibrarySection(db.Model):
     position = db.Column(db.Integer, nullable=False, index=True) 
     
     # Link factoids to a section
-    factoids = db.relationship('LibraryFactoid', backref='section', cascade="all, delete-orphan", lazy=True)
+    factoids = db.relationship('LibraryFactoid', backref='section', cascade='all, delete-orphan', passive_deletes=True)
+ 
+    def delete_and_reindex(self):
+            """
+            Deletes this section (cascading factoids→questions→choices and
+            room-states via configured cascades/FKs) and then renumbers its
+            siblings so positions stay 0…n-1.
+            """
+            parent_unit = self.unit
+
+            # delete me (SQLAlchemy will cascade all the way down)
+            db.session.delete(self)
+
+            # reindex the remaining sections
+            siblings = sorted(parent_unit.sections, key=lambda s: s.position)
+            for idx, sec in enumerate(siblings):
+                sec.position = idx
 
     __table_args__ = (
         db.UniqueConstraint('unit_id', 'position',
@@ -378,11 +394,11 @@ class LibrarySection(db.Model):
 
 class LibraryRoomState(db.Model): # maps users to states of rooms they are in
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    library_id = db.Column(db.Integer, db.ForeignKey('library.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), nullable=False)
+    library_id = db.Column(db.Integer, db.ForeignKey('library.id', ondelete='CASCADE'), nullable=False)
 
     room_name = db.Column(db.String(200), nullable=False)
-    section_id = db.Column(db.Integer, db.ForeignKey('library_section.id'), nullable=True)
+    section_id = db.Column(db.Integer, db.ForeignKey('library_section.id', ondelete='CASCADE'), nullable=True)
 
     num_lessons = db.Column(db.Integer, nullable=False)
     lesson_state = db.Column(db.Integer, nullable=False)  # 1-state 1, 2-state 2, 3-state 3, 4-state 4, etc...
@@ -393,7 +409,7 @@ class LibraryRoomState(db.Model): # maps users to states of rooms they are in
             ['library_membership.user_id', 'library_membership.library_id'],
             ondelete="CASCADE"          # removes room-states automatically if membership is removed
         ),
-        db.UniqueConstraint('user_id', 'section_id', name='uq_user_section'),  # Ensure one state per user per section
+        # db.UniqueConstraint('user_id', 'section_id', name='uq_user_section'),  # Ensure one state per user per section
     )
 
     def as_dict(self):
@@ -423,8 +439,8 @@ class LibraryMembership(db.Model):
     __tablename__ = 'library_membership' # Explicit table name is good practice
 
     # Composite primary key ensures a user can only be a member of a library once
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
-    library_id = db.Column(db.Integer, db.ForeignKey('library.id'), primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), primary_key=True)
+    library_id = db.Column(db.Integer, db.ForeignKey('library.id', ondelete='CASCADE'), primary_key=True)
 
     # extra information (just joined_at for now)
     joined_at = db.Column(db.DateTime, default=datetime.utcnow, server_default=db.func.now())
@@ -456,7 +472,7 @@ class LibraryFactoid(db.Model):
     lesson_name = db.Column(db.String(200), nullable=False)
     factoid_content = db.Column(db.Text, nullable=False)
 
-    questions = db.relationship('LibraryQuestion', backref='factoid')
+    questions = db.relationship('LibraryQuestion', backref='factoid', cascade="all, delete-orphan", passive_deletes=True)
 
 class LibraryQuestion(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -465,7 +481,7 @@ class LibraryQuestion(db.Model):
     correct_choice = db.Column(db.JSON, nullable=False)
     question_type = db.Column(db.String(50), nullable=False, default="multiple_choice")
 
-    choices = db.relationship('LibraryQuestionChoice', backref='question', lazy='dynamic')
+    choices = db.relationship('LibraryQuestionChoice', backref='question', cascade="all, delete-orphan", passive_deletes=True)
 
 class LibraryQuestionChoice(db.Model):
     id = db.Column(db.Integer, primary_key=True)
