@@ -194,9 +194,6 @@ TODO list:
             - ⭐️ Delete Units (requires entering the name of the unit / course just for accidental reasons)
             - ⭐️ Delete courses / libraries (whatever they're called) (requires entering the name of the unit / course just for accidental reasons)
                - ⭐️ Remember to delete from both DB and pinecone as well, as well as respective child / parent courses / units / sections / libraries, roomNameState, LibraryFavorites, question, question_choice, LibraryMembership, etc...
-        - ⭐️ (NOTE: do AFTER deleting sections / units / courses and adding sections) ability to leave a library <-- jules
-            - in explore courses page, add a "leave library" next to the "go to Course" button when a user joins the course
-            - for course owner, it is replaced by delete library, which erases everything
 
         medium (chip away at when tired / mentally exhausted from hard ones):
         - ⭐️ add staging / pre-production environment that isn't localhost
