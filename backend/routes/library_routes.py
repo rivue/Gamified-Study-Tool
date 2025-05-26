@@ -682,6 +682,7 @@ def init_library_routes(app):
         browse = request.args.get("browse", type=bool)
         user_id = current_user.id if not isinstance(current_user, AnonymousUserMixin) else None
         return lbh.get_libraries_info(user_id, browse=browse)
+    
     # @app.route("/api/libraries/browse", methods=["GET"])
     # def get_libraries_browse():
     #     user_id = current_user.id if not isinstance(current_user, AnonymousUserMixin) else None

@@ -182,6 +182,7 @@ TODO list:
                 - change id --> library in leaderboard
                 - change id --> username in course explore screen for creators of libraries
                 - make first name / last name not nullable
+                - make usernames unique in db if they aren't already
 
         hard probably (goal: 2 high level bullet points / wk):
         - ⭐️ remove alert message in library creator (not hard but have to remember)

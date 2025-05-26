@@ -3,6 +3,7 @@ from flask import jsonify, current_app as app
 from sqlalchemy import func, distinct
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from contextlib import contextmanager
+from sqlalchemy.orm import joinedload
 import random
 import math
 import string
@@ -300,17 +301,20 @@ def get_library_scores(library_id):
     # TODO: update once I implement a points system
 
     try:
-
-        memberships = LibraryMembership.query.filter_by(library_id=library_id).all()
         
+# from sqlalchemy.orm import joinedload
+
+        memberships = LibraryMembership.query.filter_by(library_id=library_id).options(
+            joinedload(LibraryMembership.user)
+        ).all()
+
         if not memberships:
             return jsonify({'error': 'No memberships found for the given library'}), 404
-        
-        member_list = []
-        for membership in memberships:
-                member_list.append({
-                    'user_id': membership.user_id,
-                })
+
+        member_list = [
+            {'username': membership.user.username}
+            for membership in memberships if membership.user
+        ]
 
         return jsonify(member_list)
     
@@ -1086,6 +1090,8 @@ def get_libraries_info(user_id=None, browse=False):
                 )
             .all())
 
+        # come back here --> get username from library to send to explore courses
+        
         response["explore_libraries"] = [model_to_dict(library, exclude=['room_names', 'factoids']) for library in explore_libraries]
         
         return jsonify(response)

@@ -20,19 +20,19 @@
             
             <!-- Leaderboard Entries -->
             <div v-else class="divide-y" style="border-color: var(--color-primary-dark);">
-                <div v-for="(entry, index) in leaderboardData.members" :key="entry.user_id"
+                <div v-for="(entry, index) in leaderboardData.members" :key="entry.username"
                 class="grid grid-cols-12 gap-2 p-3 items-center transition-colors"
-                :class="{'opacity-85': highlightCurrentUser && entry.user_id !== currentUserId}"
+                :class="{'opacity-85': highlightCurrentUser && entry.username !== currentUsername}"
                 :style="{
-                    backgroundColor: entry.user_id === currentUserId ? 'var(--background-color-2t)' : 'var(--background-color)',
+                    backgroundColor: entry.username === currentUsername ? 'var(--background-color-2t)' : 'var(--background-color)',
                 }">
-                         {{ entry.user_id }}
+                         {{ entry.username }}
                          
                          <!-- User Info -->
                          <div class="col-span-7 flex items-center">
                              <div class="truncate">
-                                 <span :class="{ 'font-semibold': entry.user_id === currentUserId }">{{ entry.name }}</span>
-                                 <span v-if="entry.user_id === currentUserId" class="ml-2 text-xs px-1 rounded"
+                                 <span :class="{ 'font-semibold': entry.username === currentUsername }">{{ entry.name }}</span>
+                                 <span v-if="entry.username === currentUsername" class="ml-2 text-xs px-1 rounded"
                                  style="background-color: var(--highlight-color); color: var(--background-color);">You</span>
                                 </div>
                             </div>
@@ -47,12 +47,15 @@
     </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
+import { computed } from 'vue';
 import axios from 'axios';
+import { useAuthStore } from '@/store/authStore'; // Adjust the path as necessary
 
 // State variables
+const authStore = useAuthStore();
 const leaderboardData = ref([]);
 const loading = ref(true);
 const sortCriteria = ref('score');
@@ -60,7 +63,7 @@ const showFilterModal = ref(false);
 const selectedTimePeriod = ref('week');
 const highlightCurrentUser = ref(true);
 const libraryId = ref(null);
-const currentUserId = ref(null); // TODO: Replace with actual user ID
+const currentUsername = computed(() => authStore.username); // TODO: Replace with actual user ID
 
 // Fetch leaderboard data
 const fetchLeaderboard = async () => {

@@ -62,7 +62,7 @@
                     <div class="card-footer">
                         <div class="creator">
                             <UserCircle class="creator-icon" />
-                            <span>{{ library.owner_id }}</span>
+                            <span>{{ library.owner_name }}</span>
                         </div>
 
                         <Button v-if="!joinedCourses.has(library.id)" 
@@ -132,6 +132,7 @@ const props = defineProps<{
         likes: number;
         library_topic: string;
         owner_id: string;
+        owner_name: string;
     }>;
 }>();
 
