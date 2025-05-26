@@ -181,14 +181,9 @@ TODO list:
             - last 2 jules tasks - add username name / first + last name
                 - change id --> library in leaderboard
                 - change id --> username in course explore screen for creators of libraries
-                - add first name + last name box side by side and user name underneath it on signup
-                    - username has to be unique and < 25 characters, fn / ln does not
-                - thankfully no need to backfill cus it alrdy has email
-                - display username / first / last name on profile page w/ ability to edit, again, first / last are
-                    right next to one another
-                    - backend route to update profile - /api/profile/user
-                - for small top right corner profile menu, hover could display pfp (will add later), name, username
-                    - change authstore to have username and first / last name
+                - LIBRARY ERROR IN API/LIBRARY --> LOOK IN retrieve_library_room_contents in library_handlers
+                - make first name / last name not nullable
+                - APPLY PROD DATABASE MIGRATIONS
 
         hard probably (goal: 2 high level bullet points / wk):
         - ⭐️ remove alert message in library creator (not hard but have to remember)
