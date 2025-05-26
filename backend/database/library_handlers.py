@@ -606,7 +606,7 @@ def retrieve_library_room_contents(library_id, section_id, user_id):
         room_contents.append(
             {"factoid_text": factoid.factoid_content, "questions": questions, "room_state": curr_state}
         )
-
+    
     return {"factoids": room_contents}
 
 def join_library(user_id: int, library_id: int, join_code: str = None):

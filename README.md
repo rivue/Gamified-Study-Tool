@@ -175,6 +175,7 @@ TODO list:
             - do the loading disabling thing and toast thing for add unit as well, although that should be much faster
             - account for duplicate unit names when user is adding a unit
             - go through library_routes and make sure routes that require login actual have @login_required decorator
+            - change Logout to have red background
 
         TODO when I get back:
             - last 2 jules tasks - add username name / first + last name
@@ -282,6 +283,7 @@ TODO list:
         Good- idk
         Bad- location in an app might be dangerous especially for public libraries, not an original feature, might get people off the app?
         - ⭐️ cram mode or something at the bottom - basically goes through review mode, but of all of them, effectively giving them the review, but without the need to break their streak
+            - grabs 10 questions from every section and gives it to the user
         - ability for user to change language
         - add toggle for users to set a home 'timezone' (dropdown menu) and add for it to automatically 
             switch

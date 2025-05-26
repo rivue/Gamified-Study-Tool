@@ -20,7 +20,7 @@
             <p class="text-center opacity-70 pt-4">
                 Member Since: {{ new Date(profile.joined_at).toLocaleDateString() }}
             </p>
-
+        </div>
         <!-- TODO: maybe add light mode later -->
     </div>
 </template>

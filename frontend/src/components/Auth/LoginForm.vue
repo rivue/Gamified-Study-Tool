@@ -37,9 +37,10 @@
 import { ref } from 'vue';
 import axios from 'axios';
 import { usePopupStore } from "@/store/popupStore";
+import { UserData } from "@/store/authStore";
 
 const emit = defineEmits<{
-    (e: 'loginSuccess'): void
+    (e: 'loginSuccess', user: UserData): void
 }>();
 
 const email = ref("");
@@ -65,7 +66,14 @@ const handleSubmit = () => {
     axios.post("api/login", formData)
         .then(response => {
             if (response.status === 200) {
-                emit("loginSuccess");
+                console.log(response)
+                const user: UserData = {
+                    id: response.data.user.id,
+                    username: response.data.user.email,
+                    firstName: response.data.user.first_name,
+                    lastName: response.data.user.last_name,
+                }
+                emit("loginSuccess", user);
             }
         })
         .catch(error => {

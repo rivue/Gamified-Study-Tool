@@ -3,8 +3,30 @@
     <div class="inspirational-quote">
         Stars can't shine without darkness. Your brilliant journey begins here.
     </div>
-
-  <form @submit.prevent="handleSubmit">
+    <form @submit.prevent="handleSubmit">
+    
+        <div class="flex flex-col sm:flex-row gap-4 w-full max-w-md mb-4">
+            <div class="form-field flex-1">
+                <label for="first_name">First Name:</label>
+                <input
+                type="text"
+                id="first_name"
+                name="first_name"
+                v-model="firstName"
+                autocomplete="given-name"
+                />
+            </div>
+            <div class="form-field flex-1">
+                <label for="last_name">Last Name:</label>
+                <input
+                type="text"
+                id="last_name"
+                name="last_name"
+                v-model="lastName"
+                autocomplete="family-name"
+                />
+            </div>
+        </div>
     <div class="form-field">
         <label for="new-email">Email:</label>
         <input
@@ -13,6 +35,17 @@
         name="new-email"
         v-model="email"
         autocomplete="email"
+        required
+        />
+    </div>
+    <div class="form-field">
+        <label for="username">Username: (Must be unique)</label>
+        <input
+        type="text"
+        id="username"
+        name="username"
+        v-model="username"
+        autocomplete="username"
         required
         />
     </div>
@@ -140,4 +173,5 @@ form {
   width: 100%;
   box-sizing: border-box;
 }
+
 </style>

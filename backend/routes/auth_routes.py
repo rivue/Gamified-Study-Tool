@@ -64,14 +64,23 @@ def init_auth_routes(app):
                     db.session.commit()
 
                 login_result = login_user(user, remember=True)
-
-                return jsonify({'status': 'success'})
+                
+                user_data = {
+                    'id': user.id,
+                    'username': user.username,
+                    'email': user.email,
+                    'first_name': user.first_name,
+                    'last_name': user.last_name
+                }
+                
+                print(f"login resulf: {user_data}")
+                return jsonify({'status': 'success', 'user': user_data})
             else:
                 return jsonify({'status': 'fail', 'message': 'Incorrect Password'}), 400
         except Exception as e:
             print(f"{e}")
             return jsonify({'status': 'fail', 'message': 'An unexpected error occurred. Please try again later.'}), 500
-    
+        
 
     @app.route("/api/logout", methods=["GET"])
     @login_required
