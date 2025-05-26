@@ -33,8 +33,10 @@
             <h2 class="section-title">Localization</h2>
             <div class="form-field">
                 <label for="timezone">Time Zone:</label>
-                <!-- TODO: Consider using a select dropdown for timezones -->
-                <input type="text" id="timezone" v-model="editableProfile.timezone" class="profile-input" />
+                <select id="timezone" v-model="editableProfile.timezone" class="profile-input">
+                    <option v-if="timezonesList.length === 0" value="" disabled>Loading timezones...</option>
+                    <option v-for="tz in timezonesList" :key="tz" :value="tz">{{ tz }}</option>
+                </select>
             </div>
         </div>
 
@@ -103,6 +105,8 @@ const editableProfile = ref({
     timezone: "UTC",
     profile_text: "" // For the generic profile text field
 });
+
+const timezonesList = ref<string[]>([]);
 
 // const cloudTokens = computed(() => authStore.cloudTokens);
 // const currentMentorName = computed(() => mentorStore.currentMentor);
@@ -210,8 +214,24 @@ const autoGrow = (event: { target: HTMLTextAreaElement }) => {
     textarea.style.height = textarea.scrollHeight + "px";
 };
 
+const fetchTimezones = async () => {
+    try {
+        const response = await axios.get<string[]>("/api/timezones");
+        if (response.data && Array.isArray(response.data)) {
+            timezonesList.value = response.data;
+        } else {
+            console.error("Failed to fetch timezones: Invalid data format", response.data);
+            popupStore.showPopup("Could not load timezones.");
+        }
+    } catch (error) {
+        console.error("Error fetching timezones:", error);
+        popupStore.showPopup("Error fetching timezones.");
+    }
+};
+
 onMounted(() => {
     fetchProfile();
+    fetchTimezones();
 });
 </script>
 

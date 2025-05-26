@@ -38,7 +38,7 @@ def init_utility_routes(app):
         return jsonify({
             "lessons": public_lessons,
         })
-        
+
     @app.route("/api/timezones", methods=["GET"])
     def get_timezones():
         try:
