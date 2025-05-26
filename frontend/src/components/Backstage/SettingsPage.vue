@@ -44,8 +44,8 @@
             <MenuButton label="Save Profile" @click="saveUserProfile" customClass="action-button" />
             <MenuButton label="Logout" @click="logout" customClass="danger-button" />
         </div>
-
-         <!-- New Time Zone section -->
+        
+        <div class="profile-section">
             <p class="text-center opacity-70 pt-4">
                 Member Since: {{ new Date(profile.joined_at).toLocaleDateString() }}
             </p>
@@ -278,6 +278,30 @@ onMounted(() => {
     color: var(--text-color);
     border: 1px solid var(--element-color-1);
     border-radius: 8px;
+    background-color: var(--background-color-2); /* Consistent background */
+}
+
+.profile-input-readonly {
+    background-color: var(--background-color-1t); /* Slightly different for readonly */
+    cursor: not-allowed;
+}
+
+.profile-input:focus {
+    outline: none;
+    border-color: var(--accent-color-1);
+    box-shadow: 0 0 0 2px var(--accent-color-1-t);
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 10px;
+}
+
+.form-field label {
+  font-size: 0.9em;
+  color: var(--text-color-secondary); /* Softer color for label */
+  margin-bottom: 4px;
 }
 
 .section-title {

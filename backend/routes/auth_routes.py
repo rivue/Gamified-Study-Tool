@@ -6,6 +6,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_required, logout_user, current_user, login_user
 import pymysql.err as pymysql_err
 import os
+import re
 # from oauth2client import client, crypt
 
 from database.models import db, User
