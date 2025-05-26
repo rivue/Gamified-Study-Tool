@@ -138,7 +138,6 @@ export const useAuthStore = defineStore('auth', {
       this.cloudTokens = (this.cloudTokens || 0) + 1; // Ensure cloudTokens is a number
     },
   },
-=======
     state: (): AuthState => ({
         loggedIn: localStorage.getItem('loggedIn') === 'true',
         user: {
@@ -258,5 +257,5 @@ export const useAuthStore = defineStore('auth', {
             this.cloudTokens = (this.cloudTokens || 0) + 1; // Ensure cloudTokens is a number
         },
     },
->>>>>>> a3276df (merge w/ jules changes - almost adding first name / last name)
+
 });

@@ -45,10 +45,13 @@
             <MenuButton label="Logout" @click="logout" customClass="danger-button" />
         </div>
 
-        <div class="profile-section">
+         <!-- New Time Zone section -->
             <p class="text-center opacity-70 pt-4">
                 Member Since: {{ new Date(profile.joined_at).toLocaleDateString() }}
             </p>
+
+            <!-- TODO: maybe add light mode later -->
+
 
             <!-- TODO: maybe add light mode later -->
 
@@ -112,6 +115,15 @@ const timezonesList = ref<string[]>([]);
 // const currentMentorName = computed(() => mentorStore.currentMentor);
 // const currentTheme = computed(() => themeStore.darkMode);
 
+// const displayTierName = computed(() => {
+//     const tierCode = profile.value.tier;
+//     const tierNameMap: Record<string, string> = {
+//         free: "Aspirant (free)",
+//         paid: "Awakened",
+//         pro: "Ascendant",
+//     };
+//     return tierNameMap[tierCode] || "Unknown Tier";
+// });
 // const displayTierName = computed(() => {
 //     const tierCode = profile.value.tier;
 //     const tierNameMap: Record<string, string> = {
@@ -266,33 +278,6 @@ onMounted(() => {
     color: var(--text-color);
     border: 1px solid var(--element-color-1);
     border-radius: 8px;
-    background-color: var(--background-color-2);
-    /* Consistent background */
-}
-
-.profile-input-readonly {
-    background-color: var(--background-color-1t);
-    /* Slightly different for readonly */
-    cursor: not-allowed;
-}
-
-.profile-input:focus {
-    outline: none;
-    border-color: var(--accent-color-1);
-    box-shadow: 0 0 0 2px var(--accent-color-1-t);
-}
-
-.form-field {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 10px;
-}
-
-.form-field label {
-    font-size: 0.9em;
-    color: var(--text-color-secondary);
-    /* Softer color for label */
-    margin-bottom: 4px;
 }
 
 .section-title {
