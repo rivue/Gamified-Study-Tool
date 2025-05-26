@@ -42,8 +42,8 @@ def upgrade():
         batch_op.create_foreign_key('uq_membership_library', 'library', ['library_id'], ['id'], ondelete='CASCADE')
         batch_op.create_foreign_key('uq_membership_user', 'user', ['user_id'], ['id'], ondelete='CASCADE')
 
-    with op.batch_alter_table('library_room_state', schema=None) as batch_op:
-        batch_op.drop_constraint('uq_user_section', type_='unique')
+    # with op.batch_alter_table('library_room_state', schema=None) as batch_op:
+    #     batch_op.drop_constraint('uq_user_section', type_='unique')
 
     with op.batch_alter_table('user', schema=None) as batch_op:
         batch_op.add_column(sa.Column('first_name', sa.String(length=25), nullable=True))

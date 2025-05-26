@@ -5,12 +5,16 @@ import os
 # Initialize global clients
 client = OpenAI()
 pc = PineconeGRPC(api_key=os.getenv("PINECONE_API_KEY"))
-if os.getenv("FLASK_ENV") == "production":
-    index_name = "beta-testing"
-else:
-    index_name = "text-sections"
+if os.getenv('FLASK_ENV') != "migration":
+    if os.getenv("FLASK_ENV") == "production":
+        index_name = "beta-testing"
+    else:
+        index_name = "text-sections"
 
-index = pc.Index(index_name)
+    index = pc.Index(index_name)
+else:
+    pc = None
+    index = None
 
 def get_query_embedding(query):
     """Get embedding for the query text"""

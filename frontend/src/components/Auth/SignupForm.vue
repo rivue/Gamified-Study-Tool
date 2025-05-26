@@ -87,6 +87,9 @@ const emit = defineEmits<{
 }>();
 
 const email = ref("");
+const username = ref("");
+const firstName = ref("");
+const lastName = ref("");
 const password = ref("");
 const confirmPassword = ref("");
 const buttonText = ref("Sign up");
@@ -109,6 +112,9 @@ const handleSubmit = () => {
   
   const formData = new FormData();
   formData.append("new-email", email.value);
+  formData.append("username", username.value);
+  formData.append("first_name", firstName.value);
+  formData.append("last_name", lastName.value);
   formData.append("new-password", password.value);
 
   axios.post("/api/signup", formData)

@@ -12,12 +12,12 @@ export interface UserData {
 }
 interface AuthState {
     loggedIn: boolean;
-    userId: string | null;
-    userTier: string;
+    user: UserData;
     cloudTokens: number;
 }
 
 export const useAuthStore = defineStore('auth', {
+
     state: (): AuthState => ({
         loggedIn: localStorage.getItem('loggedIn') === 'true',
         user: {
@@ -137,4 +137,5 @@ export const useAuthStore = defineStore('auth', {
             this.cloudTokens = (this.cloudTokens || 0) + 1; // Ensure cloudTokens is a number
         },
     },
+
 });
