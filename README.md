@@ -181,9 +181,7 @@ TODO list:
             - last 2 jules tasks - add username name / first + last name
                 - change id --> library in leaderboard
                 - change id --> username in course explore screen for creators of libraries
-                - LIBRARY ERROR IN API/LIBRARY --> LOOK IN retrieve_library_room_contents in library_handlers
                 - make first name / last name not nullable
-                - APPLY PROD DATABASE MIGRATIONS
 
         hard probably (goal: 2 high level bullet points / wk):
         - ⭐️ remove alert message in library creator (not hard but have to remember)

@@ -31,7 +31,7 @@ export const useAuthStore = defineStore('auth', {
   }),
   getters: {
     // The user getter now returns the whole user object
-    user(state): UserData {
+    getUser(state): UserData {
       return state.user;
     },
     // Specific getters if needed, e.g., for direct access or computed properties
@@ -56,7 +56,7 @@ export const useAuthStore = defineStore('auth', {
           this.cloudTokens = response.data.requestCount; // Assuming requestCount maps to cloudTokens
           this.user.id = response.data.userId;
           
-          localStorage.setItem('userTier', this.user.tier);
+        //   localStorage.setItem('userTier', this.user.tier);
           localStorage.setItem('userId', this.user.id as string); // Ensure userId is not null before setting
           
           this.loggedIn = true;

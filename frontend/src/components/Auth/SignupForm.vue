@@ -51,26 +51,6 @@
         />
     </div>
     <div class="form-field">
-        <label for="first_name">First Name:</label>
-        <input
-        type="text"
-        id="first_name"
-        name="first_name"
-        v-model="firstName"
-        autocomplete="given-name"
-        />
-    </div>
-    <div class="form-field">
-        <label for="last_name">Last Name:</label>
-        <input
-        type="text"
-        id="last_name"
-        name="last_name"
-        v-model="lastName"
-        autocomplete="family-name"
-        />
-    </div>
-    <div class="form-field">
         <label for="new-password">Password:</label>
         <input
         type="password"
