@@ -17,6 +17,8 @@ db = SQLAlchemy()
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(50), unique=True, nullable=False)
+    first_name = db.Column(db.String(25), nullable=True)
+    last_name = db.Column(db.String(25), nullable=True)
     password = db.Column(db.String(200), nullable=True)
     email = db.Column(db.String(100), unique=True, nullable=False)
     timezone = db.Column(db.String(50), default='UTC', nullable=False, server_default='UTC')

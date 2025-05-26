@@ -20,8 +20,10 @@ load_dotenv()
 app = Flask(__name__, static_folder='../frontend/dist')
 app.secret_key = os.getenv('FLASK_SECRET_KEY')
 app.config['FLASK_ENV'] = os.getenv('FLASK_ENV', 'development')
-openai.api_key = os.getenv("OPENAI_API_KEY")
-resend.api_key = os.getenv("RESEND_API_KEY")
+
+if app.config['FLASK_ENV'] != 'migration':
+    openai.api_key = os.getenv("OPENAI_API_KEY")
+    resend.api_key = os.getenv("RESEND_API_KEY")
 
 print(f"app level secret key: {app.secret_key}")
 
@@ -187,8 +189,9 @@ init_feedback_routes(app)
 init_admin_routes(app)
 init_library_routes(app)
 
-with app.app_context():
-    run_upgrades()
+if app.config['FLASK_ENV'] not in ['migration', 'production']:
+    with app.app_context():
+        run_upgrades()
 
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')

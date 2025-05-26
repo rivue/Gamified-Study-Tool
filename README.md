@@ -177,8 +177,17 @@ TODO list:
             - go through library_routes and make sure routes that require login actual have @login_required decorator
 
         TODO when I get back:
-            - last 5 jules tasks then delete something
-            - TODO: 😏😏😏😏TEST LEAVE LIBRARY AGAIN AND LOOK THROUGH NEW MIGRATION e27dc8bcfa88😏😏😏😏😏
+            - last 2 jules tasks - add username name / first + last name
+                - change id --> library in leaderboard
+                - change id --> username in course explore screen for creators of libraries
+                - add first name + last name box side by side and user name underneath it on signup
+                    - username has to be unique and < 25 characters, fn / ln does not
+                - thankfully no need to backfill cus it alrdy has email
+                - display username / first / last name on profile page w/ ability to edit, again, first / last are
+                    right next to one another
+                    - backend route to update profile - /api/profile/user
+                - for small top right corner profile menu, hover could display pfp (will add later), name, username
+                    - change authstore to have username and first / last name
 
         hard probably (goal: 2 high level bullet points / wk):
         - ⭐️ remove alert message in library creator (not hard but have to remember)
@@ -190,7 +199,6 @@ TODO list:
 
         - ✅ ⭐️ (would like to implement visibility of different courses first or at least a many:one for non-owners in library model)
             - ⭐️ Delete sections (requires entering the name of the unit / course just for accidental reasons)
-                - DELETE SECTION MIGRATION c7209aac4ac0
             - ⭐️ Delete Units (requires entering the name of the unit / course just for accidental reasons)
             - ⭐️ Delete courses / libraries (whatever they're called) (requires entering the name of the unit / course just for accidental reasons)
                - ⭐️ Remember to delete from both DB and pinecone as well, as well as respective child / parent courses / units / sections / libraries, roomNameState, LibraryFavorites, question, question_choice, LibraryMembership, etc...
@@ -209,6 +217,8 @@ TODO list:
 
     general:
     study tool additions / ideas:
+        - ask book clubs or book based groups to review your tool to see if they would like it - like to do a refresher of their
+            book at a deeper level
         - handle delete account (eventually)
         - when the course owner adds / deletes a section, broadcast it via webhooks to the other members in the form of alert toasts so they can see it live
         - complete feedback / user email dashboard detailing 1) feedback data 2) ai summaries / insights on what feedback I might have, maybe even broken up by user groups, age, location, etc... 3) list of user emails maybe? - might even be on a private url which calls my api - look into admin_routes if you know what I mean
