@@ -132,7 +132,7 @@ const props = defineProps<{
         likes: number;
         library_topic: string;
         owner_id: string;
-        owner_name: string;
+        owner_username: string;
     }>;
 }>();
 

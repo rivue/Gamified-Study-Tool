@@ -139,7 +139,7 @@ TODO list:
                     box or on the bottom / lining the right / left edge or something
                 - potential new menu: "my libraries" "browse libraries" (would link from search?) "notifications" (like error messages or who joined a library or something), create / + (or maybe it would be a tab at the top next to search)
                 - menu for library would have members list, settings for course owner, potentially a list of files to see, potentially a screen to see library statistics like # likes, # people, etc... 
-                -  settings button would enable course owners to remove people, change visibility settings I think? or check different boxes for question types, or see users or something
+                - settings button would enable course owners to remove people, change visibility settings I think? or check different boxes for question types, or see users or something
                 - users could add a note for each unit / library or something
                 - instead of making path a long rectangle shape, make it follow the curve of the nodes
                 - ⭐️ explore adding "scroll to current" on map page (last unlocked node)
@@ -165,11 +165,10 @@ TODO list:
             - make sure adding a unit actually refreshes on the page and stuff ideally w/ out refresh
             - why do different pages flicker on the screen when I am on a page and I hit refresh?
             - why is public generating a code on library creation? 
-            - current streak in lesson complete displays current streak not current streak + 1 (maybe just refetch it?)
             - improve question generation eventually, like make all answers similar length, use similar answer choices, utilize SAT / ACT / MCAT style questions, maybe tailor the answer style for each course, like MCAT = premed, SAT / ACT = SAT / ACT prep, college style = college final exam style / quiz, etc...
             - when creating library for first time, maybe move join_library call to right below or IN save_library_room_states so theres no duplicate call to add users to library room states - might have to move db.session.commit logic though
-            - on user login, make sure streak resets if last streak is more then a day ago or something like that
-            - when the user finishes a lesson and it adds to their streak, make sure the streak in the section completion page displays the updated streak
+            - on user login, make sure streak resets if last streak is more then a day ago or something like that - jules
+                - when the user finishes a lesson and it adds to their streak, make sure the streak in the section completion page displays the updated streak
             - why does the "add unit" button extend the course length a little bit --> it shouldn't for now
             - make it so that if the user either generates a library or adds a section / unit then navigates away, it kills the request so the other parts of the libray load and it doesn't get stuck in a hanging state
             - do the loading disabling thing and toast thing for add unit as well, although that should be much faster
@@ -212,6 +211,14 @@ TODO list:
 
     general:
     study tool additions / ideas:
+        - for video - 1) train scrips on veritasium or whatever captivating youtube channel 2) begin with small activity / story for the user (like the economic story from uncle larry's friend, or his story from APush), then go into the lesson now that the user is intrigued
+            - why is this better then gemini live? - probably because students are lazy, but mostly because this might be captivating to them. aka I will start with some conceptions that the user has, like the force is downwards, or something, then I will go into the lesson - 
+            - this accurately addresses a need from users (motivation + lack of knowing what to study)
+            - even if it is not better then gemini live right now, what makes me know that it will not be beat by other ai companies in the future?
+                - I am focusing on user needs / wants and what I would like a study tool to look like. Paired with the "multiplayer study games". I will make something which is much more captivating then chatgpt or gemini could make.
+        - could eventually make it so it takes you through a guided study session without even touching a button - it could even tell you exactly what course standard / section it is getting it from
+        - you could feed it your homework as well maybe so it gives you similar problems to the tests - although that would be more difficult. maybe you give it the textbook and it makes it more fun? like adds images and colors and stuff and you do it in "focus mode" so it feels more fun then a dry old textbook?
+        - use chatgpt deep research / perplexity research / grok research for most common problems for students, then use that as copy writing or whatever
         - ask book clubs or book based groups to review your tool to see if they would like it - like to do a refresher of their
             book at a deeper level
         - handle delete account (eventually)

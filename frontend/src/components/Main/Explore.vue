@@ -34,12 +34,16 @@ function fetchLibraries() {
         .get("/api/libraries", { params: { browse: true } })
         .then((response) => {
             if (authStore.loggedIn) {
-                console.log(response)
-
-                myLibraries.value = response.data.explore_libraries.sort((a, b) => 
-                    a.library_topic.localeCompare(b.library_topic)
-                );
+            console.log(response)
+            myLibraries.value = response.data.explore_libraries.map(([library, user]) => ({
+                ...library,
+                owner_username: user.username,
+                // library_topic: library.library_topic.charAt(0).toUpperCase() + library.library_topic.slice(1)
+            })).sort((a, b) => 
+                a.library_topic.localeCompare(b.library_topic)
+            );
             }
+            console.log(myLibraries.value)
         })
         .catch((error) => {
 
