@@ -21,6 +21,8 @@ class User(db.Model, UserMixin):
     last_name = db.Column(db.String(25), nullable=True)
     password = db.Column(db.String(200), nullable=True)
     email = db.Column(db.String(100), unique=True, nullable=False)
+    first_name = db.Column(db.String(25), nullable=True)
+    last_name = db.Column(db.String(25), nullable=True)
     timezone = db.Column(db.String(50), default='UTC', nullable=False, server_default='UTC')
     joined_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False, server_default=db.func.now())
 

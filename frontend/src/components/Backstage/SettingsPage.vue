@@ -84,7 +84,7 @@ interface Profile {
 
 // For data fetched from backend (largely read-only display)
 const profile = ref<Profile>({
-    user: "",
+    user: "", 
     tutor: "",
     email: "",
     // tier: "",
