@@ -27,6 +27,7 @@
                 />
             </div>
         </div>
+
     <div class="form-field">
         <label for="new-email">Email:</label>
         <input
@@ -179,5 +180,6 @@ form {
   width: 100%;
   box-sizing: border-box;
 }
+
 
 </style>
