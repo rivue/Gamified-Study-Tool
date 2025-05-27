@@ -368,7 +368,7 @@ def save_library_room_contents(library_id, section_unit_map, section_contents_ma
         with db_transaction():
             curr = 1
             for unit_name, sections in section_unit_map.items():
-                print("section unit map error")
+                
                 # 1.1 + 1.2) create unit and add to library
                 response_obj, status_code = create_unit_and_add(library_id, unit_name)
                 
@@ -397,7 +397,6 @@ def save_library_room_contents(library_id, section_unit_map, section_contents_ma
                     
                     # 3) add room states
                     add_section_user_state(user_id, library_id, section_id, num_lessons)
-                    print("add section user state error")
                     
                     if "factoids" not in section_contents_map[section]:
                         print(f"Warning: No factoids for section '{section}'")

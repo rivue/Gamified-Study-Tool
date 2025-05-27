@@ -182,7 +182,7 @@ TODO list:
         - ✅ ⭐️ Finish sections + units
             - ⭐️ Add ability to add sections to specific units (later --> come back to, reminder to make it account for 1-n number of sections no matter how that looks. add new stepping stones button is commented out for now)
                 - why is this empty? --> rag_context:
-                - TODO: !! FIX FACTOID ERROR THING!!! THEN ABOVE!! THEN 
+                - TODO: THEN ABOVE!! THEN 
                     DELETE SECTION / UNIT / COURSE / LIBRARY!!! INTERTWINING JULES STUFF ON THE WAY
 
         - ✅ ⭐️ (would like to implement visibility of different courses first or at least a many:one for non-owners in library model)
@@ -205,6 +205,8 @@ TODO list:
 
     general:
     study tool additions / ideas:
+        - in course explorer, courses that have been generated < 7 days ago have "new" tag
+            - theres also "trending" courses as well, that we could add for now
         - courses could be more of a platform, like skool.com or whatever - someone makes a fun course and its basically a market for creators w/ linktrees or sponsorships between slides or something. 
         - for video - 1) train scripts on veritasium or whatever captivating youtube channel 2) begin with small activity / story for the user (like the economic story from uncle larry's friend, or his story from APush), then go into the lesson now that the user is intrigued
             - why is this better then gemini live? - probably because students are lazy, but mostly because this might be captivating to them. aka I will start with some conceptions that the user has, like the force is downwards, or something, then I will go into the lesson - 

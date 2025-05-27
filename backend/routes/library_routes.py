@@ -466,10 +466,10 @@ def init_library_routes(app):
                 # Generate new content for this subtopic
                 last_section = None
                 try:
+                    print(f"subtopic: {subtopic}, library_id: {library_id}")
                     rag_context = query_and_respond_pinecone(subtopic, library_id)
 
                     print(f"rag context: {rag_context}")
-                    # TODO: figure out why rag context is E M P T Y
                     
                     future = executor.submit(lgn.generate_libroom_content, user_id, subtopic, library_id, rag_context)
 
