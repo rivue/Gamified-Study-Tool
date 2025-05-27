@@ -248,10 +248,9 @@ def init_library_routes(app):
             room_data = None
             if library_topic:
                 print("before unit_id, section_id")
-                unit_id, section_id = library_data.get('section_to_unit_map').get(library_topic) # problem
+                unit_id, section_id = library_data.get('section_to_unit_map').get(library_topic)
                 print("before room_data")
                 print(f"unit_id: {unit_id}, section_id: {section_id}")
-                
                 room_data = lbh.retrieve_library_room_contents(library_id, section_id, user_id)
                 print("before room_data check")
                 if not room_data:
@@ -260,6 +259,7 @@ def init_library_routes(app):
                 room_data = lbh.get_library_room_state(user_id, library_id)
             print("before library_data")
             library_data["show_settings"] = user_id == library_data.get("owner_id")
+            
             return jsonify(status="success", data=library_data, room_data=room_data)
         except: 
             return jsonify(status="error", message="Failed to retrieve library data"), 500

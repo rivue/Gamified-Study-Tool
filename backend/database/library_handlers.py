@@ -543,75 +543,81 @@ def save_section_contents(library_id, section, section_contents_map, unit_id, po
 
 def retrieve_library_room_contents(library_id, section_id, user_id):
 
-    # user HAS to be logged
-    if not user_id:
-        return None
+    try:
+        # user HAS to be logged
+        if not user_id:
+            return None
 
-    # query lesson room state map
-    # map user id, library id, and room name in map to retrieve state
-    # send state and factoids for that state back
-    curr_state = get_library_room_state(user_id, library_id, section_id)
+        # query lesson room state map
+        # map user id, library id, and room name in map to retrieve state
+        # send state and factoids for that state back
+        curr_state = get_library_room_state(user_id, library_id, section_id)
 
-    if not curr_state:
-        return None
-    
-    print("after curr_state check")
-    
-    if curr_state["lesson_state"] > curr_state["num_lessons"]:
-        # User has completed all lessons, randomly get 7-9 factoids
+        if not curr_state:
+            return None
+        
+        print("after curr_state check")
+        
+        if curr_state["lesson_state"] > curr_state["num_lessons"]:
+            # User has completed all lessons, randomly get 7-9 factoids
 
-        all_factoids = LibraryFactoid.query.filter_by(
-            section_id=section_id
-        ).all()
-    
-        # Randomly select between 7-9 factoids or all if less than 7
-        num_factoids = min(random.randint(7, 9), len(all_factoids))
-        factoids = random.sample(all_factoids, num_factoids) if len(all_factoids) >= num_factoids else all_factoids
+            all_factoids = LibraryFactoid.query.filter_by(
+                section_id=section_id
+            ).all()
+        
+            # Randomly select between 7-9 factoids or all if less than 7
+            num_factoids = min(random.randint(7, 9), len(all_factoids))
+            factoids = random.sample(all_factoids, num_factoids) if len(all_factoids) >= num_factoids else all_factoids
 
-    else:
-        # Get factoids for the current lesson state
-        factoids = LibraryFactoid.query.filter_by(
-            section_id=section_id, lesson_name=f"factoid_set_{curr_state['lesson_state']}"
-        ).all()
-    
-    print(f"length of factoids: {len(factoids)}")
+        else:
+            # Get factoids for the current lesson state
+            factoids = LibraryFactoid.query.filter_by(
+                section_id=section_id, lesson_name=f"factoid_set_{curr_state['lesson_state']}"
+            ).all()
+        
+        print(f"length of factoids: {len(factoids)}")
 
-    if len(factoids) < 3:
-        return None
-    
-    print(f"factoids: {factoids}")
+        if len(factoids) < 3:
+            return None
+        
+        print(f"factoids: {factoids}")
 
-    room_contents = []
-    for factoid in factoids:
-        questions = []
-        for question in factoid.questions:
-            question_choices = question.choices.all() if question.choices else []
-            wrong_choices = [
-                choice.choice_text
-                for choice in question_choices
-                if not choice.is_correct
-            ]
-            correct_choice = next(
-                (
+        room_contents = []
+        for factoid in factoids:
+            questions = []
+            for question in factoid.questions:
+                question_choices = question.choices if question.choices else []
+                # question_choices = question.choices.all() if question.choices else []
+                wrong_choices = [
                     choice.choice_text
                     for choice in question_choices
-                    if choice.is_correct
-                ),
-                None,
+                    if not choice.is_correct
+                ]
+                correct_choice = next(
+                    (
+                        choice.choice_text
+                        for choice in question_choices
+                        if choice.is_correct
+                    ),
+                    None,
+                )
+                questions.append(
+                    {
+                        "question_text": question.question_text,
+                        "correct_choice": correct_choice,
+                        "wrong_choices": wrong_choices,
+                        "question_type": question.question_type,
+                    }
+                )
+            room_contents.append(
+                {"factoid_text": factoid.factoid_content, "questions": questions, "room_state": curr_state}
             )
-            questions.append(
-                {
-                    "question_text": question.question_text,
-                    "correct_choice": correct_choice,
-                    "wrong_choices": wrong_choices,
-                    "question_type": question.question_type,
-                }
-            )
-        room_contents.append(
-            {"factoid_text": factoid.factoid_content, "questions": questions, "room_state": curr_state}
-        )
+        
+        return {"factoids": room_contents}
     
-    return {"factoids": room_contents}
+    except Exception as e:
+        print(f"Exception retrieve_library_room_contents: {str(e)}")   
+        raise
 
 def join_library(user_id: int, library_id: int, join_code: str = None):
     """
@@ -743,7 +749,7 @@ def increase_lesson_state(user_id, library_id, section_id):
         library_id=library_id,
         section_id=section_id
     ).first()
-    
+    print(state)
     if not state:
         return None, False  # State not found
     
