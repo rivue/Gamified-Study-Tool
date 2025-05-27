@@ -185,8 +185,6 @@ TODO list:
 
         hard probably (goal: 2 high level bullet points / wk):
         - ⭐️ remove alert message in library creator (not hard but have to remember)
-        - ⭐️ add username (backfill username w/ 1st part of email before @ symbol - maybe let people change later)
-            - for this section, make sure you modify explore page owner_id and library leaderboard
         - ✅ ⭐️ Finish sections + units
             - ⭐️ Add ability to add sections to specific units (later --> come back to, reminder to make it account for 1-n number of sections no matter how that looks. add new stepping stones button is commented out for now)
                 - why is this empty? --> rag_context:

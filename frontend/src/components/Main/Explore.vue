@@ -35,9 +35,9 @@ function fetchLibraries() {
         .then((response) => {
             if (authStore.loggedIn) {
             console.log(response)
-            myLibraries.value = response.data.explore_libraries.map(([library, user]) => ({
+            myLibraries.value = response.data.explore_libraries.map(([library, username]) => ({
                 ...library,
-                owner_username: user.username,
+                owner_username: username,
                 // library_topic: library.library_topic.charAt(0).toUpperCase() + library.library_topic.slice(1)
             })).sort((a, b) => 
                 a.library_topic.localeCompare(b.library_topic)

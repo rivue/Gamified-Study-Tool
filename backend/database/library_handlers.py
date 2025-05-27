@@ -1092,18 +1092,20 @@ def get_libraries_info(user_id=None, browse=False):
 
         # come back here --> get username from library to send to explore courses
         explore_libraries_data = []
-        library_username_map = {}
         for library in explore_libraries:
             library_dict = model_to_dict(library, exclude=['room_names', 'factoids'])
-            # library_username_map[library_dict] = User.query.filter_by(id=library.owner_id).first()
-            # print(library_dict['owner_id'])
-            print(User.query.get(id=library_dict['owner_id'])) # TODO: a;lsdkjf;alskdjf HEERREEEE!!!!!
-            explore_libraries_data.append([library_dict, User.query.get(id=library_dict['owner_id']).id])
+
+            user = User.query.get(library_dict['owner_id'])
+            name = None
+            if user:
+                name = user.username
+                
+            explore_libraries_data.append([library_dict, name])
         
         response["explore_libraries"] = explore_libraries_data
-        # response["library_username_map"] = library_username_map # problem --> putting it as a map then giving it to frontend
         
         return jsonify(response)
+    
     else:
         response = {}
 

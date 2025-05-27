@@ -62,7 +62,7 @@
                     <div class="card-footer">
                         <div class="creator">
                             <UserCircle class="creator-icon" />
-                            <span>{{ library.owner_name }}</span>
+                            <span>{{ library.owner_username === null ? "Creator not found" : library.owner_username }}</span>
                         </div>
 
                         <Button v-if="!joinedCourses.has(library.id)" 
