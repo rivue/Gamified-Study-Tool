@@ -34,7 +34,6 @@ function fetchLibraries() {
         .get("/api/libraries", { params: { browse: true } })
         .then((response) => {
             if (authStore.loggedIn) {
-            console.log(response)
             myLibraries.value = response.data.explore_libraries.map(([library, username]) => ({
                 ...library,
                 owner_username: username,

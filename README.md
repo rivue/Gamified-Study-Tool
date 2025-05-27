@@ -123,7 +123,7 @@ TODO list:
                 - not sure exactly where it is inconsistent
         - ⭐️ vvvmaybe ask for feedback before doing vvv
             - also make sure it works well(ish) for mobile
-        - ⭐️ add google 
+        - ⭐️ add google auth
             - note: probably has to make rivue email work first
         - ⭐️ Terms of use / Policy Page legal agreement thing - ask gpt if I actually need, maybe ask jake how to do but maybe not
             - ⭐️ There are probably websites and stuff for this --> do this before Stripe
@@ -144,7 +144,6 @@ TODO list:
                 - instead of making path a long rectangle shape, make it follow the curve of the nodes
                 - ⭐️ explore adding "scroll to current" on map page (last unlocked node)
                 - also, maybe change it to vertical
-                - ⭐️ add ability to leave libraries (later)
                 - ⭐️ move dropdown menu to left + make dropdown menu permanant, replace w/ profile picture --> hover menu for to see profile settings or something
                 - for course creation, make a "advanced settings" toggle for t/f, mcq, other questions, max users, etc... maybe other stuff as well
                 - ⭐️ all the other routes and stuff (terms & policies, buying subscription, can't think of others?)
@@ -168,29 +167,26 @@ TODO list:
             - improve question generation eventually, like make all answers similar length, use similar answer choices, utilize SAT / ACT / MCAT style questions, maybe tailor the answer style for each course, like MCAT = premed, SAT / ACT = SAT / ACT prep, college style = college final exam style / quiz, etc...
             - when creating library for first time, maybe move join_library call to right below or IN save_library_room_states so theres no duplicate call to add users to library room states - might have to move db.session.commit logic though
             - on user login, make sure streak resets if last streak is more then a day ago or something like that - jules
-                - when the user finishes a lesson and it adds to their streak, make sure the streak in the section completion page displays the updated streak
+                - when the user finishes a lesson and it adds to their streak, make sure the streak in the section completion page displays the updated streak - jules
             - why does the "add unit" button extend the course length a little bit --> it shouldn't for now
             - make it so that if the user either generates a library or adds a section / unit then navigates away, it kills the request so the other parts of the libray load and it doesn't get stuck in a hanging state
             - do the loading disabling thing and toast thing for add unit as well, although that should be much faster
             - account for duplicate unit names when user is adding a unit
             - go through library_routes and make sure routes that require login actual have @login_required decorator
             - change Logout to have red background
-
-        TODO when I get back:
-            - last 2 jules tasks - add username name / first + last name
-                - change id --> library in leaderboard
-                - change id --> username in course explore screen for creators of libraries
-                - make first name / last name not nullable
-                - make usernames unique in db if they aren't already
+            - make usernames unique in db if they aren't already
+            - make first name / last name not nullable
 
         hard probably (goal: 2 high level bullet points / wk):
         - ⭐️ remove alert message in library creator (not hard but have to remember)
         - ✅ ⭐️ Finish sections + units
             - ⭐️ Add ability to add sections to specific units (later --> come back to, reminder to make it account for 1-n number of sections no matter how that looks. add new stepping stones button is commented out for now)
                 - why is this empty? --> rag_context:
+                - TODO: !! FIX FACTOID ERROR THING!!! THEN ABOVE!! THEN 
+                    DELETE SECTION / UNIT / COURSE / LIBRARY!!! INTERTWINING JULES STUFF ON THE WAY
 
         - ✅ ⭐️ (would like to implement visibility of different courses first or at least a many:one for non-owners in library model)
-            - ⭐️ Delete sections (requires entering the name of the unit / course just for accidental reasons)
+            - ⭐️ Delete sections (requires entering the name of the unit / course just for accidental reasons) <-- come back to
             - ⭐️ Delete Units (requires entering the name of the unit / course just for accidental reasons)
             - ⭐️ Delete courses / libraries (whatever they're called) (requires entering the name of the unit / course just for accidental reasons)
                - ⭐️ Remember to delete from both DB and pinecone as well, as well as respective child / parent courses / units / sections / libraries, roomNameState, LibraryFavorites, question, question_choice, LibraryMembership, etc...
@@ -209,7 +205,8 @@ TODO list:
 
     general:
     study tool additions / ideas:
-        - for video - 1) train scrips on veritasium or whatever captivating youtube channel 2) begin with small activity / story for the user (like the economic story from uncle larry's friend, or his story from APush), then go into the lesson now that the user is intrigued
+        - courses could be more of a platform, like skool.com or whatever - someone makes a fun course and its basically a market for creators w/ linktrees or sponsorships between slides or something. 
+        - for video - 1) train scripts on veritasium or whatever captivating youtube channel 2) begin with small activity / story for the user (like the economic story from uncle larry's friend, or his story from APush), then go into the lesson now that the user is intrigued
             - why is this better then gemini live? - probably because students are lazy, but mostly because this might be captivating to them. aka I will start with some conceptions that the user has, like the force is downwards, or something, then I will go into the lesson - 
             - this accurately addresses a need from users (motivation + lack of knowing what to study)
             - even if it is not better then gemini live right now, what makes me know that it will not be beat by other ai companies in the future?
@@ -220,7 +217,7 @@ TODO list:
         - ask book clubs or book based groups to review your tool to see if they would like it - like to do a refresher of their
             book at a deeper level
         - handle delete account (eventually)
-        - when the course owner adds / deletes a section, broadcast it via webhooks to the other members in the form of alert toasts so they can see it live
+        - (DO WHEN SECTION / LIBRARY / UNIT DELETION IS DONE) when the course owner adds / deletes a section, broadcast it via webhooks to the other members in the form of alert toasts so they can see it live
         - complete feedback / user email dashboard detailing 1) feedback data 2) ai summaries / insights on what feedback I might have, maybe even broken up by user groups, age, location, etc... 3) list of user emails maybe? - might even be on a private url which calls my api - look into admin_routes if you know what I mean
             - contact / support pipeline?
             - use this in some private version of rivue url, not the main one
@@ -278,7 +275,7 @@ TODO list:
         -User retention: streak and cram mode
         Complete a lesson daily to keep stream. 24 hrs after u complete a lesson, the next one unlocks. Maybe some external reward like irl merch or snth
         Cram node is basically creative mode, can't do rewards but can skip around to any lesson
-        -Possible idea: adding the ability to schedule group study sessions within each library, maybe a ventral calendar for all the meetings, and maybe add the ability to pull things from canvas and moodle?
+        -Possible idea: adding the ability to schedule group study sessions within each library, maybe a central calendar for all the meetings, and maybe add the ability to pull things from canvas and moodle?
         Good- idk
         Bad- location in an app might be dangerous especially for public libraries, not an original feature, might get people off the app?
         - ⭐️ cram mode or something at the bottom - basically goes through review mode, but of all of them, effectively giving them the review, but without the need to break their streak
