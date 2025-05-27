@@ -182,7 +182,7 @@ TODO list:
         - ✅ ⭐️ Finish sections + units
             - ⭐️ Add ability to add sections to specific units (later --> come back to, reminder to make it account for 1-n number of sections no matter how that looks. add new stepping stones button is commented out for now)
                 - why is this empty? --> rag_context:
-                - TODO: THEN ABOVE!! THEN 
+                - TODO: FIX RAG CONTEXT NOT WORKING!! THEN 
                     DELETE SECTION / UNIT / COURSE / LIBRARY!!! INTERTWINING JULES STUFF ON THE WAY
 
         - ✅ ⭐️ (would like to implement visibility of different courses first or at least a many:one for non-owners in library model)
