@@ -495,7 +495,7 @@ function goToLeaderboard() {
 }
 
 function goToHome() {
-    router.push("/library");
+    router.push("/create");
 }
 
 function handleLeaveCourseClick() {

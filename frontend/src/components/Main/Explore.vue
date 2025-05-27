@@ -56,8 +56,6 @@ function fetchLibraries() {
 
 const loggedIn = computed(() => authStore.loggedIn);
 
-const browsingLibraries = computed(() => route.path === "/library");
-
 </script>
 
 <style scoped>

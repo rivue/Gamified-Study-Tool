@@ -176,14 +176,12 @@ TODO list:
             - change Logout to have red background
             - make usernames unique in db if they aren't already
             - make first name / last name not nullable
+            - have some sort of warning on the database model level if an owner tries to leave a course?
 
         hard probably (goal: 2 high level bullet points / wk):
         - ⭐️ remove alert message in library creator (not hard but have to remember)
-        - ✅ ⭐️ Finish sections + units
-            - ⭐️ Add ability to add sections to specific units (later --> come back to, reminder to make it account for 1-n number of sections no matter how that looks. add new stepping stones button is commented out for now)
-                - why is this empty? --> rag_context:
-                - TODO: FIX RAG CONTEXT NOT WORKING!! THEN 
-                    DELETE SECTION / UNIT / COURSE / LIBRARY!!! INTERTWINING JULES STUFF ON THE WAY
+
+                - TODO: THEN DELETE SECTION / UNIT / COURSE / LIBRARY!!! INTERTWINING JULES STUFF ON THE WAY
 
         - ✅ ⭐️ (would like to implement visibility of different courses first or at least a many:one for non-owners in library model)
             - ⭐️ Delete sections (requires entering the name of the unit / course just for accidental reasons) <-- come back to
@@ -205,6 +203,7 @@ TODO list:
 
     general:
     study tool additions / ideas:
+        - add a "quick create" library, where it is like a button you click and you don't have to leave the page - maybe possibly. They don't specify settings or anything, they just leave a name and the course determines the structure - useful for non-study scenarios (ex: course on friends testing one another or multiplayer game like expriences if we try to do that)
         - in course explorer, courses that have been generated < 7 days ago have "new" tag
             - theres also "trending" courses as well, that we could add for now
         - courses could be more of a platform, like skool.com or whatever - someone makes a fun course and its basically a market for creators w/ linktrees or sponsorships between slides or something. 

@@ -1,26 +1,24 @@
 <template>
     <div class="library-browser pb-8">
         <div v-if="isLoading" class="loading">
-            <span>Loading Your Libraries</span>
+            <span>Loading Your Courses</span>
             <LoadingComponent />
         </div>
 
         <template v-else>
-            <LibraryCarousel v-if="loggedIn && browsingLibraries" :libraries="myLibraries" :library-favorites-map="favoritesMap"/>
+            <LibraryCarousel v-if="loggedIn" :libraries="myLibraries" :library-favorites-map="favoritesMap"/>
         </template>
     </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from "vue";
-import { useRoute } from "vue-router";
 import axios from "axios";
 import { useAuthStore } from "@/store/authStore";
 import LoadingComponent from "@/components/Backstage/LoadingComponent.vue";
-import LibraryCarousel from "./LibraryCarousel.vue";
+import LibraryCarousel from "@/components/Game/Creation/LibraryCarousel.vue";
 
 const authStore = useAuthStore();
-const route = useRoute();
 const isLoading = ref(true);
 const myLibraries = ref([]);
 const favoritesMap = ref({});
@@ -32,10 +30,8 @@ onMounted(() => {
 function fetchLibraries() {
     axios
         .get("/api/libraries")
-
         .then((response) => {
             if (authStore.loggedIn) {
-
                 const combinedLibraries = [
                     ...response.data.mine,
                     ...response.data.joined_public,
@@ -58,8 +54,6 @@ function fetchLibraries() {
 }
 
 const loggedIn = computed(() => authStore.loggedIn);
-
-const browsingLibraries = computed(() => route.path === "/library");
 
 </script>
 

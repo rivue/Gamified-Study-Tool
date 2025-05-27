@@ -173,7 +173,6 @@
                         :isSubmitting="buttonDisabled.isSubmitting || buttonDisabled.noRooms" />
                 </div>
             </div>
-            <library-browser />
         </div>
     </div>
 </template>
@@ -184,11 +183,9 @@ import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import axios from "axios";
 
-
 import { usePopupStore } from "@/store/popupStore";
 import { useAuthStore } from "@/store/authStore";
 import CtaButton from "../../Footer/LandingPageComponents/CtaButton.vue";
-import LibraryBrowser from "./LibraryBrowser.vue";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 // New or modified data for groups
@@ -293,7 +290,7 @@ const formattedErrors = ref<ReturnType<z.ZodError["format"]>>({} as any)
 const newGroupName = ref("");
 
 const libgenRoute = computed(() => {
-    return route.path === "/library";
+    return route.path === "/create";
 });
 
 const submitButtonText = computed(() => {

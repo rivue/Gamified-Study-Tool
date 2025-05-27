@@ -103,7 +103,7 @@ const handleMessageCode = (code: string | null) => {
 
 const redirectLogin = () => {
     if (authStore.loggedIn) {
-        router.push("/library");
+        router.push("/create");
     } else {
         router.push("/login");
     }
