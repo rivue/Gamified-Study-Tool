@@ -1,9 +1,10 @@
 <template>
     <div class="relative">
         <button @click="openModal"
+            :disabled="false"
             class="p-1 rounded-full text-red-500 hover:bg-red-100 dark:hover:bg-red-700/50 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-red-400"
             title="Delete Section">
-            <TrashIcon class="w-5 h-5" />
+            <TrashIcon class="w-8 h-8" />
         </button>
 
         <teleport to="body">
