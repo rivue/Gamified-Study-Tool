@@ -109,6 +109,7 @@ IDEAS:
         - could be rocks in an island (or actual islands)
         - could be something in a crop field
         - possibly take inspiration from btd5 or btd6 / odessey
+        - make sure delete section actually refreshes the page and closes the modal
 
 TODO list:
 
@@ -182,8 +183,6 @@ TODO list:
 
         hard probably (goal: 2 high level bullet points / wk):
         - ⭐️ remove alert message in library creator (not hard but have to remember)
-
-                - TODO: THEN DELETE SECTION / UNIT / COURSE / LIBRARY!!! INTERTWINING JULES STUFF ON THE WAY
 
         - ✅ ⭐️ (would like to implement visibility of different courses first or at least a many:one for non-owners in library model)
             - ⭐️ Delete sections (requires entering the name of the unit / course just for accidental reasons) <-- come back to
@@ -387,6 +386,8 @@ TODO list:
         - eventually look into custom api / llm specifically designed for education or review or whatever
         - *possibly* add a slider to each course based on how lenient the course creator wants the fuzzy string matcher to be (for misspelled words)
         - only fetch most 30 recent factoids, or summary of factoids or something when doing room generation
+        - add a small button at the end to make password visible
+        - center "Courses" text in create screen
 
     game page:
         - break up error checking in frontend for unit creation

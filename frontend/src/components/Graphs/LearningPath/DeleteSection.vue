@@ -1,8 +1,8 @@
 <template>
-    <div class="relative">
+    <div class="absolute -top-3 -right-3 z-20">
         <button @click="openModal"
             :disabled="false"
-            class="p-1 rounded-full text-red-500 hover:bg-red-100 dark:hover:bg-red-700/50 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-red-400"
+            class="p-1 rounded-full text-red-500 hover:bg-red-100 dark:hover:bg-red-700/50 transition-colors duration-150 "
             title="Delete Section">
             <TrashIcon class="w-8 h-8" />
         </button>
