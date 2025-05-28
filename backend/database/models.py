@@ -3,10 +3,8 @@ from flask_login import UserMixin
 from sqlalchemy import JSON, update
 from sqlalchemy.ext.mutable import MutableList
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
-from datetime import datetime, timedelta, date
+from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
-import traceback
-import logging
 import secrets, string
 import hashlib
 import random
@@ -367,29 +365,43 @@ class LibraryUnit(db.Model):
 class LibrarySection(db.Model):
     __tablename__ = "library_section"
     id = db.Column(db.Integer, primary_key=True)
-    unit_id = db.Column(db.Integer, db.ForeignKey('library_unit.id'), nullable=False)
+    unit_id = db.Column(
+        db.Integer,
+        db.ForeignKey(
+            'library_unit.id',
+            name='fk_library_section__unit_id',
+            ondelete='CASCADE'
+        ),
+        nullable=False
+    )
     section_name = db.Column(db.String(200), nullable=False)
 
-    position = db.Column(db.Integer, nullable=False, index=True) 
+    position = db.Column(db.Integer, nullable=False, index=True)
     
     # Link factoids to a section
-    factoids = db.relationship('LibraryFactoid', backref='section', cascade='all, delete-orphan', passive_deletes=True)
- 
+    factoids = db.relationship('LibraryFactoid', backref='section', cascade='all, delete-orphan')
+    room_states = db.relationship("LibraryRoomState", backref="section", cascade="all, delete-orphan")
+    
     def delete_and_reindex(self):
-            """
-            Deletes this section (cascading factoids→questions→choices and
-            room-states via configured cascades/FKs) and then renumbers its
-            siblings so positions stay 0…n-1.
-            """
-            parent_unit = self.unit
+        """
+        Deletes this section (cascading factoids→questions→choices and
+        room-states via configured cascades/FKs) and then renumbers its
+        siblings so positions stay 0…n-1.
+        """
+        try:
+            with db.session.no_autoflush:
+                parent_unit = self.unit
+        
+                # delete me (SQLAlchemy will cascade all the way down)
+                db.session.delete(self)
 
-            # delete me (SQLAlchemy will cascade all the way down)
-            db.session.delete(self)
-
-            # reindex the remaining sections
-            siblings = sorted(parent_unit.sections, key=lambda s: s.position)
-            for idx, sec in enumerate(siblings):
-                sec.position = idx
+                # reindex the remaining sections
+                siblings = sorted(parent_unit.sections, key=lambda s: s.position)
+                for idx, sec in enumerate(siblings):
+                    sec.position = idx
+        except Exception as e:
+            db.session.rollback() # keep the DB clean
+            
 
     __table_args__ = (
         db.UniqueConstraint('unit_id', 'position',
@@ -472,11 +484,11 @@ class LibraryFactoid(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     library_id = db.Column(db.Integer, db.ForeignKey('library.id'), nullable=True)
     room_name = db.Column(db.String(200), nullable=True)
-    section_id = db.Column(db.Integer, db.ForeignKey('library_section.id'), nullable=True)
+    section_id = db.Column(db.Integer, db.ForeignKey('library_section.id', ondelete='CASCADE'), nullable=True)
     lesson_name = db.Column(db.String(200), nullable=False)
     factoid_content = db.Column(db.Text, nullable=False)
 
-    questions = db.relationship('LibraryQuestion', backref='factoid', cascade="all, delete-orphan", passive_deletes=True)
+    questions = db.relationship('LibraryQuestion', backref='factoid', cascade="all, delete-orphan")
 
 class LibraryQuestion(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -485,7 +497,7 @@ class LibraryQuestion(db.Model):
     correct_choice = db.Column(db.JSON, nullable=False)
     question_type = db.Column(db.String(50), nullable=False, default="multiple_choice")
 
-    choices = db.relationship('LibraryQuestionChoice', backref='question', cascade="all, delete-orphan", passive_deletes=True)
+    choices = db.relationship('LibraryQuestionChoice', backref='question', cascade="all, delete-orphan")
 
 class LibraryQuestionChoice(db.Model):
     id = db.Column(db.Integer, primary_key=True)

@@ -15,6 +15,7 @@
                     />
 
                     <SideMenuButton
+                        v-if="loggedIn"
                         label="My Courses"
                         :isSelected="isRouteActive('/courses')"
                         @click="openRoute('/courses')"
@@ -22,6 +23,7 @@
                     />
 
                     <SideMenuButton
+                        v-if="loggedIn"
                         label="Create Course"
                         :isSelected="isRouteActive('/create')"
                         @click="openRoute('/create')"
@@ -29,6 +31,7 @@
                     />
 
                     <SideMenuButton
+                        v-if="loggedIn"
                         label="Explore"
                         :isSelected="isRouteActive('/explore')"
                         @click="openRoute('/explore')"

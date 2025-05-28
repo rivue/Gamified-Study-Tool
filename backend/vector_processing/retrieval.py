@@ -2,14 +2,10 @@ from openai import OpenAI
 from pinecone.grpc import PineconeGRPC
 import os
 
-import openai
-openai.api_key = "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"
-print("Ptest")
-
 # Initialize global clients
-client = OpenAI(api_key=openai.api_key)
+client = OpenAI(api_key=os.getenv("PINECONE_API_KEY"))
 if os.getenv('FLASK_ENV') != "migration":
-    pc = PineconeGRPC(api_key="pcsk_42u1w8_815CW2LEFJJaeVPwHuZXopj7s4eJiQVFrVHTyeba6NTWpcjvN6EvU6jYQKrjHoc")
+    pc = PineconeGRPC()
     if os.getenv("FLASK_ENV") == "production":
         index_name = "beta-testing"
     else:
@@ -33,8 +29,6 @@ def query_pinecone(query, library_id, top_k=5):
     print(query_embedding)
     library_id = int(library_id) if isinstance(library_id, str) else library_id
     try:
-        print(f"query: {query}, library_id: {library_id}, top_k: {top_k}")
-        print(f"query: {type(query)}, library_id: {type(library_id)}, top_k: {type(top_k)}")
         results = index.query(
             vector=query_embedding,
             top_k=top_k,
@@ -70,6 +64,3 @@ def query_and_respond_pinecone(query, library_id, top_k=5):
     context = format_context(matches)
     
     return context
-
-
-print(query_and_respond_pinecone("Gender identity", 10))

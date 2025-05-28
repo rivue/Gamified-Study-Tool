@@ -83,11 +83,12 @@ else:
     origins = "*"
 CORS(app, origins=origins, supports_credentials=True)
 
-@event.listens_for(Engine, "connect")
-def _enable_sqlite_fk(dbapi_conn, conn_record):
-    # Turn on enforcement of FOREIGN KEY constraints in SQLite
-    dbapi_conn.execute("PRAGMA foreign_keys = ON;")
-    
+if app.config['FLASK_ENV'] == 'development':
+    @event.listens_for(Engine, "connect")
+    def _enable_sqlite_fk(dbapi_conn, conn_record):
+        # Turn on enforcement of FOREIGN KEY constraints in SQLite
+        dbapi_conn.execute("PRAGMA foreign_keys = ON;")
+        
 # Global error handler for all unhandled exceptions
 @app.errorhandler(Exception)
 def handle_exception(e):

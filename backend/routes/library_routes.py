@@ -520,39 +520,42 @@ def init_library_routes(app):
     @app.route("/api/library/section/<int:section_id>", methods=['DELETE'])
     @login_required
     def delete_section(section_id):
-        
-        section = LibrarySection.query.get_or_404(section_id)
+        section = LibrarySection.query.get_or_404(section_id) # Let Flask handle 404 if not found
         
         if section.unit.library.owner_id != current_user.id:
-           raise PermissionError("You do not own this library.")
+            # Explicitly handle permission error for ownership
+            return jsonify(status="error", message="You do not own this library."), 403
         
-        print("before delete")
-        
-        section.delete_and_reindex()
-        print("after delete")
-        # user_id needs to point to a user, 
-        # user needs to be owner of the library (section = section_id; section.unit_id = unit_id; unit.library_id = library_id)
-        # verify owner in frontend as well as here, don't send library_id bc thats not RESTful
-        # library = db.session.query(Library).filter_by(id=library_id).first()  
-        # position reordering
-        # delete:
-        # factoid --> questions --> question choices
-        # room state
-        # factoid
-        # SEE CLAUDE!!!
-        # SEE CHATGPT FOR BACKREF THINGS!!!
-            # AND FOR CASCADE IN LIBRARY ROOM STATE AS WELL!!!
-            # SEE delete_and_reindex IN LIBRARYSECTION AND GO TO CLAUDE IF THAT DOESN'T WORK
-
         try:
-            db.session.commit()
-        except PermissionError as e:
-            return jsonify(status="error", message=f"{str(e)}"), 403
-        except Exception as e:
-            db.session.rollback()
-            return jsonify(status="error", message="An Error occurred"), 400
+            print("before delete")
+            print(section)
+            section.delete_and_reindex()
+            print("after delete")
+            # user_id needs to point to a user, 
+            # user needs to be owner of the library (section = section_id; section.unit_id = unit_id; unit.library_id = library_id)
+            # verify owner in frontend as well as here, don't send library_id bc thats not RESTful
+            # library = db.session.query(Library).filter_by(id=library_id).first()  
+            # position reordering
+            # delete:
+            # factoid --> questions --> question choices
+            # room state
+            # factoid
+            # SEE CLAUDE!!!
+            # SEE CHATGPT FOR BACKREF THINGS!!!
+                # AND FOR CASCADE IN LIBRARY ROOM STATE AS WELL!!!
+                # SEE delete_and_reindex IN LIBRARYSECTION AND GO TO CLAUDE IF THAT DOESN'T WORK
 
-        return jsonify(status="success", message="Section successfully deleted")
+            db.session.commit()
+            return jsonify(status="success", message="Section successfully deleted")
+
+        except PermissionError as e: # Handles PermissionError from delete_and_reindex or commit
+            db.session.rollback()
+            print(f"Permission Error during section deletion/commit: {str(e)}")
+            return jsonify(status="error", message=f"{str(e)}"), 403
+        except Exception as e: # Handles other errors from delete_and_reindex or commit
+            db.session.rollback()
+            print(f"Error deleting section: {str(e)}")
+            return jsonify(status="error", message="An Error occurred during section deletion"), 400
         
     @app.route('/api/library/available-generated-rooms', methods=['POST'])
     def get_available_generated_rooms():

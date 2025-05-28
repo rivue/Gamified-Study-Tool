@@ -177,6 +177,8 @@ TODO list:
             - make usernames unique in db if they aren't already
             - make first name / last name not nullable
             - have some sort of warning on the database model level if an owner tries to leave a course?
+            - make contact page not require login to send feedback
+            - go through all models and make sure cascade / ondelete=cascade are in sync w/ each other (ideally use ondelete cascade)
 
         hard probably (goal: 2 high level bullet points / wk):
         - ⭐️ remove alert message in library creator (not hard but have to remember)
