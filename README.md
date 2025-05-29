@@ -180,6 +180,7 @@ TODO list:
             - have some sort of warning on the database model level if an owner tries to leave a course?
             - make contact page not require login to send feedback
             - go through all models and make sure cascade / ondelete=cascade are in sync w/ each other (ideally use ondelete cascade)
+            - if courses are empty, add a "create" button which links to create page
 
         hard probably (goal: 2 high level bullet points / wk):
         - ⭐️ remove alert message in library creator (not hard but have to remember)
@@ -204,6 +205,7 @@ TODO list:
 
     general:
     study tool additions / ideas:
+        - for library course structure, make manual course / unit creation under "advanced" or something, and default is just select a course syllabus
         - add a "quick create" library, where it is like a button you click and you don't have to leave the page - maybe possibly. They don't specify settings or anything, they just leave a name and the course determines the structure - useful for non-study scenarios (ex: course on friends testing one another or multiplayer game like expriences if we try to do that)
         - in course explorer, courses that have been generated < 7 days ago have "new" tag
             - theres also "trending" courses as well, that we could add for now
