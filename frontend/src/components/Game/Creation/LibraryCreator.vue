@@ -40,7 +40,7 @@
                                     {{ formattedErrors.selectedFile._errors[0] }}
                                 </div>
                                 <div class="helper-text">
-                                    🐙 Required. PDF files only, max 500kb.
+                                    🐙 Required - PDF files only for now, max 500kb. This file will be used to generate content for your course subtopics.
                                 </div>
                             </div>
                         </div>
@@ -50,24 +50,24 @@
                     <!-- Room Names Section with Groups -->
                     <div class="form-group room-names">
                         <div class="libgen-title">
-                            Course Structure
+                            Course Structure (Topics & Subtopics)
                         </div>
                         <div class="helper-text">
-                            Define the structure of your course. Each course requires at least one Unit, and each Unit requires at least one Section. All names should be 4-25 characters long without leading or trailing spaces.
+                            Define how your course content will be organized. Think of topics as high level concepts (like "Photosynthesis" or "Calculus Basics") and subtopics as lessons within each topic. Your uploaded file will be used to generate content for these subtopics.
                         </div>
                         <div class="room-input-container">
                             <!-- Group controls -->
                             <div class="group-controls">
 
                                 <div class="group-input-wrapper">
-                                    <input type="text" v-model="newGroupName" placeholder="Exam 1, Exam 2, etc..."
+                                    <input type="text" v-model="newGroupName" placeholder="Enter a major topic name..."
                                         maxlength="40" :disabled="disableExtras" @keyup.enter="addGroup" />
                                     <button class="add-btn" @click="addGroup"
                                         :disabled="!newGroupName.trim() || groups.length >= 10 || disableExtras">
-                                        Add Unit
+                                        Add Topic
                                     </button>
                                 </div>
-                                <div class="helper-text">🐙 Unit names must be unique.</div>
+                                <div class="helper-text">🐙 Example topic names: "Cell Biology", "Algebra Basics", "Ancient Rome"</div>
 
                                 <div v-if="formattedErrors.groups?._errors?.length" class="error-message">
                                     {{ formattedErrors.groups._errors[0] }}
@@ -76,12 +76,19 @@
 
                             <!-- Groups list -->
                             <div class="groups-container">
+                                <div class="mb-4 p-3 border rounded-lg bg-opacity-10 bg-gray-200">
+                                    <div class="text-sm mb-2"><strong>Example Structure:</strong></div>
+                                    <div class="ml-2">
+                                        <div><strong>Topic:</strong> "Cell Biology"</div>
+                                        <div class="ml-4 mt-1"><strong>Subtopics:</strong> "Cell Membrane", "Mitochondria", "Nucleus"</div>
+                                    </div>
+                                </div>
                                 <div v-for="(group, groupIndex) in groups" :key="groupIndex" class="group-item">
 
                                     <div class="group-header">
                                         <div class="group-title">{{ group.name }}</div>
                                         <div class="group-actions">
-                                            <span class="section-count">{{ group.sections.length }} sections</span>
+                                            <span class="section-count">{{ group.sections.length }} subtopics</span>
                                             <button class="remove-btn" @click="removeGroup(groupIndex)">×</button>
                                         </div>
                                     </div>
@@ -102,16 +109,16 @@
                                         <!-- Section input for this group -->
                                         <div class="section-input-wrapper">
                                             <input type="text" v-model="group.newSectionName"
-                                                placeholder="Mitosis, Derivative Rule, etc..." maxlength="40"
+                                                placeholder="Enter a subtopic name..." maxlength="40"
                                                 :disabled="group.sections.length >= 15 || disableExtras"
                                                 :class="{ 'input-error': formattedErrors.groups?.[groupIndex]?.sections?._errors?.length }"
                                                 @keyup.enter="addSection(groupIndex)" />
                                             <button class="add-btn" @click="addSection(groupIndex)"
                                                 :disabled="!group.newSectionName?.trim() || group.sections.length >= 15 || disableExtras">
-                                                Add Section
+                                                Add Subtopic
                                             </button>
                                         </div>
-                                        <div class="helper-text">🐙 Note: Section names must be unique within this unit and the entire course.</div>
+                                        <div class="helper-text">🐙 Example section names: "Mitosis", "Quadratic Equations", "Roman Empire"</div>
                                         <div v-if="formattedErrors.groups?.[groupIndex]?.name?._errors?.length"
                                             class="error-message">
                                             {{ formattedErrors.groups[groupIndex].name._errors[0] }}
@@ -128,7 +135,7 @@
                         </div>
 
                         <div class="helper-text">
-                            🐙 You can create up to 10 units, with up to 15 sections each.
+                            🐙 You can create up to 10 topics, with up to 15 subtopics each.
                         </div>
                         <div class="helper-text">
                             🐙 Don't worry about adding everything now - you can add more later!
@@ -199,19 +206,19 @@ import { z } from "zod";
 
 // Define schemas for your form
 const sectionSchema = z.string()
-    .min(4, "Section names must be at least 4 characters")
-    .max(25, "Section names must be at most 25 characters")
+    .min(4, "Subtopic names must be at least 4 characters")
+    .max(25, "Subtopic names must be at most 25 characters")
     .refine(val => !val.startsWith(" ") && !val.endsWith(" "),
-        "Section names must not start or end with a space");
+        "Subtopic names must not start or end with a space");
 
 const groupSchema = z.object({
     name: z.string()
-        .min(4, "Unit names must be at least 4 characters")
-        .max(25, "Unit names must be at most 25 characters")
+        .min(4, "Topic names must be at least 4 characters")
+        .max(25, "Topic names must be at most 25 characters")
         .refine(val => !val.startsWith(" ") && !val.endsWith(" "),
-            "Unit names must not start or end with a space"),
+            "Topic names must not start or end with a space"),
     sections: z.array(z.string())
-        .min(1, "Every Unit must have at least one section")
+        .min(1, "Every Topic must have at least one section")
         .superRefine((sections, ctx) => {
             // Check for length issues first
             const lengthIssues = sections.some(
@@ -221,7 +228,7 @@ const groupSchema = z.object({
             if (lengthIssues) {
                 ctx.addIssue({
                     code: z.ZodIssueCode.custom,
-                    message: "All section names must be between 4 and 25 characters"
+                    message: "All subtopic names must be between 4 and 25 characters"
                 });
                 return;
             }
@@ -234,16 +241,16 @@ const groupSchema = z.object({
             if (whitespaceIssues) {
                 ctx.addIssue({
                     code: z.ZodIssueCode.custom,
-                    message: "Section names must not start or end with a space"
+                    message: "Subtopic names must not start or end with a space"
                 });
                 return;
             }
             
-            // Check duplicates within a unit
+            // Check duplicates within a topic
             if (sections.length !== new Set(sections.map(s => s.toLowerCase())).size) {
                 ctx.addIssue({
                     code: z.ZodIssueCode.custom,
-                    message: "Duplicate section names are not allowed within a unit"
+                    message: "Duplicate subtopic names are not allowed within a topic"
                 });
             }
         })
@@ -257,15 +264,15 @@ const formSchema = z.object({
         .refine(val => !val.startsWith(" ") && !val.endsWith(" "),
             "Course name must not start or end with a space"),
     visibility: z.boolean(),
-    selectedFile: z.instanceof(File, { message: "Must have at least one file" }),
+    selectedFile: z.instanceof(File, { message: "Must have at least one file - we wouldn't know what to generate!" }),
     groups: z.array(groupSchema)
-        .min(1, "Must have at least one Unit")
+        .min(1, "Must have at least one Topic")
         .refine(
             groups => {
                 const names = groups.map(g => g.name.toLowerCase());
                 return names.length === new Set(names).size;
             },
-            "Duplicate unit names are not allowed"
+            "Duplicate topic names are not allowed"
         )
 });
 const route = useRoute();
@@ -298,7 +305,7 @@ const submitButtonText = computed(() => {
         return "Loading (~60s)";
     }
     else if (buttonDisabled.value.noRooms) {
-        return "Add at least one Unit to generate a course";
+        return "Add at least one Topic to generate a course";
     }
     else {
         return "Generate Course";
