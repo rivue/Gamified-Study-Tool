@@ -5,8 +5,19 @@
             <div class="contact-overlay">
                 <div class="popup-content">
                     <h1>Contact / Submit feedback</h1>
+                    
+                    <!-- Added feedback info section -->
+                    <div class="feedback-info">
+                        <p><strong>Your feedback matters!</strong> All submissions are:</p>
+                        <ul>
+                            <li>Read by our development team</li>
+                            <li>Used to prioritize new features and improvements</li>
+                            <li>Stored securely and used only to enhance Rivue.ai</li>
+                        </ul>
+                    </div>
+
                     <form v-if="loggedIn" @submit.prevent="handleSubmit">
-                        <textarea id="message" v-model="message" placeholder="Share your thoughts here" rows="4"
+                        <textarea id="message" v-model="message" placeholder="Share your thoughts, bug reports, or feature requests here" rows="4"
                             required></textarea>
 
                         <input type="submit" value="Submit" />
@@ -49,12 +60,12 @@ function handleSubmit() {
                 response.data.message &&
                 response.data.feedback_id
             ) {
-                const successMessage = `${response.data.message} Your feedback ID is ${response.data.feedback_id}.`;
+                const successMessage = `${response.data.message} Your feedback ID is ${response.data.feedback_id}. Thank you for helping us improve Rivue.ai!`;
                 popupStore.showPopup(successMessage);
             } else {
-                popupStore.showPopup("Feedback submitted.");
+                popupStore.showPopup("Feedback submitted successfully! Thank you for helping us improve Rivue.ai!");
             }
-            message.value;
+            message.value = "";
         })
         .catch((error) => {
             const popupStore = usePopupStore();
@@ -69,7 +80,6 @@ function handleSubmit() {
             popupStore.showPopup(message);
         });
 }
-
 </script>
 
 <style scoped>
@@ -106,6 +116,28 @@ function handleSubmit() {
     display: flex;
     flex-direction: column;
     align-items: center;
+}
+
+/* Added styles for feedback info section */
+.feedback-info {
+    padding: 15px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+}
+
+.feedback-info p {
+    margin: 0 0 10px 0;
+    font-weight: 500;
+}
+
+.feedback-info ul {
+    text-align: left;
+    margin: 0;
+    padding-left: 20px;
+}
+
+.feedback-info li {
+    margin-bottom: 5px;
 }
 
 .popup-content label {

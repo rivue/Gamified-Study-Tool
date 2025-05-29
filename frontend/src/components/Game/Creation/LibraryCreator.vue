@@ -15,7 +15,7 @@
                                 placeholder="Mrs. Frizzle's science class, Biology 272, etc..." maxlength="100"
                                 @focus="selectInputText" @paste="handlePaste" />
                         </div>
-                        <div class="helper-text text-xs opacity-70 mt-1">🐙 Note: Course name must be 4-25 characters.</div>
+                        <div class="helper-text">🐙 Note: Course name must be 4-25 characters.</div>
                         <div v-if="formattedErrors.topic?._errors?.length" class="error-message">
                             {{ formattedErrors.topic._errors[0] }}
                         </div>
@@ -52,7 +52,7 @@
                         <div class="libgen-title">
                             Course Structure
                         </div>
-                        <div class="helper-text text-sm opacity-80 mt-1 mb-3 text-center">
+                        <div class="helper-text">
                             Define the structure of your course. Each course requires at least one Unit, and each Unit requires at least one Section. All names should be 4-25 characters long without leading or trailing spaces.
                         </div>
                         <div class="room-input-container">
@@ -67,7 +67,7 @@
                                         Add Unit
                                     </button>
                                 </div>
-                                <div class="helper-text text-xs opacity-70 mt-1">🐙 Unit names must be unique.</div>
+                                <div class="helper-text">🐙 Unit names must be unique.</div>
 
                                 <div v-if="formattedErrors.groups?._errors?.length" class="error-message">
                                     {{ formattedErrors.groups._errors[0] }}
@@ -111,7 +111,7 @@
                                                 Add Section
                                             </button>
                                         </div>
-                                        <div class="helper-text text-xs opacity-70 mt-1">🐙 Note: Section names must be unique within this unit and the entire course.</div>
+                                        <div class="helper-text">🐙 Note: Section names must be unique within this unit and the entire course.</div>
                                         <div v-if="formattedErrors.groups?.[groupIndex]?.name?._errors?.length"
                                             class="error-message">
                                             {{ formattedErrors.groups[groupIndex].name._errors[0] }}
@@ -745,8 +745,8 @@ input[type="text"] {
 }
 
 .helper-text {
-    font-size: 0.8em;
-    opacity: 0.7;
+    font-weight: bold;
+    font-size: 0.9em;
     margin-top: 0.5em;
     text-align: center;
     color: var(--text-color);
