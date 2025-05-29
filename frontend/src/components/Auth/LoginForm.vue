@@ -1,8 +1,5 @@
 <template>
     <h1>Login</h1>
-    <div class="inspirational-quote">
-        The stars in the universe are not just for us to see, but to remind us we can shine just as brightly. Let's continue your story.
-    </div>
 
     <form @submit.prevent="handleSubmit">
         <div class="form-field">
@@ -18,14 +15,27 @@
         </div>
         <div class="form-field">
             <label for="password">Password:</label>
-            <input
-                type="password"
-                id="password"
-                name="password"
-                v-model="password"
-                autocomplete="current-password"
-                required
-            />
+            <div class="password-input-container">
+                <input
+                    :type="showPassword ? 'text' : 'password'"
+                    id="password"
+                    name="password"
+                    v-model="password"
+                    autocomplete="current-password"
+                    required
+                />
+                
+                <EyeIcon 
+                    type="button"
+                    class="password-toggle w-7 h-7"
+                    @click="togglePasswordVisibility"
+                    :aria-label="showPassword ? 'Hide password' : 'Show password'"v-if="showPassword"/>
+                <EyeSlashIcon 
+                    type="button"
+                    class="password-toggle w-7 h-7"
+                    @click="togglePasswordVisibility"
+                    :aria-label="showPassword ? 'Hide password' : 'Show password'" v-else/>
+            </div>
         </div>
         <div class="button-container">
             <input type="submit" id="submit" :disabled="isSubmitting" :value="buttonText" />
@@ -38,6 +48,8 @@ import { ref } from 'vue';
 import axios from 'axios';
 import { usePopupStore } from "@/store/popupStore";
 import { UserData } from "@/store/authStore";
+import { EyeIcon, EyeSlashIcon } from '@heroicons/vue/24/solid';
+ 
 
 const emit = defineEmits<{
     (e: 'loginSuccess', user: UserData): void
@@ -47,6 +59,11 @@ const email = ref("");
 const password = ref("");
 const buttonText = ref("Log in");
 const isSubmitting = ref(false);
+const showPassword = ref(false);
+
+const togglePasswordVisibility = () => {
+    showPassword.value = !showPassword.value;
+};
 
 const handleSubmit = () => {
     if (!email.value || !password.value) {
@@ -101,13 +118,6 @@ form {
     border: none;
 }
 
-.inspirational-quote {
-    text-align: center;
-    font-style: italic;
-    margin-bottom: 20px;
-    color: #555;
-}
-
 .form-field {
     display: flex;
     flex-direction: column;
@@ -128,9 +138,28 @@ form {
 .form-field input[type="password"] {
     background-color: #00000000;
     padding: 10px;
+    padding-right: 40px; /* Add space for the icon */
     border: 1px solid var(--text-color);
     border-radius: 4px;
     width: 100%;
     box-sizing: border-box;
+}
+.password-toggle {
+    position: absolute;
+    right: 10px; /* Position from the right edge */
+    top: 50%;
+    transform: translateY(-50%); /* Center vertically */
+    cursor: pointer;
+    z-index: 1;
+}
+.password-input-container {
+    position: relative;
+    width: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.password-toggle:hover {
+    opacity: 0.7;
 }
 </style>
