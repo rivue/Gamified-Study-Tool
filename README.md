@@ -4,10 +4,76 @@ Tool that allows users to input things like lecture recordings, lecture slides, 
 
 Note: use npm audit --only=prod for this, 0 vulnerabilities = good
 
-IDEAS:
 
-    resume:
-        - add resend api "build email sending list using resend api" or whatever
+Ideas for MCP:
+*   **Dynamic System Prompts:** Managed primarily by `backend/message_handler.py`, system prompts are dynamically assembled. They start from base templates (found in `backend/SystemPrompts/`) which can define AI personas (e.g., `BaseAzalea.txt`) and task-specific instructions (e.g., `LessonCreate.txt`, `QuizCreate.txt`). These templates are then enriched with real-time data such as:
+    *   The user's profile (education level, interests, learning goals).
+    *   The selected AI tutor's persona and any tutor-generated introductory content.
+    *   Definitions of available tools or functions the AI can request (see Function Calling).
+    *   Current application state or specific content like retrieved documents (see RAG).
+*   **Conversation History:** The system maintains a history of user and AI interactions, which is fed back to the LLM. This allows the AI to "remember" previous turns in the conversation, providing continuity and more coherent interactions. This is managed through `backend/message_handler.py` and database calls (`backend/database/db_handlers.py`).
+*   **Function Calling (OpenAI Models):** For OpenAI models, the application utilizes the function calling feature. Schemas for available functions are defined in `backend/functions.py` (e.g., `Profile`, `Lesson`, `CreateQuiz`, `GenerateLibraryRoom`). These schemas instruct the LLM on how to structure its output as a JSON object when it needs to perform a specific action or return structured data. `backend/completion_tasks.py` then processes these function calls, executes relevant application logic (like saving to a database), and guides the conversation flow. This enables more reliable and tool-like behavior from the AI.
+*   **Retrieval Augmented Generation (RAG):** The system uses a vector database (Pinecone) to store and retrieve relevant text sections from user-uploaded documents.
+    *   `backend/vector_processing/embedding_service.py` handles embedding text sections (using OpenAI's `text-embedding-3-small` model via `backend/openapi.py`) and storing them in Pinecone, associated with a specific `library_id`.
+    *   `backend/vector_processing/retrieval.py` queries Pinecone using the embedding of a user's query or a topic. It fetches the most relevant document snippets, filtered by `library_id`, which are then formatted and injected into the LLM's prompt. This allows the AI to generate content (lessons, quizzes) based on the specific source materials provided by the user for their study library.
+
+#### AI Agent Examples
+The combination of dynamic context, conversation history, function calling, and RAG allows for the creation of specialized "AI agents" within the application. These are not necessarily autonomous agents in the full sense but rather LLM configurations tailored for specific roles and tasks:
+
+*   **User Profiling Agent:**
+    *   **Context:** Uses prompts like `ProfileGather.txt` and `ProfileCreate.txt`, along with the `Profile` function schema.
+    *   **Task:** Interacts with the user to gather information about their identity, language, education level, interests, and learning goals. The structured output is then saved to the database.
+*   **Lesson Generation Agent:**
+    *   **Context:** Employs system prompts like `LessonCreate.txt` (which incorporates a base persona and user profile). It receives the lesson topic (often suggested by another AI interaction or chosen by the user). For lessons tied to specific library content, RAG is used to pull relevant text from user-uploaded documents, which becomes part of the context given to the LLM.
+    *   **Task:** Generates a self-contained lesson on the given topic, adhering to specified word count and style guidelines.
+*   **Quiz Creation Agent:**
+    *   **Context:** Utilizes `QuizCreate.txt` (again, with persona and user profile). Critically, it receives the content of the preceding lesson as context. It is guided by the `CreateQuiz` function schema to produce a structured quiz.
+    *   **Task:** Creates a quiz with a mix of multiple-choice and true/false questions, ensuring questions are based only on the provided lesson content and focus on understanding over rote memorization.
+*   **Library Content Agent:**
+    *   **Context:** Uses specialized prompts and function schemas like `GenerateLibraryRoomNames.txt` / `GenerateLibraryRoomNames` and `GenerateLibraryRoom.txt` / `GenerateLibraryRoom`. These are likely used in conjunction with topics derived from user inputs or uploaded syllabi/textbooks (potentially processed via RAG).
+    *   **Task:** Generates structured content for "library rooms," including thematic room names, "factoids" (interesting snippets of information), and associated questions of various types (fill-in-the-blank, multiple-choice, one-word answer). This agent is responsible for populating the core study units of a library.
+
+This approach allows for flexible and powerful AI integration, tailored to the diverse functional requirements of your gamified study tool.
+
+### Future Ideas
+Many of the ideas in the "grand plan / future" and "study tool additions / ideas" sections of this README can be conceptualized in terms of advanced Model Context Provisioning and specialized AI Agents. Here are a few examples:
+
+*   **Automated Mind-Map Composer:**
+    *   **Model Context Provisioning (MCP):**
+        *   Input: User's unstructured notes, highlights, lecture transcripts, or existing library content (factoids, lesson summaries).
+        *   Preferences: User-defined settings for mind-map style (density, layout, visual cues).
+        *   Schema: A defined structure for the mind-map output (e.g., nodes with text and properties, connections with labels, hierarchical relationships) to ensure it can be rendered by a visualization tool.
+    *   **AI Agent Task:** This agent would parse the input text, identify key concepts, entities, and their relationships. It would then organize these into a structured mind-map format, grouping related themes, establishing hierarchies, and potentially suggesting "chain reactions" or links to other relevant ideas within the user's study materials.
+
+*   **Voice-First Study Mode:**
+    *   **Model Context Provisioning (MCP):**
+        *   Input: Real-time transcribed user speech (for answers or commands).
+        *   Content Context: The current lesson material or quiz question being audibly presented.
+        *   State: Awareness of the current interaction mode (e.g., "answering quiz," "awaiting command").
+        *   Command Schema: Predefined structures for voice commands (e.g., `{"command": "next_question"}`, `{"command": "explain_concept", "concept": "photosynthesis"}`).
+    *   **AI Agent Task:** This would likely be a suite of interconnected agents:
+        *   *Speech-to-Text Agent:* Converts spoken audio to text.
+        *   *Natural Language Understanding (NLU) Agent:* Interprets the transcribed text to determine user intent (e.g., providing an answer, issuing a navigation command, asking for help).
+        *   *Core Logic Agent (adapted from existing):* Processes the intent, fetches the appropriate next piece of content, or generates an explanation.
+        *   *Text-to-Speech (TTS) Agent:* Converts the application's textual responses into natural-sounding spoken audio.
+
+*   **"Predict & Prescribe" Engine:**
+    *   **Model Context Provisioning (MCP):**
+        *   Data: Aggregated, anonymized performance data from many users (e.g., common errors, time taken on specific topics/questions).
+        *   User Context: The current user's learning path, historical performance, and upcoming topics.
+        *   Content Structure: Detailed metadata about lessons, topics, and their relationships (prerequisites, difficulty).
+        *   Intervention Schema: Defined formats for "readiness modules" or prescriptive advice.
+    *   **AI Agent Task:** This agent would analyze historical and current user data to forecast topics or concepts where the user is likely to struggle. It would then proactively generate or recommend targeted "readiness modules" (e.g., quick refreshers, alternative explanations, links to foundational concepts) to prepare the user *before* they encounter these predicted difficulties, personalizing the learning path to mitigate challenges.
+
+*   **Dynamic Difficulty Tuning:**
+    *   **Model Context Provisioning (MCP):**
+        *   Real-time Performance: A continuous stream of the user's answers, correctness, and speed.
+        *   Content Pool: Access to a repository of questions tagged by concept and difficulty level, plus related "micro-lessons."
+        *   User State: The user's current position in the learning path and their recent performance trend.
+    *   **AI Agent Task:** This agent monitors the user's interaction with learning content in real-time.
+        *   If the user is progressing easily, the agent can dynamically inject more challenging questions, "speed-run" sub-quizzes, or complex real-world problems related to the current concept to maintain engagement and accelerate learning.
+        *   If the user falters, the agent can automatically introduce bite-sized "micro-lessons," simpler prerequisite questions, or hints to provide support and build mastery before returning to the original difficulty level. This creates a highly adaptive learning experience.
+IDEAS:
 
     cleanup / maintenence (files to break apart):
         - remove library difficulty, mentor, language, etc... from db course structure, backend, frontend course creation screen
@@ -388,7 +454,6 @@ TODO list:
         - eventually look into custom api / llm specifically designed for education or review or whatever
         - *possibly* add a slider to each course based on how lenient the course creator wants the fuzzy string matcher to be (for misspelled words)
         - only fetch most 30 recent factoids, or summary of factoids or something when doing room generation
-        - add a small button at the end to make password visible
         - center "Courses" text in create screen
 
     game page:

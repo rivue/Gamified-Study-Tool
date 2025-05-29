@@ -20,7 +20,6 @@ import LoadingComponent from "@/components/Backstage/LoadingComponent.vue";
 import ExploreCarousel from "@/components/Main/ExploreCarousel.vue";
 
 const authStore = useAuthStore();
-const route = useRoute();
 const isLoading = ref(true);
 const myLibraries = ref([]);
 

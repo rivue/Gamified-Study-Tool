@@ -3,6 +3,7 @@
         <div class="list-header-container">
             <div class="list-header">
                 <h1>Courses</h1>
+                <p class="course-description">Your created courses and courses you've joined</p>
             </div>
             <div class="join-private-course">
                 <div class="join-form">
@@ -32,21 +33,10 @@
         </div>
 
         <Input
-            class="mb-4 text-lg bg-transparent border-[1px] border-solid border-[var(--text-color)] rounded-[4px] placeholder-[var(--text-color)] text-[var(--text-color)]"
-            type="text" v-model="searchQuery" @input="filterLibraries" @keydown="handleSearchKeydown"
-            placeholder="Search courses..." />
-
-        <!-- TODO: REMOVE THIS BEFORE HARD LAUNCH!!! -->
-        <Alert
-            class="p-4 mb-4 border-[1px] border-solid border-[var(--text-color)] rounded-[4px] bg-[var(--background-color-2t)] text-[var(--text-color)]">
-            <AlertTitle class="text-xl font-bold mb-2">Missing Courses?</AlertTitle>
-            <AlertDescription class="text-base">
-                We're working fast to bring the best experience possible and might
-                have broken some things. If you made a course before April 28th, 2025, you may not be able to see your
-                course listed. We are still learning and will not do this again. Please feel free to generate another
-                course, we sincerely apologize for any inconvenience and aim to not do this again.
-            </AlertDescription>
-        </Alert>
+        class="mb-4 text-lg bg-transparent border-[1px] border-solid border-[var(--text-color)] rounded-[4px] placeholder-[var(--text-color)] text-[var(--text-color)]"
+        type="text" v-model="searchQuery" @input="filterLibraries" @keydown="handleSearchKeydown"
+        placeholder="Search courses..." />
+        
         <!-- Conditional rendering based on library count -->
         <div v-if="libraries.length > 0" class="list-table">
             <Table>
@@ -338,6 +328,7 @@ function goToPage(page: number) {
     font-weight: 700;
     margin-bottom: 8px;
     color: var(--text-color);
+    justify-content: center;
 }
 
 .subtitle {
@@ -700,13 +691,25 @@ function goToPage(page: number) {
 .list-header-container {
     display: flex;
     flex-direction: column;
+    position: relative;
 }
 
 @media (min-width: 768px) {
     .list-header-container {
         flex-direction: row;
         align-items: flex-start;
-        justify-content: space-between;
+        justify-content: center;
+    }
+    
+    .list-header {
+        position: relative;
+        left: 50%;
+        transform: translateX(-50%);
+        text-align: center;
+    }
+    
+    .join-private-course {
+        margin-left: auto;
     }
 }
 

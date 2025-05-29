@@ -295,15 +295,14 @@ const libgenRoute = computed(() => {
 
 const submitButtonText = computed(() => {
     if (buttonDisabled.value.isSubmitting) {
-        return "Loading (~45s)";
+        return "Loading (~60s)";
     }
     else if (buttonDisabled.value.noRooms) {
-        return "Add at least one Unit to get started!";
+        return "Add at least one Unit to generate a course";
     }
     else {
-        return "Explore!";
+        return "Generate Course";
     }
-    // return isSubmitting ? isSubmitting.isEmpty ? "hi there" : "Loading (~45s)" : "Explore!";
 });
 
 

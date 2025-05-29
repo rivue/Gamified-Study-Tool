@@ -34,24 +34,9 @@
             <div class="courses-grid">
                 <div v-for="library in displayedLibraries" :key="library.id" class="course-card">
                     <div class="card-content">
-                        <div class="card-header">
-                            <div class="difficulty-badge" :class="getDifficultyClass(library.difficulty)">
-                                {{ library.difficulty || 'All Levels' }}
-                            </div>
-                            <div class="card-meta">
-                                <span class="language-tag">{{ library.language || 'General' }}</span>
-                                <span v-if="library.language_difficulty" class="language-level">{{
-                                    library.language_difficulty }}</span>
-                            </div>
-                        </div>
-
                         <h3 class="course-title">{{ library.library_topic }}</h3>
 
                         <div class="card-stats">
-                            <div class="stat">
-                                <Eye class="stat-icon" />
-                                <span>{{ library.clicks || 0 }}</span>
-                            </div>
                             <div class="stat">
                                 <Heart class="stat-icon" />
                                 <span>{{ library.likes || 0 }}</span>
@@ -347,10 +332,11 @@ function handleSearchKeydown(event: KeyboardEvent) {
     max-width: 1200px;
     margin: 0 auto;
     padding: 2rem;
-    color: #1a1a1a;
-    background-color: #fafafa;
+    color: var(--text-color);
+    background: var(--background-color);
     border-radius: 16px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(26, 139, 127, 0.2);
 }
 
 .header-container {
@@ -376,7 +362,7 @@ function handleSearchKeydown(event: KeyboardEvent) {
     font-size: 2.5rem;
     font-weight: 800;
     margin-bottom: 0.5rem;
-    background: linear-gradient(90deg, #000000, #6366f1);
+    background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -385,7 +371,7 @@ function handleSearchKeydown(event: KeyboardEvent) {
 
 .subtitle {
     font-size: 1rem;
-    color: #666;
+    color: var(--text-color-secondary);
     max-width: 500px;
 }
 
@@ -402,45 +388,52 @@ function handleSearchKeydown(event: KeyboardEvent) {
 .join-input {
     flex: 1;
     border-radius: 8px;
-    border: 1px solid #e2e8f0;
-    background-color: white;
+    border: 1px solid rgba(26, 139, 127, 0.3);
+    background-color: rgba(26, 139, 127, 0.1);
+    color: var(--text-color);
     height: 44px;
     font-size: 0.9rem;
+}
+
+.join-input::placeholder {
+    color: var(--text-color-secondary);
 }
 
 .join-button {
     height: 44px;
     border-radius: 8px;
-    background-color: #6366f1;
-    color: white;
+    background: var(--button-gradient);
+    color: var(--text-color);
     font-weight: 600;
     padding: 0 1.25rem;
     transition: all 0.2s;
+    border: none;
 }
 
 .join-button:hover:not(:disabled) {
-    background-color: #4f46e5;
+    background: linear-gradient(135deg, var(--color-primary-dark), var(--color-primary));
     transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(26, 139, 127, 0.3);
 }
 
 .join-message {
     margin-top: 0.5rem;
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
-    font-size: 0.75rem;
-    white-space: nowrap;
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    backdrop-filter: blur(10px);
 }
 
 .success {
-    background-color: rgba(34, 197, 94, 0.1);
-    color: #16a34a;
-    border: 1px solid rgba(34, 197, 94, 0.2);
+    background-color: rgba(16, 185, 129, 0.2);
+    color: var(--success-color);
+    border: 1px solid rgba(16, 185, 129, 0.3);
 }
 
 .error {
-    background-color: rgba(239, 68, 68, 0.1);
-    color: #dc2626;
-    border: 1px solid rgba(239, 68, 68, 0.2);
+    background-color: rgba(255, 116, 108, 0.2);
+    color: var(--error-color);
+    border: 1px solid rgba(255, 116, 108, 0.3);
 }
 
 .search-container {
@@ -453,7 +446,7 @@ function handleSearchKeydown(event: KeyboardEvent) {
     left: 1rem;
     top: 50%;
     transform: translateY(-50%);
-    color: #94a3b8;
+    color: var(--color-primary-light);
     width: 1.25rem;
     height: 1.25rem;
 }
@@ -463,15 +456,21 @@ function handleSearchKeydown(event: KeyboardEvent) {
     height: 50px;
     padding-left: 3rem;
     border-radius: 12px;
-    border: 1px solid #e2e8f0;
-    background-color: white;
+    border: 1px solid rgba(26, 139, 127, 0.3);
+    background-color: rgba(26, 139, 127, 0.1);
+    color: var(--text-color);
     font-size: 1rem;
     transition: all 0.2s;
 }
 
+.search-input::placeholder {
+    color: var(--text-color-secondary);
+}
+
 .search-input:focus {
-    border-color: #6366f1;
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(26, 139, 127, 0.2);
+    outline: none;
 }
 
 .courses-grid {
@@ -485,19 +484,21 @@ function handleSearchKeydown(event: KeyboardEvent) {
     display: flex;
     flex-direction: column;
     height: 100%;
-    background-color: white;
+    background: var(--background-color-1t);
+    backdrop-filter: blur(10px);
     border-radius: 16px;
     overflow: hidden;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
     transition: all 0.3s ease;
     cursor: pointer;
-    border: 1px solid #f1f5f9;
+    border: 1px solid rgba(26, 139, 127, 0.2);
 }
 
 .course-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 12px 20px rgba(0, 0, 0, 0.08);
-    border-color: #e2e8f0;
+    box-shadow: 0 12px 20px rgba(26, 139, 127, 0.2);
+    border-color: var(--color-primary-light);
+    background: var(--background-color-2t);
 }
 
 .card-content {
@@ -507,57 +508,12 @@ function handleSearchKeydown(event: KeyboardEvent) {
     flex-direction: column;
 }
 
-.card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 1rem;
-}
-
-.difficulty-badge {
-    padding: 0.25rem 0.75rem;
-    border-radius: 20px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: white;
-}
-
-.beginner {
-    background-color: #10b981;
-}
-
-.intermediate {
-    background-color: #f59e0b;
-}
-
-.advanced {
-    background-color: #ef4444;
-}
-
-.all-levels {
-    background-color: #8b5cf6;
-}
-
-.card-meta {
-    display: flex;
-    gap: 0.5rem;
-}
-
-.language-tag,
-.language-level {
-    padding: 0.25rem 0.5rem;
-    border-radius: 6px;
-    font-size: 0.75rem;
-    background-color: #f1f5f9;
-    color: #64748b;
-}
-
 .course-title {
     font-size: 1.25rem;
     font-weight: 700;
     margin-bottom: 1rem;
     line-height: 1.4;
-    color: #1e293b;
+    color: var(--text-color);
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
@@ -575,7 +531,7 @@ function handleSearchKeydown(event: KeyboardEvent) {
     display: flex;
     align-items: center;
     gap: 0.375rem;
-    color: #64748b;
+    color: var(--color-primary-light);
     font-size: 0.875rem;
 }
 
@@ -586,8 +542,8 @@ function handleSearchKeydown(event: KeyboardEvent) {
 
 .card-footer {
     padding: 1rem 1.5rem;
-    background-color: #f8fafc;
-    border-top: 1px solid #f1f5f9;
+    background: rgba(26, 139, 127, 0.1);
+    border-top: 1px solid rgba(26, 139, 127, 0.2);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -597,13 +553,14 @@ function handleSearchKeydown(event: KeyboardEvent) {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    color: #64748b;
+    color: var(--text-color-secondary);
     font-size: 0.875rem;
 }
 
 .creator-icon {
     width: 1rem;
     height: 1rem;
+    color: var(--color-primary-light);
 }
 
 .loading-indicator {
@@ -612,20 +569,21 @@ function handleSearchKeydown(event: KeyboardEvent) {
     align-items: center;
     justify-content: center;
     padding: 2rem;
-    color: #64748b;
+    color: var(--text-color-secondary);
     gap: 0.75rem;
 }
 
 .loader-icon {
     width: 2rem;
     height: 2rem;
+    color: var(--color-primary);
     animation: spin 1s linear infinite;
 }
 
 .end-message {
     text-align: center;
     padding: 1.5rem;
-    color: #64748b;
+    color: var(--text-color-secondary);
     font-style: italic;
     font-size: 0.875rem;
 }
@@ -637,28 +595,28 @@ function handleSearchKeydown(event: KeyboardEvent) {
     justify-content: center;
     text-align: center;
     padding: 4rem 2rem;
-    background-color: white;
+    background: var(--background-color-1t);
     border-radius: 16px;
-    border: 1px dashed #e2e8f0;
+    border: 1px dashed rgba(26, 139, 127, 0.3);
 }
 
 .empty-icon {
     width: 4rem;
     height: 4rem;
-    color: #cbd5e1;
+    color: var(--color-primary-light);
     margin-bottom: 1.5rem;
 }
 
 .empty-title {
     font-size: 1.5rem;
     font-weight: 700;
-    color: #1e293b;
+    color: var(--text-color);
     margin-bottom: 0.75rem;
 }
 
 .empty-description {
     max-width: 400px;
-    color: #64748b;
+    color: var(--text-color-secondary);
     line-height: 1.6;
 }
 
@@ -673,23 +631,10 @@ function handleSearchKeydown(event: KeyboardEvent) {
     opacity: 0;
 }
 
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
 @keyframes spin {
     from {
         transform: rotate(0deg);
     }
-
     to {
         transform: rotate(360deg);
     }
@@ -711,34 +656,44 @@ function handleSearchKeydown(event: KeyboardEvent) {
 }
 
 .join-card-button {
-    background-color: #6366f1;
-    color: white;
+    background: var(--button-gradient);
+    color: var(--text-color);
     font-weight: 600;
     border-radius: 8px;
     padding: 0.5rem 1rem;
     font-size: 0.875rem;
     transition: all 0.2s;
     cursor: pointer;
+    border: none;
+}
+
+.join-card-button:hover:not(:disabled) {
+    background: linear-gradient(135deg, var(--color-primary-dark), var(--color-primary));
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(26, 139, 127, 0.3);
 }
 
 .joined-card-button {
-    background-color: #16a34a;
-    color: white;
+    background: linear-gradient(135deg, var(--success-color), #059669);
+    color: var(--text-color);
     font-weight: 600;
     border-radius: 8px;
     padding: 0.5rem 1rem;
     font-size: 0.875rem;
     transition: all 0.2s;
     cursor: pointer;
+    border: none;
 }
 
 .joined-card-button:hover {
-    background-color: #15803d;
+    background: linear-gradient(135deg, #059669, #047857);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(16, 185, 129, 0.3);
 }
 
 .join-container {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
 }
 </style>

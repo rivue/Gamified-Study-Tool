@@ -1,8 +1,6 @@
 <template>
     <h1>Signup</h1>
-    <div class="inspirational-quote">
-        Stars can't shine without darkness. Your brilliant journey begins here.
-    </div>
+
     <form @submit.prevent="handleSubmit">
     
         <div class="flex flex-col sm:flex-row gap-4 w-full max-w-md mb-4">
@@ -135,12 +133,6 @@ const handleSubmit = () => {
 <style>
 .button-container {
   text-align: center;
-}
-.inspirational-quote {
-    text-align: center;
-    font-style: italic;
-    margin-bottom: 20px;
-    color: #555;
 }
 
 form {
