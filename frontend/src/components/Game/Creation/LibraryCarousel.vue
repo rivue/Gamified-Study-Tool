@@ -35,7 +35,7 @@
         <Input
         class="mb-4 text-lg bg-transparent border-[1px] border-solid border-[var(--text-color)] rounded-[4px] placeholder-[var(--text-color)] text-[var(--text-color)]"
         type="text" v-model="searchQuery" @input="filterLibraries" @keydown="handleSearchKeydown"
-        placeholder="Search courses..." />
+        placeholder="Search courses you've joined..." />
         
         <!-- Conditional rendering based on library count -->
         <div v-if="libraries.length > 0" class="list-table">

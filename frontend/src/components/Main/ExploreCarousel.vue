@@ -5,7 +5,7 @@
                 <h1 class="title">Explore Courses</h1>
                 <p class="subtitle">Discover and join courses created by the community</p>
             </div>
-
+<!-- 
             <div class="join-course-container">
                 <div class="join-form">
                     <Input v-model="joinCode" placeholder="Enter private library code..." @keydown.enter="joinCourse"
@@ -20,7 +20,7 @@
                         {{ joinPrivateMessage }}
                     </div>
                 </Transition>
-            </div>
+            </div> -->
         </div>
 
         <div class="search-container">
@@ -39,7 +39,7 @@
                         <div class="card-stats">
                             <div class="stat">
                                 <Heart class="stat-icon" />
-                                <span>{{ library.likes || 0 }}</span>
+                                <span>{{ library.likes === null ? "Likes not found" : library.likes }}</span>
                             </div>
                         </div>
                     </div>
@@ -50,8 +50,17 @@
                             <span>{{ library.owner_username === null ? "Creator not found" : library.owner_username }}</span>
                         </div>
 
+
+                        <Input v-if="!library.is_public" v-model="joinCode" placeholder="Enter private library code..." @keydown.enter="joinCourse"
+                        class="join-input" />
+
+                       <!-- <Button @click="joinCourse" :disabled="joinPrivateLoading" class="join-button">
+                        <LoaderCircle v-if="joinPrivateLoading" class="mr-2 h-4 w-4 animate-spin" />
+                        Join Private Course
+                        </Button> -->
+
                         <Button v-if="!joinedCourses.has(library.id)" 
-                            @click="joinSpecificCourse(library.id)"
+                            @click="joinSpecificCourse(library.id, library.is_public)"
                             :disabled="joinPublicLoading.has(library.id)" 
                             class="join-card-button">
                             <LoaderCircle v-if="joinPublicLoading.has(library.id)" class="mr-2 h-4 w-4 animate-spin" />
@@ -100,7 +109,7 @@ import { ref, watch, onMounted, onUnmounted } from "vue";
 import { useRouter } from "vue-router";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { LoaderCircle, Search, Eye, Heart, UserCircle, BookOpen } from "lucide-vue-next";
+import { LoaderCircle, Search, Heart, UserCircle, BookOpen } from "lucide-vue-next";
 import axios from "axios";
 
 // Props
@@ -118,6 +127,7 @@ const props = defineProps<{
         library_topic: string;
         owner_id: string;
         owner_username: string;
+        is_public: boolean;
     }>;
 }>();
 
@@ -128,10 +138,10 @@ const filteredLibraries = ref<Array<any>>([]);
 const displayedLibraries = ref<Array<any>>([]);
 const joinCode = ref("");
 
-// For Private library code button
-const joinPrivateMessage = ref("");
-const joinPrivateMessageType = ref("");
-const joinPrivateLoading = ref(false);
+// // For Private library code button
+// const joinPrivateMessage = ref("");
+// const joinPrivateMessageType = ref("");
+// const joinPrivateLoading = ref(false);
 
 // actual list of courses 
 const joinPublicMessages = ref(new Map());
@@ -237,48 +247,48 @@ onUnmounted(() => {
     window.removeEventListener('scroll', handleScroll);
 });
 
-async function joinCourse() {
-    if (!joinCode.value.trim()) return;
+// async function joinCourse() {
+//     if (!joinCode.value.trim()) return; 
 
-    joinPrivateLoading.value = true;
-    joinPrivateMessage.value = "";
+//     joinPrivateLoading.value = true;
+//     joinPrivateMessage.value = "";
 
-    axios
-        .post('/api/library/join', {
-            joinCode: joinCode.value.trim(),
-        })
-        .then((response) => {
-            if (response.status === 200) {
-                // Update the local favorites map
-                joinPrivateMessageType.value = "success";
-                joinPrivateMessage.value = "Successfully joined course!";
-                joinCode.value = "";
+//     axios
+//         .post('/api/library/join', {
+//             joinCode: joinCode.value.trim(),
+//         })
+//         .then((response) => {
+//             if (response.status === 200) {
+//                 // Update the local favorites map
+//                 joinPrivateMessageType.value = "success";
+//                 joinPrivateMessage.value = "Successfully joined course!";
+//                 joinCode.value = "";
 
-                // Add to local libraries array if needed
-                if (response.data.library) {
-                    const newLibrary = response.data.library;
-                    const libraryExists = props.libraries.some(lib => lib.id === newLibrary.id);
-                    if (!libraryExists) {
-                        filteredLibraries.value.unshift(newLibrary);
-                        filterLibraries();
-                    }
-                }
-            }
-        })
-        .catch((error) => {
-            console.error("Error updating favorite status:", error);
-            joinPrivateMessageType.value = "error";
-            joinPrivateMessage.value = error.response?.data?.message || "Failed to join course";
-        })
-        .finally(() => {
-            joinPrivateLoading.value = false;
+//                 // Add to local libraries array if needed
+//                 if (response.data.library) {
+//                     const newLibrary = response.data.library;
+//                     const libraryExists = props.libraries.some(lib => lib.id === newLibrary.id);
+//                     if (!libraryExists) {
+//                         filteredLibraries.value.unshift(newLibrary);
+//                         filterLibraries();
+//                     }
+//                 }
+//             }
+//         })
+//         .catch((error) => {
+//             console.error("Error updating favorite status:", error);
+//             joinPrivateMessageType.value = "error";
+//             joinPrivateMessage.value = error.response?.data?.message || "Failed to join course";
+//         })
+//         .finally(() => {
+//             joinPrivateLoading.value = false;
 
-            // Auto-hide message after 5 seconds
-            setTimeout(() => {
-                joinPrivateMessage.value = "";
-            }, 5000);
-        });
-}
+//             // Auto-hide message after 5 seconds
+//             setTimeout(() => {
+//                 joinPrivateMessage.value = "";
+//             }, 5000);
+//         });
+// }
 
 async function joinSpecificCourse(id: number) {
     joinPublicLoading.value.set(id, true);
@@ -287,6 +297,7 @@ async function joinSpecificCourse(id: number) {
     axios
         .post('/api/library/join', {
             libraryId: id,
+            joinCode: joinCode.value.trim(),
         })
         .then((response) => {
             if (response.status === 200) {

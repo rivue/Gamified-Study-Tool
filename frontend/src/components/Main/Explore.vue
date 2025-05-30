@@ -41,7 +41,6 @@ function fetchLibraries() {
                 a.library_topic.localeCompare(b.library_topic)
             );
             }
-            console.log(myLibraries.value)
         })
         .catch((error) => {
 

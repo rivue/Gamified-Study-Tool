@@ -1,189 +1,203 @@
 <template>
     <div class="library-gen-page p-8">
         <div class="form-container" @keydown.enter="handleSubmit">
-
-            <!-- Topic Selection -->
             <div class="libgen-create p-16 br-4" style="border: 1px solid var(--text-color); border-radius: 5px;">
                 <h1 v-if="libgenRoute">Create a Course to Explore</h1>
-                <div class="libgen-section">
-                    <div class="form-group topic-selection">
+                
+                <!-- Tab Navigation -->
+                <Tabs v-model="currentTab" class="w-full">
+                    <TabsList class="grid w-full grid-cols-3 mb-8">
+                        <TabsTrigger value="basics">Course & Files</TabsTrigger>
+                        <TabsTrigger value="structure">Course Structure</TabsTrigger>
+                        <TabsTrigger value="settings">Settings</TabsTrigger>
+                    </TabsList>
 
-                        <div class="libgen-title">Course name</div>
-                        <div class="title-bar">
-                            <input type="text" id="topicInput" ref="topicInput" v-model="topic"
-                                :class="{ 'input-error': formattedErrors.topic?._errors?.length }"
-                                placeholder="Mrs. Frizzle's science class, Biology 272, etc..." maxlength="100"
-                                @focus="selectInputText" @paste="handlePaste" />
-                        </div>
-                        <div class="helper-text">🐙 Note: Course name must be 4-25 characters.</div>
-                        <div v-if="formattedErrors.topic?._errors?.length" class="error-message">
-                            {{ formattedErrors.topic._errors[0] }}
-                        </div>
-                    </div>
-                </div>
-
-                <div class="libgen-section">
-                    <div class="libgen-section">
-
-                        <!-- File Upload Section -->
-                        <div class="form-group file-upload">
-                            <div class="libgen-title">Upload File</div>
-                            <div class="file-input-container text-[var(--text-color)] border-[var(--text-color)]">
-                                <input type="file" id="fileInput" ref="fileInput" @change="handleFileUpload"
-                                    :class="{ 'input-error': formattedErrors.selectedFile?._errors?.length }"
-                                    :disabled="disableExtras" accept=".pdf" />
-                                <div v-if="selectedFile" class="selected-file">
-                                    Selected: {{ selectedFile.name }}
-                                    <button class="remove-file-btn" @click="removeFile">×</button>
+                    <!-- Tab 1: Course Name and Files -->
+                    <TabsContent value="basics" class="space-y-6">
+                        <div class="libgen-section">
+                            <div class="form-group topic-selection">
+                                <div class="libgen-title">Course name</div>
+                                <div class="title-bar">
+                                    <input type="text" id="topicInput" ref="topicInput" v-model="topic"
+                                        :class="{ 'input-error': formattedErrors.topic?._errors?.length }"
+                                        placeholder="Mrs. Frizzle's science class, Biology 272, etc..." maxlength="100"
+                                        @focus="selectInputText" @paste="handlePaste" />
                                 </div>
-                                <div v-if="formattedErrors.selectedFile?._errors?.length" class="error-message">
-                                    {{ formattedErrors.selectedFile._errors[0] }}
-                                </div>
-                                <div class="helper-text">
-                                    🐙 Required - PDF files only for now, max 500kb. This file will be used to generate content for your course subtopics.
+                                <div class="helper-text">🐙 Note: Course name must be 4-25 characters.</div>
+                                <div v-if="formattedErrors.topic?._errors?.length" class="error-message">
+                                    {{ formattedErrors.topic._errors[0] }}
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-
-                    <!-- Room Names Section with Groups -->
-                    <div class="form-group room-names">
-                        <div class="libgen-title">
-                            Course Structure (Topics & Subtopics)
-                        </div>
-                        <div class="helper-text">
-                            Define how your course content will be organized. Think of topics as high level concepts (like "Photosynthesis" or "Calculus Basics") and subtopics as lessons within each topic. Your uploaded file will be used to generate content for these subtopics.
-                        </div>
-                        <div class="room-input-container">
-                            <!-- Group controls -->
-                            <div class="group-controls">
-
-                                <div class="group-input-wrapper">
-                                    <input type="text" v-model="newGroupName" placeholder="Enter a major topic name..."
-                                        maxlength="40" :disabled="disableExtras" @keyup.enter="addGroup" />
-                                    <button class="add-btn" @click="addGroup"
-                                        :disabled="!newGroupName.trim() || groups.length >= 10 || disableExtras">
-                                        Add Topic
-                                    </button>
+                        <div class="libgen-section">
+                            <div class="form-group file-upload">
+                                <div class="libgen-title">Upload File</div>
+                                <div class="file-input-container text-[var(--text-color)] border-[var(--text-color)]">
+                                    <input type="file" id="fileInput" ref="fileInput" @change="handleFileUpload"
+                                        :class="{ 'input-error': formattedErrors.selectedFile?._errors?.length }"
+                                        :disabled="disableExtras" accept=".pdf" />
+                                    <div v-if="selectedFile" class="selected-file">
+                                        Selected: {{ selectedFile.name }}
+                                        <button class="remove-file-btn" @click="removeFile">×</button>
+                                    </div>
+                                    <div v-if="formattedErrors.selectedFile?._errors?.length" class="error-message">
+                                        {{ formattedErrors.selectedFile._errors[0] }}
+                                    </div>
+                                    <div class="helper-text">
+                                        🐙 Required - PDF files only for now, max 500kb. This file will be used to generate
+                                        content for your course subtopics.
+                                    </div>
                                 </div>
-                                <div class="helper-text">🐙 Example topic names: "Cell Biology", "Algebra Basics", "Ancient Rome"</div>
+                            </div>
+                        </div>
+                    </TabsContent>
+
+                    <!-- Tab 2: Course Structure -->
+                    <TabsContent value="structure" class="space-y-6">
+                        <div class="libgen-section">
+                            <div class="form-group course-structure">
+                                <div class="libgen-title">Course Structure (Topics & Subtopics)</div>
+                                <div class="helper-text mb-6">
+                                    Define how your course content will be organized. Think of topics as high level concepts
+                                    (like "Photosynthesis" or "Calculus Basics") and subtopics as lessons within each topic.
+                                    Your uploaded file will be used to generate content for these subtopics.
+                                </div>
+
+                                <!-- Example Structure -->
+                                <Card class="mb-6 bg-opacity-10 bg-gray-200">
+                                    <CardContent class="p-4">
+                                        <div class="text-sm mb-2"><strong>Example Structure:</strong></div>
+                                        <div class="ml-2">
+                                            <div><strong>Topic:</strong> "Cell Biology"</div>
+                                            <div class="ml-4 mt-1"><strong>Subtopics:</strong> "Cell Membrane",
+                                                "Mitochondria", "Nucleus"</div>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+
+                                <!-- Topic Cards -->
+                                <div class="topics-container space-y-4">
+                                    <Card v-for="(group, groupIndex) in groups" :key="groupIndex" class="topic-card">
+                                        <CardHeader class="pb-3">
+                                            <div class="flex items-center justify-between">
+                                                <input 
+                                                    type="text" 
+                                                    v-model="group.name"
+                                                    placeholder="Enter topic name..."
+                                                    maxlength="40"
+                                                    class="topic-name-input flex-1 mr-2"
+                                                    :class="{ 'input-error': formattedErrors.groups?.[groupIndex]?.name?._errors?.length }"
+                                                />
+                                                <button class="remove-btn" @click="removeGroup(groupIndex)">×</button>
+                                            </div>
+                                            <div v-if="formattedErrors.groups?.[groupIndex]?.name?._errors?.length" class="error-message">
+                                                {{ formattedErrors.groups[groupIndex].name._errors[0] }}
+                                            </div>
+                                        </CardHeader>
+                                        
+                                        <CardContent class="pt-0">
+                                            <!-- Subtopics -->
+                                            <div class="subtopics-section">
+                                                <div v-if="group.sections.length > 0" class="subtopics-list space-y-2 mb-3">
+                                                    <div v-for="(section, sectionIndex) in group.sections" :key="sectionIndex"
+                                                        class="subtopic-item">
+                                                        <input 
+                                                            type="text" 
+                                                            v-model="group.sections[sectionIndex]"
+                                                            placeholder="Enter subtopic name..."
+                                                            maxlength="40"
+                                                            class="subtopic-input flex-1"
+                                                        />
+                                                        <button class="remove-section-btn" @click="removeSection(groupIndex, sectionIndex)">×</button>
+                                                    </div>
+                                                </div>
+                                                
+                                                <!-- Add Subtopic Button -->
+                                                <button 
+                                                    class="add-subtopic-btn w-full"
+                                                    @click="addSection(groupIndex)"
+                                                    :disabled="group.sections.length >= 15 || disableExtras"
+                                                >
+                                                    + Add Subtopic
+                                                </button>
+                                                
+                                                <div v-if="formattedErrors.groups?.[groupIndex]?.sections?._errors?.length" class="error-message mt-2">
+                                                    {{ formattedErrors.groups[groupIndex].sections._errors[0] }}
+                                                </div>
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+
+                                    <!-- Add Topic Button -->
+                                    <Card class="add-topic-card">
+                                        <CardContent class="p-4">
+                                            <button 
+                                                class="add-topic-btn w-full"
+                                                @click="addGroup"
+                                                :disabled="groups.length >= 10 || disableExtras"
+                                            >
+                                                + Add Topic
+                                            </button>
+                                        </CardContent>
+                                    </Card>
+                                </div>
 
                                 <div v-if="formattedErrors.groups?._errors?.length" class="error-message">
                                     {{ formattedErrors.groups._errors[0] }}
                                 </div>
-                            </div>
 
-                            <!-- Groups list -->
-                            <div class="groups-container">
-                                <div class="mb-4 p-3 border rounded-lg bg-opacity-10 bg-gray-200">
-                                    <div class="text-sm mb-2"><strong>Example Structure:</strong></div>
-                                    <div class="ml-2">
-                                        <div><strong>Topic:</strong> "Cell Biology"</div>
-                                        <div class="ml-4 mt-1"><strong>Subtopics:</strong> "Cell Membrane", "Mitochondria", "Nucleus"</div>
-                                    </div>
+                                <div class="helper-text">
+                                    🐙 You can create up to 10 topics, with up to 15 subtopics each.
                                 </div>
-                                <div v-for="(group, groupIndex) in groups" :key="groupIndex" class="group-item">
-
-                                    <div class="group-header">
-                                        <div class="group-title">{{ group.name }}</div>
-                                        <div class="group-actions">
-                                            <span class="section-count">{{ group.sections.length }} subtopics</span>
-                                            <button class="remove-btn" @click="removeGroup(groupIndex)">×</button>
-                                        </div>
-                                    </div>
-
-
-                                    <!-- Sections for this group -->
-                                    <div class="group-sections">
-                                        <div class="section-chips">
-                                            <div v-for="(section, sectionIndex) in group.sections" :key="sectionIndex"
-                                                class="section-chip">
-                                                {{ section }}
-                                                <button class="remove-section-btn"
-                                                @click="removeSection(groupIndex, sectionIndex)">×
-                                            </button>
-                                            </div>
-                                        </div>
-
-                                        <!-- Section input for this group -->
-                                        <div class="section-input-wrapper">
-                                            <input type="text" v-model="group.newSectionName"
-                                                placeholder="Enter a subtopic name..." maxlength="40"
-                                                :disabled="group.sections.length >= 15 || disableExtras"
-                                                :class="{ 'input-error': formattedErrors.groups?.[groupIndex]?.sections?._errors?.length }"
-                                                @keyup.enter="addSection(groupIndex)" />
-                                            <button class="add-btn" @click="addSection(groupIndex)"
-                                                :disabled="!group.newSectionName?.trim() || group.sections.length >= 15 || disableExtras">
-                                                Add Subtopic
-                                            </button>
-                                        </div>
-                                        <div class="helper-text">🐙 Example section names: "Mitosis", "Quadratic Equations", "Roman Empire"</div>
-                                        <div v-if="formattedErrors.groups?.[groupIndex]?.name?._errors?.length"
-                                            class="error-message">
-                                            {{ formattedErrors.groups[groupIndex].name._errors[0] }}
-                                        </div>
-
-                                        <div v-if="formattedErrors.groups?.[groupIndex]?.sections?._errors?.length"
-                                            class="error-message">
-                                            {{ formattedErrors.groups[groupIndex].sections._errors[0] }}
-                                        </div>
-
-                                    </div>
+                                <div class="helper-text">
+                                    🐙 Don't worry about adding everything now - you can add more later!
                                 </div>
                             </div>
                         </div>
+                    </TabsContent>
 
-                        <div class="helper-text">
-                            🐙 You can create up to 10 topics, with up to 15 subtopics each.
+                    <!-- Tab 3: Settings -->
+                    <TabsContent value="settings" class="space-y-6">
+                        <div class="libgen-section">
+                            <div class="form-group visibility-toggle p-4">
+                                <div style="font-size:0.8em; opacity:0.7; display:flex; justify-content:center; align-items:center;"
+                                    class="mb-2">Visibility</div>
+                                <div class="flex items-center justify-center w-full mb-3">
+                                    <Tabs v-model="visibilityTab" class="w-full max-w-[400px]">
+                                        <TabsList class="grid w-full grid-cols-2 p-1 py-0.5"
+                                            style="background-color: rgba(var(--element-color-1-rgb), 0.5);">
+                                            <TabsTrigger value="private"
+                                                class="border-0 data-[state=inactive]:opacity-50 data-[state=active]:bg-[var(--element-color-1)] data-[state=active]:text-[var(--text-color)]">
+                                                Private
+                                            </TabsTrigger>
+                                            <TabsTrigger value="public"
+                                                class="border-0 data-[state=inactive]:opacity-50 data-[state=active]:bg-[var(--element-color-1)] data-[state=active]:text-[var(--text-color)]">
+                                                Public
+                                            </TabsTrigger>
+                                        </TabsList>
+                                    </Tabs>
+                                </div>
+                                <div class="helper-text">
+                                    🐙 Public courses will appear in the course library for all users to explore.
+                                </div>
+                                <div class="helper-text">
+                                    🐙 Private courses need a code to join.
+                                </div>
+                            </div>
                         </div>
-                        <div class="helper-text">
-                            🐙 Don't worry about adding everything now - you can add more later!
+                        <div class="cta-container mt-8">
+                            <CtaButton :buttonText="submitButtonText" @click="handleSubmit"
+                                :isSubmitting="buttonDisabled.isSubmitting || buttonDisabled.noRooms" />
                         </div>
-                    </div>
-                </div>
-
-                <!-- Public/Private Toggle -->
-                <div class="libgen-section">
-                    <div class="form-group visibility-toggle p-4">
-                        <div style="font-size:0.8em; opacity:0.7; display:flex; justify-content:center; align-items:center;"
-                            class="mb-2">Visibility</div>
-                        <div class="flex items-center justify-center w-full mb-3">
-                            <Tabs v-model="visibilityTab" class="w-full max-w-[400px]">
-                                <TabsList class="grid w-full grid-cols-2 p-1 py-0.5"
-                                    style="background-color: rgba(var(--element-color-1-rgb), 0.5);">
-                                    <TabsTrigger value="private"
-                                        class="border-0 data-[state=inactive]:opacity-50 data-[state=active]:bg-[var(--element-color-1)] data-[state=active]:text-[var(--text-color)]">
-                                        Private
-                                    </TabsTrigger>
-
-                                    <TabsTrigger value="public"
-                                        class="border-0 data-[state=inactive]:opacity-50 data-[state=active]:bg-[var(--element-color-1)] data-[state=active]:text-[var(--text-color)]">
-                                        Public
-                                    </TabsTrigger>
-                                </TabsList>
-
-                            </Tabs>
-                        </div>
-                        <div class="helper-text">
-                            🐙 Public courses will appear in the course library for all users to explore.
-                        </div>
-                        <div class="helper-text">
-                            🐙 Private courses need a code to join.
-                        </div>
-                    </div>
-                </div>
+                    </TabsContent>
+                </Tabs>
 
                 <!-- CTA Button -->
-                <div class="cta-container">
-                    <CtaButton :buttonText="submitButtonText" @click="handleSubmit"
-                        :isSubmitting="buttonDisabled.isSubmitting || buttonDisabled.noRooms" />
-                </div>
             </div>
         </div>
     </div>
 </template>
-
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue';
@@ -193,7 +207,9 @@ import axios from "axios";
 import { usePopupStore } from "@/store/popupStore";
 import { useAuthStore } from "@/store/authStore";
 import CtaButton from "../../Footer/LandingPageComponents/CtaButton.vue";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+
 
 // New or modified data for groups
 interface Group {
@@ -201,6 +217,8 @@ interface Group {
     sections: string[];
     newSectionName: string;
     sectionError: boolean;
+    isEditing?: boolean;
+    editingName?: string;
 }
 import { z } from "zod";
 
@@ -224,7 +242,7 @@ const groupSchema = z.object({
             const lengthIssues = sections.some(
                 section => section.length < 4 || section.length > 25
             );
-            
+
             if (lengthIssues) {
                 ctx.addIssue({
                     code: z.ZodIssueCode.custom,
@@ -232,12 +250,12 @@ const groupSchema = z.object({
                 });
                 return;
             }
-            
+
             // Check for whitespace
             const whitespaceIssues = sections.some(
                 section => section.startsWith(" ") || section.endsWith(" ")
             );
-            
+
             if (whitespaceIssues) {
                 ctx.addIssue({
                     code: z.ZodIssueCode.custom,
@@ -245,7 +263,7 @@ const groupSchema = z.object({
                 });
                 return;
             }
-            
+
             // Check duplicates within a topic
             if (sections.length !== new Set(sections.map(s => s.toLowerCase())).size) {
                 ctx.addIssue({
@@ -294,7 +312,7 @@ const fileInput = ref<HTMLInputElement | null>(null);
 const visibilityTab = ref<'public' | 'private'>('public');
 const isPublic = computed<boolean>(() => visibilityTab.value === 'public');
 const formattedErrors = ref<ReturnType<z.ZodError["format"]>>({} as any)
-const newGroupName = ref("");
+const currentTab = ref<'basics' | 'structure' | 'settings'>('basics');
 
 const libgenRoute = computed(() => {
     return route.path === "/create";
@@ -312,30 +330,24 @@ const submitButtonText = computed(() => {
     }
 });
 
-
 const disableExtras = computed(() => {
     return !authStore.loggedIn;
 });
 
 // Methods for group management
 const addGroup = () => {
-
-    const trimmedName = newGroupName.value.trim();
-
-    if (trimmedName && groups.value.length < 10) {
-
+    if (groups.value.length < 10) {
         groups.value.push({
-            name: trimmedName,
+            name: "",
             sections: [],
             newSectionName: "",
-            sectionError: false
+            sectionError: false,
+            isEditing: false,
+            editingName: ''
         });
-
         buttonDisabled.value.noRooms = false;
-        newGroupName.value = "";
     }
 };
-
 
 const removeGroup = (groupIndex: number) => {
     groups.value.splice(groupIndex, 1);
@@ -344,16 +356,11 @@ const removeGroup = (groupIndex: number) => {
     }
 };
 
-
 // Methods for section management
 const addSection = (groupIndex: number) => {
     const group = groups.value[groupIndex];
-    const trimmedName = group.newSectionName.trim();
-
-    if (trimmedName && group.sections.length < 15) {
-
-        group.sections.push(trimmedName);
-        group.newSectionName = "";
+    if (group.sections.length < 15) {
+        group.sections.push("");
         buttonDisabled.value.noRooms = false;
     }
 };
@@ -376,13 +383,11 @@ const handlePaste = (event: ClipboardEvent) => {
     }
 };
 
-
 const selectInputText = (event: FocusEvent) => {
     if (event.target instanceof HTMLInputElement) {
         event.target.select();
     }
 };
-
 
 const handleFileUpload = (event: Event) => {
     const input = event.target as HTMLInputElement;
@@ -397,12 +402,10 @@ const handleFileUpload = (event: Event) => {
     }
 };
 
-
 const removeFile = () => {
     selectedFile.value = null;
     if (fileInput.value) fileInput.value.value = '';
 };
-
 
 // Helper function to count total sections across all groups
 const getTotalSectionCount = () => {
@@ -412,7 +415,6 @@ const getTotalSectionCount = () => {
 const resetErrors = () => {
     formattedErrors.value = {} as any
 };
-
 
 function validateForm(data: unknown) {
     resetErrors()
@@ -428,7 +430,6 @@ function validateForm(data: unknown) {
 }
 
 async function handleSubmit() {
-
     buttonDisabled.value.isSubmitting = true;
 
     const payload = {
@@ -437,15 +438,14 @@ async function handleSubmit() {
         selectedFile: selectedFile.value,
         groups: groups.value.map(g => ({
             name: g.name,
-            sections: g.sections
-        }))
+            sections: g.sections.filter(s => s.trim() !== "") // Filter out empty sections
+        })).filter(g => g.name.trim() !== "") // Filter out groups with empty names
     }
 
     if (!validateForm(payload)) {
         buttonDisabled.value.isSubmitting = false;
         return
     }
-    
 
     // Flatten groups and sections into the format expected by your API
     const formData = new FormData();
@@ -455,13 +455,12 @@ async function handleSubmit() {
     }
 
     // Add group structure data
-    groups.value.forEach((group, index) => {
+    payload.groups.forEach((group, index) => {
         formData.append(`groupNames[${index}]`, group.name);
         group.sections.forEach(section => {
             formData.append(`groupSections[${index}][]`, section);
         });
     });
-
 
     formData.append("topic", topic.value);
     formData.append("language", "English");
@@ -507,34 +506,28 @@ async function handleSubmit() {
         });
 };
 
-
 // Lifecycle hooks
 onMounted(() => {
     libraryDifficulty.value = "Normal";
 });
-
 
 onUnmounted(() => {
     typingEffectStop.value();
 });
 </script>
 
-
 <style scoped>
 .library-gen-page {
     display: flex;
     justify-content: flex-start;
-    /* Align content at the top */
     display: flex;
     flex-direction: column;
     width: 100%;
 }
 
-
 .libgen-section {
     width: 100%;
 }
-
 
 .form-container {
     display: flex;
@@ -547,7 +540,6 @@ onUnmounted(() => {
     padding: 1em;
 }
 
-
 .libgen-create {
     flex-direction: column;
     align-items: center;
@@ -556,14 +548,12 @@ onUnmounted(() => {
     background: var(--background-color-1t);
 }
 
-
 .form-group {
     display: flex;
     flex-direction: column;
     width: 100%;
     margin-bottom: 1em;
 }
-
 
 .libgen-title {
     margin-left: 1em;
@@ -572,18 +562,15 @@ onUnmounted(() => {
     opacity: 0.7;
 }
 
-
 .title-bar {
     display: flex;
     flex-direction: row;
     align-items: baseline;
 }
 
-
 .input-error {
     border-color: red;
 }
-
 
 .error-message {
     color: var(--error-color);
@@ -591,23 +578,9 @@ onUnmounted(() => {
     margin-top: 0.5em;
 }
 
-
-.option {
-    background: #00000000;
-    opacity: 0.8;
-    color: var(--highlight-color);
-}
-
-
 input[type="text"]::placeholder {
     color: var(--text-color);
     opacity: 0.65;
-}
-
-
-.input {
-    margin-left: 2px;
-    margin-right: 2px;
 }
 
 .form-container input[type="text"] {
@@ -616,16 +589,7 @@ input[type="text"]::placeholder {
     border-radius: 4px;
     width: 100%;
     box-sizing: border-box;
-}
-
-select {
-    padding: 10px;
-    border: 1px solid var(--element-color-1);
-}
-
-input[type="text"] {
     padding: 8px;
-    /* background: var(--background-color-1t); */
 }
 
 .cta-container {
@@ -634,29 +598,11 @@ input[type="text"] {
     margin: 1em auto 0;
 }
 
-
-.toggle-button {
-    margin-left: 0;
-    color: var(--text-color);
-    opacity: 0.7;
-    background: none;
-    border: none;
-    font-size: 0.8em;
-    cursor: pointer;
-}
-
-
-.file-upload {
-    margin-bottom: 2em;
-}
-
-
 .file-input-container {
     display: flex;
     flex-direction: column;
     gap: 0.5em;
 }
-
 
 .file-input-container input[type="file"] {
     padding: 8px;
@@ -664,7 +610,6 @@ input[type="text"] {
     border-radius: 4px;
     background-color: rgb(0, 0, 0, 0);
 }
-
 
 .selected-file {
     display: flex;
@@ -676,7 +621,6 @@ input[type="text"] {
     border: 1px solid var(--text-color);
 }
 
-
 .remove-file-btn {
     background: none;
     border: none;
@@ -687,67 +631,7 @@ input[type="text"] {
     opacity: 0.7;
 }
 
-
 .remove-file-btn:hover {
-    opacity: 1;
-}
-
-
-.room-input-container {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5em;
-    margin-bottom: 1em;
-}
-
-
-.room-input-wrapper {
-    display: flex;
-    gap: 0.5em;
-}
-
-
-.room-input-wrapper input {
-    flex-grow: 1;
-}
-
-
-.add-room-btn {
-    padding: 8px 16px;
-    background-color: var(--element-color-1);
-    border: none;
-    border-radius: 4px;
-    color: var(--text-color);
-    cursor: pointer;
-}
-
-
-.add-room-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-
-.room-count {
-    font-size: 0.8em;
-    opacity: 0.7;
-    text-align: right;
-}
-
-.remove-room-btn {
-    background: none;
-    border: none;
-    color: var(--text-color);
-    cursor: pointer;
-    padding: 0;
-    font-size: 1.2em;
-    opacity: 0.7;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.remove-room-btn:hover {
     opacity: 1;
 }
 
@@ -759,90 +643,29 @@ input[type="text"] {
     color: var(--text-color);
 }
 
-
-/* New styles for groups */
-.group-controls {
-    margin-bottom: 16px;
+/* New card-based styles */
+.topics-container {
+    max-width: 100%;
 }
 
-
-.section-heading {
-    font-size: 0.9em;
-    font-weight: 600;
-    margin-bottom: 8px;
-    color: var(--text-color);
-}
-
-
-.group-input-wrapper {
-    display: flex;
-    gap: 0.5em;
-}
-
-.group-input-wrapper input {
-    flex-grow: 1;
-}
-
-.add-btn {
-    padding: 8px 16px;
-    background-color: var(--element-color-1);
-    border: none;
-    border-radius: 4px;
-    color: var(--text-color);
-    cursor: pointer;
-    white-space: no-wrap;
-}
-
-.add-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-.error-container {
-    margin-top: 4px;
-}
-
-.groups-container {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    margin-bottom: 16px;
-}
-
-
-.group-item {
+.topic-card {
     border: 1px solid var(--text-color);
-    border-radius: 8px;
-    padding: 12px;
+    background: var(--background-color-1);
 }
 
-
-.group-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 12px;
-}
-
-
-.group-title {
+.topic-name-input {
+    background-color: transparent;
+    border: 1px solid rgba(var(--text-color-rgb), 0.3);
+    border-radius: 4px;
+    padding: 8px 12px;
+    font-size: 1.1em;
     font-weight: 600;
-    font-size: 1em;
 }
 
-
-.group-actions {
-    display: flex;
-    align-items: center;
-    gap: 12px;
+.topic-name-input:focus {
+    outline: none;
+    border-color: var(--element-color-1);
 }
-
-
-.section-count {
-    font-size: 0.8em;
-    opacity: 0.7;
-}
-
 
 .remove-btn {
     background: none;
@@ -851,70 +674,93 @@ input[type="text"] {
     cursor: pointer;
     font-size: 1.2em;
     opacity: 0.7;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    padding: 4px 8px;
+    border-radius: 4px;
 }
-
 
 .remove-btn:hover {
     opacity: 1;
+    background-color: rgba(255, 0, 0, 0.1);
 }
 
-
-.group-sections {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-
-.section-input-wrapper {
-    display: flex;
-    gap: 0.5em;
-    border: var(--text-color);
-}
-
-
-.section-input-wrapper input {
-    flex-grow: 1;
-}
-
-
-.section-chips {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-bottom: 8px;
-}
-
-
-.section-chip {
+.subtopic-item {
     display: flex;
     align-items: center;
-    gap: 6px;
-    padding: 4px 10px;
-    background-color: var(--element-color-1);
-    border-radius: 16px;
-    font-size: 0.85em;
+    gap: 8px;
 }
 
+.subtopic-input {
+    background-color: transparent;
+    border: 1px solid rgba(var(--text-color-rgb), 0.3);
+    border-radius: 4px;
+    padding: 6px 10px;
+}
+
+.subtopic-input:focus {
+    outline: none;
+    border-color: var(--element-color-1);
+}
 
 .remove-section-btn {
     background: none;
     border: none;
     color: var(--text-color);
     cursor: pointer;
-    padding: 0;
     font-size: 1.1em;
     opacity: 0.7;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    padding: 2px 6px;
+    border-radius: 4px;
+    flex-shrink: 0;
 }
-
 
 .remove-section-btn:hover {
     opacity: 1;
+    background-color: rgba(255, 0, 0, 0.1);
+}
+
+.add-subtopic-btn {
+    background: var(--element-color-1);
+    border: 1px solid rgba(var(--text-color-rgb), 0.3);
+    color: var(--text-color);
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.add-subtopic-btn:hover:not(:disabled) {
+    background: rgba(var(--element-color-1-rgb), 0.8);
+}
+
+.add-subtopic-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.add-topic-card {
+    border: 2px dashed rgba(var(--text-color-rgb), 0.3);
+    background: transparent;
+}
+
+.add-topic-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-color);
+    padding: 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1.1em;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+}
+
+.add-topic-btn:hover:not(:disabled) {
+    opacity: 1;
+    background: rgba(var(--element-color-1-rgb), 0.1);
+}
+
+.add-topic-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
 }
 </style>

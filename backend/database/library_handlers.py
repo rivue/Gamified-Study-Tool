@@ -631,16 +631,16 @@ def join_library(user_id: int, library_id: int, join_code: str = None):
 
     library = Library.query.filter(Library.id == library_id).first()
     if not library:
-
-        if not join_code:
-            raise ValueError(f"Library {library_id} not found")
-        else:
-            library = Library.query.filter(
-                (Library.join_code == join_code) and 
-                (not Library.is_public)
-                ).first()
-            if not library:
-                raise InvalidJoinCodeError("Invalid join code")
+        raise ValueError(f"Library {library_id} not found")
+    
+    # Check join conditions
+    if library.is_public:
+        # Public library - no join code needed
+        pass
+    else:
+        # Private library - requires matching join code
+        if not join_code or library.join_code != join_code:
+            raise InvalidJoinCodeError("Invalid join code for private library")
 
     already_exists = db.session.query(LibraryMembership) \
         .filter_by(user_id=user_id, library_id=library_id) \
@@ -1090,8 +1090,8 @@ def get_libraries_info(user_id=None, browse=False):
                 ~Library.id.in_(
                 db.session.query(LibraryMembership.library_id)
                 .filter_by(user_id=user_id)
-                ), 
-                Library.is_public.is_(True)
+                )#
+                # Library.is_public.is_(True)
                 )
             .all())
 
