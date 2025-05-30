@@ -21,7 +21,7 @@
                                 <span v-if="getStepIndex(currentTab) > index" class="check-icon">✓</span>
                                 <span v-else class="step-number">{{ index + 1 }}</span>
                             </div>
-                            
+
                             <!-- Step Label -->
                             <div :class="['step-info', {
                                 'active': currentTab === step.value,
@@ -30,7 +30,7 @@
                                 <div class="step-title">{{ step.label }}</div>
                                 <div class="step-description">{{ step.description }}</div>
                             </div>
-                            
+
                             <!-- Connector Line -->
                             <div v-if="index < steps.length - 1" :class="['step-connector', {
                                 'completed': getStepIndex(currentTab) > index
@@ -46,7 +46,8 @@
                         <div class="section-card">
                             <div class="card-header">
                                 <h2 class="section-title">Course Information</h2>
-                                <p class="section-description">Give your course a name and upload your source material</p>
+                                <p class="section-description">Give your course a name and upload your source material
+                                </p>
                             </div>
 
                             <div class="form-group">
@@ -88,7 +89,8 @@
                                 <div v-if="formattedErrors.selectedFile?._errors?.length" class="error-text">
                                     {{ formattedErrors.selectedFile._errors[0] }}
                                 </div>
-                                <div class="input-hint">This file will be used to generate content for your course topics</div>
+                                <div class="input-hint">This file will be used to generate content for your course
+                                    topics</div>
                             </div>
                         </div>
                     </div>
@@ -121,18 +123,24 @@
                                         <input type="text" v-model="group.name" placeholder="Enter topic name..."
                                             maxlength="40"
                                             :class="['topic-input', { 'error': formattedErrors.groups?.[groupIndex]?.name?._errors?.length }]" />
-                                        <button class="remove-topic-btn" @click="removeGroup(groupIndex)" type="button">✕</button>
+                                        <button class="remove-topic-btn" @click="removeGroup(groupIndex)"
+                                            type="button">✕</button>
                                     </div>
-                                    <div v-if="formattedErrors.groups?.[groupIndex]?.name?._errors?.length" class="error-text">
+                                    <div v-if="formattedErrors.groups?.[groupIndex]?.name?._errors?.length"
+                                        class="error-text">
                                         {{ formattedErrors.groups[groupIndex].name._errors[0] }}
                                     </div>
 
                                     <div class="subtopics-section">
                                         <div v-if="group.sections.length > 0" class="subtopics-list">
-                                            <div v-for="(section, sectionIndex) in group.sections" :key="sectionIndex" class="subtopic-item">
+                                            <div v-for="(section, sectionIndex) in group.sections" :key="sectionIndex"
+                                                class="subtopic-item">
                                                 <input type="text" v-model="group.sections[sectionIndex]"
-                                                    placeholder="Enter subtopic name..." maxlength="40" class="subtopic-input" />
-                                                <button class="remove-subtopic-btn" @click="removeSection(groupIndex, sectionIndex)" type="button">✕</button>
+                                                    placeholder="Enter subtopic name..." maxlength="40"
+                                                    class="subtopic-input" />
+                                                <button class="remove-subtopic-btn"
+                                                    @click="removeSection(groupIndex, sectionIndex)"
+                                                    type="button">✕</button>
                                             </div>
                                         </div>
 
@@ -141,14 +149,16 @@
                                             + Add Subtopic
                                         </button>
 
-                                        <div v-if="formattedErrors.groups?.[groupIndex]?.sections?._errors?.length" class="error-text">
+                                        <div v-if="formattedErrors.groups?.[groupIndex]?.sections?._errors?.length"
+                                            class="error-text">
                                             {{ formattedErrors.groups[groupIndex].sections._errors[0] }}
                                         </div>
                                     </div>
                                 </div>
 
                                 <!-- Add Topic Button -->
-                                <button class="add-topic-btn" @click="addGroup" :disabled="groups.length >= 10 || disableExtras" type="button">
+                                <button class="add-topic-btn" @click="addGroup"
+                                    :disabled="groups.length >= 10 || disableExtras" type="button">
                                     + Add Topic
                                 </button>
                             </div>
@@ -159,7 +169,8 @@
 
                             <div class="structure-hints">
                                 <div class="hint">📝 You can create up to 10 topics with 15 subtopics each</div>
-                                <div class="hint">✨ Don't worry about adding everything now - you can expand later!</div>
+                                <div class="hint">✨ Don't worry about adding everything now - you can expand later!
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -218,11 +229,13 @@
 
                 <!-- Navigation -->
                 <div class="navigation-section">
-                    <button v-if="currentTab !== 'basics'" class="nav-button secondary" @click="goToPreviousStep" type="button">
+                    <button v-if="currentTab !== 'basics'" class="nav-button secondary" @click="goToPreviousStep"
+                        type="button">
                         ← Previous
                     </button>
                     <div class="nav-spacer"></div>
-                    <button v-if="currentTab !== 'settings'" class="nav-button primary" @click="goToNextStep" type="button">
+                    <button v-if="currentTab !== 'settings'" class="nav-button primary" @click="goToNextStep"
+                        type="button">
                         Next →
                     </button>
                 </div>
@@ -655,6 +668,7 @@ onUnmounted(() => {
 .step-info {
     text-align: center;
     max-width: 120px;
+    background-color: var(--background-color);
 }
 
 .step-title {
@@ -1201,6 +1215,7 @@ onUnmounted(() => {
     from {
         transform: rotate(0deg);
     }
+
     to {
         transform: rotate(360deg);
     }
