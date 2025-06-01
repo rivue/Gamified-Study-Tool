@@ -681,7 +681,6 @@ onMounted(() => {
 </script>
 
 <style scoped>
-/* Keep existing base styles and add stepper-specific styles */
 
 /* Header */
 .header-section {

@@ -13,7 +13,6 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from "vue";
-import { useRoute } from "vue-router";
 import axios from "axios";
 import { useAuthStore } from "@/store/authStore";
 import LoadingComponent from "@/components/Backstage/LoadingComponent.vue";
@@ -24,7 +23,6 @@ const isLoading = ref(true);
 const myLibraries = ref([]);
 
 onMounted(() => {
-
     fetchLibraries();
 });
 

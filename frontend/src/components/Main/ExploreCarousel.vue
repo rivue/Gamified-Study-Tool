@@ -51,7 +51,7 @@
                         </div>
 
 
-                        <Input v-if="!library.is_public" v-model="joinCode" placeholder="Enter private library code..." @keydown.enter="joinCourse"
+                        <Input v-if="!library.is_public" v-model="joinCode" placeholder="Enter private library code..." @keydown.enter="joinSpecificCourse(library.id)"
                         class="join-input" />
 
                        <!-- <Button @click="joinCourse" :disabled="joinPrivateLoading" class="join-button">
@@ -60,7 +60,7 @@
                         </Button> -->
 
                         <Button v-if="!joinedCourses.has(library.id)" 
-                            @click="joinSpecificCourse(library.id, library.is_public)"
+                            @click="joinSpecificCourse(library.id)"
                             :disabled="joinPublicLoading.has(library.id)" 
                             class="join-card-button">
                             <LoaderCircle v-if="joinPublicLoading.has(library.id)" class="mr-2 h-4 w-4 animate-spin" />
@@ -137,11 +137,6 @@ const searchQuery = ref("");
 const filteredLibraries = ref<Array<any>>([]);
 const displayedLibraries = ref<Array<any>>([]);
 const joinCode = ref("");
-
-// // For Private library code button
-// const joinPrivateMessage = ref("");
-// const joinPrivateMessageType = ref("");
-// const joinPrivateLoading = ref(false);
 
 // actual list of courses 
 const joinPublicMessages = ref(new Map());
@@ -221,15 +216,15 @@ function handleScroll() {
 }
 
 // Get appropriate CSS class based on difficulty
-function getDifficultyClass(difficulty: string | undefined) {
-    if (!difficulty) return 'all-levels';
+// function getDifficultyClass(difficulty: string | undefined) {
+//     if (!difficulty) return 'all-levels';
 
-    const lowercaseDifficulty = difficulty.toLowerCase();
-    if (lowercaseDifficulty.includes('beginner')) return 'beginner';
-    if (lowercaseDifficulty.includes('intermediate')) return 'intermediate';
-    if (lowercaseDifficulty.includes('advanced')) return 'advanced';
-    return 'all-levels';
-}
+//     const lowercaseDifficulty = difficulty.toLowerCase();
+//     if (lowercaseDifficulty.includes('beginner')) return 'beginner';
+//     if (lowercaseDifficulty.includes('intermediate')) return 'intermediate';
+//     if (lowercaseDifficulty.includes('advanced')) return 'advanced';
+//     return 'all-levels';
+// }
 
 // Watch for changes to the libraries prop
 watch(() => props.libraries, (newLibraries) => {

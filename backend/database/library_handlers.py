@@ -1108,7 +1108,7 @@ def get_libraries_info(user_id=None, browse=False):
             explore_libraries_data.append([library_dict, name])
         
         response["explore_libraries"] = explore_libraries_data
-        
+        print(response)
         return jsonify(response)
     
     else:

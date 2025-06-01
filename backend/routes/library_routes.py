@@ -82,8 +82,8 @@ def init_library_routes(app):
             if language_difficulty not in VALID_LANGUAGE_DIFFICULTIES:
                 language_difficulty = "Normal"
 
-        print(request.form.get("visibility"))
         is_public = request.form.get("visibility", "false").lower() == "true"
+        print(is_public)
 
         # Extra context checks
         extra_context = request.form.get("extraContent")
