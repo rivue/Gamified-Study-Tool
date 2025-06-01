@@ -4,38 +4,72 @@
         <div class="fixed top-20 right-6 flex gap-6 z-10">
 
             <button v-if="isOwner" @click="toggleEditMode"
-                class="bg-black/30 backdrop-blur-sm shadow-md rounded-full p-4 hover:bg-black/40"
+                class="menu-button bg-background-color-1t backdrop-blur-sm shadow-lg rounded-lg p-4 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200"
+                style="color: var(--highlight-color);">
+                <PencilIcon class="w-6 h-6" />
+            </button>
+
+            <button @click="goToLeaderboard"
+                class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg p-4 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200"
+                style="color: var(--highlight-color);">
+                <ChartBarIcon class="w-6 h-6" />
+            </button>
+
+            <button v-if="isOwner" @click="toggleSettings"
+                class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg p-4 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200"
+                style="color: var(--highlight-color);">
+                <CogIcon class="w-6 h-6" />
+            </button>
+        </div>
+
+        <div class="fixed top-20 left-6 flex gap-6 z-10">
+            <button @click="goToHome" 
+                class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg px-6 py-4 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200 font-medium"
+                style="color: var(--highlight-color);">
+                <span class="text-lg">My Courses</span>
+            </button>
+
+            <button v-if="!isOwner" @click="handleLeaveCourseClick"
+                class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg p-4 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200"
+                style="color: var(--highlight-color);">
+                <ArrowLeftOnRectangleIcon class="w-6 h-6" />
+            </button>
+        </div>
+
+
+            <!-- <button v-if="isOwner" @click="toggleEditMode"
+                class="bg-black/50 backdrop-blur-sm shadow-lg rounded-full p-4 hover:bg-black/60 border border-white/20"
                 style="color: var(--highlight-color);">
                 <PencilIcon class="w-12 h-12" />
             </button>
 
             <button @click="goToLeaderboard"
-                class="bg-black/30 backdrop-blur-sm shadow-md rounded-full p-4 hover:bg-black/40"
+                class="bg-black/50 backdrop-blur-sm shadow-md rounded-full p-4 hover:bg-black/60 border border-white/20"
                 style="color: var(--highlight-color);">
                 <ChartBarIcon class="w-12 h-12" />
             </button>
 
             <button v-if="isOwner" @click="toggleSettings"
-                class="bg-black/30 backdrop-blur-sm shadow-md rounded-full p-4 hover:bg-black/40"
+                class="bg-black/50 backdrop-blur-sm shadow-md rounded-full p-4 hover:bg-black/60 border border-white/20"
                 style="color: var(--highlight-color);">
                 <CogIcon class="w-12 h-12" />
             </button>
         </div>
 
         <div class="fixed top-20 left-6 flex gap-6 z-10">
-
-            <button @click="goToHome" class="bg-black/30 backdrop-blur-sm shadow-md rounded-full p-4 hover:bg-black/40"
+            <button @click="goToHome" 
+                class="bg-black/30 backdrop-blur-sm shadow-md rounded-3xl p-4 hover:bg-black/60 border border-white/20"
                 style="color: var(--highlight-color);">
-                <HomeIcon class="w-12 h-12" />
+                <span class="text-2xl w-12 h-56 p-2">My Courses</span>
             </button>
 
             <button v-if="!isOwner" @click="handleLeaveCourseClick"
-                class="bg-black/30 backdrop-blur-sm shadow-md rounded-full p-4 hover:bg-black/40"
+                class="bg-black/50 backdrop-blur-sm shadow-md rounded-full p-4 hover:bg-black/60 border border-white/20"
                 style="color: var(--highlight-color);">
                 <ArrowLeftOnRectangleIcon class="w-12 h-12" />
             </button>
 
-        </div>
+        </div> -->
 
         <div class="relative flex flex-col w-full h-full">
 
@@ -495,7 +529,7 @@ function goToLeaderboard() {
 }
 
 function goToHome() {
-    router.push("/create");
+    router.push("/courses");
 }
 
 function handleLeaveCourseClick() {

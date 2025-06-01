@@ -15,26 +15,52 @@
                             <!-- Step Circle -->
                             <div :class="['step-circle', {
                                 'active': currentTab === step.value,
-                                'completed': getStepIndex(currentTab) > index,
-                                'pending': getStepIndex(currentTab) < index
+                                'completed': getStepIndex(currentTab) > index && !hasStepErrors(step.value),
+                                'pending': getStepIndex(currentTab) < index,
+                                'error': hasStepErrors(step.value) && getStepIndex(currentTab) > index
                             }]">
-                                <span v-if="getStepIndex(currentTab) > index" class="check-icon">✓</span>
+                                <span v-if="hasStepErrors(step.value) && getStepIndex(currentTab) > index" class="error-icon">!</span>
+                                <span v-else-if="getStepIndex(currentTab) > index && !hasStepErrors(step.value)" class="check-icon">✓</span>
                                 <span v-else class="step-number">{{ index + 1 }}</span>
                             </div>
 
                             <!-- Step Label -->
                             <div :class="['step-info', {
                                 'active': currentTab === step.value,
-                                'completed': getStepIndex(currentTab) > index
+                                'completed': getStepIndex(currentTab) > index && !hasStepErrors(step.value),
+                                'error': hasStepErrors(step.value) && getStepIndex(currentTab) > index
                             }]">
                                 <div class="step-title">{{ step.label }}</div>
-                                <div class="step-description">{{ step.description }}</div>
+                                <div class="step-description">
+                                    <span v-if="hasStepErrors(step.value) && getStepIndex(currentTab) > index" class="error-indicator">
+                                        Has errors
+                                    </span>
+                                    <span v-else>{{ step.description }}</span>
+                                </div>
                             </div>
 
                             <!-- Connector Line -->
                             <div v-if="index < steps.length - 1" :class="['step-connector', {
-                                'completed': getStepIndex(currentTab) > index
+                                'completed': getStepIndex(currentTab) > index && !hasStepErrors(step.value)
                             }]"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Error Summary (shown only in settings tab) -->
+                <div v-if="currentTab === 'settings' && hasPreviousStepErrors" class="error-summary">
+                    <div class="error-summary-header">
+                        <span class="error-icon">⚠️</span>
+                        <span class="error-title">Please fix the following issues:</span>
+                    </div>
+                    <div class="error-list">
+                        <div v-if="hasStepErrors('basics')" class="error-item" @click="currentTab = 'basics'">
+                            <span class="error-step">Course Basics:</span>
+                            <span class="error-details">{{ getStepErrorSummary('basics') }}</span>
+                        </div>
+                        <div v-if="hasStepErrors('structure')" class="error-item" @click="currentTab = 'structure'">
+                            <span class="error-step">Course Structure:</span>
+                            <span class="error-details">{{ getStepErrorSummary('structure') }}</span>
                         </div>
                     </div>
                 </div>
@@ -43,6 +69,7 @@
                 <div class="form-content" @keydown.enter="handleSubmit">
                     <!-- Step 1: Course Basics -->
                     <div v-if="currentTab === 'basics'" class="step-content">
+                        <!-- Keep existing basics content -->
                         <div class="section-card">
                             <div class="card-header">
                                 <h2 class="section-title">Course Information</h2>
@@ -322,7 +349,7 @@ const formSchema = z.object({
     visibility: z.boolean(),
     selectedFile: z.instanceof(File, { message: "Must have at least one file - we wouldn't know what to generate!" }),
     groups: z.array(groupSchema)
-        .min(1, "Must have at least one Topic")
+        .min(1, "Must have at least one Topic (and topic names can't be empty)")
         .refine(
             groups => {
                 const names = groups.map(g => g.name.toLowerCase());
@@ -339,7 +366,6 @@ const authStore = useAuthStore();
 const popupStore = usePopupStore();
 
 const groups = ref<Group[]>([]);
-const typingEffectStop = ref(() => { });
 const topic = ref("");
 const libraryDifficulty = ref("Normal");
 const buttonDisabled = ref({
@@ -353,12 +379,13 @@ const visibilityTab = ref<'public' | 'private'>('public');
 const isPublic = computed<boolean>(() => visibilityTab.value === 'public');
 const formattedErrors = ref<ReturnType<z.ZodError["format"]>>({} as any)
 const currentTab = ref<'basics' | 'structure' | 'settings'>('basics');
+const validationAttempted = ref(false); // Add this flag
 
 // Updated steps with descriptions
 const steps = computed(() => [
     { value: 'basics', label: 'Course Basics', description: 'Name and materials' },
     { value: 'structure', label: 'Course Structure', description: 'Topics and subtopics' },
-    { value: 'settings', label: 'Settings', description: 'Visibility and options' }
+    { value: 'settings', label: 'Settings', description: 'Fine tune your experience' }
 ]);
 
 const disableExtras = computed(() => {
@@ -458,6 +485,93 @@ const handleFileUpload = (event: Event) => {
     }
 };
 
+const hasStepErrors = (step: 'basics' | 'structure' | 'settings') => {
+        // Only show errors if validation has been attempted
+        if (!validationAttempted.value) return false;
+        
+        const payload = {
+            topic: topic.value,
+            visibility: isPublic.value,
+            selectedFile: selectedFile.value,
+            groups: groups.value.map(g => ({
+                name: g.name,
+                sections: g.sections.filter(s => s.trim() !== "")
+            })).filter(g => g.name.trim() !== "")
+        }
+    
+        try {
+            formSchema.parse(payload)
+            return false
+        } catch (e) {
+            if (e instanceof z.ZodError) {
+                const errors = e.format()
+                
+                switch (step) {
+                    case 'basics':
+                        return !!(errors.topic?._errors?.length || errors.selectedFile?._errors?.length)
+                    case 'structure':
+                        return !!(errors.groups?._errors?.length || 
+                                 (errors.groups && typeof errors.groups === 'object' && 
+                                  Object.keys(errors.groups).some(key => key !== '_errors')))
+                    case 'settings':
+                        return false
+                    default:
+                        return false
+                }
+            }
+        }
+        return false
+    }
+
+    const hasPreviousStepErrors = computed(() => {
+        // Only show errors if validation has been attempted
+        if (!validationAttempted.value) return false;
+        return hasStepErrors('basics') || hasStepErrors('structure')
+    })
+
+    const getStepErrorSummary = (step: 'basics' | 'structure') => {
+        // Only show errors if validation has been attempted
+        if (!validationAttempted.value) return '';
+        
+        const payload = {
+            topic: topic.value,
+            visibility: isPublic.value,
+            selectedFile: selectedFile.value,
+            groups: groups.value.map(g => ({
+                name: g.name,
+                sections: g.sections.filter(s => s.trim() !== "")
+            })).filter(g => g.name.trim() !== "")
+        }
+    
+        try {
+            formSchema.parse(payload)
+            return ''
+        } catch (e) {
+            if (e instanceof z.ZodError) {
+                const errors = e.format()
+                
+                switch (step) {
+                    case 'basics':
+                        const basicErrors = []
+                        if (errors.topic?._errors?.length) basicErrors.push('Course name')
+                        if (errors.selectedFile?._errors?.length) basicErrors.push('Course material')
+                        return basicErrors.join(', ')
+                    case 'structure':
+                        const structureErrors = []
+                        if (errors.groups?._errors?.length) structureErrors.push('Topics required')
+                        if (errors.groups && typeof errors.groups === 'object') {
+                            const hasGroupErrors = Object.keys(errors.groups).some(key => key !== '_errors')
+                            if (hasGroupErrors) structureErrors.push('Topic/subtopic names')
+                        }
+                        return structureErrors.join(', ')
+                    default:
+                        return ''
+                }
+            }
+        }
+        return ''
+    }
+
 const removeFile = () => {
     selectedFile.value = null;
     if (fileInput.value) fileInput.value.value = '';
@@ -473,6 +587,7 @@ const resetErrors = () => {
 
 function validateForm(data: unknown) {
     resetErrors()
+    validationAttempted.value = true;
     try {
         formSchema.parse(data)
         return true
@@ -562,10 +677,6 @@ async function handleSubmit() {
 
 onMounted(() => {
     libraryDifficulty.value = "Normal";
-});
-
-onUnmounted(() => {
-    typingEffectStop.value();
 });
 </script>
 
@@ -1267,5 +1378,75 @@ onUnmounted(() => {
     .remove-topic-btn {
         align-self: flex-end;
     }
+}
+
+.step-circle.error {
+    background: var(--error-color);
+    border-color: var(--error-color);
+    color: white;
+}
+
+.step-info.error .step-title {
+    color: var(--error-color);
+}
+
+.error-icon {
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.error-indicator {
+    color: var(--error-color);
+    font-size: 0.75rem;
+}
+
+/* Error Summary */
+.error-summary {
+    background: rgba(255, 59, 48, 0.1);
+    border: 1px solid rgba(255, 59, 48, 0.3);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.error-summary-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.error-title {
+    font-weight: 600;
+    color: var(--error-color);
+}
+
+.error-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.error-item {
+    display: flex;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    background: rgba(255, 59, 48, 0.05);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.error-item:hover {
+    background: rgba(255, 59, 48, 0.1);
+}
+
+.error-step {
+    font-weight: 600;
+    color: var(--error-color);
+}
+
+.error-details {
+    color: var(--text-color-secondary);
 }
 </style>

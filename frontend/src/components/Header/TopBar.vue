@@ -3,6 +3,7 @@
         <router-link to="/" custom v-slot="{ navigate }">
             <div class="app-title" @click="navigate">{{ pageTitle }}</div>
         </router-link>
+
         <div class="menu-buttons">
             <div v-if="loggedIn" class="streak-container">
                 <div class="streak-wrapper">
@@ -17,6 +18,13 @@
                     </div>
                 </div>
             </div>
+
+            <router-link v-if="!loggedIn" to="/login" custom v-slot="{ navigate }">
+                <button class="login-button" @click="navigate">
+                    Log in
+                </button>
+            </router-link>
+
             <button class="menu-btn icon-btn" @click="toggleSideMenu" aria-label="side menu">
                 <span class="menu-line"></span>
                 <span class="menu-line"></span>
@@ -82,16 +90,15 @@ export default {
     top: 0;
     width: 100%;
     z-index: 200;
-    background-color: var(--background-color-1t);
+    background-color: var(--background-color);
     color: var(--text-color);
-    padding: 4px;
-    padding-left: 8px;
-    padding-right: 8px;
+    padding: 8px 16px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     backdrop-filter: blur(8px);
-    box-shadow: 0 0 2px 2px var(--background-color-1t);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid var(--color-primary-dark);
 }
 
 .logo {
@@ -100,19 +107,41 @@ export default {
 }
 
 .app-title {
-    /* font-family: "Arial", sans-serif; */
     display: block;
     margin: 0;
     font-size: 24px;
     text-align: center;
     font-weight: 700;
     cursor: pointer;
+    color: var(--highlight-color);
 }
 
 .menu-buttons {
     display: flex;
     gap: 16px;
     align-items: center;
+}
+
+.login-button {
+    padding: 10px 16px;
+    border-radius: 10px;
+    background-color: var(--background-color-1t);
+    color: var(--highlight-color);
+    border: 1px solid var(--color-primary-dark);
+    transition: all 0.2s ease;
+    font-weight: 500;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.login-button:hover {
+    background-color: var(--element-color-1);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.login-button:active {
+    transform: translateY(0);
 }
 
 .menu-btn {
@@ -159,17 +188,14 @@ export default {
 
 .menu-btn.text-btn {
     min-width: 100px;
-    /* ensures consistent button width */
     text-align: right;
     justify-content: flex-end;
 }
-
 
 .streak-count {
     font-size: 16px;
     font-weight: 600;
     margin-left: -12px;
-
 }
 
 .streak-container {
@@ -213,12 +239,11 @@ export default {
     min-width: 180px;
     transition: opacity 0.2s ease, transform 0.2s ease;
     pointer-events: none;
-    backdrop-filter: blur(8px); /* Optional: adds blur effect */
+    backdrop-filter: blur(8px);
 }
 
 .streak-container:hover .streak-dropdown {
     pointer-events: auto;
-    
 }
 
 .streak-info p {

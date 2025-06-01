@@ -1,7 +1,7 @@
 <template>
     <div class="page-main-container">
         <div v-if="!loading && library && isDataValid">
-            <h1 class="page-title">{{ library.data.library_topic }} Lessons</h1>
+            <h1 class="page-title text-3xl">{{ library.data.library_topic }}</h1>
             <LearningPath :libraryId="Number(library.data.id)" :room-names="library.data.room_names"
                 :room-data="library.room_data" :library-is-public="library.data.is_public"
                 :unit-section-map="processedUnitSectionMap" :library-join-code="library.data.join_code" 

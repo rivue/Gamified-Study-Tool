@@ -6,13 +6,6 @@
 
                 <!-- Menu Buttons -->
                 <div class="menu-buttons space-y-2">
-                    <SideMenuButton
-                        v-if="!loggedIn"
-                        label="Log in"
-                        :isSelected="isRouteActive('/login')"
-                        @click="openRoute('/login')"
-                        class="menu-button"
-                    />
 
                     <SideMenuButton
                         v-if="loggedIn"

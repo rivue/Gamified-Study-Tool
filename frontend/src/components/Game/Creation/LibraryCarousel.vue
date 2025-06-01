@@ -3,7 +3,7 @@
         <div class="list-header-container">
             <div class="list-header">
                 <h1>Courses</h1>
-                <p class="course-description">Your created courses and courses you've joined</p>
+                <p class="course-description">Courses you've joined or created</p>
             </div>
             <div class="join-private-course">
                 <div class="join-form">
