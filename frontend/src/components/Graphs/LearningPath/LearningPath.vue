@@ -832,4 +832,28 @@ const handleScroll = () => {
     border-top-right-radius: 0.625rem;
     border-bottom-right-radius: 0.625rem;
 }
+
+.menu-button {
+    border-radius: 10px;
+    background-color: var(--background-color-1t);
+    color: var(--highlight-color);
+    border: 1px solid var(--color-primary-dark);
+    transition: all 0.2s ease;
+}
+
+.menu-button:hover {
+    background-color: var(--element-color-1);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.menu-button:active {
+    transform: translateY(0);
+}
+
+.menu-button.selected {
+    background-color: var(--element-color-1);
+    border-color: var(--color-primary);
+    color: var(--light-text);
+}
 </style>

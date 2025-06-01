@@ -1,25 +1,15 @@
 <template>
-    <div class="library-list px-16 py-12">
-        <div class="list-header-container">
-            <div class="list-header">
-                <h1>Courses</h1>
-                <p class="course-description">Courses you've joined or created</p>
+    <div class="library-list">
+        <div class="header-container">
+            <div class="header-content">
+                <h1 class="title">Courses</h1>
+                <p class="subtitle">Courses you've joined or created</p>
             </div>
-            <div class="join-private-course">
+            <div class="join-course-container">
                 <div class="join-form">
-                    <Input
-                        class="join-input"
-                        type="text"
-                        v-model="joinCode"
-                        placeholder="Enter course code..."
-                        @keydown.enter="joinCourse"
-                    />
-                    <Button 
-                        class="join-button" 
-                        @click="joinCourse"
-                        :disabled="joinLoading"
-                        variant="destructive"
-                    >
+                    <Input class="join-input" type="text" v-model="joinCode" placeholder="Enter course code..."
+                        @keydown.enter="joinCourse" />
+                    <Button class="join-button" @click="joinCourse" :disabled="joinLoading">
                         <LoaderCircle v-if="joinLoading" class="mr-2 h-4 w-4 animate-spin" />
                         Join
                     </Button>
@@ -32,47 +22,49 @@
             </div>
         </div>
 
-        <Input
-        class="mb-4 text-lg bg-transparent border-[1px] border-solid border-[var(--text-color)] rounded-[4px] placeholder-[var(--text-color)] text-[var(--text-color)]"
-        type="text" v-model="searchQuery" @input="filterLibraries" @keydown="handleSearchKeydown"
-        placeholder="Search courses you've joined..." />
-        
+        <div class="search-container">
+            <Search class="search-icon" />
+            <Input class="search-input" type="text" v-model="searchQuery" @input="filterLibraries"
+                @keydown="handleSearchKeydown" placeholder="Search courses you've joined..." />
+        </div>
+
         <!-- Conditional rendering based on library count -->
-        <div v-if="libraries.length > 0" class="list-table">
-            <Table>
-                <TableBody>
-                    <template v-if="paginatedLibraries.length">
-                        <TableRow v-for="library in paginatedLibraries" :key="library.id"
-                            class="cursor-pointer text-[var(--text-color)] hover:text-white hover:bg-[var(--element-color-1)]"
-                            @click="goToLibrary(library.id)">
-                            <div class="absolute inset-0 border-[1px] border-solid border-[var(--text-color)] rounded-lg pointer-events-none"></div>
-                            <TableCell class="w-16">
-                                <button @click.stop="updateFavoritedStatus(library.id, libraryFavoritesMap[library.id])"
-                                    class="star-button flex items-center justify-center w-8 h-8 rounded-full hover:bg-[var(--background-color-2)]">
-                                    <StarIcon v-if="libraryFavoritesMap[library.id] === true"
-                                        class="text-yellow-500 hover:text-yellow-400" size="20" />
-                                    <StarIcon v-else class="text-white-500 hover:text-yellow-300" size="20" />
-                                </button>
-                            </TableCell>
-                            <TableCell class="text-xl text-center p-4 w-full">{{ library.library_topic }}</TableCell>
-                            <TableCell class="text-xs text-right italic opacity-70 pr-4">
-                                <span v-if="library.owner_id == authStore.user.id" class="px-2 py-1 rounded-md bg-[var(--background-color-2t)]">Owner</span>
-                            </TableCell>
-                        </TableRow>
-                    </template>
-                    <TableRow v-else class="border-[1px] border-solid border-[var(--text-color)]">
-                        <TableCell colspan="5" class="h-24 text-center text-xl">
-                            No results
-                        </TableCell>
-                    </TableRow>
-                </TableBody>
-            </Table>
+        <div v-if="libraries.length > 0" class="courses-container">
+            <div class="courses-grid">
+                <div v-for="library in paginatedLibraries" :key="library.id" class="course-card">
+                    <div class="card-content">
+                        <div class="card-header">
+                            <h3 class="course-title">{{ library.library_topic }}</h3>
+                            <button @click.stop="updateFavoritedStatus(library.id, libraryFavoritesMap[library.id])"
+                                class="star-button p-4">
+                                <StarIcon
+                                    :class="['star-icon', 'h-6', 'w-6', libraryFavoritesMap[library.id] ? 'favorited' : '']"
+                                />
+                            </button>
+                        </div>
+                        <div class="card-stats">
+                            <div class="stat">
+                                <span v-if="library.owner_id == authStore.user.id" class="owner-badge">Owner</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-footer">
+                        <Button @click="goToLibrary(library.id)" class="go-to-course-button">
+                            Go to Course
+                        </Button>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Display this when there are no libraries -->
-        <div v-else class="no-libraries">
-            <p>You don't have any courses yet!</p>
-            <p>Use the form above to create your first course and start learning.</p>
+        <div v-else class="empty-state">
+            <BookOpen class="empty-icon" />
+            <h3 class="empty-title">No Courses Found</h3>
+            <p class="empty-description">
+                You don't have any courses yet! Use the form above to join your first course and start learning.
+            </p>
         </div>
 
         <!-- Pagination only shows if there are libraries -->
@@ -97,27 +89,26 @@
         </div>
     </div>
 </template>
+
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { Input } from "@/components/ui/input";
 import { StarIcon } from "@heroicons/vue/24/solid";
-import { Table, TableRow, TableBody, TableCell } from "@/components/ui/table";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { LoaderCircle } from "lucide-vue-next";
+import { LoaderCircle, Search, BookOpen } from "lucide-vue-next";
 import { useAuthStore } from "@/store/authStore";
 import axios from "axios";
 
 // Props
 const props = defineProps<{
-    libraries: Array<{ clicks: number; context: any; difficulty: string; guide: string; id: number; image_url: string, language: string; language_difficulty: string; likes: number; library_topic: string }>;
+    libraries: Array<{ clicks: number; context: any; difficulty: string; guide: string; id: number; image_url: string, language: string; language_difficulty: string; likes: number; library_topic: string; owner_id: number }>;
     libraryFavoritesMap: Record<number, boolean>;
 }>();
 
 // State
 const currentPage = ref(1);
-const itemsPerPage = 5;
+const itemsPerPage = 6;
 const router = useRouter();
 const searchQuery = ref("");
 const filteredLibraries = ref<Array<any>>([]);
@@ -158,7 +149,7 @@ function filterLibraries() {
 }
 
 // Watch for changes to the libraries prop
-watch(() => props.libraries, (newLibraries) => {
+watch(() => props.libraries, () => {
     // Update filtered libraries when props change
     filterLibraries();
 }, { deep: true });
@@ -212,59 +203,57 @@ const displayedPages = computed(() => {
 
 // Methods
 function goToLibrary(id: number) {
-    console.log("a;lskdjfasdf");
-    console.log(id);
     router.push(`/lessons/${id}`);
 }
 
 async function joinCourse() {
     if (!joinCode.value.trim()) return;
-    
+
     joinLoading.value = true;
     joinMessage.value = "";
-        
+
     axios
-    .post('/api/library/join', {
-        joinCode: joinCode.value.trim(),
-    })
-    .then((response) => {
-        if (response.status === 200) {
-            // Update the local favorites map
-            joinMessageType.value = "success";
-            joinMessage.value = "Successfully joined course!";
-            joinCode.value = "";
-            
-            // Emit event to refresh libraries list
-            emit('libraryJoined', response.data.library);
-    
-            // Add to local libraries array if needed
-            if (response.data.library) {
-                const newLibrary = response.data.library;
-                const libraryExists = props.libraries.some(lib => lib.id === newLibrary.id);
-                if (!libraryExists) {
-                    filteredLibraries.value.unshift(newLibrary);
-                    filterLibraries();
+        .post('/api/library/join', {
+            joinCode: joinCode.value.trim(),
+        })
+        .then((response) => {
+            if (response.status === 200) {
+                // Update the local favorites map
+                joinMessageType.value = "success";
+                joinMessage.value = "Successfully joined course!";
+                joinCode.value = "";
+
+                // Emit event to refresh libraries list
+                emit('libraryJoined', response.data.library);
+
+                // Add to local libraries array if needed
+                if (response.data.library) {
+                    const newLibrary = response.data.library;
+                    const libraryExists = props.libraries.some(lib => lib.id === newLibrary.id);
+                    if (!libraryExists) {
+                        filteredLibraries.value.unshift(newLibrary);
+                        filterLibraries();
+                    }
                 }
             }
-        }
-    })
-    .catch((error) => {
-        console.log(error);
-        console.error("Error updating favorite status:", error);
-        joinMessageType.value = "error";
-        joinMessage.value = error.response?.data?.message || "Failed to join course";
-    
-    })
-    .finally(() => {
-        joinLoading.value = false;
-    
-        // Auto-hide message after 5 seconds
-        setTimeout(() => {
-            joinMessage.value = "";
-        }, 5000);
+        })
+        .catch((error) => {
+            console.log(error);
+            console.error("Error updating favorite status:", error);
+            joinMessageType.value = "error";
+            joinMessage.value = error.response?.data?.message || "Failed to join course";
 
-    });
-       
+        })
+        .finally(() => {
+            joinLoading.value = false;
+
+            // Auto-hide message after 5 seconds
+            setTimeout(() => {
+                joinMessage.value = "";
+            }, 5000);
+
+        });
+
 }
 
 function updateFavoritedStatus(libraryId: number, oldStatus: boolean) {
@@ -309,272 +298,323 @@ function goToPage(page: number) {
 }
 </script>
 
-
 <style scoped>
 .library-list {
-    margin-top: 50px;
-    background: var(--background-color-1t);
-    border: 1px solid var(--text-color);
-    border-radius: 5px;
-}
-
-
-.list-header {
-    margin-bottom: 24px;
-}
-
-.list-header h1 {
-    font-size: 24px;
-    font-weight: 700;
-    margin-bottom: 8px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
     color: var(--text-color);
-    justify-content: center;
+    background: var(--background-color);
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(26, 139, 127, 0.2);
 }
 
-.subtitle {
-    color: var(--text-color-secondary);
-    font-size: 15px;
-}
-
-.list-table {
-    width: 100%;
-    border-radius: 8px;
-    overflow: hidden;
-    border: 1px solid var(--border-color);
-    margin-bottom: 16px;
-}
-
-.table-header,
-.library-item {
-    display: grid;
-    /* Define columns here - ADJUST THESE values as needed for your design */
-    grid-template-columns:
-        minmax(100px, 2fr)
-        /* col-name: min 100px, flexible */
-        minmax(80px, 1fr)
-        /* col-status: min 80px, flexible */
-        minmax(120px, 1fr)
-        /* col-stats: min 100px, flexible */
-        minmax(48px, 48px);
-    /* col-actions: fixed 48px */
-    align-items: center;
-    /*padding: 14px 16px; /* Keep padding */
-    gap: 16px;
-    /* Add gap for spacing between grid cells */
-
-    /* --- Key Additions for Horizontal Scrolling --- */
-    padding-bottom: 10px;
-}
-
-
-.library-item {
+.header-container {
     display: flex;
-    flex-wrap: wrap;
-    /* Allow items to wrap to the next line */
-    align-items: center;
-    /* Align items nicely vertically */
-    gap: 12px 16px;
-    /* Row gap, Column gap */
-    padding: 16px;
-    border: 1px solid var(--border-color);
-    /* Add border to each item */
-    border-radius: 8px;
-    /* Rounded corners for card look */
-    margin-bottom: 16px;
-    /* Space between cards */
-    background-color: var(--background-color-1);
-    /* Ensure items have background */
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-}
-
-.table-header {
-    /* padding: 14px 16px;
-    background-color: var(--background-color-2);
-    border-bottom: 1px solid var(--border-color);
-    color: var(--text-color-secondary);
-    font-size: 14px;
-    font-weight: 600; */
-    display: none;
-}
-
-.library-item:last-child {
-    border-bottom: none;
-}
-
-.library-item:hover {
-    background-color: var(--element-color-1);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.col-name h3 {
-    font-size: 16px;
-    font-weight: 600;
-    color: var(--text-color);
-    margin: 0;
-    /* Allow name text itself to wrap if extremely long */
-    white-space: normal;
-    word-break: break-word;
-    /* Break long words if needed */
-}
-
-.col-status {
-    background: none;
-    border: none;
-    cursor: pointer;
-    width: 32px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    transition: background-color 0.2s ease;
-}
-
-.col-status:hover {
-    background-color: var(--background-color-2);
-}
-
-.col-stats {
-    display: flex;
-    flex-wrap: wrap;
-    /* Allow stats themselves to wrap if needed */
-    gap: 12px;
-    /* Gap between individual stats */
-    align-items: center;
-    /* Ensure stats can appear on new line */
-    flex-basis: 100%;
-    /* Default to taking full width when wrapped below name/status */
-    justify-content: flex-start;
-    /* Align stats to the start */
-}
-
-@media (min-width: 400px) {
-
-    /* Example breakpoint where stats might fit better beside status */
-    .col-stats {
-        flex-basis: auto;
-        /* Allow stats to sit beside status */
-        justify-content: flex-end;
-    }
-
-    .col-status {
-        margin-right: 0;
-    }
-}
-
-.stat {
-    font-size: 14px;
-    color: var(--text-color-secondary);
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    font-weight: 500;
-    white-space: nowrap;
-    /* Prevent text within a stat from wrapping */
-    flex-shrink: 0;
-}
-
-.col-date {
-    font-size: 14px;
-    color: var(--text-color-secondary);
+    flex-direction: column;
+    gap: 2rem;
+    margin-bottom: 2rem;
 }
 
 @media (min-width: 768px) {
-    .list-table {
-        /* Re-add border styling to the table container */
-        border-radius: 8px;
-        overflow: hidden;
-        border: 1px solid var(--border-color);
-    }
-
-    /* Show the header and style it as a grid */
-    .table-header {
-        display: grid;
-        /* Use grid layout */
-        grid-template-columns: 80px minmax(150px, 2fr) 1fr 1fr 48px;
-        /* Define columns */
-        padding: 14px 16px;
-        background-color: var(--background-color-2);
-        border-bottom: 1px solid var(--border-color);
-        color: var(--text-color-secondary);
-        font-size: 14px;
-        font-weight: 600;
-        gap: 16px;
-        /* Add gap */
-        /* Ensure header text doesn't wrap undesirably */
-        white-space: nowrap;
-    }
-
-    .table-header>div {
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-
-    .library-item {
-        display: grid;
-        /* Switch back to grid */
-        grid-template-columns: 80px minmax(150px, 2fr) 1fr 1fr 48px;
-        /* Same columns as header */
-        flex-wrap: nowrap;
-        /* Disable wrapping for grid */
-        border: none;
-        /* Remove individual item border */
-        border-radius: 0;
-        /* Remove individual item radius */
-        margin-bottom: 0;
-        /* Remove margin between items */
-        border-bottom: 1px solid var(--border-color);
-        /* Use bottom border */
-        gap: 16px;
-        /* Add gap */
-        /* Ensure grid text content truncates if needed */
-        white-space: nowrap;
-    }
-
-    .library-item>div {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        /* Allow normal whitespace wrapping WITHIN cells if specifically desired */
-        /* white-space: normal; */
-    }
-
-    .library-item:last-child {
-        border-bottom: none;
-    }
-
-    .col-name {
-        /* Re-apply specific styling for grid if needed */
-        min-width: 0;
-        /* Allow shrinking in grid */
-    }
-
-    .col-name h3 {
-        /* Re-apply truncation for grid */
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-
-    .col-status {
-        margin-right: 0;
-        /* Reset margin override */
-    }
-
-    .col-stats {
-        display: flex;
-        flex-wrap: nowrap;
-        /* Prevent stats wrapping on desktop */
-        gap: 16px;
-        flex-basis: auto;
-        /* Reset flex-basis */
-        justify-content: flex-start;
-        /* Reset justify */
+    .header-container {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: flex-start;
     }
 }
 
+.header-content {
+    flex: 1;
+}
+
+.title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    line-height: 1.2;
+}
+
+.subtitle {
+    font-size: 1rem;
+    color: var(--text-color-secondary);
+    max-width: 500px;
+}
+
+.join-course-container {
+    width: 100%;
+    max-width: 400px;
+}
+
+.join-form {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.join-input {
+    flex: 1;
+    border-radius: 8px;
+    border: 1px solid rgba(26, 139, 127, 0.3);
+    background-color: rgba(26, 139, 127, 0.1);
+    color: var(--text-color);
+    font-size: 0.9rem;
+    height: 44px;
+}
+
+.join-input::placeholder {
+    color: var(--text-color-secondary);
+}
+
+.join-button {
+    height: 44px;
+    border-radius: 8px;
+    background: var(--button-gradient);
+    color: var(--text-color);
+    font-weight: 600;
+    padding: 0 1.25rem;
+    transition: all 0.2s;
+    border: none;
+}
+
+.join-button:hover:not(:disabled) {
+    background: linear-gradient(135deg, var(--color-primary-dark), var(--color-primary));
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(26, 139, 127, 0.3);
+}
+
+.join-message {
+    margin-top: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    backdrop-filter: blur(10px);
+}
+
+.success {
+    background-color: rgba(16, 185, 129, 0.2);
+    color: var(--success-color);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.error {
+    background-color: rgba(255, 116, 108, 0.2);
+    color: var(--error-color);
+    border: 1px solid rgba(255, 116, 108, 0.3);
+}
+
+.search-container {
+    position: relative;
+    margin-bottom: 2rem;
+}
+
+.search-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--color-primary-light);
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+.search-input {
+    width: 100%;
+    height: 50px;
+    padding-left: 3rem;
+    border-radius: 12px;
+    border: 1px solid rgba(26, 139, 127, 0.3);
+    background-color: rgba(26, 139, 127, 0.1);
+    color: var(--text-color);
+    font-size: 1rem;
+    transition: all 0.2s;
+}
+
+.search-input::placeholder {
+    color: var(--text-color-secondary);
+}
+
+.search-input:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(26, 139, 127, 0.2);
+    outline: none;
+}
+
+.courses-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.course-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: var(--background-color-1t);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: 1px solid rgba(26, 139, 127, 0.2);
+}
+
+.course-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 20px rgba(26, 139, 127, 0.2);
+    border-color: var(--color-primary-light);
+    background: var(--background-color-2t);
+}
+
+.card-content {
+    flex: 1;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.course-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    line-height: 1.4;
+    color: var(--text-color);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    flex: 1;
+    margin-right: 1rem;
+}
+
+.star-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.3rem;
+    border-radius: 50%;
+    transition: background-color 0.2s ease;
+    /* display: flex; */
+    /* align-items: center; */
+    /* justify-content: center; */
+}
+
+.star-button:hover {
+    background-color: rgba(26, 139, 127, 0.1);
+}
+
+.star-icon {
+    color: var(--text-color-secondary);
+    transition: color 0.2s ease;
+}
+
+.star-button:hover .star-icon.favorited {
+    color: #ffd363;
+}
+
+.star-button:hover .star-icon:not(.favorited) {
+    color: #fadc90;
+}
+
+.star-icon.favorited {
+    color: #fbbf24;
+}
+
+.card-stats {
+    display: flex;
+    gap: 1rem;
+    margin-top: auto;
+}
+
+.stat {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    color: var(--color-primary-light);
+    font-size: 0.875rem;
+}
+
+.owner-badge {
+    background-color: rgba(26, 139, 127, 0.2);
+    color: var(--color-primary);
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border: 1px solid rgba(26, 139, 127, 0.3);
+}
+
+.card-footer {
+    padding: 1rem 1.5rem;
+    background: rgba(26, 139, 127, 0.1);
+    border-top: 1px solid rgba(26, 139, 127, 0.2);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.go-to-course-button {
+    width: 100%;
+    background: var(--button-gradient);
+    color: var(--text-color);
+    font-weight: 600;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    transition: all 0.2s;
+    cursor: pointer;
+    border: none;
+}
+
+.go-to-course-button:hover {
+    background: linear-gradient(135deg, var(--color-primary-dark), var(--color-primary));
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(26, 139, 127, 0.3);
+}
+
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 4rem 2rem;
+    background: var(--background-color-1t);
+    border-radius: 16px;
+    border: 1px dashed rgba(26, 139, 127, 0.3);
+}
+
+.empty-icon {
+    width: 4rem;
+    height: 4rem;
+    color: var(--color-primary-light);
+    margin-bottom: 1.5rem;
+}
+
+.empty-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-color);
+    margin-bottom: 0.75rem;
+}
+
+.empty-description {
+    max-width: 400px;
+    color: var(--text-color-secondary);
+    line-height: 1.6;
+}
 
 .pagination {
     display: flex;
@@ -582,10 +622,11 @@ function goToPage(page: number) {
     align-items: center;
     flex-wrap: wrap;
     gap: 12px;
+    margin-top: 2rem;
 }
 
 .pagination-info {
-    color: var(--background-color-1);
+    color: var(--text-color-secondary);
     font-size: 14px;
     font-weight: 500;
 }
@@ -598,10 +639,10 @@ function goToPage(page: number) {
 
 .pagination-btn {
     padding: 8px 14px;
-    border: 1px solid var(--border-color);
-    background: var(--background-color-1);
+    border: 1px solid rgba(26, 139, 127, 0.3);
+    background: rgba(26, 139, 127, 0.1);
     color: var(--text-color);
-    border-radius: 6px;
+    border-radius: 8px;
     cursor: pointer;
     font-size: 14px;
     font-weight: 500;
@@ -612,8 +653,8 @@ function goToPage(page: number) {
 }
 
 .pagination-btn:hover:not(:disabled) {
-    background: var(--background-color-2);
-    border-color: var(--text-color-secondary);
+    background: rgba(26, 139, 127, 0.2);
+    border-color: var(--color-primary);
 }
 
 .pagination-btn:disabled {
@@ -636,9 +677,9 @@ function goToPage(page: number) {
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 6px;
-    border: 1px solid var(--border-color);
-    background: var(--background-color-1);
+    border-radius: 8px;
+    border: 1px solid rgba(26, 139, 127, 0.3);
+    background: rgba(26, 139, 127, 0.1);
     color: var(--text-color);
     font-size: 14px;
     cursor: pointer;
@@ -648,130 +689,20 @@ function goToPage(page: number) {
 }
 
 .page-btn:hover {
-    background: var(--background-color-2);
-    border-color: var(--text-color-secondary);
+    background: rgba(26, 139, 127, 0.2);
+    border-color: var(--color-primary);
 }
 
 .page-btn.active {
-    background: var(--primary-color, #4361ee);
+    background: var(--button-gradient);
     color: white;
-    border-color: var(--primary-color, #4361ee);
+    border-color: var(--color-primary);
     font-weight: 600;
-    box-shadow: 0 2px 8px rgba(67, 97, 238, 0.3);
+    box-shadow: 0 2px 8px rgba(26, 139, 127, 0.3);
     transform: scale(1.05);
 }
 
-/* Styles for no-libraries message */
-.no-libraries {
-    text-align: center;
-    padding: 40px;
-    color: var(--text-color-secondary);
-    font-size: 16px;
-}
-
-.no-libraries p {
-    margin: 8px 0;
-}
-
-/* Fallback styles if CSS variables are not defined */
-:root {
-    --background-color-1: #ffffff;
-    --background-color-2: #f8f9fa;
-    --background-color-3: #e9ecef;
-    --text-color: #212529;
-    --text-color-secondary: #6c757d;
-    --border-color: #dee2e6;
-    --success-color: #198754;
-    --success-color-bg: rgba(42, 87, 66, 0.1);
-    --primary-color: #4361ee;
-    --primary-hover: #3d55d5;
-}
-
-
-.list-header-container {
-    display: flex;
-    flex-direction: column;
-    position: relative;
-}
-
-@media (min-width: 768px) {
-    .list-header-container {
-        flex-direction: row;
-        align-items: flex-start;
-        justify-content: center;
-    }
-    
-    .list-header {
-        position: relative;
-        left: 50%;
-        transform: translateX(-50%);
-        text-align: center;
-    }
-    
-    .join-private-course {
-        margin-left: auto;
-    }
-}
-
-.join-private-course {
-    width: 100%;
-    max-width: 400px;
-}
-
-.join-form {
-    display: flex;
-    gap: 8px;
-}
-
-.join-input {
-    flex: 1;
-    background-color: var(--background-color-2t);
-    border: 1px solid var(--text-color);
-    border-radius: 4px;
-    color: var(--text-color);
-    height: 40px;
-    padding: 0 12px;
-}
-
-.join-button {
-    background-color: var(--element-color-1);
-    color: var(--text-color);
-    border: 1px solid var(--text-color);
-    border-radius: 4px;
-    height: 40px;
-    padding: 0 16px;
-    transition: all 0.2s ease;
-}
-
-.join-button:hover:not(:disabled) {
-    background-color: var(--element-color-2);
-}
-
-.join-button:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
-
-.join-message {
-    margin-top: 8px;
-    padding: 6px 12px;
-    border-radius: 4px;
-    font-size: 14px;
-    animation: fadeIn 0.3s ease-in-out;
-}
-
-.success {
-    background-color: rgba(34, 197, 94, 0.2);
-    color: #15803d;
-    border: 1px solid rgba(34, 197, 94, 0.3);
-}
-
-.error {
-    background-color: rgba(239, 68, 68, 0.3);
-    color: #dc2626;
-    border: 1px solid rgba(239, 68, 68, 0.4);
-}
-
+/* Animations */
 .fade-enter-active,
 .fade-leave-active {
     transition: opacity 0.3s ease;
@@ -782,8 +713,18 @@ function goToPage(page: number) {
     opacity: 0;
 }
 
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
+@media (max-width: 640px) {
+    .library-list {
+        padding: 1.5rem;
+        border-radius: 12px;
+    }
+
+    .title {
+        font-size: 1.75rem;
+    }
+
+    .courses-grid {
+        grid-template-columns: 1fr;
+    }
 }
 </style>
