@@ -5,7 +5,7 @@
                 <h1 class="title">Explore Courses</h1>
                 <p class="subtitle">Discover and join courses created by the community</p>
             </div>
-<!-- 
+            <!-- 
             <div class="join-course-container">
                 <div class="join-form">
                     <Input v-model="joinCode" placeholder="Enter private library code..." @keydown.enter="joinCourse"
@@ -47,34 +47,26 @@
                     <div class="card-footer">
                         <div class="creator">
                             <UserCircle class="creator-icon" />
-                            <span>{{ library.owner_username === null ? "Creator not found" : library.owner_username }}</span>
+                            <span>{{ library.owner_username === null ? "Creator not found" : library.owner_username
+                                }}</span>
                         </div>
 
 
-                        <Input v-if="!library.is_public" v-model="joinCode" placeholder="Enter private library code..." @keydown.enter="joinSpecificCourse(library.id)"
-                        class="join-input" />
+                        <Input v-if="!library.is_public" v-model="joinCode" placeholder="Enter private library code"
+                            @keydown.enter="joinSpecificCourse(library.id)" class="join-input m-2 h-10 p-4" />
 
-                       <!-- <Button @click="joinCourse" :disabled="joinPrivateLoading" class="join-button">
-                        <LoaderCircle v-if="joinPrivateLoading" class="mr-2 h-4 w-4 animate-spin" />
-                        Join Private Course
-                        </Button> -->
-
-                        <Button v-if="!joinedCourses.has(library.id)" 
-                            @click="joinSpecificCourse(library.id)"
-                            :disabled="joinPublicLoading.has(library.id)" 
-                            class="join-card-button">
+                        <Button v-if="!joinedCourses.has(library.id)" @click="joinSpecificCourse(library.id)"
+                            :disabled="joinPublicLoading.has(library.id)" class="join-card-button h-10 p-4">
                             <LoaderCircle v-if="joinPublicLoading.has(library.id)" class="mr-2 h-4 w-4 animate-spin" />
                             Join
                         </Button>
-                        <Button 
-                            v-else 
-                            @click="goToCourse(library.id)" 
-                            class="joined-card-button">
+                        <Button v-else @click="goToCourse(library.id)" class="joined-card-button">
                             Go to Course
                         </Button>
                     </div>
                     <Transition name="fade">
-                        <div v-if="joinPublicMessages.has(library.id)" :class="['join-message', joinPublicMessageTypes.get(library.id)]">
+                        <div v-if="joinPublicMessages.has(library.id)"
+                            :class="['join-message', joinPublicMessageTypes.get(library.id)]">
                             {{ joinPublicMessages.get(library.id) }}
                         </div>
                     </Transition>
@@ -397,7 +389,6 @@ function handleSearchKeydown(event: KeyboardEvent) {
     border: 1px solid rgba(26, 139, 127, 0.3);
     background-color: rgba(26, 139, 127, 0.1);
     color: var(--text-color);
-    height: 44px;
     font-size: 0.9rem;
 }
 
@@ -641,6 +632,7 @@ function handleSearchKeydown(event: KeyboardEvent) {
     from {
         transform: rotate(0deg);
     }
+
     to {
         transform: rotate(360deg);
     }
@@ -666,8 +658,8 @@ function handleSearchKeydown(event: KeyboardEvent) {
     color: var(--text-color);
     font-weight: 600;
     border-radius: 8px;
-    padding: 0.5rem 1rem;
-    font-size: 0.875rem;
+    /* padding: 0.5rem 1rem; */
+    /* font-size: 0.875rem; */
     transition: all 0.2s;
     cursor: pointer;
     border: none;
