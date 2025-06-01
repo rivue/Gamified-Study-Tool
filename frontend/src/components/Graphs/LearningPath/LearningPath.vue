@@ -23,16 +23,16 @@
         </div>
 
         <div class="fixed top-20 left-6 flex gap-6 z-10">
-            <button @click="goToHome" 
+            <button @click="goToCourseList"
                 class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg px-6 py-4 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200 font-medium"
                 style="color: var(--highlight-color);">
-                <span class="text-lg">My Courses</span>
+                <ArrowLeftOnRectangleIcon class="w-6 h-6" />
             </button>
-
+            
             <button v-if="!isOwner" @click="handleLeaveCourseClick"
                 class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg p-4 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200"
                 style="color: var(--highlight-color);">
-                <ArrowLeftOnRectangleIcon class="w-6 h-6" />
+                <span class="text-lg">Leave Course</span>
             </button>
         </div>
 
@@ -493,7 +493,7 @@ function goToLeaderboard() {
     router.push(`/lessons/${props.libraryId}/leaderboard`)
 }
 
-function goToHome() {
+function goToCourseList() {
     router.push("/courses");
 }
 
