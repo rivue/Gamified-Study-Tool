@@ -333,7 +333,7 @@ function goToPage(page: number) {
     font-size: 2.5rem;
     font-weight: 800;
     margin-bottom: 0.5rem;
-    background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
+    background-color: var(--text-color);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;

@@ -44,6 +44,7 @@ import axios from 'axios';
         // Main routes
         { path: '/', component: defineAsyncComponent(() => import('./components/HomePage.vue')), meta: { title: 'Rivue.ai' } },
         { path: '/explore', component: defineAsyncComponent(() => import('./components/Main/Explore.vue')), meta: { title: 'Rivue.ai' } },
+        { path: '/experiments', component: defineAsyncComponent(() => import('./components/Graphs/LearningPath/Experiments.vue')), meta: { title: 'Rivue.ai' } },
         {
             name: 'GamePage',
             path: '/lessons/:id/:roomName',
@@ -117,6 +118,7 @@ import axios from 'axios';
         // { path: '/lessons', redirect: '/' },
         { path: '/lessons/:pathMatch(.*)*', redirect: '/' },
         { path: '/explore/:pathMatch(.*)*', redirect: '/explore' },
+        { path: '/experiments/:pathMatch(.*)*', redirect: '/experiments' },
         { path: '/courses/:pathMatch(.*)*', redirect: '/courses' },
         { path: '/create/:pathMatch(.*)*', redirect: '/create' },
         // { path: '/progress/:pathMatch(.*)*', redirect: '/progress' },

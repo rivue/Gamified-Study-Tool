@@ -3,8 +3,14 @@
     <div class="fixed left-8 right-8 top-0 bottom-0 overflow-hidden">
         <div class="fixed top-20 right-6 flex gap-6 z-10">
 
+            <button @click="goToExperiments"
+                class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg p-4 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200"
+                style="color: var(--highlight-color);">
+                <LightBulbIcon class="w-6 h-6" />
+            </button>
+
             <button v-if="isOwner" @click="toggleEditMode"
-                class="menu-button bg-background-color-1t backdrop-blur-sm shadow-lg rounded-lg p-4 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200"
+                class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg p-4 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200"
                 style="color: var(--highlight-color);">
                 <PencilIcon class="w-6 h-6" />
             </button>
@@ -274,10 +280,10 @@
                 </div>
             </div>
 
-            <div class="flex justify-between mt-4 px-8 pb-32">
+            <div class="flex justify-between items-center mt-4 px-8 pb-32 relative">
 
                 <!-- left side -->
-                <div class="flex gap-2 pointer-events-auto">
+                <div class="flex gap-2 pointer-events-auto h-16">
                     <button v-if="scrollPosition > 300" @click="scrollToStart(); $nextTick(handleScroll)"
                         class="p-4 rounded-full bg-black/30 backdrop-blur-sm hover:bg-black/40 shadow-md flex items-center gap-2"
                         style="color: var(--highlight-color);">
@@ -291,8 +297,17 @@
                     </button>
                 </div>
 
+                <!-- middle (save for later) -->
+                <!-- <div class="absolute inset-0 flex justify-center items-center pointer-events-auto mb-32 h-16">
+                    <button @click="scrollToStart(); $nextTick(handleScroll)"
+                        class="menu-button p-4 rounded-full bg-black/30 backdrop-blur-sm hover:bg-black/40 shadow-md flex items-center gap-2"
+                        style="color: var(--highlight-color);">
+                        <ChevronDoubleLeftIcon class="w-6 h-6" />
+                    </button>
+                </div> -->
+
                 <!-- right side -->
-                <div class="flex gap-2 pointer-events-auto">
+                <div class="flex gap-2 pointer-events-auto h-16">
                     <button v-if="scrollPosition < (maxLeft - 300)" @click="scroll('right'); $nextTick(handleScroll)"
                         class="p-4 rounded-full bg-black/30 backdrop-blur-sm hover:bg-black/40 shadow-md"
                         style="color: var(--highlight-color);">
@@ -339,7 +354,8 @@ import {
     PencilIcon,
     PlusIcon,
     HomeIcon,
-    ArrowLeftOnRectangleIcon
+    ArrowLeftOnRectangleIcon,
+    LightBulbIcon
 } from '@heroicons/vue/24/solid';
 import { useGameStore } from '@/store/gameStore'
 import { useRouter } from 'vue-router';
@@ -491,6 +507,10 @@ function toggleEditMode() {
 
 function goToLeaderboard() {
     router.push(`/lessons/${props.libraryId}/leaderboard`)
+}
+
+function goToExperiments() {
+    router.push(`/experiments`)
 }
 
 function goToCourseList() {
