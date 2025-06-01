@@ -1,5 +1,5 @@
 <template>
-    <div class="library-list">
+    <div class="library-list mt-8 m-auto">
         <div class="header-container">
             <div class="header-content">
                 <h1 class="title">Courses</h1>
@@ -301,7 +301,7 @@ function goToPage(page: number) {
 <style scoped>
 .library-list {
     max-width: 1200px;
-    margin: 0 auto;
+    /* margin: 0 auto; */
     padding: 2rem;
     color: var(--text-color);
     background: var(--background-color);
@@ -343,7 +343,7 @@ function goToPage(page: number) {
 .subtitle {
     font-size: 1rem;
     color: var(--text-color-secondary);
-    max-width: 500px;
+    text-align: center; /*  the text */
 }
 
 .join-course-container {

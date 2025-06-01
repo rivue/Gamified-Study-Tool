@@ -370,7 +370,7 @@ function handleSearchKeydown(event: KeyboardEvent) {
 .subtitle {
     font-size: 1rem;
     color: var(--text-color-secondary);
-    max-width: 500px;
+    text-align: center; /*  the text */
 }
 
 .join-course-container {
