@@ -3,7 +3,7 @@ from pinecone.grpc import PineconeGRPC
 import os
 
 # Initialize global clients
-client = OpenAI(api_key=os.getenv("PINECONE_API_KEY"))
+client = OpenAI()
 if os.getenv('FLASK_ENV') != "migration":
     pc = PineconeGRPC()
     if os.getenv("FLASK_ENV") == "production":
