@@ -150,7 +150,7 @@ async function handleLeaveCourse() {
             toast.success(`Successfully left "${props.libraryTopic}".`, { id: toastId });
             emit('course-left');
             closeModal();
-            router.push('/create'); 
+            router.push('/courses'); 
         } else {
             const errorMessage = response.data?.message || 'An unexpected error occurred.';
             apiError.value = errorMessage;

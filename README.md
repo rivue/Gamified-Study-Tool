@@ -247,6 +247,7 @@ TODO list:
             - make contact page not require login to send feedback
             - go through all models and make sure cascade / ondelete=cascade are in sync w/ each other (ideally use ondelete cascade)
             - if courses are empty, add a "create" button which links to create page
+            - add a "leave" course button in Explore Courses screen after the user clicks "join course"
 
         hard probably (goal: 2 high level bullet points / wk):
         - ⭐️ remove alert message in library creator (not hard but have to remember)

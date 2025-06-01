@@ -36,41 +36,6 @@
             </button>
         </div>
 
-
-            <!-- <button v-if="isOwner" @click="toggleEditMode"
-                class="bg-black/50 backdrop-blur-sm shadow-lg rounded-full p-4 hover:bg-black/60 border border-white/20"
-                style="color: var(--highlight-color);">
-                <PencilIcon class="w-12 h-12" />
-            </button>
-
-            <button @click="goToLeaderboard"
-                class="bg-black/50 backdrop-blur-sm shadow-md rounded-full p-4 hover:bg-black/60 border border-white/20"
-                style="color: var(--highlight-color);">
-                <ChartBarIcon class="w-12 h-12" />
-            </button>
-
-            <button v-if="isOwner" @click="toggleSettings"
-                class="bg-black/50 backdrop-blur-sm shadow-md rounded-full p-4 hover:bg-black/60 border border-white/20"
-                style="color: var(--highlight-color);">
-                <CogIcon class="w-12 h-12" />
-            </button>
-        </div>
-
-        <div class="fixed top-20 left-6 flex gap-6 z-10">
-            <button @click="goToHome" 
-                class="bg-black/30 backdrop-blur-sm shadow-md rounded-3xl p-4 hover:bg-black/60 border border-white/20"
-                style="color: var(--highlight-color);">
-                <span class="text-2xl w-12 h-56 p-2">My Courses</span>
-            </button>
-
-            <button v-if="!isOwner" @click="handleLeaveCourseClick"
-                class="bg-black/50 backdrop-blur-sm shadow-md rounded-full p-4 hover:bg-black/60 border border-white/20"
-                style="color: var(--highlight-color);">
-                <ArrowLeftOnRectangleIcon class="w-12 h-12" />
-            </button>
-
-        </div> -->
-
         <div class="relative flex flex-col w-full h-full">
 
             <div ref="scrollContainer"
