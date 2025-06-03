@@ -34,7 +34,10 @@
             <div class="courses-grid">
                 <div v-for="library in displayedLibraries" :key="library.id" class="course-card">
                     <div class="card-content">
-                        <h3 class="course-title">{{ library.library_topic }}</h3>
+                        <h3 class="course-title">
+                            {{ library.library_topic }}
+                            <Lock v-if="!library.is_public" class="lock-icon" />
+                        </h3>
 
                         <div class="card-stats">
                             <div class="stat">
@@ -47,10 +50,10 @@
                     <div class="card-footer">
                         <div class="creator">
                             <UserCircle class="creator-icon" />
-                            <span>{{ library.owner_username === null ? "Creator not found" : library.owner_username
-                                }}</span>
+                            <span>{{ library.owner_username === null ? "Creator not found" :
+                                library.owner_username.length > 12 && !library.is_public ?
+                                    library.owner_username.slice(0, 9) + "..." : library.owner_username }}</span>
                         </div>
-
 
                         <Input v-if="!library.is_public" v-model="joinCode" placeholder="Enter private library code"
                             @keydown.enter="joinSpecificCourse(library.id)" class="join-input m-2 h-10 p-4" />
@@ -71,6 +74,7 @@
                         </div>
                     </Transition>
                 </div>
+
             </div>
 
             <!-- Loading indicator for infinite scroll -->
@@ -101,7 +105,7 @@ import { ref, watch, onMounted, onUnmounted } from "vue";
 import { useRouter } from "vue-router";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { LoaderCircle, Search, Heart, UserCircle, BookOpen } from "lucide-vue-next";
+import { LoaderCircle, Search, Heart, UserCircle, BookOpen, Lock } from "lucide-vue-next";
 import axios from "axios";
 
 // Props
@@ -370,7 +374,8 @@ function handleSearchKeydown(event: KeyboardEvent) {
 .subtitle {
     font-size: 1rem;
     color: var(--text-color-secondary);
-    text-align: center; /*  the text */
+    text-align: center;
+    /*  the text */
 }
 
 .join-course-container {
@@ -516,6 +521,17 @@ function handleSearchKeydown(event: KeyboardEvent) {
     -webkit-box-orient: vertical;
     overflow: hidden;
     flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.lock-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+    color: var(--color-primary-light);
+    flex-shrink: 0;
+    opacity: 0.8;
 }
 
 .card-stats {
