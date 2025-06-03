@@ -332,3 +332,7 @@ a:hover {
     @apply bg-background text-foreground;
   }
 }
+
+[data-state="open"][data-side] {
+    z-index: 9999 !important;
+  }
