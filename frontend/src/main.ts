@@ -44,7 +44,6 @@ import axios from 'axios';
         // Main routes
         { path: '/', component: defineAsyncComponent(() => import('./components/HomePage.vue')), meta: { title: 'Rivue.ai' } },
         { path: '/explore', component: defineAsyncComponent(() => import('./components/Main/Explore.vue')), meta: { title: 'Rivue.ai' } },
-        { path: '/experiments', component: defineAsyncComponent(() => import('./components/Graphs/LearningPath/Experiments.vue')), meta: { title: 'Rivue.ai' } },
         {
             name: 'GamePage',
             path: '/lessons/:id/:roomName',
@@ -58,7 +57,7 @@ import axios from 'axios';
                         const roomNames = roomList.map((room: any[]) => room[0]); // Extract just the room names
                         const decodedRoomName = decodeURIComponent(to.params.roomName as string);
                         roomNames.includes(decodedRoomName) ? next() : next(`/lessons/${to.params.id}`);
-
+                        
                     } else {
                         next('/create');
                     }
@@ -67,6 +66,38 @@ import axios from 'axios';
                     next('/create');
                 }
             }
+        },
+        { 
+            path: '/lessons/:id/experiments', 
+            component: defineAsyncComponent(() => import('./components/Graphs/Experiments/Experiments.vue')), 
+            meta: { title: 'Rivue.ai'},
+            // beforeEnter: async (to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext) => {
+            //     try {
+            //         const response = await axios.get(`/api/library/${to.params.id}`);
+            //         if (response.data?.status === "success") {
+            //             next();
+            //         } else {
+            //             // next('/create');
+            //         }
+            //     } catch (error) {
+            //         console.error("Failed to validate library/room:", error);
+            //         // next('/create');
+            //     }
+            // },
+        },
+        {
+            path: '/lessons/:id/braindump',
+            component: defineAsyncComponent(() => import('./components/Graphs/Experiments/BrainDump.vue')),
+            meta: { title: 'Rivue.ai', hideHeaderFooter: true  },
+            // beforeEnter: async (to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext) => {
+            //     try {
+            //         const response = await axios.get(`/api/library/${to.params.id}`);
+            //         response.data?.status === "success" ? next() : next('/create');
+            //     } catch (error) {
+            //         console.error("Failed to validate experiment details:", error);
+            //         next('/create');
+            //     }
+            // }
         },
         { 
             path: '/lessons/:id',
@@ -116,9 +147,8 @@ import axios from 'axios';
 
         // Redirects
         // { path: '/lessons', redirect: '/' },
-        { path: '/lessons/:pathMatch(.*)*', redirect: '/' },
+        // { path: '/lessons/:pathMatch(.*)*', redirect: '/' },
         { path: '/explore/:pathMatch(.*)*', redirect: '/explore' },
-        { path: '/experiments/:pathMatch(.*)*', redirect: '/experiments' },
         { path: '/courses/:pathMatch(.*)*', redirect: '/courses' },
         { path: '/create/:pathMatch(.*)*', redirect: '/create' },
         // { path: '/progress/:pathMatch(.*)*', redirect: '/progress' },
@@ -131,7 +161,7 @@ import axios from 'axios';
         // { path: '/admin/:pathMatch(.*)*', redirect: '/admin' },
         
         // Catch-all route - must be last!
-        // { path: '/:pathMatch(.*)*', component: defineAsyncComponent(() => import('./components/Backstage/404.vue')), meta: { title: 'Rivue.ai' } },
+        { path: '/:pathMatch(.*)*', component: defineAsyncComponent(() => import('./components/Backstage/404.vue')), meta: { title: 'Rivue.ai' } },
 
     ];
 

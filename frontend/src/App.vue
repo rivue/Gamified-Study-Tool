@@ -4,7 +4,6 @@
     <div class="app-container" :class="themeClass">
         <div v-if="!hideHeaderFooter">
         <TopBar />
-        <SubHeader v-if="loggedIn && shouldShowChat && subheaderExists" :key="forceUpdateKey" />
         <SideMenu />
         <MentorSelection />
     </div>
@@ -26,7 +25,6 @@ import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import TopBar from "./components/Header/TopBar.vue";
 import SideMenu from "./components/Header/SideMenu.vue";
-import SubHeader from "./components/Header/SubHeader.vue";
 import InfoPopup from "./components/Menus/InfoPopup.vue";
 import AdPopup from "./components/Monetization/AdPopup.vue";
 import MentorSelection from "./components/Backstage/MentorSelection.vue";
@@ -45,13 +43,11 @@ import 'vue-sonner/style.css' // vue-sonner v2 requires this import
 const router = useRouter();
 const route = useRoute();
 const lastVisible = ref(new Date());
-const loadingStore = useLoadingStore();
 
 // Computed properties
 const hideHeaderFooter = computed(() => route.meta.hideHeaderFooter);
 
 const messageStore = useMessageStore();
-const forceUpdateKey = computed(() => messageStore.progress);
 
 const themeStore = useThemeStore();
 const themeClass = computed(() => themeStore.darkMode ? "light-theme" : "");
@@ -72,17 +68,12 @@ const shouldShowChat = computed(() => {
 
 const shouldShowRouterView = computed(() => route.path !== "/");
 
-const subheaderExists = computed(() => !(messageStore.subheading === ""));
 
 // Methods
 const onScroll = (event: Event) => {
     const scrollStore = useScrollStore();
     const target = event.target as Element;
     scrollStore.scrollTop = target.scrollTop;
-};
-
-const refreshApp = () => {
-    window.location.reload();
 };
 
 const handleVisibilityChange = () => {
@@ -135,7 +126,7 @@ watch(loggedIn, (newValue) => {
 watch(() => route.path, () => {
     // console.log(route.path);
     if (shouldShowChat.value) {
-        messageStore.fetchRecentMessages(route.path);
+        // messageStore.fetchRecentMessages(route.path);
     } else {
         window.scrollTo(0, 0);
     }

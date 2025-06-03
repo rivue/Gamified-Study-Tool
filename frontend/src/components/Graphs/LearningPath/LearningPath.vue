@@ -353,7 +353,6 @@ import {
     ChartBarIcon,
     PencilIcon,
     PlusIcon,
-    HomeIcon,
     ArrowLeftOnRectangleIcon,
     LightBulbIcon
 } from '@heroicons/vue/24/solid';
@@ -510,7 +509,8 @@ function goToLeaderboard() {
 }
 
 function goToExperiments() {
-    router.push(`/experiments`)
+    router.push(`/lessons/${props.libraryId}/experiments`)
+
 }
 
 function goToCourseList() {
