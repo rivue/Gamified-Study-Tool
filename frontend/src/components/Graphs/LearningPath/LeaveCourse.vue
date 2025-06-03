@@ -6,7 +6,7 @@
                 <div class="rounded-2xl p-6 w-full max-w-md shadow-xl border pointer-events-auto"
                     style="background-color: var(--background-color); color: var(--light-text); border-color: var(--color-primary-dark);">
                     <div class="flex justify-between items-center mb-4">
-                        <h2 class="text-xl font-semibold">Leave Course</h2>
+                        <h2 class="text-xl font-semibold">Remove Course</h2>
                         <button @click="closeModal" style="color: var(--highlight-color);"
                             :disabled="isLeaving"
                             :class="{ 'opacity-50 cursor-not-allowed': isLeaving }">
@@ -15,7 +15,7 @@
                     </div>
                     <div class="space-y-4">
                         <p>
-                            Are you sure you want to leave the course
+                            Are you sure you want to remove the course
                             <strong style="color: var(--highlight-color);">"{{ libraryTopic }}"</strong>?
                             This action cannot be undone.
                         </p>
