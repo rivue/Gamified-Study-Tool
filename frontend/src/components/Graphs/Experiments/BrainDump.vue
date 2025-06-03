@@ -5,7 +5,7 @@
         <button @click="back"
             class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg p-4 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200"
             style="color: var(--highlight-color);">
-            <ArrowLeftOnRectangleIcon class="w-6 h-6" />
+            <ArrowLeftIcon class="w-6 h-6" />
         </button>
     </div>
         <!-- Timer -->
@@ -83,7 +83,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, computed } from 'vue'
-import { ArrowLeftOnRectangleIcon } from '@heroicons/vue/24/solid';
+import { ArrowLeftIcon } from '@heroicons/vue/24/solid';
 import { useRoute, useRouter } from 'vue-router'
 
 interface UserNode {

@@ -7,7 +7,7 @@
                 <button @click="back"
                     class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg p-4 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200"
                     style="color: var(--highlight-color);">
-                    <ArrowLeftOnRectangleIcon class="w-6 h-6" />
+                    <ArrowLeftIcon class="w-6 h-6" />
                 </button>
             </div>
         </div>
@@ -22,13 +22,13 @@
                 <div class="card-icon">
                     <i :class="experiment.icon"></i>
                 </div>
-                <h3 style="color: var(--text-color);">{{ experiment.title }}</h3>
-                <p>{{ experiment.description }}</p>
-                <div class="card-footer">
+                <h3 style="color: var(--text-color);">{{ experiment.route === "undefined" ? "Coming Soon!" : experiment.title }}</h3>
+                <p>{{ experiment.route === "undefined" ? "" : experiment.description }}</p>
+                <div v-if="experiment.route && experiment.route != 'undefined'" class="card-footer">
                     <span class="difficulty" :class="experiment.difficulty">
-                        {{ experiment.difficulty }}
+                        {{ experiment.route === "undefined" ? "" : experiment.difficulty }}
                     </span>
-                    <span class="duration">{{ experiment.duration }}</span>
+                    <span class="duration">{{ experiment.route === "undefined" ? "" : experiment.duration }}</span>
                 </div>
             </div>
         </div>
@@ -40,7 +40,7 @@
 
 import { ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { ArrowLeftOnRectangleIcon } from '@heroicons/vue/24/outline';
+import { ArrowLeftIcon } from '@heroicons/vue/24/outline';
 
 interface Experiment {
     id: number;
@@ -62,7 +62,7 @@ const experiments: Experiment[] = [
         description: 'Recall everything you remember about a topic',
         icon: 'fas fa-layer-group',
         difficulty: 'easy',
-        duration: '5-15 min',
+        duration: '3 min',
         route: 'braindump'
     },
     {
@@ -72,7 +72,7 @@ const experiments: Experiment[] = [
         icon: 'fas fa-layer-group',
         difficulty: 'easy',
         duration: '5-15 min',
-        route: 'asdf',
+        route: 'undefined',
     },
     {
         id: 3,
@@ -81,7 +81,7 @@ const experiments: Experiment[] = [
         icon: 'fas fa-clock',
         difficulty: 'medium',
         duration: '10-30 min',
-        route: 'asdf',
+        route: 'undefined',
     },
     {
         id: 4,
@@ -90,7 +90,7 @@ const experiments: Experiment[] = [
         icon: 'fas fa-gamepad',
         difficulty: 'easy',
         duration: '15-45 min',
-        route: 'asdf',
+        route: 'undefined',
     },
     {
         id: 5,
@@ -99,7 +99,7 @@ const experiments: Experiment[] = [
         icon: 'fas fa-file-alt',
         difficulty: 'hard',
         duration: '30-120 min',
-        route: 'asdf',
+        route: 'undefined',
     },
     {
         id: 6,
@@ -108,7 +108,7 @@ const experiments: Experiment[] = [
         icon: 'fas fa-brain',
         difficulty: 'medium',
         duration: '10-20 min',
-        route: 'asdf',
+        route: 'undefined',
     },
     {
         id: 7,
@@ -117,7 +117,7 @@ const experiments: Experiment[] = [
         icon: 'fas fa-building',
         difficulty: 'hard',
         duration: '20-60 min',
-        route: 'asdf',
+        route: 'undefined',
     }
 ];
 
@@ -158,6 +158,20 @@ function navigateToExperiment(route: string) {
     gap: 2rem;
     max-width: 1200px;
     margin: 0 auto;
+    grid-auto-rows: 1fr; /* Ensures all cards have the same height */
+}
+
+.experiment-card {
+    background-color: var(--background-color-1t);
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 1px solid var(--color-primary-dark);
+    display: flex; /* Ensures content stretches */
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 .experiment-card {
