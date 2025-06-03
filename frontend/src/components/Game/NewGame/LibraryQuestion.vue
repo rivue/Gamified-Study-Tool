@@ -2,7 +2,9 @@
     <transition name="fade">
         <div v-if="questionVisible" class="question-overlay">
             <div class="question-backdrop">
-                <div class="close-button" @click="leavePopup">x</div>
+
+                <LeaveGameWarning />
+
                 <div class="info-icon" @click="flipQuestion">i</div>
                 <!-- Completion message when no more questions -->
                 <div v-if="question === null" class="completion-message">
@@ -29,7 +31,6 @@
                             wrong: choice === answerState.wrong,
                             disabledButton: isDisabled
                         }" :disabled="isDisabled" @click.stop="submitAnswer(choice)" v-html="choice"></button>
-                    <LeaveGameWarning />
                     </div>
                 </div>
             </div>
@@ -48,7 +49,6 @@ import stringSimilarity from "string-similarity";
 const router = useRouter();
 const route = useRoute();
 const store = useGameStore();
-const showLeaveWarning = ref(false);
 
 const answerState = ref<{ correct: string | null; wrong: string | null }>({
     correct: null,
@@ -57,11 +57,6 @@ const answerState = ref<{ correct: string | null; wrong: string | null }>({
 const isDisabled = ref(false);
 const isShaking = ref(false);
 const userAnswer = ref("");
-
-function leavePopup() {
-    if (isDisabled.value) return;
-    showLeaveWarning.value = true;
-}
 
 function shuffleArray<T>(array: T[]): void {
     for (let i = array.length - 1; i > 0; i--) {
@@ -222,27 +217,6 @@ const questionVisible = computed(() => store.questionVisible);
     /* Added rounded corners */
 }
 
-/* New close button styles */
-.close-button {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    width: 30px;
-    height: 30px;
-    background: rgba(255, 0, 0, 0.8);
-    color: white;
-    border-radius: 50%;
-    text-align: center;
-    line-height: 28px;
-    font-size: 24px;
-    cursor: pointer;
-    transition: background-color 0.2s;
-}
-
-.close-button:hover {
-    background: rgba(255, 0, 0, 1);
-}
-
 /* Moved info icon to top right */
 .info-icon {
     position: absolute;
@@ -274,9 +248,7 @@ const questionVisible = computed(() => store.questionVisible);
             var(--background-color-2t),
             var(--background-color-1t));
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    z-index: 111;
     font-size: 1.4em;
-    /* Increased font size */
     margin: 20px 0;
 }
 

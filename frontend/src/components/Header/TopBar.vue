@@ -113,7 +113,7 @@ export default {
     text-align: center;
     font-weight: 700;
     cursor: pointer;
-    color: var(--highlight-color);
+    color: var(--text-color);
 }
 
 .menu-buttons {
