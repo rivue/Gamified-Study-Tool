@@ -5,7 +5,6 @@
                 <!-- Header -->
                 <div class="header-section">
                     <h1 class="main-title">Create Your Course</h1>
-                    <p class="main-subtitle">Build an engaging learning experience from your materials</p>
                 </div>
 
                 <!-- Stepper Navigation -->
@@ -38,7 +37,6 @@
                                         class="error-indicator">
                                         Has errors
                                     </span>
-                                    <span v-else>{{ step.description }}</span>
                                 </div>
                             </div>
 
@@ -58,7 +56,7 @@
                     </div>
                     <div class="error-list">
                         <div v-if="hasStepErrors('basics')" class="error-item" @click="currentTab = 'basics'">
-                            <span class="error-step">Course Basics:</span>
+                            <span class="error-step">Course Information:</span>
                             <span class="error-details">{{ getStepErrorSummary('basics') }}</span>
                         </div>
                         <div v-if="hasStepErrors('structure')" class="error-item" @click="currentTab = 'structure'">
@@ -74,14 +72,12 @@
                     <!-- Loading State with Lottie Animation -->
                     <div v-if="buttonDisabled.isSubmitting" class="loading-overlay">
                         <div class="loading-content">
-                            <DotLottieVue 
-                                autoplay 
-                                loop 
-                                src="https://lottie.host/b96a9b39-d99b-4f64-a92d-8b39aefc27ca/73Yl9OD4Tc.lottie" 
-                            />
+                            <DotLottieVue autoplay loop
+                                src="https://lottie.host/b96a9b39-d99b-4f64-a92d-8b39aefc27ca/73Yl9OD4Tc.lottie" />
                             <h2 class="loading-title">Creating Your Course</h2>
-                            <p class="loading-subtitle">This may take a few moments while we process your materials...</p>
-                            
+                            <p class="loading-subtitle">This may take a few moments while we process your materials...
+                            </p>
+
                             <!-- Rotating Educational Messages -->
                             <div class="loading-messages">
                                 <Transition name="fade" mode="out-in">
@@ -137,7 +133,7 @@
                                                 <div class="file-details">
                                                     <span class="file-name">{{ selectedFile.name }}</span>
                                                     <span class="file-size">{{ formatFileSize(selectedFile.size)
-                                                    }}</span>
+                                                        }}</span>
                                                 </div>
                                             </div>
                                             <button class="remove-file" @click="removeFile" type="button">✕</button>
@@ -286,12 +282,12 @@
                 </div>
 
                 <!-- Navigation -->
-                <div  v-if="!buttonDisabled.isSubmitting" class="navigation-section">
+                <div v-if="!buttonDisabled.isSubmitting" class="navigation-section">
                     <button v-if="currentTab !== 'basics'" class="nav-button secondary" @click="goToPreviousStep"
                         type="button">
                         ← Previous
                     </button>
-                    <div class="nav-spacer"></div>
+                    <div v-if="currentTab === 'basics'" class="nav-spacer-visible"></div>
                     <button v-if="currentTab !== 'settings'" class="nav-button primary" @click="goToNextStep"
                         type="button">
                         Next →
@@ -390,11 +386,20 @@ const router = useRouter();
 const authStore = useAuthStore();
 const popupStore = usePopupStore();
 
-const groups = ref<Group[]>([]);
+const groups = ref<Group[]>(
+    [{
+        name: "",
+        sections: [],
+        newSectionName: "",
+        sectionError: false,
+        isEditing: false,
+        editingName: ''
+    }]
+);
 const topic = ref("");
 const libraryDifficulty = ref("Normal");
 const buttonDisabled = ref({
-    noRooms: true,
+    noRooms: false,
     isSubmitting: false,
 });
 const selectedFile = ref<File | null>(null);
@@ -431,9 +436,9 @@ const loadingMessages = ref([
 
 // Updated steps with descriptions
 const steps = computed(() => [
-    { value: 'basics', label: 'Course Basics', description: 'Name and materials' },
-    { value: 'structure', label: 'Course Structure', description: 'Topics and subtopics' },
-    { value: 'settings', label: 'Settings', description: 'Fine tune your experience' }
+    { value: 'basics', label: 'Course Basics' },
+    { value: 'structure', label: 'Course Structure' },
+    { value: 'settings', label: 'Settings' }
 ]);
 
 const disableExtras = computed(() => {
@@ -663,7 +668,7 @@ function validateForm(data: unknown) {
 
 // Keep existing handleSubmit function...
 async function handleSubmit() {
-    
+
     const payload = {
         topic: topic.value,
         visibility: isPublic.value,
@@ -673,14 +678,14 @@ async function handleSubmit() {
             sections: g.sections.filter(s => s.trim() !== "")
         })).filter(g => g.name.trim() !== "")
     }
-    
+
     if (!validateForm(payload)) {
         return
     }
 
     buttonDisabled.value.isSubmitting = true;
     startMessageRotation(); // Start rotating messages
-    
+
     const formData = new FormData();
 
     if (selectedFile.value) {
@@ -750,7 +755,6 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-
 /* Header */
 .header-section {
     text-align: center;
@@ -768,12 +772,6 @@ onUnmounted(() => {
     line-height: 1.2;
 }
 
-.main-subtitle {
-    font-size: 1.1rem;
-    color: var(--text-color-secondary);
-    margin: 0;
-}
-
 /* Stepper Navigation */
 .stepper-nav {
     margin-bottom: 3rem;
@@ -784,7 +782,8 @@ onUnmounted(() => {
     align-items: flex-start;
     justify-content: space-between;
     position: relative;
-    max-width: 600px;
+    width: 600px;
+    /* Changed from max-width to fixed width */
     margin: 0 auto;
 }
 
@@ -793,7 +792,8 @@ onUnmounted(() => {
     flex-direction: column;
     align-items: center;
     position: relative;
-    flex: 1;
+    width: 200px;
+    /* Fixed width for each step item */
 }
 
 .step-circle {
@@ -891,19 +891,32 @@ onUnmounted(() => {
 
 /* Keep all existing form styles */
 .step-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
     margin-bottom: 2rem;
 }
 
+
 .section-card {
+    flex: 1;
     background: rgba(26, 139, 127, 0.05);
     border-radius: 16px;
     padding: 2rem;
     border: 1px solid rgba(26, 139, 127, 0.1);
+    display: flex;
+    flex-direction: column;
+    min-height: 500px;
+    justify-content: space-between;
+    width: 100%;
+    /* Ensure full width */
 }
 
+
 .card-header {
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
     text-align: center;
+    flex-shrink: 0;
 }
 
 .section-title {
@@ -920,13 +933,16 @@ onUnmounted(() => {
 
 /* Form Elements */
 .form-group {
-    margin-bottom: 1.5rem;
+    margin-bottom: 2rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
 }
 
 .form-label {
     display: block;
     font-weight: 600;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.75rem;
     color: var(--text-color);
 }
 
@@ -973,6 +989,11 @@ onUnmounted(() => {
     transition: all 0.2s;
     position: relative;
     background: rgba(26, 139, 127, 0.05);
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 150px;
 }
 
 .file-upload-area:hover {
@@ -1075,6 +1096,7 @@ onUnmounted(() => {
     border-radius: 12px;
     padding: 1.5rem;
     margin-bottom: 2rem;
+    flex-shrink: 0;
 }
 
 .example-header {
@@ -1098,6 +1120,7 @@ onUnmounted(() => {
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
+    flex: 1;
 }
 
 .topic-card {
@@ -1105,6 +1128,7 @@ onUnmounted(() => {
     border: 1px solid rgba(26, 139, 127, 0.2);
     border-radius: 12px;
     padding: 1.5rem;
+    flex: 1;
 }
 
 .topic-header {
@@ -1149,11 +1173,18 @@ onUnmounted(() => {
     background: rgba(255, 0, 0, 0.1);
 }
 
+.subtopics-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
 .subtopics-list {
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
     margin-bottom: 1rem;
+    flex: 1;
 }
 
 .subtopic-item {
@@ -1200,6 +1231,7 @@ onUnmounted(() => {
     color: var(--color-primary);
     cursor: pointer;
     transition: all 0.2s;
+    margin-top: auto;
 }
 
 .add-subtopic-btn:hover:not(:disabled) {
@@ -1222,6 +1254,7 @@ onUnmounted(() => {
     cursor: pointer;
     font-size: 1.1rem;
     transition: all 0.2s;
+    margin-top: auto;
 }
 
 .add-topic-btn:hover:not(:disabled) {
@@ -1236,10 +1269,12 @@ onUnmounted(() => {
 }
 
 .structure-hints {
-    margin-top: 1.5rem;
+    margin-top: auto;
+    padding-top: 1.5rem;
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+    flex-shrink: 0;
 }
 
 .hint {
@@ -1251,6 +1286,9 @@ onUnmounted(() => {
 /* Visibility Settings */
 .visibility-section {
     margin-bottom: 2rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
 }
 
 .visibility-toggle {
@@ -1258,6 +1296,7 @@ onUnmounted(() => {
     grid-template-columns: 1fr 1fr;
     gap: 1rem;
     margin-top: 0.75rem;
+    flex: 1;
 }
 
 .visibility-option {
@@ -1303,8 +1342,10 @@ onUnmounted(() => {
 
 /* Create Button */
 .create-section {
-    margin-top: 2rem;
+    margin-top: auto;
+    padding-top: 2rem;
     text-align: center;
+    flex-shrink: 0;
 }
 
 .create-button {
@@ -1352,10 +1393,11 @@ onUnmounted(() => {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 2rem;
+    padding-top: 2rem;
+    margin-top: auto;
 }
 
-.nav-spacer {
+.nav-spacer-visible {
     flex: 1;
 }
 
@@ -1403,12 +1445,16 @@ onUnmounted(() => {
 /* Responsive Design */
 @media (max-width: 768px) {
     .stepper-container {
+        width: 100%;
+        /* Full width on mobile */
         flex-direction: column;
         gap: 2rem;
         align-items: stretch;
     }
 
     .stepper-item {
+        width: 100%;
+        /* Full width on mobile */
         flex-direction: row;
         align-items: center;
         gap: 1rem;
@@ -1445,6 +1491,19 @@ onUnmounted(() => {
 
     .remove-topic-btn {
         align-self: flex-end;
+    }
+
+    .navigation-section {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .nav-button {
+        width: 100%;
+    }
+
+    .nav-spacer-visible {
+        display: none;
     }
 }
 
@@ -1572,4 +1631,17 @@ onUnmounted(() => {
     opacity: 0;
 }
 
+/* Equal height for all step content */
+
+/* Also ensure the form content has consistent width */
+.form-content {
+    min-height: 600px;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 800px;
+    /* Add max-width for consistency */
+    margin: 0 auto;
+    /* Center the content */
+}
 </style>
