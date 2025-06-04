@@ -333,9 +333,10 @@ TODO list:
             - or make it adopt to a curve like exponential games or like xp in skyblock something more broken like --> (1, 3, 6, 8, 18, 36, 42, 69, 120, 210, etc...)
                 - but offer rewards at even perks (5, 10, 15, 25, 50) to make it even more enticing?
             - could be for a smaller one: https://lottiefiles.com/free-animation/fire-flame-4De5RVVPag
-            - slightly bigger one: https://lottiefiles.com/free-animation/fire-IuJfcIXKF1
+            - slightly bigger one: https://lottiefiles.com/free-animation/fire-sIuJfcIXKF1
             - maybe for 50 or 100, this whisks accross the little hover menu?: https://lottiefiles.com/free-animation/dancing-fire-CtzldMIEf9
             - maybe for smaller one like 5-10: https://lottiefiles.com/free-animation/fire-TLLDXwQuCQ
+            - maybe do this but only include a little flash for the flame, and not the loading animation
             - do this a little later
         - small idea for later (maybe): when you mouse over the unit name in learning path, it hovers a little bit, highlights white or --text-color, and displays above any names it is over
         - massive reorg / cleaning - get rid of unused functions / db models, commands / db calls / api calls / frontend components and rearrange existing ones using files structures / Blueprints that make sense

@@ -5,9 +5,10 @@
             <div class="fixed top-20 left-12 flex gap-6 z-10">
 
                 <button @click="back"
-                    class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg p-4 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200"
+                    class="menu-button justify-content flex flex-center bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg p-4 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200"
                     style="color: var(--highlight-color);">
-                    <ArrowLeftIcon class="w-6 h-6" />
+                    <ArrowLeftIcon class="w-6 h-6 pr-2" />
+                    Back to Learning Path
                 </button>
             </div>
         </div>

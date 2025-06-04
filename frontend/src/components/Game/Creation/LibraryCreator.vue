@@ -19,8 +19,10 @@
                                 'pending': getStepIndex(currentTab) < index,
                                 'error': hasStepErrors(step.value) && getStepIndex(currentTab) > index
                             }]">
-                                <span v-if="hasStepErrors(step.value) && getStepIndex(currentTab) > index" class="error-icon">!</span>
-                                <span v-else-if="getStepIndex(currentTab) > index && !hasStepErrors(step.value)" class="check-icon">✓</span>
+                                <span v-if="hasStepErrors(step.value) && getStepIndex(currentTab) > index"
+                                    class="error-icon">!</span>
+                                <span v-else-if="getStepIndex(currentTab) > index && !hasStepErrors(step.value)"
+                                    class="check-icon">✓</span>
                                 <span v-else class="step-number">{{ index + 1 }}</span>
                             </div>
 
@@ -32,7 +34,8 @@
                             }]">
                                 <div class="step-title">{{ step.label }}</div>
                                 <div class="step-description">
-                                    <span v-if="hasStepErrors(step.value) && getStepIndex(currentTab) > index" class="error-indicator">
+                                    <span v-if="hasStepErrors(step.value) && getStepIndex(currentTab) > index"
+                                        class="error-indicator">
                                         Has errors
                                     </span>
                                     <span v-else>{{ step.description }}</span>
@@ -65,197 +68,225 @@
                     </div>
                 </div>
 
+
                 <!-- Form Content -->
                 <div class="form-content" @keydown.enter="handleSubmit">
-                    <!-- Step 1: Course Basics -->
-                    <div v-if="currentTab === 'basics'" class="step-content">
-                        <!-- Keep existing basics content -->
-                        <div class="section-card">
-                            <div class="card-header">
-                                <h2 class="section-title">Course Information</h2>
-                                <p class="section-description">Give your course a name and upload your source material
-                                </p>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="form-label">Course Name</label>
-                                <input type="text" v-model="topic" ref="topicInput"
-                                    :class="['form-input', { 'error': formattedErrors.topic?._errors?.length }]"
-                                    placeholder="e.g., Introduction to Biology, Advanced Calculus..." maxlength="100"
-                                    @focus="selectInputText" @paste="handlePaste" />
-                                <div class="input-hint">Must be 4-25 characters long</div>
-                                <div v-if="formattedErrors.topic?._errors?.length" class="error-text">
-                                    {{ formattedErrors.topic._errors[0] }}
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="form-label">Course Material</label>
-                                <div class="file-upload-area" :class="{ 'has-file': selectedFile }">
-                                    <input type="file" id="fileInput" ref="fileInput" @change="handleFileUpload"
-                                        :class="{ 'error': formattedErrors.selectedFile?._errors?.length }"
-                                        accept=".pdf" class="file-input" />
-                                    <div v-if="!selectedFile" class="upload-placeholder">
-                                        <div class="upload-icon">📄</div>
-                                        <div class="upload-text">
-                                            <span class="upload-main">Click to upload PDF</span>
-                                            <span class="upload-sub">Maximum size: 500KB</span>
-                                        </div>
+                    <!-- Loading State with Lottie Animation -->
+                    <div v-if="buttonDisabled.isSubmitting" class="loading-overlay">
+                        <div class="loading-content">
+                            <DotLottieVue 
+                                autoplay 
+                                loop 
+                                src="https://lottie.host/b96a9b39-d99b-4f64-a92d-8b39aefc27ca/73Yl9OD4Tc.lottie" 
+                            />
+                            <h2 class="loading-title">Creating Your Course</h2>
+                            <p class="loading-subtitle">This may take a few moments while we process your materials...</p>
+                            
+                            <!-- Rotating Educational Messages -->
+                            <div class="loading-messages">
+                                <Transition name="fade" mode="out-in">
+                                    <div :key="currentMessageIndex" class="loading-message">
+                                        {{ loadingMessages[currentMessageIndex] }}
                                     </div>
-                                    <div v-else class="selected-file-display">
-                                        <div class="file-info">
-                                            <div class="file-icon">📄</div>
-                                            <div class="file-details">
-                                                <span class="file-name">{{ selectedFile.name }}</span>
-                                                <span class="file-size">{{ formatFileSize(selectedFile.size) }}</span>
-                                            </div>
-                                        </div>
-                                        <button class="remove-file" @click="removeFile" type="button">✕</button>
-                                    </div>
-                                </div>
-                                <div v-if="formattedErrors.selectedFile?._errors?.length" class="error-text">
-                                    {{ formattedErrors.selectedFile._errors[0] }}
-                                </div>
-                                <div class="input-hint">This file will be used to generate content for your course
-                                    topics</div>
+                                </Transition>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Step 2: Course Structure -->
-                    <div v-if="currentTab === 'structure'" class="step-content">
-                        <div class="section-card">
-                            <div class="card-header">
-                                <h2 class="section-title">Course Structure</h2>
-                                <p class="section-description">Organize your course into topics and subtopics</p>
-                            </div>
+                    <!-- Rest of the template remains the same -->
+                    <template v-else>
+                        <!-- ... existing template content ... -->
+                        <div v-if="currentTab === 'basics'" class="step-content">
+                            <!-- Keep existing basics content -->
+                            <div class="section-card">
+                                <div class="card-header">
+                                    <h2 class="section-title">Course Information</h2>
+                                    <p class="section-description">Give your course a name and upload your source
+                                        material
+                                    </p>
+                                </div>
 
-                            <!-- Example Structure -->
-                            <div class="example-card">
-                                <div class="example-header">Example Structure</div>
-                                <div class="example-content">
-                                    <div class="example-topic">
-                                        <strong>Topic:</strong> "Cell Biology"
-                                        <div class="example-subtopics">
-                                            <strong>Subtopics:</strong> "Cell Membrane", "Mitochondria", "Nucleus"
+                                <div class="form-group">
+                                    <label class="form-label">Course Name</label>
+                                    <input type="text" v-model="topic" ref="topicInput"
+                                        :class="['form-input', { 'error': formattedErrors.topic?._errors?.length }]"
+                                        placeholder="e.g., Introduction to Biology, Advanced Calculus..."
+                                        maxlength="100" @focus="selectInputText" @paste="handlePaste" />
+                                    <div class="input-hint">Must be 4-25 characters long</div>
+                                    <div v-if="formattedErrors.topic?._errors?.length" class="error-text">
+                                        {{ formattedErrors.topic._errors[0] }}
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Course Material</label>
+                                    <div class="file-upload-area" :class="{ 'has-file': selectedFile }">
+                                        <input type="file" id="fileInput" ref="fileInput" @change="handleFileUpload"
+                                            :class="{ 'error': formattedErrors.selectedFile?._errors?.length }"
+                                            accept=".pdf" class="file-input" />
+                                        <div v-if="!selectedFile" class="upload-placeholder">
+                                            <div class="upload-icon">📄</div>
+                                            <div class="upload-text">
+                                                <span class="upload-main">Click to upload PDF</span>
+                                                <span class="upload-sub">Maximum size: 500KB</span>
+                                            </div>
+                                        </div>
+                                        <div v-else class="selected-file-display">
+                                            <div class="file-info">
+                                                <div class="file-icon">📄</div>
+                                                <div class="file-details">
+                                                    <span class="file-name">{{ selectedFile.name }}</span>
+                                                    <span class="file-size">{{ formatFileSize(selectedFile.size)
+                                                    }}</span>
+                                                </div>
+                                            </div>
+                                            <button class="remove-file" @click="removeFile" type="button">✕</button>
+                                        </div>
+                                    </div>
+                                    <div v-if="formattedErrors.selectedFile?._errors?.length" class="error-text">
+                                        {{ formattedErrors.selectedFile._errors[0] }}
+                                    </div>
+                                    <div class="input-hint">This file will be used to generate content for your course
+                                        topics</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Step 2: Course Structure -->
+                        <div v-if="currentTab === 'structure'" class="step-content">
+                            <div class="section-card">
+                                <div class="card-header">
+                                    <h2 class="section-title">Course Structure</h2>
+                                    <p class="section-description">Organize your course into topics and subtopics</p>
+                                </div>
+
+                                <!-- Example Structure -->
+                                <div class="example-card">
+                                    <div class="example-header">Example Structure</div>
+                                    <div class="example-content">
+                                        <div class="example-topic">
+                                            <strong>Topic:</strong> "Cell Biology"
+                                            <div class="example-subtopics">
+                                                <strong>Subtopics:</strong> "Cell Membrane", "Mitochondria", "Nucleus"
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <!-- Topics List -->
-                            <div class="topics-list">
-                                <div v-for="(group, groupIndex) in groups" :key="groupIndex" class="topic-card">
-                                    <div class="topic-header">
-                                        <input type="text" v-model="group.name" placeholder="Enter topic name..."
-                                            maxlength="40"
-                                            :class="['topic-input', { 'error': formattedErrors.groups?.[groupIndex]?.name?._errors?.length }]" />
-                                        <button class="remove-topic-btn" @click="removeGroup(groupIndex)"
-                                            type="button">✕</button>
-                                    </div>
-                                    <div v-if="formattedErrors.groups?.[groupIndex]?.name?._errors?.length"
-                                        class="error-text">
-                                        {{ formattedErrors.groups[groupIndex].name._errors[0] }}
-                                    </div>
-
-                                    <div class="subtopics-section">
-                                        <div v-if="group.sections.length > 0" class="subtopics-list">
-                                            <div v-for="(section, sectionIndex) in group.sections" :key="sectionIndex"
-                                                class="subtopic-item">
-                                                <input type="text" v-model="group.sections[sectionIndex]"
-                                                    placeholder="Enter subtopic name..." maxlength="40"
-                                                    class="subtopic-input" />
-                                                <button class="remove-subtopic-btn"
-                                                    @click="removeSection(groupIndex, sectionIndex)"
-                                                    type="button">✕</button>
-                                            </div>
+                                <!-- Topics List -->
+                                <div class="topics-list">
+                                    <div v-for="(group, groupIndex) in groups" :key="groupIndex" class="topic-card">
+                                        <div class="topic-header">
+                                            <input type="text" v-model="group.name" placeholder="Enter topic name..."
+                                                maxlength="40"
+                                                :class="['topic-input', { 'error': formattedErrors.groups?.[groupIndex]?.name?._errors?.length }]" />
+                                            <button class="remove-topic-btn" @click="removeGroup(groupIndex)"
+                                                type="button">✕</button>
                                         </div>
-
-                                        <button class="add-subtopic-btn" @click="addSection(groupIndex)"
-                                            :disabled="group.sections.length >= 15 || disableExtras" type="button">
-                                            + Add Subtopic
-                                        </button>
-
-                                        <div v-if="formattedErrors.groups?.[groupIndex]?.sections?._errors?.length"
+                                        <div v-if="formattedErrors.groups?.[groupIndex]?.name?._errors?.length"
                                             class="error-text">
-                                            {{ formattedErrors.groups[groupIndex].sections._errors[0] }}
+                                            {{ formattedErrors.groups[groupIndex].name._errors[0] }}
                                         </div>
+
+                                        <div class="subtopics-section">
+                                            <div v-if="group.sections.length > 0" class="subtopics-list">
+                                                <div v-for="(section, sectionIndex) in group.sections"
+                                                    :key="sectionIndex" class="subtopic-item">
+                                                    <input type="text" v-model="group.sections[sectionIndex]"
+                                                        placeholder="Enter subtopic name..." maxlength="40"
+                                                        class="subtopic-input" />
+                                                    <button class="remove-subtopic-btn"
+                                                        @click="removeSection(groupIndex, sectionIndex)"
+                                                        type="button">✕</button>
+                                                </div>
+                                            </div>
+
+                                            <button class="add-subtopic-btn" @click="addSection(groupIndex)"
+                                                :disabled="group.sections.length >= 15 || disableExtras" type="button">
+                                                + Add Subtopic
+                                            </button>
+
+                                            <div v-if="formattedErrors.groups?.[groupIndex]?.sections?._errors?.length"
+                                                class="error-text">
+                                                {{ formattedErrors.groups[groupIndex].sections._errors[0] }}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Add Topic Button -->
+                                    <button class="add-topic-btn" @click="addGroup"
+                                        :disabled="groups.length >= 10 || disableExtras" type="button">
+                                        + Add Topic
+                                    </button>
+                                </div>
+
+                                <div v-if="formattedErrors.groups?._errors?.length" class="error-text">
+                                    {{ formattedErrors.groups._errors[0] }}
+                                </div>
+
+                                <div class="structure-hints">
+                                    <div class="hint">📝 You can create up to 10 topics with 15 subtopics each</div>
+                                    <div class="hint">✨ Don't worry about adding everything now - you can expand later!
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Step 3: Settings -->
+                        <div v-if="currentTab === 'settings'" class="step-content">
+                            <div class="section-card">
+                                <div class="card-header">
+                                    <h2 class="section-title">Course Settings</h2>
+                                    <p class="section-description">Configure how others can access your course</p>
+                                </div>
+
+                                <div class="visibility-section">
+                                    <label class="form-label">Course Visibility</label>
+                                    <div class="visibility-toggle">
+                                        <button type="button"
+                                            :class="['visibility-option', { 'active': visibilityTab === 'public' }]"
+                                            @click="visibilityTab = 'public'">
+                                            <Globe class="option-icon" />
+                                            <div class="option-content">
+                                                <div class="option-title">Public</div>
+                                                <div class="option-desc">Anyone can join</div>
+                                            </div>
+                                        </button>
+                                        <button type="button"
+                                            :class="['visibility-option', { 'active': visibilityTab === 'private' }]"
+                                            @click="visibilityTab = 'private'">
+                                            <Lock class="option-icon" />
+                                            <div class="option-content">
+                                                <div class="option-title">Private</div>
+                                                <div class="option-desc">Requires join code to join</div>
+                                            </div>
+                                        </button>
                                     </div>
                                 </div>
 
-                                <!-- Add Topic Button -->
-                                <button class="add-topic-btn" @click="addGroup"
-                                    :disabled="groups.length >= 10 || disableExtras" type="button">
-                                    + Add Topic
-                                </button>
-                            </div>
-
-                            <div v-if="formattedErrors.groups?._errors?.length" class="error-text">
-                                {{ formattedErrors.groups._errors[0] }}
-                            </div>
-
-                            <div class="structure-hints">
-                                <div class="hint">📝 You can create up to 10 topics with 15 subtopics each</div>
-                                <div class="hint">✨ Don't worry about adding everything now - you can expand later!
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Step 3: Settings -->
-                    <div v-if="currentTab === 'settings'" class="step-content">
-                        <div class="section-card">
-                            <div class="card-header">
-                                <h2 class="section-title">Course Settings</h2>
-                                <p class="section-description">Configure how others can access your course</p>
-                            </div>
-
-                            <div class="visibility-section">
-                                <label class="form-label">Course Visibility</label>
-                                <div class="visibility-toggle">
-                                    <button type="button"
-                                        :class="['visibility-option', { 'active': visibilityTab === 'public' }]"
-                                        @click="visibilityTab = 'public'">
-                                        <div class="option-icon">🌍</div>
-                                        <div class="option-content">
-                                            <div class="option-title">Public</div>
-                                            <div class="option-desc">Visible in course library</div>
-                                        </div>
-                                    </button>
-                                    <button type="button"
-                                        :class="['visibility-option', { 'active': visibilityTab === 'private' }]"
-                                        @click="visibilityTab = 'private'">
-                                        <div class="option-icon">🔒</div>
-                                        <div class="option-content">
-                                            <div class="option-title">Private</div>
-                                            <div class="option-desc">Requires join code</div>
-                                        </div>
+                                <!-- Create Button -->
+                                <div class="create-section">
+                                    <button type="button" class="create-button" @click="handleSubmit"
+                                        :disabled="buttonDisabled.isSubmitting || buttonDisabled.noRooms">
+                                        <span v-if="buttonDisabled.isSubmitting" class="button-loading">
+                                            <div class="spinner"></div>
+                                            Creating Course...
+                                        </span>
+                                        <span v-else-if="buttonDisabled.noRooms">
+                                            Add Topics to Continue
+                                        </span>
+                                        <span v-else>
+                                            Create Course
+                                        </span>
                                     </button>
                                 </div>
                             </div>
-
-                            <!-- Create Button -->
-                            <div class="create-section">
-                                <button type="button" class="create-button" @click="handleSubmit"
-                                    :disabled="buttonDisabled.isSubmitting || buttonDisabled.noRooms">
-                                    <span v-if="buttonDisabled.isSubmitting" class="button-loading">
-                                        <div class="spinner"></div>
-                                        Creating Course...
-                                    </span>
-                                    <span v-else-if="buttonDisabled.noRooms">
-                                        Add Topics to Continue
-                                    </span>
-                                    <span v-else>
-                                        Create Course
-                                    </span>
-                                </button>
-                            </div>
                         </div>
-                    </div>
+                    </template>
                 </div>
 
                 <!-- Navigation -->
-                <div class="navigation-section">
+                <div  v-if="!buttonDisabled.isSubmitting" class="navigation-section">
                     <button v-if="currentTab !== 'basics'" class="nav-button secondary" @click="goToPreviousStep"
                         type="button">
                         ← Previous
@@ -274,10 +305,12 @@
 <script setup lang="ts">
 // Keep all existing imports and logic...
 import { ref, computed, onMounted, onUnmounted } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { useRouter } from 'vue-router';
 import axios from "axios";
 import { z } from "zod";
 
+import { Lock, Globe } from "lucide-vue-next";
+import { DotLottieVue } from '@lottiefiles/dotlottie-vue'
 import { usePopupStore } from "@/store/popupStore";
 import { useAuthStore } from "@/store/authStore";
 
@@ -290,13 +323,6 @@ interface Group {
     isEditing?: boolean;
     editingName?: string;
 }
-
-// Keep existing schemas...
-const sectionSchema = z.string()
-    .min(4, "Subtopic names must be at least 4 characters")
-    .max(25, "Subtopic names must be at most 25 characters")
-    .refine(val => !val.startsWith(" ") && !val.endsWith(" "),
-        "Subtopic names must not start or end with a space");
 
 const groupSchema = z.object({
     name: z.string()
@@ -360,7 +386,6 @@ const formSchema = z.object({
 });
 
 // Keep all existing state...
-const route = useRoute();
 const router = useRouter();
 const authStore = useAuthStore();
 const popupStore = usePopupStore();
@@ -379,7 +404,30 @@ const visibilityTab = ref<'public' | 'private'>('public');
 const isPublic = computed<boolean>(() => visibilityTab.value === 'public');
 const formattedErrors = ref<ReturnType<z.ZodError["format"]>>({} as any)
 const currentTab = ref<'basics' | 'structure' | 'settings'>('basics');
-const validationAttempted = ref(false); // Add this flag
+const validationAttempted = ref(false);
+
+// Loading messages state
+const currentMessageIndex = ref(0);
+let messageInterval: NodeJS.Timeout | null = null;
+
+// Educational loading messages
+const loadingMessages = ref([
+    "Setting up the classroom...",
+    "Sharpening the pencils...",
+    "Moving desks so you don't talk to your friends...",
+    "Grading yesterday's homework...",
+    "Creating lesson plans...",
+    "Preparing pop quizzes (there's one tomorrow!)...",
+    "Dusting off encyclopedias...",
+    "Calling substitute teachers...",
+    "Checking attendance...",
+    "Organizing study groups...",
+    "Writing on the chalkboard...",
+    "Updating the syllabus...",
+    "Brewing teacher's coffee...",
+    "Organizing field trips...",
+    "Ringing the school bell..."
+]);
 
 // Updated steps with descriptions
 const steps = computed(() => [
@@ -408,6 +456,20 @@ const goToPreviousStep = () => {
     const currentIndex = getStepIndex(currentTab.value);
     if (currentIndex > 0) {
         currentTab.value = steps.value[currentIndex - 1].value as 'basics' | 'structure' | 'settings';
+    }
+};
+
+// Message rotation function
+const startMessageRotation = () => {
+    messageInterval = setInterval(() => {
+        currentMessageIndex.value = (currentMessageIndex.value + 1) % loadingMessages.value.length;
+    }, 3000);
+};
+
+const stopMessageRotation = () => {
+    if (messageInterval) {
+        clearInterval(messageInterval);
+        messageInterval = null;
     }
 };
 
@@ -486,91 +548,91 @@ const handleFileUpload = (event: Event) => {
 };
 
 const hasStepErrors = (step: 'basics' | 'structure' | 'settings') => {
-        // Only show errors if validation has been attempted
-        if (!validationAttempted.value) return false;
-        
-        const payload = {
-            topic: topic.value,
-            visibility: isPublic.value,
-            selectedFile: selectedFile.value,
-            groups: groups.value.map(g => ({
-                name: g.name,
-                sections: g.sections.filter(s => s.trim() !== "")
-            })).filter(g => g.name.trim() !== "")
-        }
-    
-        try {
-            formSchema.parse(payload)
-            return false
-        } catch (e) {
-            if (e instanceof z.ZodError) {
-                const errors = e.format()
-                
-                switch (step) {
-                    case 'basics':
-                        return !!(errors.topic?._errors?.length || errors.selectedFile?._errors?.length)
-                    case 'structure':
-                        return !!(errors.groups?._errors?.length || 
-                                 (errors.groups && typeof errors.groups === 'object' && 
-                                  Object.keys(errors.groups).some(key => key !== '_errors')))
-                    case 'settings':
-                        return false
-                    default:
-                        return false
-                }
-            }
-        }
+    // Only show errors if validation has been attempted
+    if (!validationAttempted.value) return false;
+
+    const payload = {
+        topic: topic.value,
+        visibility: isPublic.value,
+        selectedFile: selectedFile.value,
+        groups: groups.value.map(g => ({
+            name: g.name,
+            sections: g.sections.filter(s => s.trim() !== "")
+        })).filter(g => g.name.trim() !== "")
+    }
+
+    try {
+        formSchema.parse(payload)
         return false
-    }
+    } catch (e) {
+        if (e instanceof z.ZodError) {
+            const errors = e.format()
 
-    const hasPreviousStepErrors = computed(() => {
-        // Only show errors if validation has been attempted
-        if (!validationAttempted.value) return false;
-        return hasStepErrors('basics') || hasStepErrors('structure')
-    })
-
-    const getStepErrorSummary = (step: 'basics' | 'structure') => {
-        // Only show errors if validation has been attempted
-        if (!validationAttempted.value) return '';
-        
-        const payload = {
-            topic: topic.value,
-            visibility: isPublic.value,
-            selectedFile: selectedFile.value,
-            groups: groups.value.map(g => ({
-                name: g.name,
-                sections: g.sections.filter(s => s.trim() !== "")
-            })).filter(g => g.name.trim() !== "")
-        }
-    
-        try {
-            formSchema.parse(payload)
-            return ''
-        } catch (e) {
-            if (e instanceof z.ZodError) {
-                const errors = e.format()
-                
-                switch (step) {
-                    case 'basics':
-                        const basicErrors = []
-                        if (errors.topic?._errors?.length) basicErrors.push('Course name')
-                        if (errors.selectedFile?._errors?.length) basicErrors.push('Course material')
-                        return basicErrors.join(', ')
-                    case 'structure':
-                        const structureErrors = []
-                        if (errors.groups?._errors?.length) structureErrors.push('Topics required')
-                        if (errors.groups && typeof errors.groups === 'object') {
-                            const hasGroupErrors = Object.keys(errors.groups).some(key => key !== '_errors')
-                            if (hasGroupErrors) structureErrors.push('Topic/subtopic names')
-                        }
-                        return structureErrors.join(', ')
-                    default:
-                        return ''
-                }
+            switch (step) {
+                case 'basics':
+                    return !!(errors.topic?._errors?.length || errors.selectedFile?._errors?.length)
+                case 'structure':
+                    return !!(errors.groups?._errors?.length ||
+                        (errors.groups && typeof errors.groups === 'object' &&
+                            Object.keys(errors.groups).some(key => key !== '_errors')))
+                case 'settings':
+                    return false
+                default:
+                    return false
             }
         }
-        return ''
     }
+    return false
+}
+
+const hasPreviousStepErrors = computed(() => {
+    // Only show errors if validation has been attempted
+    if (!validationAttempted.value) return false;
+    return hasStepErrors('basics') || hasStepErrors('structure')
+})
+
+const getStepErrorSummary = (step: 'basics' | 'structure') => {
+    // Only show errors if validation has been attempted
+    if (!validationAttempted.value) return '';
+
+    const payload = {
+        topic: topic.value,
+        visibility: isPublic.value,
+        selectedFile: selectedFile.value,
+        groups: groups.value.map(g => ({
+            name: g.name,
+            sections: g.sections.filter(s => s.trim() !== "")
+        })).filter(g => g.name.trim() !== "")
+    }
+
+    try {
+        formSchema.parse(payload)
+        return ''
+    } catch (e) {
+        if (e instanceof z.ZodError) {
+            const errors = e.format()
+
+            switch (step) {
+                case 'basics':
+                    const basicErrors = []
+                    if (errors.topic?._errors?.length) basicErrors.push('Course name')
+                    if (errors.selectedFile?._errors?.length) basicErrors.push('Course material')
+                    return basicErrors.join(', ')
+                case 'structure':
+                    const structureErrors = []
+                    if (errors.groups?._errors?.length) structureErrors.push('Topics required')
+                    if (errors.groups && typeof errors.groups === 'object') {
+                        const hasGroupErrors = Object.keys(errors.groups).some(key => key !== '_errors')
+                        if (hasGroupErrors) structureErrors.push('Topic/subtopic names')
+                    }
+                    return structureErrors.join(', ')
+                default:
+                    return ''
+            }
+        }
+    }
+    return ''
+}
 
 const removeFile = () => {
     selectedFile.value = null;
@@ -601,8 +663,7 @@ function validateForm(data: unknown) {
 
 // Keep existing handleSubmit function...
 async function handleSubmit() {
-    buttonDisabled.value.isSubmitting = true;
-
+    
     const payload = {
         topic: topic.value,
         visibility: isPublic.value,
@@ -612,12 +673,14 @@ async function handleSubmit() {
             sections: g.sections.filter(s => s.trim() !== "")
         })).filter(g => g.name.trim() !== "")
     }
-
+    
     if (!validateForm(payload)) {
-        buttonDisabled.value.isSubmitting = false;
         return
     }
 
+    buttonDisabled.value.isSubmitting = true;
+    startMessageRotation(); // Start rotating messages
+    
     const formData = new FormData();
 
     if (selectedFile.value) {
@@ -672,12 +735,18 @@ async function handleSubmit() {
         })
         .finally(() => {
             buttonDisabled.value.isSubmitting = false;
+            stopMessageRotation(); // Stop rotating messages
         });
 };
 
 onMounted(() => {
     libraryDifficulty.value = "Normal";
 });
+
+onUnmounted(() => {
+    stopMessageRotation(); // Clean up interval on component unmount
+});
+
 </script>
 
 <style scoped>
@@ -1448,4 +1517,59 @@ onMounted(() => {
 .error-details {
     color: var(--text-color-secondary);
 }
+
+/* Loading overlay */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--background-color);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.loading-content {
+    width: 100%;
+    max-width: 500px;
+    text-align: center;
+    padding: 2rem;
+}
+
+/* Set explicit dimensions for the Lottie animation */
+.loading-content :deep(svg) {
+    width: 100% !important;
+    height: auto !important;
+    max-height: 300px;
+}
+
+/* Loading messages styles */
+.loading-messages {
+    margin-top: 2rem;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.loading-message {
+    font-size: 1.1rem;
+    color: var(--text-color-secondary);
+    font-weight: 500;
+}
+
+/* Fade transition for messages */
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.8s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
+}
+
 </style>
