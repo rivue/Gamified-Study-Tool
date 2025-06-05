@@ -4,7 +4,7 @@
         <div v-if="loggingIn" id="loadingCloud" class="cloud-animation">☁️</div>
         <div v-else class="popup-content">
             <transition name="fade" mode="out-in">
-                <div :key="activeForm" @click="handleSignupSuccess">
+                <div :key="activeForm">
                     <LoginForm v-if="activeForm === 'login'" @loginSuccess="handleLoginSuccess" />
                     <SignupForm v-else-if="activeForm === 'signup'" @signupSuccess="handleSignupSuccess"/>
                     <SendPasswordResetEmail v-else-if="activeForm === 'passwordReset'" @resetSuccess="handleResetSuccess" />
@@ -20,6 +20,7 @@
                         <button class="forgot-password" @click="toggleForms('passwordReset')">
                             Forgot your password? <span class="underline-text">Reset Here</span>
                         </button>
+                        <!-- <button class="toggle-btn" @click="toggleForms('signup')"> -->
                         <button class="toggle-btn" @click="toggleForms('signup')">
                             Don't have an account? <span class="underline-text">Sign up</span>
                         </button>
@@ -82,13 +83,9 @@ const toEmailVerificationScreen = () => {
     router.push("/verify");
 };
 
-const handleSignupSuccess = () => {
-    const popupStore = usePopupStore();
-    // popupStore.showPopup(
-    //     "Registration email sent!\n Please click the link in the email to start your ascent."
-    // );
-    router.push("/verify");
-    showSignupToast();
+const handleSignupSuccess = (userEmail: string) => {
+    router.push({name: 'Verify'});
+    showSignupToast(userEmail);
 };
 
 const handleResetSuccess = () => {

@@ -1,0 +1,26 @@
+
+@keyframes shimmer {
+    0% {
+        background-image: linear-gradient(var(--element-color-1), var(--element-color-1)),
+        conic-gradient(from 0deg, var(--highlight-color), #00ff88, var(--highlight-color), #ff6b35, var(--highlight-color));
+    }
+    100% {
+        background-image: linear-gradient(var(--element-color-1), var(--element-color-1)),
+        conic-gradient(from 360deg, var(--highlight-color), #00ff88, var(--highlight-color), #ff6b35, var(--highlight-color));
+    }
+}
+
+.signup-toast {
+    background: var(--element-color-1) !important;
+    color: var(--light-text) !important;
+    border: 2px solid transparent !important;
+    border-radius: 8px !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+    width: 500px !important;
+    max-width: 90vw !important;
+    background-image: linear-gradient(var(--element-color-1), var(--element-color-1)), 
+                     conic-gradient(from 0deg, var(--highlight-color), #00ff88, var(--highlight-color), #ff6b35, var(--highlight-color)) !important;
+    background-origin: border-box !important;
+    background-clip: padding-box, border-box !important;
+    animation: shimmer 1s linear infinite !important;
+}

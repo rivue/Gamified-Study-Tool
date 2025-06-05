@@ -1,4 +1,6 @@
 import { toast } from 'vue-sonner';
+import './toasts.css';
+
 
 export const showExperimentsToast = () => {
     toast.error('Navigation Error', {
@@ -15,17 +17,11 @@ export const showExperimentsToast = () => {
     });
 };
 
-export const showSignupToast = () => {
+export const showSignupToast = (userEmail: string) => {
     toast.success('Account Created Successfully', {
-        description: 'Please check email for a verification link.',
-        duration: 10000,
-        position: 'bottom-right',
-        style: {
-            background: 'var(--element-color-1)',
-            color: 'var(--light-text)',
-            border: '1px solid var(--highlight-color)',
-            borderRadius: '8px',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
-        },
+        description: `We just sent an email to ${userEmail}. Please check your inbox and click the link.`,
+        duration: Infinity,
+        position: 'top-center',
+        class: 'signup-toast',
     });
 };

@@ -105,9 +105,10 @@ import { ref } from 'vue';
 import axios from 'axios';
 import { usePopupStore } from "@/store/popupStore";
 import { EyeIcon, EyeSlashIcon } from '@heroicons/vue/24/solid';
+import { maskEmailSecure } from "@/utils/general";
 
 const emit = defineEmits<{
-  (e: 'signupSuccess'): void
+  (e: 'signupSuccess', email: string): void;
 }>();
 
 const email = ref("");
@@ -149,7 +150,8 @@ const handleSubmit = () => {
   axios.post("/api/signup", formData)
     .then((response) => {
       if (response.status === 200) {
-        emit("signupSuccess");
+        const maskedUserEmail = maskEmailSecure(email.value);
+        emit("signupSuccess", maskedUserEmail);
         buttonText.value = "Sign up";
       }
     })
