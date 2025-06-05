@@ -34,17 +34,35 @@
 
             <!-- User Nodes -->
             <div v-for="node in userNodes" :key="node.id" class="user-node"
-                :class="{ 'dragging': draggedNodeId === node.id }" :style="{ left: node.x + 'px', top: node.y + 'px' }"
+                :class="{ 'dragging': draggedNodeId === node.id }" 
+                :style="{ left: node.x + 'px', top: node.y + 'px' }"
                 @mousedown="startDrag($event, node.id)">
                 <div class="node-header drag-handle">
                     <input v-model="node.title" placeholder="Concept title..." class="node-title-input"
                         @input="updateNode(node.id, 'title', $event.target.value)" @mousedown.stop />
+                    <button @click="addChildNode(node.id)" class="add-child-btn" @mousedown.stop title="Add child concept">+</button>
                     <button @click="removeNode(node.id)" class="remove-btn" @mousedown.stop>×</button>
                 </div>
                 <textarea v-model="node.content"
                     placeholder="Recall as much detailed information you know about this concept"
                     class="node-content-textarea" @input="updateNode(node.id, 'content', $event.target.value)"
                     @mousedown.stop></textarea>
+                
+                <!-- Child Nodes -->
+                <div v-if="node.children && node.children.length > 0" class="children-container">
+                    <div v-for="child in node.children" :key="child.id" class="child-node"
+                        @mousedown.stop>
+                        <div class="child-node-header">
+                            <input v-model="child.title" placeholder="Child concept..." class="child-title-input"
+                                @input="updateChildNode(node.id, child.id, 'title', $event.target.value)" />
+                            <button @click="removeChildNode(node.id, child.id)" class="remove-child-btn">×</button>
+                        </div>
+                        <textarea v-model="child.content"
+                            placeholder="Details about this sub-concept..."
+                            class="child-content-textarea" 
+                            @input="updateChildNode(node.id, child.id, 'content', $event.target.value)"></textarea>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -54,7 +72,9 @@
             <h2>Your Brain Dump for: {{ centralConcept }}</h2>
 
             <div class="results-summary">
-                <p><strong>Concepts Added:</strong> {{ userNodes.length }}</p>
+                <p><strong>Concepts Added:</strong> {{ totalConcepts }}</p>
+                <p><strong>Parent Concepts:</strong> {{ userNodes.length }}</p>
+                <p><strong>Child Concepts:</strong> {{ totalChildConcepts }}</p>
                 <p><strong>Total Words:</strong> {{ totalWords }}</p>
             </div>
 
@@ -62,6 +82,14 @@
                 <div v-for="node in userNodes" :key="node.id" class="concept-card">
                     <h3>{{ node.title || 'Untitled Concept' }}</h3>
                     <p>{{ node.content || 'No content added' }}</p>
+                    
+                    <div v-if="node.children && node.children.length > 0" class="child-concepts">
+                        <h4>Sub-concepts:</h4>
+                        <div v-for="child in node.children" :key="child.id" class="child-concept-card">
+                            <h5>{{ child.title || 'Untitled Sub-concept' }}</h5>
+                            <p>{{ child.content || 'No content added' }}</p>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -73,7 +101,6 @@
     </div>
 </template>
 
-
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { ArrowLeftIcon } from '@heroicons/vue/24/solid';
@@ -81,12 +108,19 @@ import { useRoute, useRouter } from 'vue-router'
 import { showExperimentsToast } from '@/utils/toasts';
 import axios from 'axios';
 
+interface ChildNode {
+    id: number
+    title: string
+    content: string
+}
+
 interface UserNode {
     id: number
     title: string
     content: string
     x: number
     y: number
+    children: ChildNode[]
 }
 
 // Game state
@@ -95,6 +129,7 @@ const timeLeft = ref<number>(180) // 3 minutes in seconds
 const gameEnded = ref<boolean>(false)
 const userNodes = ref<UserNode[]>([])
 const nodeIdCounter = ref<number>(1)
+const childIdCounter = ref<number>(1)
 let gameTimer: NodeJS.Timeout | null = null
 const route = useRoute();
 const params = ref(route.params);
@@ -114,34 +149,43 @@ const totalWords = computed(() => {
     return userNodes.value.reduce((total, node) => {
         const titleWords = node.title.trim().split(/\s+/).filter(word => word.length > 0).length
         const contentWords = node.content.trim().split(/\s+/).filter(word => word.length > 0).length
-        return total + titleWords + contentWords
+        
+        const childWords = node.children.reduce((childTotal, child) => {
+            const childTitleWords = child.title.trim().split(/\s+/).filter(word => word.length > 0).length
+            const childContentWords = child.content.trim().split(/\s+/).filter(word => word.length > 0).length
+            return childTotal + childTitleWords + childContentWords
+        }, 0)
+        
+        return total + titleWords + contentWords + childWords
     }, 0)
 })
 
+const totalConcepts = computed(() => {
+    return userNodes.value.length + totalChildConcepts.value
+})
+
+const totalChildConcepts = computed(() => {
+    return userNodes.value.reduce((total, node) => total + node.children.length, 0)
+})
+
 const fetchLibraryInfo = async (): Promise<void> => {
-
     try {
-
         const response = await axios.get(`/api/library/${params.value.id}`, {
             signal: abortController.signal
         });
         if (response.data && response.data.data && response.data.data.library_topic) {
             centralConcept.value = capitalizeWords(response.data.data.library_topic);
-
         } else {
             router.back();
             showExperimentsToast();
         }
-
     } catch (error: any) {
         router.back();
         showExperimentsToast();
     } 
-
 };
 
 const back = () => {
-    // Navigate back to the previous page
     router.push(`/lessons/${params.value.id}/experiments`)
 }
 
@@ -178,11 +222,48 @@ const addNode = (): void => {
         title: '',
         content: '',
         x: -100 + (10 * userNodes.value.length),
-        y: 70 + (10 * userNodes.value.length)
+        y: 70 + (10 * userNodes.value.length),
+        children: []
     }
 
     userNodes.value.push(newNode)
 }
+
+const addChildNode = (parentId: number): void => {
+    if (gameEnded.value) return
+
+    const parentNode = userNodes.value.find(node => node.id === parentId)
+    if (!parentNode) return
+
+    const newChild: ChildNode = {
+        id: childIdCounter.value++,
+        title: '',
+        content: ''
+    }
+
+    parentNode.children.push(newChild)
+}
+
+const updateChildNode = (parentId: number, childId: number, field: keyof ChildNode, value: string): void => {
+    const parentNode = userNodes.value.find(node => node.id === parentId)
+    if (!parentNode) return
+
+    const childNode = parentNode.children.find(child => child.id === childId)
+    if (childNode && (field === 'title' || field === 'content')) {
+        childNode[field] = value
+    }
+}
+
+const removeChildNode = (parentId: number, childId: number): void => {
+    const parentNode = userNodes.value.find(node => node.id === parentId)
+    if (!parentNode) return
+
+    const childIndex = parentNode.children.findIndex(child => child.id === childId)
+    if (childIndex > -1) {
+        parentNode.children.splice(childIndex, 1)
+    }
+}
+
 
 const removeNode = (nodeId: number): void => {
     const index = userNodes.value.findIndex(node => node.id === nodeId)
@@ -247,7 +328,6 @@ const restartGame = (): void => {
     nodeIdCounter.value = 1
     startTimer()
 }
-
 const shareResults = (): void => {
     const resultsText = `I just completed a Brain Dump on "${centralConcept.value}"! 
 Added ${userNodes.value.length} concepts with ${totalWords.value} total words in 3 minutes! 🧠💪`
@@ -552,5 +632,158 @@ onUnmounted(() => {
     background-color: var(--element-color-1);
     border-color: var(--color-primary);
     color: var(--light-text);
+}
+
+/* Child Node Container */
+.children-container {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 2px solid #e0e0e0;
+}
+
+/* Individual Child Node */
+.child-node {
+    background: rgba(240, 248, 255, 0.8);
+    border: 1px solid #d0d0d0;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 10px;
+    transition: background-color 0.2s ease;
+}
+
+.child-node:hover {
+    background: rgba(230, 240, 255, 0.9);
+}
+
+/* Child Node Header */
+.child-node-header {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+    align-items: center;
+}
+
+/* Child Node Title Input */
+.child-title-input {
+    flex: 1;
+    padding: 6px 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    background: white;
+    color: #333;
+    cursor: text;
+}
+
+.child-title-input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+}
+
+/* Remove Child Button */
+.remove-child-btn {
+    background: #ff6b6b;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease;
+}
+
+.remove-child-btn:hover {
+    background: #ff5252;
+}
+
+/* Child Node Content Textarea */
+.child-content-textarea {
+    width: 100%;
+    min-height: 60px;
+    padding: 6px 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    resize: vertical;
+    font-family: inherit;
+    font-size: 0.85rem;
+    background: white;
+    color: #555;
+    cursor: text;
+}
+
+.child-content-textarea:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+}
+
+/* Add Child Button */
+.add-child-btn {
+    background: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease;
+}
+
+.add-child-btn:hover {
+    background: #45a049;
+}
+
+/* Timer and Add Container */
+.timer-add-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+/* Child Concepts in Results */
+.child-concepts {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #e0e0e0;
+}
+
+.child-concepts h4 {
+    margin: 0 0 10px 0;
+    color: #555;
+    font-size: 1rem;
+}
+
+.child-concept-card {
+    background: #f8f9fa;
+    padding: 12px;
+    border-radius: 6px;
+    margin-bottom: 8px;
+    border-left: 3px solid #667eea;
+}
+
+.child-concept-card h5 {
+    margin: 0 0 6px 0;
+    color: #333;
+    font-size: 0.9rem;
+}
+
+.child-concept-card p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #666;
+    line-height: 1.4;
 }
 </style>
