@@ -9,7 +9,6 @@ export const useUserStatsStore = defineStore('user', {
     }),
     actions: {
         async fetchStreak() {
-            if (this.streakLoaded) return
             try {
                 const { data } = await axios.get('/api/user/streak');
                 if (data) { // Fixed: was using response.data instead of data
@@ -26,6 +25,11 @@ export const useUserStatsStore = defineStore('user', {
             this.currentStreak = null;
             this.bestStreak = null;
             this.streakLoaded = false;
+        },
+        setStreakData(currentStreak, highestStreak) {
+            this.currentStreak = currentStreak;
+            this.bestStreak = highestStreak;
+            this.streakLoaded = true;
         }
     },
 });

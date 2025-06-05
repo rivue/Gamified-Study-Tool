@@ -1,6 +1,7 @@
 // store/authStore.ts
 import { defineStore } from 'pinia';
 import axios from 'axios';
+import { useUserStatsStore } from '@/store/userStatsStore';
 
 // Define an interface for the auth state
 
@@ -9,6 +10,8 @@ export interface UserData {
     username: string | null;
     firstName: string | null;
     lastName: string | null;
+    current_streak?: number;
+    highest_streak?: number;
     // tier: string;
 }
 interface AuthState {
@@ -94,6 +97,12 @@ export const useAuthStore = defineStore('auth', {
         //     this.user.tier = payload.tier;
         //     localStorage.setItem('userTier', payload.tier);
         // }
+
+        // Set streak data
+        if (payload.current_streak !== undefined && payload.highest_streak !== undefined) {
+            const userStats = useUserStatsStore();
+            userStats.setStreakData(payload.current_streak, payload.highest_streak);
+        }
       }
     },
     logout() {

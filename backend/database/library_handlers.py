@@ -1059,7 +1059,7 @@ def update_game_end(user_id, library_id, section_id):
         #     user.experience_points += score
 
         db.session.commit()
-        return jsonify({'status': 'success', 'message': 'Game ended and recorded successfully.'}), 200
+        return jsonify({'status': 'success', 'message': 'Game ended and recorded successfully.', 'current_streak': user.streak_count, 'highest_streak': user.highest_streak}), 200
     except Exception as e:
         db.session.rollback()
         return jsonify({'status': 'error', 'message': str(e)}), 500
