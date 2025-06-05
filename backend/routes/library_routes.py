@@ -631,7 +631,7 @@ def init_library_routes(app):
         except Exception as e:
             return jsonify(status="error", message=f"Failed to update library favorited status: {str(e)}"), 500
         
-    @app.route("/api/library/visibility_status/<int:library_id>", methods=["GET", "POST"])
+    @app.route("/api/library/visibility_status/<int:library_id>", methods=["GET", "PUT"])
     def library_visibility_status(library_id):
         try:
             if request.method == "GET":
@@ -654,7 +654,7 @@ def init_library_routes(app):
                 
                 return jsonify({'is_public': visibility_status}), 200
             
-            elif request.method == "POST":
+            elif request.method == "PUT":
                 
                 data = request.get_json()
                 new_status = data.get('newStatus')

@@ -15,7 +15,7 @@
         </div>
         <header class="portal-header">
             <h1 style="color: var(--text-color);">Experiments</h1>
-            <p>Different methods of studying</p>
+            <p>Prototypes for research backed ways to study more effectively</p>
         </header>
 
         <div class="experiments-grid ">
