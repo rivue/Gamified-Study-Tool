@@ -10,6 +10,7 @@
                     <ArrowLeftIcon class="w-6 h-6 pr-2" />
                     Back to Learning Path
                 </button>
+
             </div>
         </div>
         <header class="portal-header">
@@ -93,33 +94,33 @@ const experiments: Experiment[] = [
         duration: '15-45 min',
         route: 'undefined',
     },
-    {
-        id: 5,
-        title: 'Practice Tests',
-        description: 'Full-length exam simulations',
-        icon: 'fas fa-file-alt',
-        difficulty: 'hard',
-        duration: '30-120 min',
-        route: 'undefined',
-    },
-    {
-        id: 6,
-        title: 'Spaced Repetition',
-        description: 'AI-powered review scheduling',
-        icon: 'fas fa-brain',
-        difficulty: 'medium',
-        duration: '10-20 min',
-        route: 'undefined',
-    },
-    {
-        id: 7,
-        title: 'Memory Palace',
-        description: 'Visual learning and memory techniques',
-        icon: 'fas fa-building',
-        difficulty: 'hard',
-        duration: '20-60 min',
-        route: 'undefined',
-    }
+    // {
+    //     id: 5,
+    //     title: 'Practice Tests',
+    //     description: 'Full-length exam simulations',
+    //     icon: 'fas fa-file-alt',
+    //     difficulty: 'hard',
+    //     duration: '30-120 min',
+    //     route: 'undefined',
+    // },
+    // {
+    //     id: 6,
+    //     title: 'Spaced Repetition',
+    //     description: 'AI-powered review scheduling',
+    //     icon: 'fas fa-brain',
+    //     difficulty: 'medium',
+    //     duration: '10-20 min',
+    //     route: 'undefined',
+    // },
+    // {
+    //     id: 7,
+    //     title: 'Memory Palace',
+    //     description: 'Visual learning and memory techniques',
+    //     icon: 'fas fa-building',
+    //     difficulty: 'hard',
+    //     duration: '20-60 min',
+    //     route: 'undefined',
+    // }
 ];
 
 function back() {

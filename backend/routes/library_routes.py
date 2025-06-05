@@ -6,21 +6,17 @@ from flask_login import current_user, login_required, AnonymousUserMixin
 from bleach import clean
 from flask_executor import Executor
 import concurrent.futures
-from app import InvalidJoinCodeError, UserAlreadyMemberError, UserAlreadyMemberError, InvalidJoinCodeError, MaxUnitsReachedError, NotFoundError
-
-from io import BytesIO
+from app import InvalidJoinCodeError, UserAlreadyMemberError, UserAlreadyMemberError, InvalidJoinCodeError, NotFoundError
 
 from openapi import moderate
 from utils import mask_email, parse_group_structure
 import database.library_handlers as lbh
 import knowledge_net.library_generator as lgn
-from images.library_imager import generate_images_task, save_image
-from database.user_handler import increment_violations, is_within_limit, check_generation_allowed, mark_generation_done
+from images.library_imager import generate_images_task
+from database.user_handler import increment_violations
 from database.models import Library, LibrarySection, LibraryUnit, db
 from vector_processing.file_handler import process_document
 from vector_processing.retrieval import query_and_respond_pinecone
-import app
-from sqlalchemy.exc import IntegrityError
 import time
 
 def init_library_routes(app):
@@ -578,7 +574,6 @@ def init_library_routes(app):
 
         except Exception as e:
             return jsonify(status="error", message=f"Failed to generate content {e}"), 500
-
 
     @app.route("/api/library/end", methods=["POST"])
     def end_game():

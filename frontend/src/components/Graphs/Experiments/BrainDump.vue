@@ -1,18 +1,28 @@
 <template>
     <div class="brain-dump-container">
         <div class="fixed top-20 left-12 flex gap-6 z-10">
-
-        <button @click="back"
-            class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg p-4 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200"
-            style="color: var(--highlight-color);">
-            <ArrowLeftIcon class="w-6 h-6" />
-        </button>
-    </div>
-        <!-- Timer -->
-        <div class="timer-container">
-            <div class="timer" :class="{ 'timer-warning': timeLeft <= 30, 'timer-danger': timeLeft <= 10 }">
-                {{ formatTime(timeLeft) }}
+            <button @click="back"
+                class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg p-4 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200"
+                style="color: var(--highlight-color);">
+                <ArrowLeftIcon class="w-6 h-6" />
+            </button>
+        </div>
+        
+        <!-- Timer and Add Node Button Container -->
+        <div class="timer-add-container">
+            <div class="timer-container">
+                <div class="timer" :class="{ 'timer-warning': timeLeft <= 30, 'timer-danger': timeLeft <= 10 }">
+                    {{ formatTime(timeLeft) }}
+                </div>
             </div>
+            
+            <!-- Add Node Button - updated styling -->
+            <button v-if="!gameEnded" @click="addNode" 
+                class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg p-4 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200"
+                style="color: var(--highlight-color);"
+                :disabled="gameEnded">
+                + Add Concept
+            </button>
         </div>
 
         <!-- Game Area -->
@@ -23,44 +33,26 @@
             </div>
 
             <!-- User Nodes -->
-            <div 
-                v-for="node in userNodes" 
-                :key="node.id" 
-                class="user-node"
-                :class="{ 'dragging': draggedNodeId === node.id }"
-                :style="{ left: node.x + 'px', top: node.y + 'px' }"
-                @mousedown="startDrag($event, node.id)"
-            >
+            <div v-for="node in userNodes" :key="node.id" class="user-node"
+                :class="{ 'dragging': draggedNodeId === node.id }" :style="{ left: node.x + 'px', top: node.y + 'px' }"
+                @mousedown="startDrag($event, node.id)">
                 <div class="node-header drag-handle">
-                    <input 
-                        v-model="node.title" 
-                        placeholder="Concept title..."
-                        class="node-title-input"
-                        @input="updateNode(node.id, 'title', $event.target.value)"
-                        @mousedown.stop
-                    />
+                    <input v-model="node.title" placeholder="Concept title..." class="node-title-input"
+                        @input="updateNode(node.id, 'title', $event.target.value)" @mousedown.stop />
                     <button @click="removeNode(node.id)" class="remove-btn" @mousedown.stop>×</button>
                 </div>
-                <textarea 
-                    v-model="node.content"
-                    placeholder="What do you know about this?"
-                    class="node-content-textarea"
-                    @input="updateNode(node.id, 'content', $event.target.value)"
-                    @mousedown.stop
-                ></textarea>
+                <textarea v-model="node.content"
+                    placeholder="Recall as much detailed information you know about this concept"
+                    class="node-content-textarea" @input="updateNode(node.id, 'content', $event.target.value)"
+                    @mousedown.stop></textarea>
             </div>
-
-            <!-- Add Node Button -->
-            <button @click="addNode" class="add-node-btn" :disabled="gameEnded">
-                + Add Concept
-            </button>
         </div>
 
         <!-- Results Screen -->
         <div v-else class="results-screen">
-            <h1>Time's Up! 🧠</h1>
+            <h1>Time's Up!</h1>
             <h2>Your Brain Dump for: {{ centralConcept }}</h2>
-            
+
             <div class="results-summary">
                 <p><strong>Concepts Added:</strong> {{ userNodes.length }}</p>
                 <p><strong>Total Words:</strong> {{ totalWords }}</p>
@@ -81,10 +73,13 @@
     </div>
 </template>
 
+
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { ArrowLeftIcon } from '@heroicons/vue/24/solid';
 import { useRoute, useRouter } from 'vue-router'
+import { showExperimentsToast } from '@/utils/toasts';
+import axios from 'axios';
 
 interface UserNode {
     id: number
@@ -104,12 +99,17 @@ let gameTimer: NodeJS.Timeout | null = null
 const route = useRoute();
 const params = ref(route.params);
 const router = useRouter();
+const abortController = new AbortController();
 
 // Drag state
 const draggedNodeId = ref<number | null>(null)
 const dragOffset = ref<{ x: number, y: number }>({ x: 0, y: 0 })
 
-// Computed properties
+function capitalizeWords(str: string | null | undefined): string {
+    if (!str) return str || ''; // Handle null or undefined input
+    return str.replace(/(^|\s|[-])\S/g, match => match.toUpperCase()).replace(/-/g, ' ');
+}
+
 const totalWords = computed(() => {
     return userNodes.value.reduce((total, node) => {
         const titleWords = node.title.trim().split(/\s+/).filter(word => word.length > 0).length
@@ -117,6 +117,28 @@ const totalWords = computed(() => {
         return total + titleWords + contentWords
     }, 0)
 })
+
+const fetchLibraryInfo = async (): Promise<void> => {
+
+    try {
+
+        const response = await axios.get(`/api/library/${params.value.id}`, {
+            signal: abortController.signal
+        });
+        if (response.data && response.data.data && response.data.data.library_topic) {
+            centralConcept.value = capitalizeWords(response.data.data.library_topic);
+
+        } else {
+            router.back();
+            showExperimentsToast();
+        }
+
+    } catch (error: any) {
+        router.back();
+        showExperimentsToast();
+    } 
+
+};
 
 const back = () => {
     // Navigate back to the previous page
@@ -155,10 +177,10 @@ const addNode = (): void => {
         id: nodeIdCounter.value++,
         title: '',
         content: '',
-        x: Math.random() * 400 + 200, // Random position around center
-        y: Math.random() * 300 + 200
+        x: -100 + (10 * userNodes.value.length),
+        y: 70 + (10 * userNodes.value.length)
     }
-    
+
     userNodes.value.push(newNode)
 }
 
@@ -179,7 +201,7 @@ const updateNode = (nodeId: number, field: keyof UserNode, value: string): void 
 // Drag functionality
 const startDrag = (event: MouseEvent, nodeId: number): void => {
     if (gameEnded.value) return
-    
+
     const node = userNodes.value.find(n => n.id === nodeId)
     if (!node) return
 
@@ -191,7 +213,7 @@ const startDrag = (event: MouseEvent, nodeId: number): void => {
 
     document.addEventListener('mousemove', onMouseMove)
     document.addEventListener('mouseup', onMouseUp)
-    
+
     // Prevent text selection while dragging
     event.preventDefault()
 }
@@ -213,7 +235,7 @@ const onMouseMove = (event: MouseEvent): void => {
 const onMouseUp = (): void => {
     draggedNodeId.value = null
     dragOffset.value = { x: 0, y: 0 }
-    
+
     document.removeEventListener('mousemove', onMouseMove)
     document.removeEventListener('mouseup', onMouseUp)
 }
@@ -229,7 +251,7 @@ const restartGame = (): void => {
 const shareResults = (): void => {
     const resultsText = `I just completed a Brain Dump on "${centralConcept.value}"! 
 Added ${userNodes.value.length} concepts with ${totalWords.value} total words in 3 minutes! 🧠💪`
-    
+
     if (navigator.share) {
         navigator.share({
             title: 'Brain Dump Results',
@@ -244,9 +266,11 @@ Added ${userNodes.value.length} concepts with ${totalWords.value} total words in
 // Lifecycle
 onMounted(() => {
     startTimer()
+    fetchLibraryInfo();
 })
 
 onUnmounted(() => {
+    abortController.abort()
     if (gameTimer) {
         clearInterval(gameTimer)
     }
@@ -254,6 +278,7 @@ onUnmounted(() => {
     document.removeEventListener('mousemove', onMouseMove)
     document.removeEventListener('mouseup', onMouseUp)
 })
+
 </script>
 
 <style scoped>
@@ -293,9 +318,17 @@ onUnmounted(() => {
 }
 
 @keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-    100% { transform: scale(1); }
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+
+    100% {
+        transform: scale(1);
+    }
 }
 
 .game-area {
@@ -376,7 +409,7 @@ onUnmounted(() => {
 
 .node-content-textarea {
     /* width: 100%; */
-    min-height: 80px;
+    min-height: 90px;
     padding: 8px;
     border: 1px solid black;
     border-radius: 6px;
@@ -472,7 +505,8 @@ onUnmounted(() => {
     justify-content: center;
 }
 
-.restart-btn, .share-btn {
+.restart-btn,
+.share-btn {
     padding: 15px 30px;
     border: none;
     border-radius: 25px;
@@ -491,7 +525,8 @@ onUnmounted(() => {
     color: white;
 }
 
-.restart-btn:hover, .share-btn:hover {
+.restart-btn:hover,
+.share-btn:hover {
     transform: translateY(-2px);
 }
 

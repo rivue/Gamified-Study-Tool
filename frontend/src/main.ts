@@ -9,6 +9,7 @@ import { useLoadingStore } from "@/store/loadingStore";
 import './assets/styles.css';
 import './assets/themes.css';
 import axios from 'axios';
+import { showExperimentsToast } from './utils/toasts';
 
 // basically main home page
 // { path: '/', component: defineAsyncComponent(() => import('./components/Footer/MainPage.vue')), meta: { title: Rivue.ai | Learn Anything!' } },
@@ -40,130 +41,122 @@ import axios from 'axios';
 //     meta: { title: 'Rivue.ai | Page Not Found' } 
 // }
 
-    const routes = [
-        // Main routes
-        { path: '/', component: defineAsyncComponent(() => import('./components/HomePage.vue')), meta: { title: 'Rivue.ai' } },
-        { path: '/explore', component: defineAsyncComponent(() => import('./components/Main/Explore.vue')), meta: { title: 'Rivue.ai' } },
-        {
-            name: 'GamePage',
-            path: '/lessons/:id/:roomName',
-            component: defineAsyncComponent(() => import('./components/Game/NewGame/GamePage.vue')),
-            meta: { title: 'Rivue.ai | Explore Library', hideHeaderFooter: true },
-            beforeEnter: async (to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext) => {
-                try {
-                    const response = await axios.get(`/api/library/${to.params.id}`);
-                    if (response.data?.status === "success") {
-                        const roomList = response.data.data.room_names || [];
-                        const roomNames = roomList.map((room: any[]) => room[0]); // Extract just the room names
-                        const decodedRoomName = decodeURIComponent(to.params.roomName as string);
-                        roomNames.includes(decodedRoomName) ? next() : next(`/lessons/${to.params.id}`);
-                        
-                    } else {
-                        next('/create');
-                    }
-                } catch (error) {
-                    console.error("Failed to validate library/room:", error);
-                    next('/create');
-                }
-            }
-        },
-        { 
-            path: '/lessons/:id/experiments', 
-            component: defineAsyncComponent(() => import('./components/Graphs/Experiments/Experiments.vue')), 
-            meta: { title: 'Rivue.ai'},
-            // beforeEnter: async (to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext) => {
-            //     try {
-            //         const response = await axios.get(`/api/library/${to.params.id}`);
-            //         if (response.data?.status === "success") {
-            //             next();
-            //         } else {
-            //             // next('/create');
-            //         }
-            //     } catch (error) {
-            //         console.error("Failed to validate library/room:", error);
-            //         // next('/create');
-            //     }
-            // },
-        },
-        {
-            path: '/lessons/:id/braindump',
-            component: defineAsyncComponent(() => import('./components/Graphs/Experiments/BrainDump.vue')),
-            meta: { title: 'Rivue.ai', hideHeaderFooter: true  },
-            // beforeEnter: async (to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext) => {
-            //     try {
-            //         const response = await axios.get(`/api/library/${to.params.id}`);
-            //         response.data?.status === "success" ? next() : next('/create');
-            //     } catch (error) {
-            //         console.error("Failed to validate experiment details:", error);
-            //         next('/create');
-            //     }
-            // }
-        },
-        { 
-            path: '/lessons/:id',
-            component: defineAsyncComponent(() => import('./components/Backstage/MapPage.vue')), 
-            meta: { title: 'Rivue.ai | Explore Library', requiresCreator: true },
-            beforeEnter: async (to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext) => {
-                try {
-                    const response = await axios.get(`/api/library/${to.params.id}`);
-                    response.data?.status === "success" ? next() : next('/create');
-                } catch (error) {
-                    console.error("Failed to validate library:", error);
-                    next('/create');
-                }
-            }
-        },
-        { 
-            name: 'Leaderboard',
-            path: '/lessons/:libraryId/leaderboard',
-            component: defineAsyncComponent(() => import('./components/Graphs/LearningPath/Leaderboard.vue')), 
-            meta: { title: 'Rivue.ai | Leaderboard', requiresCreator: true },
-            beforeEnter: async (to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext) => {
-                try {
-                    console.log(to.params.libraryId)
-                    const response = await axios.get(`/api/library/${to.params.libraryId}/scores`);
-                    response.data?.status === "success" ? next() : next('/create');
-                } catch (error) {
-                    console.error("Failed to validate library:", error);
-                    next('/create');
-                }
-            }
-        },
-        
-        // Simple routes
-        { path: '/courses', component: defineAsyncComponent(() => import('./components/Game/Creation/LibraryBrowser.vue')), meta: { title: 'Rivue.ai | My Courses' } },
-        { path: '/create', component: defineAsyncComponent(() => import('./components/Game/Creation/LibraryCreator.vue')), meta: { title: 'Rivue.ai | Create Course' } },
-        // { path: '/progress', component: defineAsyncComponent(() => import('./components/Backstage/ProgressPage.vue')), meta: { title: 'Rivue.ai | Progress' } },
-        { path: '/contact', component: defineAsyncComponent(() => import('./components/Footer/ContactPage.vue')), meta: { title: 'Rivue.ai | Contact Us' } },
-        { path: '/settings', component: defineAsyncComponent(() => import('./components/Backstage/SettingsPage.vue')), meta: { title: 'Rivue.ai | Settings' } },
-        // { path: '/terms', component: defineAsyncComponent(() => import('./components/Footer/TermsAndPoliciesPage.vue')), meta: { title: 'Rivue.ai | Terms and Policies' } },
-        // { path: '/plan', component: defineAsyncComponent(() => import('./components/Monetization/PlanPage.vue')), meta: { title: 'Rivue.ai | Premium Plans' } },
-        { path: '/login', component: defineAsyncComponent(() => import('./components/Auth/LoginSignupPopup.vue')), meta: { title: 'Rivue.ai | Login/Signup' } },
-        // { path: '/admin', component: defineAsyncComponent(() => import('./components/Auth/AdminPage.vue')), meta: { title: 'Rivue.ai | Admin' } },
-        { path: '/verify', component: defineAsyncComponent(() => import('./components/Auth/VerifyEmail.vue')), meta: { title: 'Rivue.ai | Verify Email' }},
-        { path: '/verify/:token', component: defineAsyncComponent(() => import('./components/Auth/VerifyEmail.vue')), meta: { title: 'Rivue.ai | Verify Email' }},
-        { path: '/reset-password/:token', component: defineAsyncComponent(() => import('./components/Auth/PasswordResetForm.vue')), props: true, meta: { title: 'Rivue.ai | Password Reset' }},
-        { path: '/profile', component: defineAsyncComponent(() => import('./components/Graphs/UserStats.vue')), props: true, meta: { title: 'Rivue.ai | My Profile' }},
+const routes = [
+    // Main routes
+    { path: '/', component: defineAsyncComponent(() => import('./components/HomePage.vue')), meta: { title: 'Rivue.ai' } },
+    { path: '/explore', component: defineAsyncComponent(() => import('./components/Main/Explore.vue')), meta: { title: 'Rivue.ai' } },
+    {
+        name: 'GamePage',
+        path: '/lessons/:id/:roomName',
+        component: defineAsyncComponent(() => import('./components/Game/NewGame/GamePage.vue')),
+        meta: { title: 'Rivue.ai | Explore Library', hideHeaderFooter: true },
+        beforeEnter: async (to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext) => {
+            try {
+                const response = await axios.get(`/api/library/${to.params.id}`);
+                if (response.data?.status === "success") {
+                    const roomList = response.data.data.room_names || [];
+                    const roomNames = roomList.map((room: any[]) => room[0]); // Extract just the room names
+                    const decodedRoomName = decodeURIComponent(to.params.roomName as string);
+                    roomNames.includes(decodedRoomName) ? next() : next(`/lessons/${to.params.id}`);
 
-        // Redirects
-        // { path: '/lessons', redirect: '/' },
-        // { path: '/lessons/:pathMatch(.*)*', redirect: '/' },
-        { path: '/explore/:pathMatch(.*)*', redirect: '/explore' },
-        { path: '/courses/:pathMatch(.*)*', redirect: '/courses' },
-        { path: '/create/:pathMatch(.*)*', redirect: '/create' },
-        // { path: '/progress/:pathMatch(.*)*', redirect: '/progress' },
-        { path: '/contact/:pathMatch(.*)*', redirect: '/contact' },
-        { path: '/settings/:pathMatch(.*)*', redirect: '/settings' },
-        // { path: '/terms/:pathMatch(.*)*', redirect: '/terms' },
-        // { path: '/plan/:pathMatch(.*)*', redirect: '/plan' },
-        { path: '/login/:pathMatch(.*)*', redirect: '/login' },
-        { path: '/profile/:pathMatch(.*)*', redirect: '/profile' },
-        // { path: '/admin/:pathMatch(.*)*', redirect: '/admin' },
-        
-        // Catch-all route - must be last!
-        { path: '/:pathMatch(.*)*', component: defineAsyncComponent(() => import('./components/Backstage/404.vue')), meta: { title: 'Rivue.ai' } },
+                } else {
+                    next('/create');
+                }
+            } catch (error) {
+                console.error("Failed to validate library/room:", error);
+                next('/create');
+            }
+        }
+    },
+    {
+        path: '/lessons/:id/experiments',
+        component: defineAsyncComponent(() => import('./components/Graphs/Experiments/Experiments.vue')),
+        meta: { title: 'Rivue.ai' }
+    },
+    {
+        path: '/lessons/:id/braindump',
+        component: defineAsyncComponent(() => import('./components/Graphs/Experiments/BrainDump.vue')),
+        meta: { title: 'Rivue.ai', hideHeaderFooter: true },
+        beforeEnter: async (to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext) => {
+            try {
+                const response = await axios.get(`/api/library/${to.params.id}`);
+                if (response.data?.status === "success") {
+                    next();
+                } else {
+                    showExperimentsToast();
 
-    ];
+                }
+            } catch (error) {
+                showExperimentsToast();
+
+            }
+        },
+    },
+    {
+        path: '/lessons/:id',
+        component: defineAsyncComponent(() => import('./components/Backstage/MapPage.vue')),
+        meta: { title: 'Rivue.ai | Explore Library', requiresCreator: true },
+        beforeEnter: async (to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext) => {
+            try {
+                const response = await axios.get(`/api/library/${to.params.id}`);
+                response.data?.status === "success" ? next() : next('/create');
+            } catch (error) {
+                console.error("Failed to validate library:", error);
+                next('/create');
+            }
+        }
+    },
+    {
+        name: 'Leaderboard',
+        path: '/lessons/:libraryId/leaderboard',
+        component: defineAsyncComponent(() => import('./components/Graphs/LearningPath/Leaderboard.vue')),
+        meta: { title: 'Rivue.ai | Leaderboard', requiresCreator: true },
+        beforeEnter: async (to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext) => {
+            try {
+                console.log(to.params.libraryId)
+                const response = await axios.get(`/api/library/${to.params.libraryId}/scores`);
+                response.data?.status === "success" ? next() : next('/create');
+            } catch (error) {
+                console.error("Failed to validate library:", error);
+                next('/create');
+            }
+        }
+    },
+
+    // Simple routes
+    { path: '/courses', component: defineAsyncComponent(() => import('./components/Game/Creation/LibraryBrowser.vue')), meta: { title: 'Rivue.ai | My Courses' } },
+    { path: '/create', component: defineAsyncComponent(() => import('./components/Game/Creation/LibraryCreator.vue')), meta: { title: 'Rivue.ai | Create Course' } },
+    // { path: '/progress', component: defineAsyncComponent(() => import('./components/Backstage/ProgressPage.vue')), meta: { title: 'Rivue.ai | Progress' } },
+    { path: '/contact', component: defineAsyncComponent(() => import('./components/Footer/ContactPage.vue')), meta: { title: 'Rivue.ai | Contact Us' } },
+    { path: '/settings', component: defineAsyncComponent(() => import('./components/Backstage/SettingsPage.vue')), meta: { title: 'Rivue.ai | Settings' } },
+    // { path: '/terms', component: defineAsyncComponent(() => import('./components/Footer/TermsAndPoliciesPage.vue')), meta: { title: 'Rivue.ai | Terms and Policies' } },
+    // { path: '/plan', component: defineAsyncComponent(() => import('./components/Monetization/PlanPage.vue')), meta: { title: 'Rivue.ai | Premium Plans' } },
+    { path: '/login', component: defineAsyncComponent(() => import('./components/Auth/LoginSignupPopup.vue')), meta: { title: 'Rivue.ai | Login/Signup' } },
+    // { path: '/admin', component: defineAsyncComponent(() => import('./components/Auth/AdminPage.vue')), meta: { title: 'Rivue.ai | Admin' } },
+    { path: '/verify', component: defineAsyncComponent(() => import('./components/Auth/VerifyEmail.vue')), meta: { title: 'Rivue.ai | Verify Email' } },
+    { path: '/verify/:token', component: defineAsyncComponent(() => import('./components/Auth/VerifyEmail.vue')), meta: { title: 'Rivue.ai | Verify Email' } },
+    { path: '/reset-password/:token', component: defineAsyncComponent(() => import('./components/Auth/PasswordResetForm.vue')), props: true, meta: { title: 'Rivue.ai | Password Reset' } },
+    { path: '/profile', component: defineAsyncComponent(() => import('./components/Graphs/UserStats.vue')), props: true, meta: { title: 'Rivue.ai | My Profile' } },
+
+    // Redirects
+    // { path: '/lessons', redirect: '/' },
+    // { path: '/lessons/:pathMatch(.*)*', redirect: '/' },
+    { path: '/explore/:pathMatch(.*)*', redirect: '/explore' },
+    { path: '/courses/:pathMatch(.*)*', redirect: '/courses' },
+    { path: '/create/:pathMatch(.*)*', redirect: '/create' },
+    // { path: '/progress/:pathMatch(.*)*', redirect: '/progress' },
+    { path: '/contact/:pathMatch(.*)*', redirect: '/contact' },
+    { path: '/settings/:pathMatch(.*)*', redirect: '/settings' },
+    // { path: '/terms/:pathMatch(.*)*', redirect: '/terms' },
+    // { path: '/plan/:pathMatch(.*)*', redirect: '/plan' },
+    { path: '/login/:pathMatch(.*)*', redirect: '/login' },
+    { path: '/profile/:pathMatch(.*)*', redirect: '/profile' },
+    // { path: '/admin/:pathMatch(.*)*', redirect: '/admin' },
+
+    // Catch-all route - must be last!
+    { path: '/:pathMatch(.*)*', component: defineAsyncComponent(() => import('./components/Backstage/404.vue')), meta: { title: 'Rivue.ai' } },
+
+];
 
 const router = createRouter({
     history: createWebHistory(),
@@ -185,16 +178,16 @@ router.beforeEach(async (to, from, next) => {
         '/verify', // Explicitly add /verify as a public path
         '/verify/', // Make /verify/ a public path
     ];
-    
+
     // Check if the path is a reset password path
     const isResetPasswordPath = to.path.startsWith('/reset-password/');
-    
+
     // Check if the path is /verify exactly (public) or starts with /verify/ (now also public)
     const isPublicVerifyPath = to.path === '/verify' || to.path.startsWith('/verify/');
-    
-    const requiresAuth = !publicPaths.includes(to.path) && 
-                         !isResetPasswordPath && 
-                         !isPublicVerifyPath;
+
+    const requiresAuth = !publicPaths.includes(to.path) &&
+        !isResetPasswordPath &&
+        !isPublicVerifyPath;
 
     if (to.meta.requiresCreator && to.params.id) {
         // Only proceed with this check if the user is logged in
@@ -209,15 +202,15 @@ router.beforeEach(async (to, from, next) => {
                 }
                 // Check if the user is the creator of the library
                 const response = await axios.get(`/api/library/${to.params.id}`);
-                if (response.data && 
-                    response.data.data && 
+                if (response.data &&
+                    response.data.data &&
                     response.data.data.membership_status) { // membership_status is true / false
-                        return next();
+                    return next();
                 } else {
                     console.log(response.data.data.membership_status)
                     return next('/library');
                 }
-                    
+
             } catch (error) {
                 console.error("Error checking library permissions:", error);
                 return next('/library');
@@ -227,9 +220,9 @@ router.beforeEach(async (to, from, next) => {
             console.debug("Requires creator access, redirecting to login");
             return next(
                 {
-                path: '/login',
-                query: { redirect: to.fullPath },
-            });
+                    path: '/login',
+                    query: { redirect: to.fullPath },
+                });
         }
     }
 

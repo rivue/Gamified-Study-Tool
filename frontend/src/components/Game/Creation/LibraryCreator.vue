@@ -762,6 +762,7 @@ onUnmounted(() => {
 }
 
 .main-title {
+    padding-top: 3rem;
     font-size: 2.5rem;
     font-weight: 800;
     margin-bottom: 0.75rem;

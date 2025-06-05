@@ -48,7 +48,6 @@ const route = useRoute();
 const libraryId = route.params.id as string;
 const library = ref<Library | null>(null);
 const loading = ref(true);
-const orderedMap = ref([]);
 const abortController = new AbortController();
 
 
