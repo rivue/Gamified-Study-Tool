@@ -22,10 +22,33 @@
             </div>
         </div>
 
-        <div class="search-container">
-            <Search class="search-icon" />
-            <Input class="search-input" type="text" v-model="searchQuery" @input="filterLibraries"
-                @keydown="handleSearchKeydown" placeholder="Search courses you've joined..." />
+        <div class="filters-container">
+            <div class="search-container">
+                <Search class="search-icon" />
+                <Input class="search-input" type="text" v-model="searchQuery" @input="filterLibraries"
+                    @keydown="handleSearchKeydown" placeholder="Search courses you've joined..." />
+            </div>
+            
+            <div class="filter-buttons">
+                <button 
+                    @click="setOwnerFilter('all')" 
+                    :class="['filter-btn', { 'active': ownerFilter === 'all' }]"
+                >
+                    All Courses
+                </button>
+                <button 
+                    @click="setOwnerFilter('owned')" 
+                    :class="['filter-btn', { 'active': ownerFilter === 'owned' }]"
+                >
+                    My Courses
+                </button>
+                <button 
+                    @click="setOwnerFilter('joined')" 
+                    :class="['filter-btn', { 'active': ownerFilter === 'joined' }]"
+                >
+                    Joined Courses
+                </button>
+            </div>
         </div>
 
         <!-- Conditional rendering based on library count -->
@@ -118,6 +141,7 @@ const joinMessage = ref("");
 const joinMessageType = ref("");
 const joinLoading = ref(false);
 const authStore = useAuthStore();
+const ownerFilter = ref<'all' | 'owned' | 'joined'>('all');
 
 // so parent can refresh list
 const emit = defineEmits(['libraryJoined']);
@@ -125,6 +149,12 @@ const emit = defineEmits(['libraryJoined']);
 // Filtering function
 function filterLibraries() {
     let libraries = [...props.libraries];
+
+    if (ownerFilter.value === 'owned') {
+        libraries = libraries.filter(library => library.owner_id === parseInt(authStore.user.id));
+    } else if (ownerFilter.value === 'joined') {
+        libraries = libraries.filter(library => library.owner_id !== parseInt(authStore.user.id));
+    }
 
     // First, sort libraries so favorited ones appear first
     libraries.sort((a, b) => {
@@ -136,6 +166,7 @@ function filterLibraries() {
         return 0;
     });
 
+    // Apply search filter
     if (!searchQuery.value.trim()) {
         filteredLibraries.value = libraries;
     } else {
@@ -146,6 +177,12 @@ function filterLibraries() {
     }
     // Reset to first page when filtering
     currentPage.value = 1;
+}
+
+// Set owner filter
+function setOwnerFilter(filter: 'all' | 'owned' | 'joined') {
+    ownerFilter.value = filter;
+    filterLibraries();
 }
 
 // Watch for changes to the libraries prop
@@ -299,6 +336,60 @@ function goToPage(page: number) {
 </script>
 
 <style scoped>
+
+
+.filters-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+@media (min-width: 768px) {
+    .filters-container {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+    }
+}
+
+.search-container {
+    position: relative;
+    flex: 1;
+}
+
+.filter-buttons {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.filter-btn {
+    padding: 0.5rem 1rem;
+    border: 1px solid rgba(26, 139, 127, 0.3);
+    background: rgba(26, 139, 127, 0.1);
+    color: var(--text-color);
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.filter-btn:hover {
+    background: rgba(26, 139, 127, 0.2);
+    border-color: var(--color-primary);
+}
+
+.filter-btn.active {
+    background: var(--button-gradient);
+    color: white;
+    border-color: var(--color-primary);
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(26, 139, 127, 0.3);
+}
+
 .library-list {
     max-width: 1200px;
     /* margin: 0 auto; */
