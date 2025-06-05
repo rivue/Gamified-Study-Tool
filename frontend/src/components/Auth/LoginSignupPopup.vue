@@ -4,9 +4,9 @@
         <div v-if="loggingIn" id="loadingCloud" class="cloud-animation">☁️</div>
         <div v-else class="popup-content">
             <transition name="fade" mode="out-in">
-                <div :key="activeForm">
+                <div :key="activeForm" @click="handleSignupSuccess">
                     <LoginForm v-if="activeForm === 'login'" @loginSuccess="handleLoginSuccess" />
-                    <SignupForm v-else-if="activeForm === 'signup'" @signupSuccess="handleSignupSuccess" />
+                    <SignupForm v-else-if="activeForm === 'signup'" @signupSuccess="handleSignupSuccess"/>
                     <SendPasswordResetEmail v-else-if="activeForm === 'passwordReset'" @resetSuccess="handleResetSuccess" />
 
                     <!-- Buttons under each form -->
@@ -43,6 +43,7 @@ import SignupForm from "./SignupForm.vue";
 import SendPasswordResetEmail from "./SendPasswordResetEmail.vue";
 import { usePopupStore } from "@/store/popupStore";
 import { useAuthStore, UserData } from "@/store/authStore";
+import { showSignupToast } from "@/utils/toasts";
 
 const router = useRouter();
 const route = useRoute();
@@ -76,16 +77,18 @@ const handleLoginSuccess = async (user: UserData) => {
     const redirectPath = route.query.redirect?.toString() || "/";
     router.push(redirectPath);
 };
+
 const toEmailVerificationScreen = () => {
     router.push("/verify");
 };
 
 const handleSignupSuccess = () => {
     const popupStore = usePopupStore();
-    popupStore.showPopup(
-        "Registration email sent!\n Please click the link in the email to start your ascent."
-    );
-    router.push("/");
+    // popupStore.showPopup(
+    //     "Registration email sent!\n Please click the link in the email to start your ascent."
+    // );
+    router.push("/verify");
+    showSignupToast();
 };
 
 const handleResetSuccess = () => {

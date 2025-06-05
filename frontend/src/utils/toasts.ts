@@ -14,3 +14,18 @@ export const showExperimentsToast = () => {
         },
     });
 };
+
+export const showSignupToast = () => {
+    toast.success('Account Created Successfully', {
+        description: 'Please check email for a verification link.',
+        duration: 10000,
+        position: 'bottom-right',
+        style: {
+            background: 'var(--element-color-1)',
+            color: 'var(--light-text)',
+            border: '1px solid var(--highlight-color)',
+            borderRadius: '8px',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+        },
+    });
+};
