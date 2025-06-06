@@ -1,40 +1,43 @@
 <template>
-    <div class="verification-container p-8">
-        <div v-if="loading" class="loading">
-            <p>Loading...</p>
-        </div>
-        <div v-else>
-
-            <div v-if="status === 'success'" class="success">
-                <h1>Email Verified!</h1>
-                <p>Your email has been successfully verified.</p>
-                <p>You are now verified and can now login to use Rivue!</p>
-                <router-link to="/" class="button">Go to Login</router-link>
-            </div>
-            <div v-else class="success">
-
-
-                <div v-if="token">
-                    <h1>Verification Failed</h1>
-                    <p> We couldn't verify your email. The link may be invalid or expired.</p>
+    <div class="popup-overlay">
+        <div v-if="loading" id="loadingCloud" class="cloud-animation">☁️</div>
+        <div v-else class="popup-content">
+            <div class="form-container">
+                <div v-if="status === 'success'" class="success-content">
+                    <div class="header-content">
+                        <h1 class="title">Email Verified!</h1>
+                        <p class="subtitle">Your email has been successfully verified.</p>
+                        <p class="subtitle">You are now verified and can now login to use Rivue!</p>
+                    </div>
+                    <div class="form-actions">
+                        <router-link to="/" class="login-button">Go to Login</router-link>
+                    </div>
                 </div>
 
-                <h1 v-if="!token">Resend Verification Email</h1>
+                <div v-else class="verification-form">
+                    <div class="header-content">
+                        <h1 v-if="token" class="title">Verification Failed</h1>
+                        <h1 v-else class="title">Resend Verification Email</h1>
+                        
+                        <p v-if="token" class="subtitle">We couldn't verify your email. The link may be invalid or expired.</p>
+                    </div>
 
-                <form @submit.prevent="handleSendNewVerificationEmail">
-                    <br/>
-                    <div class="form-field">
-                        <label for="email">Email:</label>
-                        <input type="text" id="email" name="email" v-model="email" autocomplete="email" required />
-                    </div>
-                    <div v-if="completed && status === ''" class="completed-message">
-                        If there is an unverified account associated with this email, a reset link was sent to it.
-                    </div>
-                    <div v-if="!completed" class="completed-message">Please enter your email and click the button below to resend a verification link.</div>
-                    <div class="button-containered px-8 py-4 text-md">
-                        <input type="submit" id="submit" :value="buttonText" />
-                    </div>
-                </form>
+                    <form @submit.prevent="handleSendNewVerificationEmail">
+                        <div class="form-field">
+                            <label for="email">Email:</label>
+                            <input type="email" id="email" name="email" v-model="email" autocomplete="email" required />
+                        </div>
+                        
+                        <div v-if="completed && status === ''" class="completed-message">
+                            If there is an unverified account associated with this email, a reset link was sent to it.
+                        </div>
+                        <div v-if="!completed" class="completed-message">
+                            Please enter your email and click the button below to resend a verification link.
+                        </div>
+                        
+                        <input type="submit" :value="buttonText" />
+                    </form>
+                </div>
             </div>
         </div>
     </div>
@@ -91,56 +94,176 @@ const handleSendNewVerificationEmail = () => {
             }, 750);
         });
 };
-
 </script>
 
-<style>
-.button-containered {
-    text-align: center;
-    border-radius: 6px;
-    background-color: var(--color-primary)
+<style scoped>
+.popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--background-haze);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 95;
+    padding: 25px;
 }
 
-form {
+.popup-content {
+    background: var(--background-color);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(26, 139, 127, 0.2);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    padding: 2rem;
+    max-width: 450px;
+    width: 100%;
+    min-height: 400px;
+    color: var(--text-color);
+}
+
+.header-content {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.title {
+    background-color: var(--text-color);
+    font-size: 2rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    line-height: 1.2;
+}
+
+.subtitle {
+    font-size: 1rem;
+    color: var(--text-color-secondary);
+    text-align: center;
+    margin-bottom: 0.5rem;
+}
+
+.form-container {
+    width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 100%;
 }
 
 .form-field {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start;
+    margin-bottom: 16px;
     max-width: 300px;
     width: 100%;
-    margin-bottom: 16px;
     margin-left: auto;
     margin-right: auto;
 }
 
 .form-field label {
-    display: flex;
+    margin-bottom: 6px;
     font-size: 0.9em;
     color: var(--text-color);
 }
 
-.form-field input[type="text"],
-.form-field input[type="password"] {
-    background-color: #00000000;
-    padding: 10px;
-    border: 1px solid var(--text-color);
-    border-radius: 4px;
+.form-actions {
     width: 100%;
-    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+input[type="submit"] {
+    width: 100%;
+    max-width: 300px;
+    height: 44px;
+    margin-top: 8px;
+    padding: 0 1.25rem;
+    background: var(--button-gradient, linear-gradient(135deg, var(--color-primary), var(--color-primary-light)));
+    color: var(--text-color);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+    font-weight: 600;
+    font-size: 1rem;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+input[type="submit"]:hover {
+    background: linear-gradient(135deg, var(--color-primary-dark), var(--color-primary));
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(26, 139, 127, 0.3);
+}
+
+input[type="email"] {
+    width: 100%;
+    height: 44px;
+    padding: 0 1rem;
+    border-radius: 8px;
+    border: 1px solid rgba(26, 139, 127, 0.3);
+    background-color: rgba(26, 139, 127, 0.1);
+    color: var(--text-color);
+    font-size: 1rem;
+    transition: all 0.2s;
+}
+
+input[type="email"]:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(26, 139, 127, 0.2);
+    outline: none;
+}
+
+input::placeholder {
+    color: var(--text-color-secondary);
+}
+
+.login-button {
+    display: inline-block;
+    width: 100%;
+    max-width: 300px;
+    height: 44px;
+    padding: 0 1.25rem;
+    background: var(--button-gradient, linear-gradient(135deg, var(--color-primary), var(--color-primary-light)));
+    color: var(--text-color);
+    text-decoration: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+    font-weight: 600;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.login-button:hover {
+    background: linear-gradient(135deg, var(--color-primary-dark), var(--color-primary));
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(26, 139, 127, 0.3);
 }
 
 .completed-message {
     max-width: 300px;
     margin: 12px auto;
     padding: 10px 16px;
-    background-color: var(--background-color-1t);
-    border-left: 4px solid var(--highlight-color, #bb86fc);
+    background-color: rgba(26, 139, 127, 0.1);
+    border-left: 4px solid var(--color-primary);
     border-radius: 6px;
     color: var(--text-color);
     font-size: 0.9em;
@@ -149,57 +272,58 @@ form {
     transition: all 0.3s ease;
 }
 
-.verification-container {
-    max-width: 600px;
-    margin: 0 auto;
+@keyframes cloudMove {
+    0% {
+        opacity: 0;
+        transform: translateX(-25vw) translateY(-2vh);
+    }
+
+    25% {
+        transform: translateX(-12.5vw) translateY(2vh);
+    }
+
+    50% {
+        opacity: 1;
+        transform: translateX(0vw) translateY(-2vh);
+    }
+
+    75% {
+        transform: translateX(12.5vw) translateY(2vh);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translateX(25vw) translateY(-2vh);
+    }
+}
+
+.cloud-animation {
+    font-size: 3em;
     position: absolute;
-    top: 50%;
+    top: 40%;
     left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: var(--background-color-1t);
-    color: #f0f8ff;
-    border-radius: 8px;
-    text-align: center;
-    border: 1px solid #f0f8ff;
+    animation: cloudMove 3s linear infinite;
 }
 
-.loading,
-.success,
-.error {
-    padding: 20px;
-}
+@media (max-width: 640px) {
+    .popup-content {
+        padding: 1.5rem;
+        border-radius: 12px;
+        max-width: 350px;
+        min-height: 350px;
+    }
 
-.button {
-    display: inline-block;
-    padding: 10px 20px;
-    margin-top: 20px;
-    color: var(--text-color);
-    background-color: var(--element-color-1);
-    text-decoration: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
+    .title {
+        font-size: 1.75rem;
+    }
 
-.verification-container .error-message {
-    color: #ff4d4f;
-    /* Red color for error */
-    font-size: 1em;
-    margin: 10px 0;
-    text-align: center;
-    font-weight: bold;
-}
+    .form-field {
+        max-width: 100%;
+    }
 
-/* Update the form-field label to align it to the left */
-.form-field label {
-    display: block;
-    /* Change to block for proper alignment */
-    font-size: 0.9em;
-    color: var(--text-color);
-    text-align: left;
-    /* Align text to the left */
-    width: 100%;
-    /* Ensure it spans the width of the form field */
-    margin-bottom: 5px;
-    /* Add some spacing below the label */
+    input[type="submit"],
+    .login-button {
+        max-width: 100%;
+    }
 }
 </style>

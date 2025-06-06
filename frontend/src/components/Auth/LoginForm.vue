@@ -1,6 +1,8 @@
 <template>
-    <h1>Login</h1>
-
+    <div class="header-content">
+                <h1 class="title">Welcome Back</h1>
+                <p class="subtitle">Sign in to continue your learning journey</p>
+            </div>
     <form @submit.prevent="handleSubmit">
         <div class="form-field">
             <label for="email">Email:</label>
@@ -105,6 +107,10 @@ const handleSubmit = () => {
 </script>
 
 <style>
+.header-content {
+    text-align: center;
+    margin-bottom: 2rem;
+}
 form {
     display: flex;
     flex-direction: column;
