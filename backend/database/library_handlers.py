@@ -301,8 +301,6 @@ def get_library_scores(library_id):
     # TODO: update once I implement a points system
 
     try:
-        
-# from sqlalchemy.orm import joinedload
 
         memberships = LibraryMembership.query.filter_by(library_id=library_id).options(
             joinedload(LibraryMembership.user)
