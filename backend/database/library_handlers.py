@@ -110,50 +110,52 @@ def create_library_favorite(
     
 def create_unit_and_add(library_id, unit_name, position=-1):
     try:
-        unit = LibraryUnit(
-            library_id=library_id,
-            unit_name=unit_name,
-            position=position # use -1 for placeholder since it doesn't allow None
-        )
+        with db_transaction():
+            unit = LibraryUnit(
+                library_id=library_id,
+                unit_name=unit_name,
+                position=position  # use -1 for placeholder since it doesn't allow None
+            )
 
-        library = Library.query.get(library_id)
+            library = Library.query.get(library_id)
 
-        db.session.add(unit)
+            if not library:
+                print("Warning: not library in create_unit_and_add.")
+                raise NotFoundError
 
-        if len(library.units) >= 20:
-            print("Warning: Library has reached maximum number of units.")
-            raise MaxUnitsReachedError
+            if len(library.units) >= 20:
+                print("Warning: Library has reached maximum number of units.")
+                raise MaxUnitsReachedError
 
-        if not unit:
-            print("Warning: not unit in create_unit_and_add.")
-            raise NotFoundError
-        if  not library:
-            print("Warning: not library in create_unit_and_add.")
-            raise NotFoundError
+            db.session.add(unit)
 
-        if position != -1:
-            library.attach_unit(unit, position)
-        else:
-            library.attach_unit(unit)
+            if not unit:
+                print("Warning: not unit in create_unit_and_add.")
+                raise NotFoundError
 
-        db.session.flush()  # Flush to get the unit ID before commit
+            if position != -1:
+                library.attach_unit(unit, position)
+            else:
+                library.attach_unit(unit)
 
-        return (
-            jsonify(
-                {"message": "Unit created and added successfully", "unit": unit.id}
-            ),
-            201,
-        )
-    except Exception as e:
-        print("something else")
-        print(f"Exception in create_unit_and_add: {str(e)}")
-        return jsonify({"message": str(e)}), 400
+            db.session.flush()  # Flush to get the unit ID before commit
+
+            return (
+                jsonify(
+                    {"message": "Unit created and added successfully", "unit": unit.id}
+                ),
+                201,
+            )
     except MaxUnitsReachedError as e:
-        print(f"Library has reached max amounts of units in create unit: {str(e)}")
+        print(f"Library has reached max amounts of units in create_unit_and_add: {str(e)}")
         raise
     except NotFoundError as e:
         print(f"Library or Unit not found error in create_unit_and_add: {str(e)}")
         raise
+    except Exception as e:
+        print("something else")
+        print(f"Exception in create_unit_and_add: {str(e)}")
+        return jsonify({"message": str(e)}), 400
     
 def create_section_and_add(unit_id, section_name, position=-1):
     try:

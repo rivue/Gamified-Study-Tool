@@ -132,7 +132,6 @@ const addNewUnit = async () => {
     }
 
     isAddingUnit.value = true
-    const currentAbortController = new AbortController()
 
     try {
 
@@ -142,11 +141,7 @@ const addNewUnit = async () => {
             libraryId: props.libraryId,
             unitName: trimmedName,
             position: position,
-        }, {
-            signal: currentAbortController.signal
         })
-
-        if (currentAbortController.signal.aborted) return
 
         if (response.data && response.data.status === "success") {
             // Clear form and notify parent
@@ -158,6 +153,7 @@ const addNewUnit = async () => {
                 position: position,
                 unitId: response.data.unit_id,
             })
+            console.log("a;sldijf")
         }
     } catch (error) {
         unitNameError.value = error.response?.data?.message || 'Failed to add unit. Please try again.'

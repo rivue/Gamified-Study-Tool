@@ -361,7 +361,7 @@ def init_library_routes(app):
         try:
             
             new_unit_response, new_unit_status_code = lbh.create_unit_and_add(library_id, unit_name, position=position)
-            
+        
             new_unit = new_unit_response.get_json()
 
             if new_unit_status_code != 201:
