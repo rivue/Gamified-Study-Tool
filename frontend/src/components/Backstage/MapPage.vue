@@ -145,8 +145,6 @@ const fetchLibraryData = async (): Promise<void> => {
                 },
             };
 
-            // Log data structure for debugging in production if needed
-            console.debug("Initialized library data structure:", JSON.stringify({ hasRoomData: response.data.room_data.length > 0, unitMapKeys: Object.keys(response.data.data.unit_to_section_map) }));
         } else {
             throw new Error("Invalid response data");
         }

@@ -81,7 +81,7 @@
                                     :key="sectionIndex">
 
                                     <AddSection v-if="editModeEnabled && isOwner" class="-mx-8" :library-id="libraryId"
-                                        :unit-id="props.unitPositionMap[unitName][1]" :position="sectionIndex"
+                                        :unit-id="getUnitIdByName(unitName)" :position="sectionIndex"
                                         :offset="getNodeOffset(getGlobalSectionIndex(unitIndex, sectionIndex) - .6)"
                                         :unit-color="getUnitColor(unitIndex)" @nodes-added="onSectionAdd" />
 
@@ -404,6 +404,21 @@ const props = defineProps({
     }
 })
 
+const getUnitIdByName = (unitName: string) => {
+  if (
+    props.unitPositionMap &&
+    props.unitPositionMap[unitName] &&
+    Array.isArray(props.unitPositionMap[unitName]) &&
+    props.unitPositionMap[unitName].length > 1
+  ) {
+    return props.unitPositionMap[unitName][1];
+  }
+  console.warn(
+    `Unit ID not found for unitName: ${unitName} in unitPositionMap. This might indicate a data synchronization issue.`
+  );
+  return null;
+};
+
 const rawUnitData = ref();
 
 watch(() => props.unitSectionMap, async (newVal) => {
@@ -417,6 +432,7 @@ const showSettingsModal = ref(false)
 const showLeaveCourseModal = ref(false); // State for the leave course modal
 const isOwner = ref(false)
 const editModeEnabled = ref(false);
+const emit = defineEmits(['unitAdded']) // Add this if not already present
 
 // Track selected room for tooltip
 const selectedRoomId = ref(null)
@@ -643,38 +659,6 @@ onUnmounted(() => {
         console.debug("LearningPath unmounting, cleared initial scroll timeout.");
     }
 });
-
-// Add to your script section
-const handleUnitAdded = (unitData) => {
-    // Create a new object to store the updated unit data
-    const updatedUnitData = {};
-    const unitKeys = Object.keys(rawUnitData.value);
-
-    // Insert the new unit at the specified position
-    let inserted = false;
-
-    // Loop through existing units to maintain order
-    for (let i = 0; i < unitKeys.length; i++) {
-        if (i === unitData.position && !inserted) {
-            // Add the new unit at this position
-            updatedUnitData[unitData.name] = [];
-            inserted = true;
-        }
-
-        // Add the existing unit
-        updatedUnitData[unitKeys[i]] = rawUnitData.value[unitKeys[i]];
-    }
-
-    // If the new unit should be at the end and wasn't inserted yet
-    if (!inserted) {
-        updatedUnitData[unitData.name] = [];
-    }
-
-    // Update the raw unit data
-    rawUnitData.value = updatedUnitData;
-
-    recalcMaxLeft()
-}
 
 // Add these variables
 const startY = ref(0)

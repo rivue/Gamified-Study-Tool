@@ -97,7 +97,8 @@ export const useAuthStore = defineStore('auth', {
         //     this.user.tier = payload.tier;
         //     localStorage.setItem('userTier', payload.tier);
         // }
-
+        
+        console.log(payload);
         // Set streak data
         if (payload.current_streak !== undefined && payload.highest_streak !== undefined) {
             const userStats = useUserStatsStore();

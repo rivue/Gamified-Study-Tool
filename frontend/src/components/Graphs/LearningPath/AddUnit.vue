@@ -147,13 +147,8 @@ const addNewUnit = async () => {
             // Clear form and notify parent
             newUnitName.value = ''
             showAddUnitModal.value = false,
-            emit('unitAdded', {
-                name: trimmedName,
-                displayName: trimmedName,
-                position: position,
-                unitId: response.data.unit_id,
-            })
-            console.log("a;sldijf")
+            console.log('Unit added successfully:', response.data)
+            location.reload();
         }
     } catch (error) {
         unitNameError.value = error.response?.data?.message || 'Failed to add unit. Please try again.'
