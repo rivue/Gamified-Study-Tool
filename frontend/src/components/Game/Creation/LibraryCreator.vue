@@ -144,7 +144,6 @@
                                     <div class="input-hint">This file will be used to generate content for your course
                                         topics</div>
                                 </div>
-                                <!-- <LibraryPresetCarousel @preset-selected="handlePresetSelected" />. -->
                             </div>
                         </div>
 
@@ -302,7 +301,6 @@
 // Keep all existing imports and logic...
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
-import LibraryPresetCarousel from './LibraryPresetCarousel.vue';
 import axios from "axios";
 import { z } from "zod";
 
@@ -659,40 +657,6 @@ const getTotalSectionCount = () => {
 const resetErrors = () => {
     formattedErrors.value = {} as any
 };
-
-
-// const handlePresetSelected = (preset: SelectedPreset) => {
-//   // Set course name
-//   topic.value = preset.courseName;
-
-//   // Create a dummy File object for the placeholder PDF
-//   const dummyPdfContent = `This is a placeholder for ${preset.pdfPlaceholderFileName}.`;
-//   const blob = new Blob([dummyPdfContent], { type: 'application/pdf' });
-//   selectedFile.value = new File([blob], preset.pdfPlaceholderFileName, { type: 'application/pdf' });
-
-//   // Set visibility to private
-//   visibilityTab.value = 'private';
-
-//   // Clear existing groups and populate with preset's topic and subtopics
-//   groups.value = [
-//     {
-//       name: preset.topicName,
-//       sections: [...preset.subTopicNames], // Ensure it's a new array
-//       newSectionName: "", 
-//       sectionError: false, 
-//       isEditing: false, 
-//       editingName: '' 
-//     }
-//   ];
-
-//   // Optional: Clear any existing validation errors
-//   resetErrors(); 
-
-//   // Optional: Navigate to the next relevant field or step
-//   if (topicInput.value) {
-//     topicInput.value.focus();
-//   }
-// };
 
 function validateForm(data: unknown) {
     resetErrors()
