@@ -65,8 +65,8 @@ def init_auth_routes(app):
                     user.timezone = timezone
                     db.session.commit()
 
-                login_result = login_user(user, remember=True)
-                user.update_daily_streak()
+                login_user(user, remember=True)
+                user.update_daily_streak(True) # --> THIS NEEDS TO BE CHANGED!!!
                 db.session.commit()
                 
                 print(f" streak: {user.streak_count}, highest_streak: {user.highest_streak}")

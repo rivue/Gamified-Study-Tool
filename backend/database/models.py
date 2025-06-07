@@ -79,12 +79,18 @@ class User(db.Model, UserMixin):
         # This queries through the LibraryMembership association objects
         return [membership.library for membership in self.library_memberships]
     
-    def update_daily_streak(self): 
+    def update_daily_streak(self, login: bool = False):
+        """
+            login is a flag to indicate if the user is just doing regular activity and has not just ended a course (most of the time thats loging in or resetting the page).
+            If True, we don't want certain things updating, like an increase in streak
+            but we still want to do things like resetting the streak
+            maybe it would make more sense to rename it to just_completed_game or not and flip the logic around now that I say it like that
+        """
         tz = ZoneInfo(self.timezone or 'UTC')
         today_local = datetime.now(tz).date()
         yesterday_local = today_local - timedelta(days=1)
             
-        if self.last_streak_date is None:
+        if self.last_streak_date is None and not login:
             self.streak_count = 1
 
         else:
@@ -93,13 +99,14 @@ class User(db.Model, UserMixin):
             if last == today_local:
                 return self.streak_count
             # last request was yesterday, increment streak
-            if last == yesterday_local:
+            if last == yesterday_local and not login:
                 self.streak_count += 1
             # broke streak, reset
             else:
                 self.streak_count = 1
 
-        self.last_streak_date = today_local
+        if not login:
+            self.last_streak_date = today_local
         
         if self.streak_count > self.highest_streak:
             self.highest_streak = self.streak_count

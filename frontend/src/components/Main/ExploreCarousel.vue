@@ -187,7 +187,7 @@ const selectedLibraryToLeave = ref<any>(null); // Using any for now, can be more
 
 
 // Infinite scroll states
-const itemsPerLoad = 6;
+const itemsPerLoad = 100;
 const currentLoadIndex = ref(0);
 const isLoading = ref(false);
 const hasMoreToLoad = ref(true);

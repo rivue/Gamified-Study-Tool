@@ -15,7 +15,7 @@ def init_profile_routes(app):
     @login_required
     def get_user_streak():
         try:
-            current_user.update_daily_streak()
+            current_user.update_daily_streak(True)
             db.session.commit()
             print("Current user streak count:", current_user.streak_count)
             print("Highest user streak count:", current_user.highest_streak)
