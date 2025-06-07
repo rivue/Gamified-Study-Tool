@@ -60,6 +60,7 @@
                         <h3 class="course-title">
                             {{ library.library_topic }}
                             <Lock v-if="!library.is_public" class="lock-icon" />
+                            <span v-if="isNewCourse(library)" class="new-tag">New</span>
                         </h3>
 
                         <div class="card-stats">
@@ -89,6 +90,10 @@
                         <Button v-else @click="goToCourse(library.id)" class="joined-card-button">
                             Go to Course
                         </Button>
+                        <Button v-if="joinedCourses.has(library.id)" @click="openLeaveModal(library)" class="leave-card-button ml-2">
+                            Leave Course
+                        </Button>
+
                     </div>
                     <Transition name="fade">
                         <div v-if="joinPublicMessages.has(library.id)"
@@ -121,6 +126,15 @@
             </p>
         </div>
     </div>
+    <LeaveCourse 
+      v-if="selectedLibraryToLeave"
+      :showModal="showLeaveModal" 
+      :libraryId="selectedLibraryToLeave.id" 
+      :libraryTopic="selectedLibraryToLeave.library_topic" 
+      :fromExplore="true"
+      @update:showModal="showLeaveModal = $event" 
+      @course-left="handleCourseLeft" 
+    />
 </template>
 
 <script setup lang="ts">
@@ -129,6 +143,7 @@ import { useRouter } from "vue-router";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { LoaderCircle, Search, Heart, UserCircle, BookOpen, Lock } from "lucide-vue-next";
+import LeaveCourse from "@/components/Graphs/LearningPath/LeaveCourse.vue";
 import axios from "axios";
 
 // Props
@@ -147,6 +162,7 @@ const props = defineProps<{
         owner_id: string;
         owner_username: string;
         is_public: boolean;
+        created_at: string;
     }>;
 }>();
 
@@ -165,6 +181,9 @@ const joinPublicLoading = ref(new Map());
 
 const libraryContainer = ref<HTMLElement | null>(null);
 const joinedCourses = ref(new Set());
+const showLeaveModal = ref(false);
+const selectedLibraryToLeave = ref<any>(null); // Using any for now, can be more specific
+
 
 // Infinite scroll states
 const itemsPerLoad = 6;
@@ -242,7 +261,6 @@ function handleScroll() {
     const container = libraryContainer.value;
     const bottomOfWindow = window.innerHeight + window.scrollY;
     const distanceFromBottom = container.getBoundingClientRect().bottom - window.innerHeight;
-
     // Load more when approaching the bottom
     if (distanceFromBottom < 200 && hasMoreToLoad.value && !isLoading.value) {
         loadMoreItems();
@@ -254,6 +272,17 @@ watch(() => props.libraries, (newLibraries) => {
     // Update filtered libraries when props change
     filterLibraries();
 }, { deep: true });
+
+// Method to check if a course is new
+function isNewCourse(library: any) {
+    if (!library.created_at) {
+        return false;
+    }
+    const courseDate = new Date(library.created_at);
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    return courseDate > sevenDaysAgo;
+}
 
 // Initialize on component mount
 onMounted(() => {
@@ -303,6 +332,17 @@ async function joinSpecificCourse(id: number) {
 
 function goToCourse(libraryId: number) {
     router.push(`/lessons/${libraryId}`);
+}
+
+function openLeaveModal(library: any) {
+  selectedLibraryToLeave.value = library;
+  showLeaveModal.value = true;
+}
+
+function handleCourseLeft(libraryId: number) {
+  joinedCourses.value.delete(libraryId);
+  showLeaveModal.value = false;
+  // selectedLibraryToLeave.value = null; // Optional: Reset if not needed
 }
 
 function handleSearchKeydown(event: KeyboardEvent) {
@@ -740,5 +780,17 @@ function handleSearchKeydown(event: KeyboardEvent) {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
+}
+
+.new-tag {
+    display: inline-block;
+    background-color: var(--color-primary-light);
+    color: white;
+    font-size: 0.75rem; /* Small font size */
+    font-weight: 600;
+    padding: 0.25rem 0.5rem; /* Small padding */
+    border-radius: 9999px; /* Fully rounded */
+    line-height: 1;
+    white-space: nowrap;
 }
 </style>

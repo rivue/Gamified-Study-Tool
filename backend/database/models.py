@@ -200,6 +200,7 @@ class Library(db.Model):
     memberships = db.relationship('LibraryMembership', back_populates='library', cascade="all, delete-orphan", # If library deleted, remove memberships
         lazy='dynamic')
 
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False, server_default=db.func.now())
     library_topic = db.Column(db.String(200), nullable=False)
     difficulty = db.Column(db.String(50), nullable=False)
     guide = db.Column(db.String(50), nullable=False, default=lambda: random.choice(["Azalea", "Irona", "Bubbles", "Sterling"]))

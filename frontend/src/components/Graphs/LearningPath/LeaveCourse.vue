@@ -91,6 +91,11 @@ const props = defineProps({
     libraryTopic: {
         type: String,
         required: true
+    },
+    fromExplore: {
+        type: Boolean,
+        required: false,
+        default: false
     }
 });
 
@@ -148,9 +153,11 @@ async function handleLeaveCourse() {
         console.log(response)
         if (response.status === 200 && response.data?.status === "success") {
             toast.success(`Successfully left "${props.libraryTopic}".`, { id: toastId });
-            emit('course-left');
+            emit('course-left', props.libraryId);
             closeModal();
-            router.push('/courses'); 
+            if (props.fromExplore) {
+                router.push('/courses'); 
+            }
         } else {
             const errorMessage = response.data?.message || 'An unexpected error occurred.';
             apiError.value = errorMessage;
