@@ -4,10 +4,76 @@ Tool that allows users to input things like lecture recordings, lecture slides, 
 
 Note: use npm audit --only=prod for this, 0 vulnerabilities = good
 
-IDEAS:
 
-    resume:
-        - add resend api "build email sending list using resend api" or whatever
+Ideas for MCP:
+*   **Dynamic System Prompts:** Managed primarily by `backend/message_handler.py`, system prompts are dynamically assembled. They start from base templates (found in `backend/SystemPrompts/`) which can define AI personas (e.g., `BaseAzalea.txt`) and task-specific instructions (e.g., `LessonCreate.txt`, `QuizCreate.txt`). These templates are then enriched with real-time data such as:
+    *   The user's profile (education level, interests, learning goals).
+    *   The selected AI tutor's persona and any tutor-generated introductory content.
+    *   Definitions of available tools or functions the AI can request (see Function Calling).
+    *   Current application state or specific content like retrieved documents (see RAG).
+*   **Conversation History:** The system maintains a history of user and AI interactions, which is fed back to the LLM. This allows the AI to "remember" previous turns in the conversation, providing continuity and more coherent interactions. This is managed through `backend/message_handler.py` and database calls (`backend/database/db_handlers.py`).
+*   **Function Calling (OpenAI Models):** For OpenAI models, the application utilizes the function calling feature. Schemas for available functions are defined in `backend/functions.py` (e.g., `Profile`, `Lesson`, `CreateQuiz`, `GenerateLibraryRoom`). These schemas instruct the LLM on how to structure its output as a JSON object when it needs to perform a specific action or return structured data. `backend/completion_tasks.py` then processes these function calls, executes relevant application logic (like saving to a database), and guides the conversation flow. This enables more reliable and tool-like behavior from the AI.
+*   **Retrieval Augmented Generation (RAG):** The system uses a vector database (Pinecone) to store and retrieve relevant text sections from user-uploaded documents.
+    *   `backend/vector_processing/embedding_service.py` handles embedding text sections (using OpenAI's `text-embedding-3-small` model via `backend/openapi.py`) and storing them in Pinecone, associated with a specific `library_id`.
+    *   `backend/vector_processing/retrieval.py` queries Pinecone using the embedding of a user's query or a topic. It fetches the most relevant document snippets, filtered by `library_id`, which are then formatted and injected into the LLM's prompt. This allows the AI to generate content (lessons, quizzes) based on the specific source materials provided by the user for their study library.
+
+#### AI Agent Examples
+The combination of dynamic context, conversation history, function calling, and RAG allows for the creation of specialized "AI agents" within the application. These are not necessarily autonomous agents in the full sense but rather LLM configurations tailored for specific roles and tasks:
+
+*   **User Profiling Agent:**
+    *   **Context:** Uses prompts like `ProfileGather.txt` and `ProfileCreate.txt`, along with the `Profile` function schema.
+    *   **Task:** Interacts with the user to gather information about their identity, language, education level, interests, and learning goals. The structured output is then saved to the database.
+*   **Lesson Generation Agent:**
+    *   **Context:** Employs system prompts like `LessonCreate.txt` (which incorporates a base persona and user profile). It receives the lesson topic (often suggested by another AI interaction or chosen by the user). For lessons tied to specific library content, RAG is used to pull relevant text from user-uploaded documents, which becomes part of the context given to the LLM.
+    *   **Task:** Generates a self-contained lesson on the given topic, adhering to specified word count and style guidelines.
+*   **Quiz Creation Agent:**
+    *   **Context:** Utilizes `QuizCreate.txt` (again, with persona and user profile). Critically, it receives the content of the preceding lesson as context. It is guided by the `CreateQuiz` function schema to produce a structured quiz.
+    *   **Task:** Creates a quiz with a mix of multiple-choice and true/false questions, ensuring questions are based only on the provided lesson content and focus on understanding over rote memorization.
+*   **Library Content Agent:**
+    *   **Context:** Uses specialized prompts and function schemas like `GenerateLibraryRoomNames.txt` / `GenerateLibraryRoomNames` and `GenerateLibraryRoom.txt` / `GenerateLibraryRoom`. These are likely used in conjunction with topics derived from user inputs or uploaded syllabi/textbooks (potentially processed via RAG).
+    *   **Task:** Generates structured content for "library rooms," including thematic room names, "factoids" (interesting snippets of information), and associated questions of various types (fill-in-the-blank, multiple-choice, one-word answer). This agent is responsible for populating the core study units of a library.
+
+This approach allows for flexible and powerful AI integration, tailored to the diverse functional requirements of your gamified study tool.
+
+### Future Ideas
+Many of the ideas in the "grand plan / future" and "study tool additions / ideas" sections of this README can be conceptualized in terms of advanced Model Context Provisioning and specialized AI Agents. Here are a few examples:
+
+*   **Automated Mind-Map Composer:**
+    *   **Model Context Provisioning (MCP):**
+        *   Input: User's unstructured notes, highlights, lecture transcripts, or existing library content (factoids, lesson summaries).
+        *   Preferences: User-defined settings for mind-map style (density, layout, visual cues).
+        *   Schema: A defined structure for the mind-map output (e.g., nodes with text and properties, connections with labels, hierarchical relationships) to ensure it can be rendered by a visualization tool.
+    *   **AI Agent Task:** This agent would parse the input text, identify key concepts, entities, and their relationships. It would then organize these into a structured mind-map format, grouping related themes, establishing hierarchies, and potentially suggesting "chain reactions" or links to other relevant ideas within the user's study materials.
+
+*   **Voice-First Study Mode:**
+    *   **Model Context Provisioning (MCP):**
+        *   Input: Real-time transcribed user speech (for answers or commands).
+        *   Content Context: The current lesson material or quiz question being audibly presented.
+        *   State: Awareness of the current interaction mode (e.g., "answering quiz," "awaiting command").
+        *   Command Schema: Predefined structures for voice commands (e.g., `{"command": "next_question"}`, `{"command": "explain_concept", "concept": "photosynthesis"}`).
+    *   **AI Agent Task:** This would likely be a suite of interconnected agents:
+        *   *Speech-to-Text Agent:* Converts spoken audio to text.
+        *   *Natural Language Understanding (NLU) Agent:* Interprets the transcribed text to determine user intent (e.g., providing an answer, issuing a navigation command, asking for help).
+        *   *Core Logic Agent (adapted from existing):* Processes the intent, fetches the appropriate next piece of content, or generates an explanation.
+        *   *Text-to-Speech (TTS) Agent:* Converts the application's textual responses into natural-sounding spoken audio.
+
+*   **"Predict & Prescribe" Engine:**
+    *   **Model Context Provisioning (MCP):**
+        *   Data: Aggregated, anonymized performance data from many users (e.g., common errors, time taken on specific topics/questions).
+        *   User Context: The current user's learning path, historical performance, and upcoming topics.
+        *   Content Structure: Detailed metadata about lessons, topics, and their relationships (prerequisites, difficulty).
+        *   Intervention Schema: Defined formats for "readiness modules" or prescriptive advice.
+    *   **AI Agent Task:** This agent would analyze historical and current user data to forecast topics or concepts where the user is likely to struggle. It would then proactively generate or recommend targeted "readiness modules" (e.g., quick refreshers, alternative explanations, links to foundational concepts) to prepare the user *before* they encounter these predicted difficulties, personalizing the learning path to mitigate challenges.
+
+*   **Dynamic Difficulty Tuning:**
+    *   **Model Context Provisioning (MCP):**
+        *   Real-time Performance: A continuous stream of the user's answers, correctness, and speed.
+        *   Content Pool: Access to a repository of questions tagged by concept and difficulty level, plus related "micro-lessons."
+        *   User State: The user's current position in the learning path and their recent performance trend.
+    *   **AI Agent Task:** This agent monitors the user's interaction with learning content in real-time.
+        *   If the user is progressing easily, the agent can dynamically inject more challenging questions, "speed-run" sub-quizzes, or complex real-world problems related to the current concept to maintain engagement and accelerate learning.
+        *   If the user falters, the agent can automatically introduce bite-sized "micro-lessons," simpler prerequisite questions, or hints to provide support and build mastery before returning to the original difficulty level. This creates a highly adaptive learning experience.
+IDEAS:
 
     cleanup / maintenence (files to break apart):
         - remove library difficulty, mentor, language, etc... from db course structure, backend, frontend course creation screen
@@ -109,6 +175,7 @@ IDEAS:
         - could be rocks in an island (or actual islands)
         - could be something in a crop field
         - possibly take inspiration from btd5 or btd6 / odessey
+        - make sure delete section actually refreshes the page and closes the modal
 
 TODO list:
 
@@ -123,7 +190,7 @@ TODO list:
                 - not sure exactly where it is inconsistent
         - ⭐️ vvvmaybe ask for feedback before doing vvv
             - also make sure it works well(ish) for mobile
-        - ⭐️ add google 
+        - ⭐️ add google auth
             - note: probably has to make rivue email work first
         - ⭐️ Terms of use / Policy Page legal agreement thing - ask gpt if I actually need, maybe ask jake how to do but maybe not
             - ⭐️ There are probably websites and stuff for this --> do this before Stripe
@@ -139,12 +206,11 @@ TODO list:
                     box or on the bottom / lining the right / left edge or something
                 - potential new menu: "my libraries" "browse libraries" (would link from search?) "notifications" (like error messages or who joined a library or something), create / + (or maybe it would be a tab at the top next to search)
                 - menu for library would have members list, settings for course owner, potentially a list of files to see, potentially a screen to see library statistics like # likes, # people, etc... 
-                -  settings button would enable course owners to remove people, change visibility settings I think? or check different boxes for question types, or see users or something
+                - settings button would enable course owners to remove people, change visibility settings I think? or check different boxes for question types, or see users or something
                 - users could add a note for each unit / library or something
                 - instead of making path a long rectangle shape, make it follow the curve of the nodes
                 - ⭐️ explore adding "scroll to current" on map page (last unlocked node)
                 - also, maybe change it to vertical
-                - ⭐️ add ability to leave libraries (later)
                 - ⭐️ move dropdown menu to left + make dropdown menu permanant, replace w/ profile picture --> hover menu for to see profile settings or something
                 - for course creation, make a "advanced settings" toggle for t/f, mcq, other questions, max users, etc... maybe other stuff as well
                 - ⭐️ all the other routes and stuff (terms & policies, buying subscription, can't think of others?)
@@ -165,38 +231,32 @@ TODO list:
             - make sure adding a unit actually refreshes on the page and stuff ideally w/ out refresh
             - why do different pages flicker on the screen when I am on a page and I hit refresh?
             - why is public generating a code on library creation? 
-            - current streak in lesson complete displays current streak not current streak + 1 (maybe just refetch it?)
             - improve question generation eventually, like make all answers similar length, use similar answer choices, utilize SAT / ACT / MCAT style questions, maybe tailor the answer style for each course, like MCAT = premed, SAT / ACT = SAT / ACT prep, college style = college final exam style / quiz, etc...
             - when creating library for first time, maybe move join_library call to right below or IN save_library_room_states so theres no duplicate call to add users to library room states - might have to move db.session.commit logic though
-            - on user login, make sure streak resets if last streak is more then a day ago or something like that
-            - when the user finishes a lesson and it adds to their streak, make sure the streak in the section completion page displays the updated streak
+            - on user login, make sure streak resets if last streak is more then a day ago or something like that - jules
+                - when the user finishes a lesson and it adds to their streak, make sure the streak in the section completion page displays the updated streak - jules
             - why does the "add unit" button extend the course length a little bit --> it shouldn't for now
             - make it so that if the user either generates a library or adds a section / unit then navigates away, it kills the request so the other parts of the libray load and it doesn't get stuck in a hanging state
             - do the loading disabling thing and toast thing for add unit as well, although that should be much faster
             - account for duplicate unit names when user is adding a unit
             - go through library_routes and make sure routes that require login actual have @login_required decorator
-
-        TODO when I get back:
-            - last 5 jules tasks then delete something
-            - TODO: 😏😏😏😏TEST LEAVE LIBRARY AGAIN AND LOOK THROUGH NEW MIGRATION e27dc8bcfa88😏😏😏😏😏
+            - change Logout to have red background
+            - make usernames unique in db if they aren't already
+            - make first name / last name not nullable
+            - have some sort of warning on the database model level if an owner tries to leave a course?
+            - make contact page not require login to send feedback
+            - go through all models and make sure cascade / ondelete=cascade are in sync w/ each other (ideally use ondelete cascade)
+            - if courses are empty, add a "create" button which links to create page
+            - add a "leave" course button in Explore Courses screen after the user clicks "join course"
 
         hard probably (goal: 2 high level bullet points / wk):
         - ⭐️ remove alert message in library creator (not hard but have to remember)
-        - ⭐️ add username (backfill username w/ 1st part of email before @ symbol - maybe let people change later)
-            - for this section, make sure you modify explore page owner_id and library leaderboard
-        - ✅ ⭐️ Finish sections + units
-            - ⭐️ Add ability to add sections to specific units (later --> come back to, reminder to make it account for 1-n number of sections no matter how that looks. add new stepping stones button is commented out for now)
-                - why is this empty? --> rag_context:
 
         - ✅ ⭐️ (would like to implement visibility of different courses first or at least a many:one for non-owners in library model)
-            - ⭐️ Delete sections (requires entering the name of the unit / course just for accidental reasons)
-                - DELETE SECTION MIGRATION c7209aac4ac0
+            - ⭐️ Delete sections (requires entering the name of the unit / course just for accidental reasons) <-- come back to
             - ⭐️ Delete Units (requires entering the name of the unit / course just for accidental reasons)
             - ⭐️ Delete courses / libraries (whatever they're called) (requires entering the name of the unit / course just for accidental reasons)
                - ⭐️ Remember to delete from both DB and pinecone as well, as well as respective child / parent courses / units / sections / libraries, roomNameState, LibraryFavorites, question, question_choice, LibraryMembership, etc...
-        - ⭐️ (NOTE: do AFTER deleting sections / units / courses and adding sections) ability to leave a library <-- jules
-            - in explore courses page, add a "leave library" next to the "go to Course" button when a user joins the course
-            - for course owner, it is replaced by delete library, which erases everything
 
         medium (chip away at when tired / mentally exhausted from hard ones):
         - ⭐️ add staging / pre-production environment that isn't localhost
@@ -212,8 +272,23 @@ TODO list:
 
     general:
     study tool additions / ideas:
+        - for library course structure, make manual course / unit creation under "advanced" or something, and default is just select a course syllabus
+        - add a "quick create" library, where it is like a button you click and you don't have to leave the page - maybe possibly. They don't specify settings or anything, they just leave a name and the course determines the structure - useful for non-study scenarios (ex: course on friends testing one another or multiplayer game like expriences if we try to do that)
+        - in course explorer, courses that have been generated < 7 days ago have "new" tag
+            - theres also "trending" courses as well, that we could add for now
+        - courses could be more of a platform, like skool.com or whatever - someone makes a fun course and its basically a market for creators w/ linktrees or sponsorships between slides or something. 
+        - for video - 1) train scripts on veritasium or whatever captivating youtube channel 2) begin with small activity / story for the user (like the economic story from uncle larry's friend, or his story from APush), then go into the lesson now that the user is intrigued
+            - why is this better then gemini live? - probably because students are lazy, but mostly because this might be captivating to them. aka I will start with some conceptions that the user has, like the force is downwards, or something, then I will go into the lesson - 
+            - this accurately addresses a need from users (motivation + lack of knowing what to study)
+            - even if it is not better then gemini live right now, what makes me know that it will not be beat by other ai companies in the future?
+                - I am focusing on user needs / wants and what I would like a study tool to look like. Paired with the "multiplayer study games". I will make something which is much more captivating then chatgpt or gemini could make.
+        - could eventually make it so it takes you through a guided study session without even touching a button - it could even tell you exactly what course standard / section it is getting it from
+        - you could feed it your homework as well maybe so it gives you similar problems to the tests - although that would be more difficult. maybe you give it the textbook and it makes it more fun? like adds images and colors and stuff and you do it in "focus mode" so it feels more fun then a dry old textbook?
+        - use chatgpt deep research / perplexity research / grok research for most common problems for students, then use that as copy writing or whatever
+        - ask book clubs or book based groups to review your tool to see if they would like it - like to do a refresher of their
+            book at a deeper level
         - handle delete account (eventually)
-        - when the course owner adds / deletes a section, broadcast it via webhooks to the other members in the form of alert toasts so they can see it live
+        - (DO WHEN SECTION / LIBRARY / UNIT DELETION IS DONE) when the course owner adds / deletes a section, broadcast it via webhooks to the other members in the form of alert toasts so they can see it live
         - complete feedback / user email dashboard detailing 1) feedback data 2) ai summaries / insights on what feedback I might have, maybe even broken up by user groups, age, location, etc... 3) list of user emails maybe? - might even be on a private url which calls my api - look into admin_routes if you know what I mean
             - contact / support pipeline?
             - use this in some private version of rivue url, not the main one
@@ -258,9 +333,10 @@ TODO list:
             - or make it adopt to a curve like exponential games or like xp in skyblock something more broken like --> (1, 3, 6, 8, 18, 36, 42, 69, 120, 210, etc...)
                 - but offer rewards at even perks (5, 10, 15, 25, 50) to make it even more enticing?
             - could be for a smaller one: https://lottiefiles.com/free-animation/fire-flame-4De5RVVPag
-            - slightly bigger one: https://lottiefiles.com/free-animation/fire-IuJfcIXKF1
+            - slightly bigger one: https://lottiefiles.com/free-animation/fire-sIuJfcIXKF1
             - maybe for 50 or 100, this whisks accross the little hover menu?: https://lottiefiles.com/free-animation/dancing-fire-CtzldMIEf9
             - maybe for smaller one like 5-10: https://lottiefiles.com/free-animation/fire-TLLDXwQuCQ
+            - maybe do this but only include a little flash for the flame, and not the loading animation
             - do this a little later
         - small idea for later (maybe): when you mouse over the unit name in learning path, it hovers a little bit, highlights white or --text-color, and displays above any names it is over
         - massive reorg / cleaning - get rid of unused functions / db models, commands / db calls / api calls / frontend components and rearrange existing ones using files structures / Blueprints that make sense
@@ -271,10 +347,11 @@ TODO list:
         -User retention: streak and cram mode
         Complete a lesson daily to keep stream. 24 hrs after u complete a lesson, the next one unlocks. Maybe some external reward like irl merch or snth
         Cram node is basically creative mode, can't do rewards but can skip around to any lesson
-        -Possible idea: adding the ability to schedule group study sessions within each library, maybe a ventral calendar for all the meetings, and maybe add the ability to pull things from canvas and moodle?
+        -Possible idea: adding the ability to schedule group study sessions within each library, maybe a central calendar for all the meetings, and maybe add the ability to pull things from canvas and moodle?
         Good- idk
         Bad- location in an app might be dangerous especially for public libraries, not an original feature, might get people off the app?
         - ⭐️ cram mode or something at the bottom - basically goes through review mode, but of all of them, effectively giving them the review, but without the need to break their streak
+            - grabs 10 questions from every section and gives it to the user
         - ability for user to change language
         - add toggle for users to set a home 'timezone' (dropdown menu) and add for it to automatically 
             switch
@@ -379,6 +456,7 @@ TODO list:
         - eventually look into custom api / llm specifically designed for education or review or whatever
         - *possibly* add a slider to each course based on how lenient the course creator wants the fuzzy string matcher to be (for misspelled words)
         - only fetch most 30 recent factoids, or summary of factoids or something when doing room generation
+        - center "Courses" text in create screen
 
     game page:
         - break up error checking in frontend for unit creation

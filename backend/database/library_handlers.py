@@ -3,6 +3,7 @@ from flask import jsonify, current_app as app
 from sqlalchemy import func, distinct
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from contextlib import contextmanager
+from sqlalchemy.orm import joinedload
 import random
 import math
 import string
@@ -109,50 +110,52 @@ def create_library_favorite(
     
 def create_unit_and_add(library_id, unit_name, position=-1):
     try:
-        unit = LibraryUnit(
-            library_id=library_id,
-            unit_name=unit_name,
-            position=position # use -1 for placeholder since it doesn't allow None
-        )
+        with db_transaction():
+            unit = LibraryUnit(
+                library_id=library_id,
+                unit_name=unit_name,
+                position=position  # use -1 for placeholder since it doesn't allow None
+            )
 
-        library = Library.query.get(library_id)
+            library = Library.query.get(library_id)
 
-        db.session.add(unit)
+            if not library:
+                print("Warning: not library in create_unit_and_add.")
+                raise NotFoundError
 
-        if len(library.units) >= 20:
-            print("Warning: Library has reached maximum number of units.")
-            raise MaxUnitsReachedError
+            if len(library.units) >= 20:
+                print("Warning: Library has reached maximum number of units.")
+                raise MaxUnitsReachedError
 
-        if not unit:
-            print("Warning: not unit in create_unit_and_add.")
-            raise NotFoundError
-        if  not library:
-            print("Warning: not library in create_unit_and_add.")
-            raise NotFoundError
+            db.session.add(unit)
 
-        if position != -1:
-            library.attach_unit(unit, position)
-        else:
-            library.attach_unit(unit)
+            if not unit:
+                print("Warning: not unit in create_unit_and_add.")
+                raise NotFoundError
 
-        db.session.flush()  # Flush to get the unit ID before commit
+            if position != -1:
+                library.attach_unit(unit, position)
+            else:
+                library.attach_unit(unit)
 
-        return (
-            jsonify(
-                {"message": "Unit created and added successfully", "unit": unit.id}
-            ),
-            201,
-        )
-    except Exception as e:
-        print("something else")
-        print(f"Exception in create_unit_and_add: {str(e)}")
-        return jsonify({"message": str(e)}), 400
+            db.session.flush()  # Flush to get the unit ID before commit
+
+            return (
+                jsonify(
+                    {"message": "Unit created and added successfully", "unit": unit.id}
+                ),
+                201,
+            )
     except MaxUnitsReachedError as e:
-        print(f"Library has reached max amounts of units in create unit: {str(e)}")
+        print(f"Library has reached max amounts of units in create_unit_and_add: {str(e)}")
         raise
     except NotFoundError as e:
         print(f"Library or Unit not found error in create_unit_and_add: {str(e)}")
         raise
+    except Exception as e:
+        print("something else")
+        print(f"Exception in create_unit_and_add: {str(e)}")
+        return jsonify({"message": str(e)}), 400
     
 def create_section_and_add(unit_id, section_name, position=-1):
     try:
@@ -301,16 +304,17 @@ def get_library_scores(library_id):
 
     try:
 
-        memberships = LibraryMembership.query.filter_by(library_id=library_id).all()
-        
+        memberships = LibraryMembership.query.filter_by(library_id=library_id).options(
+            joinedload(LibraryMembership.user)
+        ).all()
+
         if not memberships:
             return jsonify({'error': 'No memberships found for the given library'}), 404
-        
-        member_list = []
-        for membership in memberships:
-                member_list.append({
-                    'user_id': membership.user_id,
-                })
+
+        member_list = [
+            {'username': membership.user.username}
+            for membership in memberships if membership.user
+        ]
 
         return jsonify(member_list)
     
@@ -364,7 +368,7 @@ def save_library_room_contents(library_id, section_unit_map, section_contents_ma
         with db_transaction():
             curr = 1
             for unit_name, sections in section_unit_map.items():
-                print("section unit map error")
+                
                 # 1.1 + 1.2) create unit and add to library
                 response_obj, status_code = create_unit_and_add(library_id, unit_name)
                 
@@ -393,7 +397,6 @@ def save_library_room_contents(library_id, section_unit_map, section_contents_ma
                     
                     # 3) add room states
                     add_section_user_state(user_id, library_id, section_id, num_lessons)
-                    print("add section user state error")
                     
                     if "factoids" not in section_contents_map[section]:
                         print(f"Warning: No factoids for section '{section}'")
@@ -539,75 +542,81 @@ def save_section_contents(library_id, section, section_contents_map, unit_id, po
 
 def retrieve_library_room_contents(library_id, section_id, user_id):
 
-    # user HAS to be logged
-    if not user_id:
-        return None
+    try:
+        # user HAS to be logged
+        if not user_id:
+            return None
 
-    # query lesson room state map
-    # map user id, library id, and room name in map to retrieve state
-    # send state and factoids for that state back
-    curr_state = get_library_room_state(user_id, library_id, section_id)
+        # query lesson room state map
+        # map user id, library id, and room name in map to retrieve state
+        # send state and factoids for that state back
+        curr_state = get_library_room_state(user_id, library_id, section_id)
 
-    if not curr_state:
-        return None
-    
-    print("after curr_state check")
-    
-    if curr_state["lesson_state"] > curr_state["num_lessons"]:
-        # User has completed all lessons, randomly get 7-9 factoids
+        if not curr_state:
+            return None
+        
+        print("after curr_state check")
+        
+        if curr_state["lesson_state"] > curr_state["num_lessons"]:
+            # User has completed all lessons, randomly get 7-9 factoids
 
-        all_factoids = LibraryFactoid.query.filter_by(
-            section_id=section_id
-        ).all()
-    
-        # Randomly select between 7-9 factoids or all if less than 7
-        num_factoids = min(random.randint(7, 9), len(all_factoids))
-        factoids = random.sample(all_factoids, num_factoids) if len(all_factoids) >= num_factoids else all_factoids
+            all_factoids = LibraryFactoid.query.filter_by(
+                section_id=section_id
+            ).all()
+        
+            # Randomly select between 7-9 factoids or all if less than 7
+            num_factoids = min(random.randint(7, 9), len(all_factoids))
+            factoids = random.sample(all_factoids, num_factoids) if len(all_factoids) >= num_factoids else all_factoids
 
-    else:
-        # Get factoids for the current lesson state
-        factoids = LibraryFactoid.query.filter_by(
-            section_id=section_id, lesson_name=f"factoid_set_{curr_state['lesson_state']}"
-        ).all()
-    
-    print(f"length of factoids: {len(factoids)}")
+        else:
+            # Get factoids for the current lesson state
+            factoids = LibraryFactoid.query.filter_by(
+                section_id=section_id, lesson_name=f"factoid_set_{curr_state['lesson_state']}"
+            ).all()
+        
+        print(f"length of factoids: {len(factoids)}")
 
-    if len(factoids) < 3:
-        return None
-    
-    print(f"factoids: {factoids}")
+        if len(factoids) < 3:
+            return None
+        
+        print(f"factoids: {factoids}")
 
-    room_contents = []
-    for factoid in factoids:
-        questions = []
-        for question in factoid.questions:
-            question_choices = question.choices.all() if question.choices else []
-            wrong_choices = [
-                choice.choice_text
-                for choice in question_choices
-                if not choice.is_correct
-            ]
-            correct_choice = next(
-                (
+        room_contents = []
+        for factoid in factoids:
+            questions = []
+            for question in factoid.questions:
+                question_choices = question.choices if question.choices else []
+                # question_choices = question.choices.all() if question.choices else []
+                wrong_choices = [
                     choice.choice_text
                     for choice in question_choices
-                    if choice.is_correct
-                ),
-                None,
+                    if not choice.is_correct
+                ]
+                correct_choice = next(
+                    (
+                        choice.choice_text
+                        for choice in question_choices
+                        if choice.is_correct
+                    ),
+                    None,
+                )
+                questions.append(
+                    {
+                        "question_text": question.question_text,
+                        "correct_choice": correct_choice,
+                        "wrong_choices": wrong_choices,
+                        "question_type": question.question_type,
+                    }
+                )
+            room_contents.append(
+                {"factoid_text": factoid.factoid_content, "questions": questions, "room_state": curr_state}
             )
-            questions.append(
-                {
-                    "question_text": question.question_text,
-                    "correct_choice": correct_choice,
-                    "wrong_choices": wrong_choices,
-                    "question_type": question.question_type,
-                }
-            )
-        room_contents.append(
-            {"factoid_text": factoid.factoid_content, "questions": questions, "room_state": curr_state}
-        )
-
-    return {"factoids": room_contents}
+        
+        return {"factoids": room_contents}
+    
+    except Exception as e:
+        print(f"Exception retrieve_library_room_contents: {str(e)}")   
+        raise
 
 def join_library(user_id: int, library_id: int, join_code: str = None):
     """
@@ -622,16 +631,16 @@ def join_library(user_id: int, library_id: int, join_code: str = None):
 
     library = Library.query.filter(Library.id == library_id).first()
     if not library:
-
-        if not join_code:
-            raise ValueError(f"Library {library_id} not found")
-        else:
-            library = Library.query.filter(
-                (Library.join_code == join_code) and 
-                (not Library.is_public)
-                ).first()
-            if not library:
-                raise InvalidJoinCodeError("Invalid join code")
+        raise ValueError(f"Library {library_id} not found")
+    
+    # Check join conditions
+    if library.is_public:
+        # Public library - no join code needed
+        pass
+    else:
+        # Private library - requires matching join code
+        if not join_code or library.join_code != join_code:
+            raise InvalidJoinCodeError("Invalid join code for private library")
 
     already_exists = db.session.query(LibraryMembership) \
         .filter_by(user_id=user_id, library_id=library_id) \
@@ -739,7 +748,7 @@ def increase_lesson_state(user_id, library_id, section_id):
         library_id=library_id,
         section_id=section_id
     ).first()
-    
+    print(state)
     if not state:
         return None, False  # State not found
     
@@ -1081,14 +1090,27 @@ def get_libraries_info(user_id=None, browse=False):
                 ~Library.id.in_(
                 db.session.query(LibraryMembership.library_id)
                 .filter_by(user_id=user_id)
-                ), 
-                Library.is_public.is_(True)
+                )#
+                # Library.is_public.is_(True)
                 )
             .all())
 
-        response["explore_libraries"] = [model_to_dict(library, exclude=['room_names', 'factoids']) for library in explore_libraries]
+        # come back here --> get username from library to send to explore courses
+        explore_libraries_data = []
+        for library in explore_libraries:
+            library_dict = model_to_dict(library, exclude=['room_names', 'factoids'])
+
+            user = User.query.get(library_dict['owner_id'])
+            name = None
+            if user:
+                name = user.username
+                
+            explore_libraries_data.append([library_dict, name])
         
+        response["explore_libraries"] = explore_libraries_data
+        print(response)
         return jsonify(response)
+    
     else:
         response = {}
 

@@ -4,6 +4,7 @@ import { defineStore } from "pinia";
 import axios from "axios";
 import { useAuthStore } from "@/store/authStore";
 import { usePopupStore } from "@/store/popupStore";
+import { useUserStatsStore } from '@/store/userStatsStore';
 
 const DEFAULT_SECTIONID_VALUE = -1000;
 
@@ -268,6 +269,7 @@ export const useGameStore = defineStore("gameStore", {
                     if (response.data.status === "success") {
                         this.completed = true;
                         this.setSectionId(DEFAULT_SECTIONID_VALUE);
+
                     } else {
                         console.error("Failed to end game:", response.data.message);
                     }

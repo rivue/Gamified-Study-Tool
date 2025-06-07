@@ -2,8 +2,8 @@
     <div class="landing-container">
         <div class="landing-page-1">
             <div class="landing-titles-container">
-                <div class="landing-title">Studying. Made. Simple.</div>
-                <div class="landing-subtitle">Revolutionize your study routine with our gamified lesson creator.</div>
+                <div class="landing-title">Learning. Made. Simple.</div>
+                <div class="landing-subtitle">Revolutionize your learning routine with our gamified course creator.</div>
             </div>
         </div>
         <div class="landing-page-2">
@@ -103,7 +103,7 @@ const handleMessageCode = (code: string | null) => {
 
 const redirectLogin = () => {
     if (authStore.loggedIn) {
-        router.push("/library");
+        router.push("/create");
     } else {
         router.push("/login");
     }

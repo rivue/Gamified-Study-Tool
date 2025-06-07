@@ -2,6 +2,7 @@
 
 from flask import jsonify
 from flask_login import login_required, current_user
+import zoneinfo
 
 import database.db_handlers as dbh
 from message_handler import initialize_messages
@@ -37,4 +38,14 @@ def init_utility_routes(app):
         return jsonify({
             "lessons": public_lessons,
         })
+
+    @app.route("/api/timezones", methods=["GET"])
+    def get_timezones():
+        try:
+            timezones = sorted(list(zoneinfo.available_timezones()))
+            return jsonify(timezones)
+        except Exception as e:
+            # Log the error e if logging is set up
+            # current_app.logger.error(f"Failed to retrieve timezones: {e}")
+            return jsonify({'error': 'Could not retrieve timezones', 'details': str(e)}), 500
         

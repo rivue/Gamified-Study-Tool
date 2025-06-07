@@ -2,10 +2,8 @@
     <div class="not-found-container">
       <div class="content">
         <h1 class="title">404</h1>
-        <h2 class="subtitle">Oops! This library doesn't exist yet</h2>
-        <p class="message">Even the stars get lost in the Rivue cosmos sometimes!</p>
-        <p class="hint">Perhaps this knowledge hasn't reached the Rivue library yet?</p>
-        <router-link to="/" class="home-button">Return to Library</router-link>
+        <h2 class="subtitle">This is the error page. There's not much here.</h2>
+        <router-link to="/" class="home-button">Back to Home</router-link>
       </div>
     </div>
   </template>

@@ -3,25 +3,59 @@
         <h1 class="page-title">Settings</h1>
 
         <div class="profile-section">
-            <h2 class="section-title">Email</h2>
-            <p class="profile-info">{{ profile.email }}</p>
-            <div class="settings-buttons half-n-half">
-                <MenuButton label="Logout" @click="logout" />
+            <h2 class="section-title">Account Information</h2>
+            <div class="form-field">
+                <label for="email">Email:</label>
+                <input type="text" id="email" :value="profile.email" readonly class="profile-input-readonly" />
+            </div>
+            <div class="form-field">
+                <label for="username">Username:</label>
+                <input type="text" id="username" v-model="editableProfile.username" class="profile-input" />
+            </div>
+            <div class="settings-buttons">
+                <MenuButton label="Save Username" @click="saveUsername" customClass="action-button" />
             </div>
         </div>
 
-        <!-- New Time Zone section -->
         <div class="profile-section">
-            <h2 class="section-title">Time Zone</h2>
-            <p class="profile-info">{{ profile.timezone }}</p>
+            <h2 class="section-title">Personal Details</h2>
+            <div class="form-field">
+                <label for="first_name">First Name:</label>
+                <input type="text" id="first_name" v-model="editableProfile.first_name" class="profile-input" />
+            </div>
+            <div class="form-field">
+                <label for="last_name">Last Name:</label>
+                <input type="text" id="last_name" v-model="editableProfile.last_name" class="profile-input" />
+            </div>
         </div>
 
-         <!-- New Time Zone section -->
+        <div class="profile-section">
+            <h2 class="section-title">Localization</h2>
+            <div class="form-field">
+                <label for="timezone">Time Zone:</label>
+                <select id="timezone" v-model="editableProfile.timezone" class="profile-input">
+                    <option v-if="timezonesList.length === 0" value="" disabled>Loading timezones...</option>
+                    <option v-for="tz in timezonesList" :key="tz" :value="tz">{{ tz }}</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="settings-buttons half-n-half">
+            <MenuButton label="Save Profile" @click="saveUserProfile" customClass="action-button" />
+            <MenuButton label="Logout" @click="logout" customClass="danger-button" />
+        </div>
+        
+        <div class="profile-section">
             <p class="text-center opacity-70 pt-4">
                 Member Since: {{ new Date(profile.joined_at).toLocaleDateString() }}
             </p>
 
-        <!-- TODO: maybe add light mode later -->
+            <!-- TODO: maybe add light mode later -->
+
+
+            <!-- TODO: maybe add light mode later -->
+
+        </div>
     </div>
 </template>
 
@@ -42,69 +76,129 @@ const authStore = useAuthStore();
 const themeStore = useThemeStore();
 
 interface Profile {
-    user: string;
+    user: string; // Corresponds to 'profile' text blob
     tutor: string;
     email: string;
-    tier: string;
+    // tier: string;
+    username: string;
+    first_name: string;
+    last_name: string;
     timezone: string;
     joined_at: string;
 }
 
+// For data fetched from backend (largely read-only display)
 const profile = ref<Profile>({
-    user: "",
+    user: "", 
     tutor: "",
     email: "",
-    tier: "",
-    timezone: "",
+    // tier: "",
+    username: "",
+    first_name: "",
+    last_name: "",
+    timezone: "UTC", // Default value
     joined_at: ""
 });
 
-const userTextarea = ref<HTMLTextAreaElement | null>(null);
-const tutorTextarea = ref<HTMLTextAreaElement | null>(null);
+// For editable fields to avoid direct mutation of profile during editing
+const editableProfile = ref({
+    username: "",
+    first_name: "",
+    last_name: "",
+    timezone: "UTC",
+    profile_text: "" // For the generic profile text field
+});
+
+const timezonesList = ref<string[]>([]);
 
 // const cloudTokens = computed(() => authStore.cloudTokens);
 // const currentMentorName = computed(() => mentorStore.currentMentor);
 // const currentTheme = computed(() => themeStore.darkMode);
 
-const displayTierName = computed(() => {
-    const tierCode = profile.value.tier;
-    const tierNameMap: Record<string, string> = {
-        free: "Aspirant (free)",
-        paid: "Awakened",
-        pro: "Ascendant",
-    };
-    return tierNameMap[tierCode] || "Unknown Tier";
-});
+// const displayTierName = computed(() => {
+//     const tierCode = profile.value.tier;
+//     const tierNameMap: Record<string, string> = {
+//         free: "Aspirant (free)",
+//         paid: "Awakened",
+//         pro: "Ascendant",
+//     };
+//     return tierNameMap[tierCode] || "Unknown Tier";
+// });
+// const displayTierName = computed(() => {
+//     const tierCode = profile.value.tier;
+//     const tierNameMap: Record<string, string> = {
+//         free: "Aspirant (free)",
+//         paid: "Awakened",
+//         pro: "Ascendant",
+//     };
+//     return tierNameMap[tierCode] || "Unknown Tier";
+// });
 
 const fetchProfile = async () => {
     try {
         const response = await axios.get("/api/profile");
         if (response.data.status === "success") {
             profile.value = response.data.profile;
-            nextTick(() => {
-                if (userTextarea.value) autoGrow({ target: userTextarea.value });
-                if (tutorTextarea.value) autoGrow({ target: tutorTextarea.value });
-            });
+            // Initialize editableProfile with fetched data
+            editableProfile.value.username = response.data.profile.username || authStore.user?.username || ""; // Use authStore as fallback
+            editableProfile.value.first_name = response.data.profile.first_name || "";
+            editableProfile.value.last_name = response.data.profile.last_name || "";
+            editableProfile.value.timezone = response.data.profile.timezone || "UTC";
+            editableProfile.value.profile_text = response.data.profile.user || ""; // 'user' field from backend is the 'profile' text blob
         } else {
+            popupStore.showPopup("Failed to fetch profile information.");
             console.error("Failed to fetch profile");
         }
     } catch (error) {
+        popupStore.showPopup("Error fetching profile information.");
         console.error("Error fetching profile:", error);
     }
 };
 
-const updateProfile = async (type: 'user' | 'tutor') => {
+const saveUserProfile = async () => {
     try {
-        const response = await axios.post(`/api/profile/${type}`, {
-            data: profile.value[type],
+        const payload = {
+            data: {
+                first_name: editableProfile.value.first_name,
+                last_name: editableProfile.value.last_name,
+                timezone: editableProfile.value.timezone,
+                profile_text: editableProfile.value.profile_text // This maps to User.profile
+            }
+        };
+        const response = await axios.post(`/api/profile/user`, payload);
+        if (response.data.status === "success") {
+            popupStore.showPopup("Profile updated successfully.");
+            // Re-fetch profile to get any backend-side updates or confirmations
+            fetchProfile();
+        } else {
+            popupStore.showPopup(response.data.message || "Failed to update profile.");
+        }
+    } catch (error: any) {
+        popupStore.showPopup(error.response?.data?.message || "Error updating profile.");
+    }
+};
+
+const saveUsername = async () => {
+    if (!editableProfile.value.username) {
+        popupStore.showPopup("Username cannot be empty.");
+        return;
+    }
+    try {
+        const response = await axios.post(`/api/profile/username`, {
+            new_username: editableProfile.value.username,
         });
         if (response.data.status === "success") {
-            popupStore.showPopup(`Profile of ${type} updated successfully.`);
+            popupStore.showPopup("Username updated successfully.");
+            // Update local profile state and authStore
+            profile.value.username = editableProfile.value.username;
+            if (authStore.user) {
+                authStore.user.username = editableProfile.value.username;
+            }
         } else {
-            popupStore.showPopup(`Failed to update ${type} profile`);
+            popupStore.showPopup(response.data.message || "Failed to update username.");
         }
-    } catch (error) {
-        popupStore.showPopup(`Error updating ${type} profile:`);
+    } catch (error: any) {
+        popupStore.showPopup(error.response?.data?.message || "Error updating username.");
     }
 };
 
@@ -132,8 +226,24 @@ const autoGrow = (event: { target: HTMLTextAreaElement }) => {
     textarea.style.height = textarea.scrollHeight + "px";
 };
 
+const fetchTimezones = async () => {
+    try {
+        const response = await axios.get<string[]>("/api/timezones");
+        if (response.data && Array.isArray(response.data)) {
+            timezonesList.value = response.data;
+        } else {
+            console.error("Failed to fetch timezones: Invalid data format", response.data);
+            popupStore.showPopup("Could not load timezones.");
+        }
+    } catch (error) {
+        console.error("Error fetching timezones:", error);
+        popupStore.showPopup("Error fetching timezones.");
+    }
+};
+
 onMounted(() => {
     fetchProfile();
+    fetchTimezones();
 });
 </script>
 
@@ -150,24 +260,53 @@ onMounted(() => {
     margin-top: 16px;
     width: 100%;
     max-width: 720px;
+    display: flex;
+    /* Added for button layout */
+    gap: 10px;
+    /* Added for spacing between buttons */
 }
 
-.profile-info {
-    padding: 8px 16px;
-    margin: 4px;
+.profile-info,
+.profile-input,
+.profile-input-readonly {
+    padding: 10px;
+    margin: 4px 0;
+    /* Adjusted margin */
     width: 100%;
-    
-    margin-top: 4px;
+    box-sizing: border-box;
+    /* Ensures padding doesn't add to width */
     color: var(--text-color);
-    justify-content: center;
-    display: flex;
-    align-items: center;
     border: 1px solid var(--element-color-1);
     border-radius: 8px;
+    background-color: var(--background-color-2); /* Consistent background */
+}
+
+.profile-input-readonly {
+    background-color: var(--background-color-1t); /* Slightly different for readonly */
+    cursor: not-allowed;
+}
+
+.profile-input:focus {
+    outline: none;
+    border-color: var(--accent-color-1);
+    box-shadow: 0 0 0 2px var(--accent-color-1-t);
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 10px;
+}
+
+.form-field label {
+  font-size: 0.9em;
+  color: var(--text-color-secondary); /* Softer color for label */
+  margin-bottom: 4px;
 }
 
 .section-title {
-    margin-bottom: 8px;
+    margin-bottom: 12px;
+    /* Increased margin */
 }
 
 .profile-textarea {
@@ -203,5 +342,20 @@ onMounted(() => {
 
 .red {
     background-color: red;
+}
+
+.action-button {
+    /* Custom styles for general action buttons if needed */
+    /* Example: flex-grow: 1; to make buttons take equal space */
+}
+
+.danger-button {
+    background-color: var(--danger-color, #e53e3e) !important;
+    /* Ensure high specificity */
+    color: white !important;
+}
+
+.danger-button:hover {
+    background-color: var(--danger-color-hover, #c53030) !important;
 }
 </style>

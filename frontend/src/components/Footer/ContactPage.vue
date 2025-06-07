@@ -1,25 +1,56 @@
-<!-- ContactPage.vue -->
 <template>
-    <div class="page-main-container">
-        <div class="page-main-section">
-            <div class="contact-overlay">
-                <div class="popup-content">
-                    <h1>Contact / Submit feedback</h1>
-                    <form v-if="loggedIn" @submit.prevent="handleSubmit">
-                        <textarea id="message" v-model="message" placeholder="Share your thoughts here" rows="4"
-                            required></textarea>
-
-                        <input type="submit" value="Submit" />
-                    </form>
-                    <div v-else>Please <a href="/login">log in</a> to submit feedback and bugs.</div>
-                    <br />
-                    <div>
-                        To reach us, join our Discord <a href="https://discord.gg/33yAcp2qDf"
-                            target="_blank">community</a> or email us at <a
-                            href="mailto:contact@rivue.ai?subject=Rivue.ai%20Feedback&body=Hello,%20I%20have%20some%20feedback..."><b>contact@rivue.ai</b></a>
-                    </div>
-                </div>
+    <div class="contact-page">
+        <div class="header-container">
+            <div class="header-content">
+                <h1 class="title">Contact / Submit feedback</h1>
+                <p class="subtitle">Your feedback matters! Help us improve Rivue.ai</p>
             </div>
+        </div>
+
+        <div class="feedback-info">
+            <div class="info-card">
+                <p class="info-title"><strong>All submissions are:</strong></p>
+                <ul class="info-list">
+                    <li>Read by our development team</li>
+                    <li>Used to prioritize new features and improvements</li>
+                    <li>Stored securely and used only to enhance Rivue.ai</li>
+                </ul>
+            </div>
+        </div>
+
+        <div v-if="loggedIn" class="form-container">
+            <form @submit.prevent="handleSubmit" class="feedback-form">
+                <textarea 
+                    id="message" 
+                    v-model="message" 
+                    placeholder="Share your thoughts, bug reports, or feature requests here" 
+                    rows="6"
+                    required
+                    class="feedback-textarea"
+                ></textarea>
+
+                <Button type="submit" class="submit-button">
+                    <span class="button-text">Submit Feedback</span>
+                </Button>
+            </form>
+        </div>
+
+        <div v-else class="login-prompt">
+            <p class="login-text">
+                Please <a href="/login" class="login-link">log in</a> to submit feedback and bugs.
+            </p>
+        </div>
+
+        <div class="contact-info">
+            <p class="contact-text">
+                To reach us, join our Discord 
+                <a href="https://discord.gg/33yAcp2qDf" target="_blank" class="contact-link">community</a> 
+                or email us at 
+                <a href="mailto:contact@rivue.ai?subject=Rivue.ai%20Feedback&body=Hello,%20I%20have%20some%20feedback..." 
+                   class="contact-link">
+                    <strong>contact@rivue.ai</strong>
+                </a>
+            </p>
         </div>
     </div>
 </template>
@@ -29,6 +60,7 @@ import axios from "axios";
 import { useAuthStore } from "@/store/authStore";
 import { usePopupStore } from "@/store/popupStore";
 import { computed, ref } from "vue";
+import { Button } from "@/components/ui/button";
 
 const message = ref("");
 
@@ -49,12 +81,12 @@ function handleSubmit() {
                 response.data.message &&
                 response.data.feedback_id
             ) {
-                const successMessage = `${response.data.message} Your feedback ID is ${response.data.feedback_id}.`;
+                const successMessage = `${response.data.message} Your feedback ID is ${response.data.feedback_id}. Thank you for helping us improve Rivue.ai!`;
                 popupStore.showPopup(successMessage);
             } else {
-                popupStore.showPopup("Feedback submitted.");
+                popupStore.showPopup("Feedback submitted successfully! Thank you for helping us improve Rivue.ai!");
             }
-            message.value;
+            message.value = "";
         })
         .catch((error) => {
             const popupStore = usePopupStore();
@@ -69,81 +101,224 @@ function handleSubmit() {
             popupStore.showPopup(message);
         });
 }
-
 </script>
 
 <style scoped>
-.contact-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: var(--background-color);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.popup-content {
-    background-color: var(--background-color-1t);
-    display: flex;
-    justify-content: center;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    padding: 10px;
-    border-radius: 8px;
-    max-width: 80%;
-}
-
-.popup-content div,
-.popup-content form {
-    width: 100%;
-}
-
-.popup-content form {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.popup-content label {
-    margin-bottom: 8px;
-}
-
-.popup-content :deep(textarea) {
-    background-color: #00000000;
-    padding: 10px;
-    border: 1px solid var(--text-color);
-    border-radius: 4px;
-    width: 100%;
-    box-sizing: border-box;
-    margin-bottom: 8px;
-}
-
-.popup-content :deep(textarea) {
-    resize: vertical;
-}
-
-.popup-content :deep(input[type="submit"]) {
-    margin-top: 8px;
-    margin-bottom: 8px;
-    padding: 10px 15px;
-    background-color: var(--element-color-1);
+.contact-page {
+    max-width: 800px;
+    margin-top: 2rem;
+    padding: 2rem;
     color: var(--text-color);
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s ease, text-shadow 0.3s ease;
-    text-align: center;
-    width: auto;
-    align-self: center;
+    background: var(--background-color);
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(26, 139, 127, 0.2);
 }
 
-.popup-content :deep(input[type="submit"]):hover {
-    background-color: var(--element-color-2);
-    text-shadow: 0 0 5px #bb86fc, 0 0 10px #bb86fc, 0 0 15px #bb86fc,
-        0 0 20px #bb86fc;
+.header-container {
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.header-content {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.title {
+    background-color: var(--text-color);
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    line-height: 1.2;
+}
+
+.subtitle {
+    font-size: 1rem;
+    color: var(--text-color-secondary);
+    line-height: 1.5;
+}
+
+.feedback-info {
+    margin-bottom: 2rem;
+}
+
+.info-card {
+    background: var(--background-color-1t);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    padding: 1.5rem;
+    border: 1px solid rgba(26, 139, 127, 0.2);
+}
+
+.info-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-color);
+    margin-bottom: 1rem;
+}
+
+.info-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    space-y: 0.75rem;
+}
+
+.info-list li {
+    position: relative;
+    padding-left: 1.5rem;
+    color: var(--text-color-secondary);
+    line-height: 1.5;
+    margin-bottom: 0.5rem;
+}
+
+.info-list li::before {
+    content: "•";
+    position: absolute;
+    left: 0;
+    color: var(--color-primary);
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+.form-container {
+    margin-bottom: 2rem;
+}
+
+.feedback-form {
+    background: var(--background-color-1t);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    padding: 2rem;
+    border: 1px solid rgba(26, 139, 127, 0.2);
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.feedback-textarea {
+    width: 100%;
+    min-height: 120px;
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid rgba(26, 139, 127, 0.3);
+    background-color: rgba(26, 139, 127, 0.1);
+    color: var(--text-color);
+    font-size: 1rem;
+    resize: vertical;
+    transition: all 0.2s;
+    font-family: inherit;
+    line-height: 1.5;
+}
+
+.feedback-textarea::placeholder {
+    color: var(--text-color-secondary);
+}
+
+.feedback-textarea:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(26, 139, 127, 0.2);
+    outline: none;
+}
+
+.submit-button {
+    align-self: center;
+    height: 48px;
+    border-radius: 8px;
+    background: var(--button-gradient);
+    color: var(--text-color);
+    font-weight: 600;
+    padding: 0 2rem;
+    transition: all 0.2s;
+    border: none;
+    cursor: pointer;
+}
+
+.submit-button:hover:not(:disabled) {
+    background: linear-gradient(135deg, var(--color-primary-dark), var(--color-primary));
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(26, 139, 127, 0.3);
+}
+
+.button-text {
+    color: var(--text-color);
+}
+
+.login-prompt {
+    background: var(--background-color-1t);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    padding: 2rem;
+    border: 1px solid rgba(26, 139, 127, 0.2);
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.login-text {
+    font-size: 1.125rem;
+    color: var(--text-color);
+}
+
+.login-link {
+    color: var(--color-primary);
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.login-link:hover {
+    color: var(--color-primary-light);
+    text-decoration: underline;
+}
+
+.contact-info {
+    background: var(--background-color-1t);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    padding: 1.5rem;
+    border: 1px solid rgba(26, 139, 127, 0.2);
+    text-align: center;
+}
+
+.contact-text {
+    color: var(--text-color);
+    line-height: 1.6;
+    margin: 0;
+}
+
+.contact-link {
+    color: var(--color-primary);
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.contact-link:hover {
+    color: var(--color-primary-light);
+    text-decoration: underline;
+}
+
+@media (max-width: 640px) {
+    .contact-page {
+        padding: 1.5rem;
+        border-radius: 12px;
+    }
+
+    .title {
+        font-size: 1.75rem;
+    }
+
+    .feedback-form {
+        padding: 1.5rem;
+    }
+
+    .submit-button {
+        width: 100%;
+        align-self: stretch;
+    }
 }
 </style>

@@ -2,7 +2,9 @@
     <transition name="fade">
         <div v-if="questionVisible" class="question-overlay">
             <div class="question-backdrop">
-                <div class="close-button" @click.stop="closeQuestion">×</div>
+
+                <LeaveGameWarning />
+
                 <div class="info-icon" @click="flipQuestion">i</div>
                 <!-- Completion message when no more questions -->
                 <div v-if="question === null" class="completion-message">
@@ -14,22 +16,12 @@
 
                 <div v-if="question !== null" class="choices-container" :class="{ 'shake': isShaking }">
                     <div v-if="question.type === 'one_word_answer'" class="input-container">
-                        <input 
-                            type="text" 
-                            v-model="userAnswer"
-                            @keyup.enter="submitOneWordAnswer"
-                            :class="{
-                                'correct': answerState.correct,
-                                'wrong': answerState.wrong
-                            }"
-                            :disabled="isDisabled"
-                            placeholder="Type your answer..."
-                        >
-                        <button
-                            class="submit-btn"
-                            @click="submitOneWordAnswer"
-                            :disabled="isDisabled || !userAnswer.trim()"
-                        >
+                        <input type="text" v-model="userAnswer" @keyup.enter="submitOneWordAnswer" :class="{
+                            'correct': answerState.correct,
+                            'wrong': answerState.wrong
+                        }" :disabled="isDisabled" placeholder="Type your answer...">
+                        <button class="submit-btn" @click="submitOneWordAnswer"
+                            :disabled="isDisabled || !userAnswer.trim()">
                             Submit
                         </button>
                     </div>
@@ -47,6 +39,8 @@
 </template>
 
 <script setup lang="ts">
+
+import LeaveGameWarning from "./LeaveGameWarning.vue";
 import { ref, computed } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useGameStore } from "@/store/gameStore";
@@ -57,68 +51,68 @@ const route = useRoute();
 const store = useGameStore();
 
 const answerState = ref<{ correct: string | null; wrong: string | null }>({
-  correct: null,
-  wrong: null,
+    correct: null,
+    wrong: null,
 });
 const isDisabled = ref(false);
 const isShaking = ref(false);
 const userAnswer = ref("");
 
 function shuffleArray<T>(array: T[]): void {
-  for (let i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]];
-  }
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
 }
 
 function submitOneWordAnswer() {
-  if (isDisabled.value || !userAnswer.value.trim()) return;
+    if (isDisabled.value || !userAnswer.value.trim()) return;
 
-  const processedAnswer = userAnswer.value.trim().toLowerCase();
-  const correctAnswer = store.factoids[store.currentQuestion].questions[0].correct_choice.toLowerCase();
-  const similarity = stringSimilarity.compareTwoStrings(processedAnswer, correctAnswer);
-  const isCorrect = similarity > 0.7;
+    const processedAnswer = userAnswer.value.trim().toLowerCase();
+    const correctAnswer = store.factoids[store.currentQuestion].questions[0].correct_choice.toLowerCase();
+    const similarity = stringSimilarity.compareTwoStrings(processedAnswer, correctAnswer);
+    const isCorrect = similarity > 0.7;
 
-  submitAnswer(userAnswer.value, isCorrect);
+    submitAnswer(userAnswer.value, isCorrect);
 }
 
 function submitAnswer(choice: string, isOneWordAnswer = false) {
-  const correct = store.factoids[store.currentQuestion].questions[0].correct_choice;
-  const isCorrect = isOneWordAnswer ? true : correct === choice;
+    const correct = store.factoids[store.currentQuestion].questions[0].correct_choice;
+    const isCorrect = isOneWordAnswer ? true : correct === choice;
 
-  if (isCorrect) {
-    answerState.value.correct = choice;
-    answerState.value.wrong = null;
-  } else {
-    answerState.value.wrong = choice;
-    answerState.value.correct = null;
-    isDisabled.value = true;
-    isShaking.value = true;
+    if (isCorrect) {
+        answerState.value.correct = choice;
+        answerState.value.wrong = null;
+    } else {
+        answerState.value.wrong = choice;
+        answerState.value.correct = null;
+        isDisabled.value = true;
+        isShaking.value = true;
+
+        setTimeout(() => {
+            isShaking.value = false;
+            isDisabled.value = false;
+            if (isOneWordAnswer) {
+                userAnswer.value = "";
+            }
+            answerState.value.wrong = null;
+        }, 1000);
+    }
 
     setTimeout(() => {
-      isShaking.value = false;
-      isDisabled.value = false;
-      if (isOneWordAnswer) {
-        userAnswer.value = "";
-      }
-      answerState.value.wrong = null;
-    }, 1000);
-  }
-
-  setTimeout(() => {
-    if (store.answerAttempt(isCorrect)) {
-      resetState();
-    } else {
-      router.push("/login");
-    }
-  }, 300);
+        if (store.answerAttempt(isCorrect)) {
+            resetState();
+        } else {
+            router.push("/login");
+        }
+    }, 300);
 }
 
 function resetState() {
-  answerState.value.correct = null;
-  answerState.value.wrong = null;
-  userAnswer.value = "";
-  isShaking.value = false;
+    answerState.value.correct = null;
+    answerState.value.wrong = null;
+    userAnswer.value = "";
+    isShaking.value = false;
 }
 
 function flipQuestion() {
@@ -129,51 +123,51 @@ function flipQuestion() {
 }
 
 function closeQuestion() {
-  router.push(`/lessons/${route.params.id}`);
+    router.push(`/lessons/${route.params.id}`);
 }
 
 function format(content: string): string {
-  return content
-    .replace(/\*\*([^*]*?)\*\*/g, "<strong>$1</strong>")
-    .replace(/_([^_]*?)_|\*([^*]*?)\*/g, "<em>$1$2</em>");
+    return content
+        .replace(/\*\*([^*]*?)\*\*/g, "<strong>$1</strong>")
+        .replace(/_([^_]*?)_|\*([^*]*?)\*/g, "<em>$1$2</em>");
 }
 
 const question = computed(() => {
-  if (store.currentQuestion === null) return null;
+    if (store.currentQuestion === null) return null;
 
-  const currentFactoid = store.factoids[store.currentQuestion];
-  if (
-    !currentFactoid ||
-    !Array.isArray(currentFactoid.questions) ||
-    currentFactoid.questions.length === 0
-  ) {
-    console.error("Invalid question structure.");
-    return null;
-  }
+    const currentFactoid = store.factoids[store.currentQuestion];
+    if (
+        !currentFactoid ||
+        !Array.isArray(currentFactoid.questions) ||
+        currentFactoid.questions.length === 0
+    ) {
+        console.error("Invalid question structure.");
+        return null;
+    }
 
-  const currentQuestion = currentFactoid.questions[0];
-  if (
-    !currentQuestion ||
-    !currentQuestion.question_text ||
-    !currentQuestion.correct_choice ||
-    !currentQuestion.question_type ||
-    !Array.isArray(currentQuestion.wrong_choices)
-  ) {
-    console.error("Missing question fields.");
-    return null;
-  }
+    const currentQuestion = currentFactoid.questions[0];
+    if (
+        !currentQuestion ||
+        !currentQuestion.question_text ||
+        !currentQuestion.correct_choice ||
+        !currentQuestion.question_type ||
+        !Array.isArray(currentQuestion.wrong_choices)
+    ) {
+        console.error("Missing question fields.");
+        return null;
+    }
 
-  const choices = [
-    currentQuestion.correct_choice,
-    ...currentQuestion.wrong_choices,
-  ];
-  shuffleArray(choices);
+    const choices = [
+        currentQuestion.correct_choice,
+        ...currentQuestion.wrong_choices,
+    ];
+    shuffleArray(choices);
 
-  return {
-    text: format(currentQuestion.question_text),
-    choices: choices.map(format),
-    type: currentQuestion.question_type,
-  };
+    return {
+        text: format(currentQuestion.question_text),
+        choices: choices.map(format),
+        type: currentQuestion.question_type,
+    };
 });
 
 const questionVisible = computed(() => store.questionVisible);
@@ -223,27 +217,6 @@ const questionVisible = computed(() => store.questionVisible);
     /* Added rounded corners */
 }
 
-/* New close button styles */
-.close-button {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    width: 30px;
-    height: 30px;
-    background: rgba(255, 0, 0, 0.8);
-    color: white;
-    border-radius: 50%;
-    text-align: center;
-    line-height: 28px;
-    font-size: 24px;
-    cursor: pointer;
-    transition: background-color 0.2s;
-}
-
-.close-button:hover {
-    background: rgba(255, 0, 0, 1);
-}
-
 /* Moved info icon to top right */
 .info-icon {
     position: absolute;
@@ -275,9 +248,7 @@ const questionVisible = computed(() => store.questionVisible);
             var(--background-color-2t),
             var(--background-color-1t));
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    z-index: 111;
     font-size: 1.4em;
-    /* Increased font size */
     margin: 20px 0;
 }
 
@@ -370,6 +341,7 @@ button.disabledButton {
         font-size: 1em;
     }
 }
+
 .input-container {
     grid-column: 1 / -1;
     display: flex;
@@ -410,20 +382,30 @@ input.wrong {
 }
 
 @keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    25% { transform: translateX(-10px); }
-    75% { transform: translateX(10px); }
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    25% {
+        transform: translateX(-10px);
+    }
+
+    75% {
+        transform: translateX(10px);
+    }
 }
 
 .shake {
-    animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+    animation: shake 0.5s cubic-bezier(.36, .07, .19, .97) both;
 }
 
 @media (max-width: 768px) {
     .input-container {
         flex-direction: column;
     }
-    
+
     .submit-btn {
         width: 100%;
     }

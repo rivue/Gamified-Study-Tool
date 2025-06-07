@@ -5,7 +5,7 @@
                 <h1 class="title">Explore Courses</h1>
                 <p class="subtitle">Discover and join courses created by the community</p>
             </div>
-
+            <!-- 
             <div class="join-course-container">
                 <div class="join-form">
                     <Input v-model="joinCode" placeholder="Enter private library code..." @keydown.enter="joinCourse"
@@ -20,7 +20,7 @@
                         {{ joinPrivateMessage }}
                     </div>
                 </Transition>
-            </div>
+            </div> -->
         </div>
 
         <div class="search-container">
@@ -34,27 +34,15 @@
             <div class="courses-grid">
                 <div v-for="library in displayedLibraries" :key="library.id" class="course-card">
                     <div class="card-content">
-                        <div class="card-header">
-                            <div class="difficulty-badge" :class="getDifficultyClass(library.difficulty)">
-                                {{ library.difficulty || 'All Levels' }}
-                            </div>
-                            <div class="card-meta">
-                                <span class="language-tag">{{ library.language || 'General' }}</span>
-                                <span v-if="library.language_difficulty" class="language-level">{{
-                                    library.language_difficulty }}</span>
-                            </div>
-                        </div>
-
-                        <h3 class="course-title">{{ library.library_topic }}</h3>
+                        <h3 class="course-title">
+                            {{ library.library_topic }}
+                            <Lock v-if="!library.is_public" class="lock-icon" />
+                        </h3>
 
                         <div class="card-stats">
                             <div class="stat">
-                                <Eye class="stat-icon" />
-                                <span>{{ library.clicks || 0 }}</span>
-                            </div>
-                            <div class="stat">
                                 <Heart class="stat-icon" />
-                                <span>{{ library.likes || 0 }}</span>
+                                <span>{{ library.likes === null ? "Likes not found" : library.likes }}</span>
                             </div>
                         </div>
                     </div>
@@ -62,29 +50,31 @@
                     <div class="card-footer">
                         <div class="creator">
                             <UserCircle class="creator-icon" />
-                            <span>{{ library.owner_id }}</span>
+                            <span>{{ library.owner_username === null ? "Creator not found" :
+                                library.owner_username.length > 12 && !library.is_public ?
+                                    library.owner_username.slice(0, 9) + "..." : library.owner_username }}</span>
                         </div>
 
-                        <Button v-if="!joinedCourses.has(library.id)" 
-                            @click="joinSpecificCourse(library.id)"
-                            :disabled="joinPublicLoading.has(library.id)" 
-                            class="join-card-button">
+                        <Input v-if="!library.is_public" v-model="joinCode" placeholder="Enter private library code"
+                            @keydown.enter="joinSpecificCourse(library.id)" class="join-input m-2 h-10 p-4" />
+
+                        <Button v-if="!joinedCourses.has(library.id)" @click="joinSpecificCourse(library.id)"
+                            :disabled="joinPublicLoading.has(library.id)" class="join-card-button h-10 p-4">
                             <LoaderCircle v-if="joinPublicLoading.has(library.id)" class="mr-2 h-4 w-4 animate-spin" />
                             Join
                         </Button>
-                        <Button 
-                            v-else 
-                            @click="goToCourse(library.id)" 
-                            class="joined-card-button">
+                        <Button v-else @click="goToCourse(library.id)" class="joined-card-button">
                             Go to Course
                         </Button>
                     </div>
                     <Transition name="fade">
-                        <div v-if="joinPublicMessages.has(library.id)" :class="['join-message', joinPublicMessageTypes.get(library.id)]">
+                        <div v-if="joinPublicMessages.has(library.id)"
+                            :class="['join-message', joinPublicMessageTypes.get(library.id)]">
                             {{ joinPublicMessages.get(library.id) }}
                         </div>
                     </Transition>
                 </div>
+
             </div>
 
             <!-- Loading indicator for infinite scroll -->
@@ -115,7 +105,7 @@ import { ref, watch, onMounted, onUnmounted } from "vue";
 import { useRouter } from "vue-router";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { LoaderCircle, Search, Eye, Heart, UserCircle, BookOpen } from "lucide-vue-next";
+import { LoaderCircle, Search, Heart, UserCircle, BookOpen, Lock } from "lucide-vue-next";
 import axios from "axios";
 
 // Props
@@ -132,6 +122,8 @@ const props = defineProps<{
         likes: number;
         library_topic: string;
         owner_id: string;
+        owner_username: string;
+        is_public: boolean;
     }>;
 }>();
 
@@ -141,11 +133,6 @@ const searchQuery = ref("");
 const filteredLibraries = ref<Array<any>>([]);
 const displayedLibraries = ref<Array<any>>([]);
 const joinCode = ref("");
-
-// For Private library code button
-const joinPrivateMessage = ref("");
-const joinPrivateMessageType = ref("");
-const joinPrivateLoading = ref(false);
 
 // actual list of courses 
 const joinPublicMessages = ref(new Map());
@@ -225,15 +212,15 @@ function handleScroll() {
 }
 
 // Get appropriate CSS class based on difficulty
-function getDifficultyClass(difficulty: string | undefined) {
-    if (!difficulty) return 'all-levels';
+// function getDifficultyClass(difficulty: string | undefined) {
+//     if (!difficulty) return 'all-levels';
 
-    const lowercaseDifficulty = difficulty.toLowerCase();
-    if (lowercaseDifficulty.includes('beginner')) return 'beginner';
-    if (lowercaseDifficulty.includes('intermediate')) return 'intermediate';
-    if (lowercaseDifficulty.includes('advanced')) return 'advanced';
-    return 'all-levels';
-}
+//     const lowercaseDifficulty = difficulty.toLowerCase();
+//     if (lowercaseDifficulty.includes('beginner')) return 'beginner';
+//     if (lowercaseDifficulty.includes('intermediate')) return 'intermediate';
+//     if (lowercaseDifficulty.includes('advanced')) return 'advanced';
+//     return 'all-levels';
+// }
 
 // Watch for changes to the libraries prop
 watch(() => props.libraries, (newLibraries) => {
@@ -251,48 +238,48 @@ onUnmounted(() => {
     window.removeEventListener('scroll', handleScroll);
 });
 
-async function joinCourse() {
-    if (!joinCode.value.trim()) return;
+// async function joinCourse() {
+//     if (!joinCode.value.trim()) return; 
 
-    joinPrivateLoading.value = true;
-    joinPrivateMessage.value = "";
+//     joinPrivateLoading.value = true;
+//     joinPrivateMessage.value = "";
 
-    axios
-        .post('/api/library/join', {
-            joinCode: joinCode.value.trim(),
-        })
-        .then((response) => {
-            if (response.status === 200) {
-                // Update the local favorites map
-                joinPrivateMessageType.value = "success";
-                joinPrivateMessage.value = "Successfully joined course!";
-                joinCode.value = "";
+//     axios
+//         .post('/api/library/join', {
+//             joinCode: joinCode.value.trim(),
+//         })
+//         .then((response) => {
+//             if (response.status === 200) {
+//                 // Update the local favorites map
+//                 joinPrivateMessageType.value = "success";
+//                 joinPrivateMessage.value = "Successfully joined course!";
+//                 joinCode.value = "";
 
-                // Add to local libraries array if needed
-                if (response.data.library) {
-                    const newLibrary = response.data.library;
-                    const libraryExists = props.libraries.some(lib => lib.id === newLibrary.id);
-                    if (!libraryExists) {
-                        filteredLibraries.value.unshift(newLibrary);
-                        filterLibraries();
-                    }
-                }
-            }
-        })
-        .catch((error) => {
-            console.error("Error updating favorite status:", error);
-            joinPrivateMessageType.value = "error";
-            joinPrivateMessage.value = error.response?.data?.message || "Failed to join course";
-        })
-        .finally(() => {
-            joinPrivateLoading.value = false;
+//                 // Add to local libraries array if needed
+//                 if (response.data.library) {
+//                     const newLibrary = response.data.library;
+//                     const libraryExists = props.libraries.some(lib => lib.id === newLibrary.id);
+//                     if (!libraryExists) {
+//                         filteredLibraries.value.unshift(newLibrary);
+//                         filterLibraries();
+//                     }
+//                 }
+//             }
+//         })
+//         .catch((error) => {
+//             console.error("Error updating favorite status:", error);
+//             joinPrivateMessageType.value = "error";
+//             joinPrivateMessage.value = error.response?.data?.message || "Failed to join course";
+//         })
+//         .finally(() => {
+//             joinPrivateLoading.value = false;
 
-            // Auto-hide message after 5 seconds
-            setTimeout(() => {
-                joinPrivateMessage.value = "";
-            }, 5000);
-        });
-}
+//             // Auto-hide message after 5 seconds
+//             setTimeout(() => {
+//                 joinPrivateMessage.value = "";
+//             }, 5000);
+//         });
+// }
 
 async function joinSpecificCourse(id: number) {
     joinPublicLoading.value.set(id, true);
@@ -301,6 +288,7 @@ async function joinSpecificCourse(id: number) {
     axios
         .post('/api/library/join', {
             libraryId: id,
+            joinCode: joinCode.value.trim(),
         })
         .then((response) => {
             if (response.status === 200) {
@@ -346,10 +334,11 @@ function handleSearchKeydown(event: KeyboardEvent) {
     max-width: 1200px;
     margin: 0 auto;
     padding: 2rem;
-    color: #1a1a1a;
-    background-color: #fafafa;
+    color: var(--text-color);
+    background: var(--background-color);
     border-radius: 16px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(26, 139, 127, 0.2);
 }
 
 .header-container {
@@ -372,10 +361,10 @@ function handleSearchKeydown(event: KeyboardEvent) {
 }
 
 .title {
+    background-color: var(--text-color);
     font-size: 2.5rem;
     font-weight: 800;
     margin-bottom: 0.5rem;
-    background: linear-gradient(90deg, #000000, #6366f1);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -384,8 +373,9 @@ function handleSearchKeydown(event: KeyboardEvent) {
 
 .subtitle {
     font-size: 1rem;
-    color: #666;
-    max-width: 500px;
+    color: var(--text-color-secondary);
+    text-align: center;
+    /*  the text */
 }
 
 .join-course-container {
@@ -401,45 +391,51 @@ function handleSearchKeydown(event: KeyboardEvent) {
 .join-input {
     flex: 1;
     border-radius: 8px;
-    border: 1px solid #e2e8f0;
-    background-color: white;
-    height: 44px;
+    border: 1px solid rgba(26, 139, 127, 0.3);
+    background-color: rgba(26, 139, 127, 0.1);
+    color: var(--text-color);
     font-size: 0.9rem;
+}
+
+.join-input::placeholder {
+    color: var(--text-color-secondary);
 }
 
 .join-button {
     height: 44px;
     border-radius: 8px;
-    background-color: #6366f1;
-    color: white;
+    background: var(--button-gradient);
+    color: var(--text-color);
     font-weight: 600;
     padding: 0 1.25rem;
     transition: all 0.2s;
+    border: none;
 }
 
 .join-button:hover:not(:disabled) {
-    background-color: #4f46e5;
+    background: linear-gradient(135deg, var(--color-primary-dark), var(--color-primary));
     transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(26, 139, 127, 0.3);
 }
 
 .join-message {
     margin-top: 0.5rem;
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
-    font-size: 0.75rem;
-    white-space: nowrap;
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    backdrop-filter: blur(10px);
 }
 
 .success {
-    background-color: rgba(34, 197, 94, 0.1);
-    color: #16a34a;
-    border: 1px solid rgba(34, 197, 94, 0.2);
+    background-color: rgba(16, 185, 129, 0.2);
+    color: var(--success-color);
+    border: 1px solid rgba(16, 185, 129, 0.3);
 }
 
 .error {
-    background-color: rgba(239, 68, 68, 0.1);
-    color: #dc2626;
-    border: 1px solid rgba(239, 68, 68, 0.2);
+    background-color: rgba(255, 116, 108, 0.2);
+    color: var(--error-color);
+    border: 1px solid rgba(255, 116, 108, 0.3);
 }
 
 .search-container {
@@ -452,7 +448,7 @@ function handleSearchKeydown(event: KeyboardEvent) {
     left: 1rem;
     top: 50%;
     transform: translateY(-50%);
-    color: #94a3b8;
+    color: var(--color-primary-light);
     width: 1.25rem;
     height: 1.25rem;
 }
@@ -462,15 +458,21 @@ function handleSearchKeydown(event: KeyboardEvent) {
     height: 50px;
     padding-left: 3rem;
     border-radius: 12px;
-    border: 1px solid #e2e8f0;
-    background-color: white;
+    border: 1px solid rgba(26, 139, 127, 0.3);
+    background-color: rgba(26, 139, 127, 0.1);
+    color: var(--text-color);
     font-size: 1rem;
     transition: all 0.2s;
 }
 
+.search-input::placeholder {
+    color: var(--text-color-secondary);
+}
+
 .search-input:focus {
-    border-color: #6366f1;
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(26, 139, 127, 0.2);
+    outline: none;
 }
 
 .courses-grid {
@@ -484,19 +486,21 @@ function handleSearchKeydown(event: KeyboardEvent) {
     display: flex;
     flex-direction: column;
     height: 100%;
-    background-color: white;
+    background: var(--background-color-1t);
+    backdrop-filter: blur(10px);
     border-radius: 16px;
     overflow: hidden;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
     transition: all 0.3s ease;
     cursor: pointer;
-    border: 1px solid #f1f5f9;
+    border: 1px solid rgba(26, 139, 127, 0.2);
 }
 
 .course-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 12px 20px rgba(0, 0, 0, 0.08);
-    border-color: #e2e8f0;
+    box-shadow: 0 12px 20px rgba(26, 139, 127, 0.2);
+    border-color: var(--color-primary-light);
+    background: var(--background-color-2t);
 }
 
 .card-content {
@@ -506,62 +510,28 @@ function handleSearchKeydown(event: KeyboardEvent) {
     flex-direction: column;
 }
 
-.card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 1rem;
-}
-
-.difficulty-badge {
-    padding: 0.25rem 0.75rem;
-    border-radius: 20px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: white;
-}
-
-.beginner {
-    background-color: #10b981;
-}
-
-.intermediate {
-    background-color: #f59e0b;
-}
-
-.advanced {
-    background-color: #ef4444;
-}
-
-.all-levels {
-    background-color: #8b5cf6;
-}
-
-.card-meta {
-    display: flex;
-    gap: 0.5rem;
-}
-
-.language-tag,
-.language-level {
-    padding: 0.25rem 0.5rem;
-    border-radius: 6px;
-    font-size: 0.75rem;
-    background-color: #f1f5f9;
-    color: #64748b;
-}
-
 .course-title {
     font-size: 1.25rem;
     font-weight: 700;
     margin-bottom: 1rem;
     line-height: 1.4;
-    color: #1e293b;
+    color: var(--text-color);
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
     flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.lock-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+    color: var(--color-primary-light);
+    flex-shrink: 0;
+    opacity: 0.8;
 }
 
 .card-stats {
@@ -574,7 +544,7 @@ function handleSearchKeydown(event: KeyboardEvent) {
     display: flex;
     align-items: center;
     gap: 0.375rem;
-    color: #64748b;
+    color: var(--color-primary-light);
     font-size: 0.875rem;
 }
 
@@ -585,8 +555,8 @@ function handleSearchKeydown(event: KeyboardEvent) {
 
 .card-footer {
     padding: 1rem 1.5rem;
-    background-color: #f8fafc;
-    border-top: 1px solid #f1f5f9;
+    background: rgba(26, 139, 127, 0.1);
+    border-top: 1px solid rgba(26, 139, 127, 0.2);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -596,13 +566,14 @@ function handleSearchKeydown(event: KeyboardEvent) {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    color: #64748b;
+    color: var(--text-color-secondary);
     font-size: 0.875rem;
 }
 
 .creator-icon {
     width: 1rem;
     height: 1rem;
+    color: var(--color-primary-light);
 }
 
 .loading-indicator {
@@ -611,20 +582,21 @@ function handleSearchKeydown(event: KeyboardEvent) {
     align-items: center;
     justify-content: center;
     padding: 2rem;
-    color: #64748b;
+    color: var(--text-color-secondary);
     gap: 0.75rem;
 }
 
 .loader-icon {
     width: 2rem;
     height: 2rem;
+    color: var(--color-primary);
     animation: spin 1s linear infinite;
 }
 
 .end-message {
     text-align: center;
     padding: 1.5rem;
-    color: #64748b;
+    color: var(--text-color-secondary);
     font-style: italic;
     font-size: 0.875rem;
 }
@@ -636,28 +608,28 @@ function handleSearchKeydown(event: KeyboardEvent) {
     justify-content: center;
     text-align: center;
     padding: 4rem 2rem;
-    background-color: white;
+    background: var(--background-color-1t);
     border-radius: 16px;
-    border: 1px dashed #e2e8f0;
+    border: 1px dashed rgba(26, 139, 127, 0.3);
 }
 
 .empty-icon {
     width: 4rem;
     height: 4rem;
-    color: #cbd5e1;
+    color: var(--color-primary-light);
     margin-bottom: 1.5rem;
 }
 
 .empty-title {
     font-size: 1.5rem;
     font-weight: 700;
-    color: #1e293b;
+    color: var(--text-color);
     margin-bottom: 0.75rem;
 }
 
 .empty-description {
     max-width: 400px;
-    color: #64748b;
+    color: var(--text-color-secondary);
     line-height: 1.6;
 }
 
@@ -670,18 +642,6 @@ function handleSearchKeydown(event: KeyboardEvent) {
 .fade-enter-from,
 .fade-leave-to {
     opacity: 0;
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
 }
 
 @keyframes spin {
@@ -710,34 +670,44 @@ function handleSearchKeydown(event: KeyboardEvent) {
 }
 
 .join-card-button {
-    background-color: #6366f1;
-    color: white;
+    background: var(--button-gradient);
+    color: var(--text-color);
     font-weight: 600;
     border-radius: 8px;
-    padding: 0.5rem 1rem;
-    font-size: 0.875rem;
+    /* padding: 0.5rem 1rem; */
+    /* font-size: 0.875rem; */
     transition: all 0.2s;
     cursor: pointer;
+    border: none;
+}
+
+.join-card-button:hover:not(:disabled) {
+    background: linear-gradient(135deg, var(--color-primary-dark), var(--color-primary));
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(26, 139, 127, 0.3);
 }
 
 .joined-card-button {
-    background-color: #16a34a;
-    color: white;
+    background: linear-gradient(135deg, var(--success-color), #059669);
+    color: var(--text-color);
     font-weight: 600;
     border-radius: 8px;
     padding: 0.5rem 1rem;
     font-size: 0.875rem;
     transition: all 0.2s;
     cursor: pointer;
+    border: none;
 }
 
 .joined-card-button:hover {
-    background-color: #15803d;
+    background: linear-gradient(135deg, #059669, #047857);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(16, 185, 129, 0.3);
 }
 
 .join-container {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
 }
 </style>

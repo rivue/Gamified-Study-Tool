@@ -1,4 +1,4 @@
-<template>
+<!-- <template>
     <button :class="['tier-button', tier]" @click="handleClick">
       {{ title }}
     </button>
@@ -74,4 +74,4 @@
     background-color: var(--background-color);
   }
   </style>
-  
+   -->

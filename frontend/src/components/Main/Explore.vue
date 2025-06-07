@@ -13,19 +13,16 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from "vue";
-import { useRoute } from "vue-router";
 import axios from "axios";
 import { useAuthStore } from "@/store/authStore";
 import LoadingComponent from "@/components/Backstage/LoadingComponent.vue";
 import ExploreCarousel from "@/components/Main/ExploreCarousel.vue";
 
 const authStore = useAuthStore();
-const route = useRoute();
 const isLoading = ref(true);
 const myLibraries = ref([]);
 
 onMounted(() => {
-
     fetchLibraries();
 });
 
@@ -34,11 +31,13 @@ function fetchLibraries() {
         .get("/api/libraries", { params: { browse: true } })
         .then((response) => {
             if (authStore.loggedIn) {
-                console.log(response)
-
-                myLibraries.value = response.data.explore_libraries.sort((a, b) => 
-                    a.library_topic.localeCompare(b.library_topic)
-                );
+            myLibraries.value = response.data.explore_libraries.map(([library, username]) => ({
+                ...library,
+                owner_username: username,
+                // library_topic: library.library_topic.charAt(0).toUpperCase() + library.library_topic.slice(1)
+            })).sort((a, b) => 
+                a.library_topic.localeCompare(b.library_topic)
+            );
             }
         })
         .catch((error) => {
@@ -52,8 +51,6 @@ function fetchLibraries() {
 }
 
 const loggedIn = computed(() => authStore.loggedIn);
-
-const browsingLibraries = computed(() => route.path === "/library");
 
 </script>
 

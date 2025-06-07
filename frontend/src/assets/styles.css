@@ -44,8 +44,7 @@ h2 {
     font-weight: 500;
     margin-top: 0.5rem;
     margin-bottom: 0.5rem;
-    border-left: 4px solid var(--element-color-1);
-    padding-left: 1rem;
+    /* border-left: 4px solid var(--element-color-1); */
 }
 
 h3 {
@@ -332,3 +331,7 @@ a:hover {
     @apply bg-background text-foreground;
   }
 }
+
+[data-state="open"][data-side] {
+    z-index: 9999 !important;
+  }

@@ -6,22 +6,25 @@
 
                 <!-- Menu Buttons -->
                 <div class="menu-buttons space-y-2">
+
                     <SideMenuButton
-                        v-if="!loggedIn"
-                        label="Log in"
-                        :isSelected="isRouteActive('/login')"
-                        @click="openRoute('/login')"
+                        v-if="loggedIn"
+                        label="My Courses"
+                        :isSelected="isRouteActive('/courses')"
+                        @click="openRoute('/courses')"
                         class="menu-button"
                     />
 
                     <SideMenuButton
-                        label="Courses"
-                        :isSelected="isRouteActive('/library')"
-                        @click="openRoute('/library')"
+                        v-if="loggedIn"
+                        label="Create Course"
+                        :isSelected="isRouteActive('/create')"
+                        @click="openRoute('/create')"
                         class="menu-button"
                     />
 
                     <SideMenuButton
+                        v-if="loggedIn"
                         label="Explore"
                         :isSelected="isRouteActive('/explore')"
                         @click="openRoute('/explore')"

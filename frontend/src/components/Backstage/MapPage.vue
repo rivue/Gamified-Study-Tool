@@ -1,7 +1,7 @@
 <template>
     <div class="page-main-container">
         <div v-if="!loading && library && isDataValid">
-            <h1 class="page-title">{{ library.data.library_topic }} Lessons</h1>
+            <h1 class="page-title text-3xl">{{ library.data.library_topic }}</h1>
             <LearningPath :libraryId="Number(library.data.id)" :room-names="library.data.room_names"
                 :room-data="library.room_data" :library-is-public="library.data.is_public"
                 :unit-section-map="processedUnitSectionMap" :library-join-code="library.data.join_code" 
@@ -48,7 +48,6 @@ const route = useRoute();
 const libraryId = route.params.id as string;
 const library = ref<Library | null>(null);
 const loading = ref(true);
-const orderedMap = ref([]);
 const abortController = new AbortController();
 
 
@@ -146,8 +145,6 @@ const fetchLibraryData = async (): Promise<void> => {
                 },
             };
 
-            // Log data structure for debugging in production if needed
-            console.debug("Initialized library data structure:", JSON.stringify({ hasRoomData: response.data.room_data.length > 0, unitMapKeys: Object.keys(response.data.data.unit_to_section_map) }));
         } else {
             throw new Error("Invalid response data");
         }

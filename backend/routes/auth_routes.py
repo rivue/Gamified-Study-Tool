@@ -1,10 +1,12 @@
 # routes/auth_routes.py
+import re
 from datetime import datetime
 from flask import request, jsonify, url_for, session, make_response
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_required, logout_user, current_user, login_user
 import pymysql.err as pymysql_err
 import os
+import re
 # from oauth2client import client, crypt
 
 from database.models import db, User
@@ -64,14 +66,23 @@ def init_auth_routes(app):
                     db.session.commit()
 
                 login_result = login_user(user, remember=True)
-
-                return jsonify({'status': 'success'})
+                
+                user_data = {
+                    'id': user.id,
+                    'username': user.username,
+                    'email': user.email,
+                    'first_name': user.first_name,
+                    'last_name': user.last_name                  
+                }
+                
+                print(f"login resulf: {user_data}")
+                return jsonify({'status': 'success', 'user': user_data})
             else:
                 return jsonify({'status': 'fail', 'message': 'Incorrect Password'}), 400
         except Exception as e:
             print(f"{e}")
             return jsonify({'status': 'fail', 'message': 'An unexpected error occurred. Please try again later.'}), 500
-    
+        
 
     @app.route("/api/logout", methods=["GET"])
     @login_required
@@ -85,15 +96,43 @@ def init_auth_routes(app):
     def signup():
         try:
             email = request.form['new-email']
-            user = User.query.filter_by(email=email).first()
+            username = request.form['username']
+            first_name = request.form.get('first_name', '').strip() # Use .get and strip
+            last_name = request.form.get('last_name', '').strip()   # Use .get and strip
 
-            if user:
+            # Validation for first_name
+            if first_name: # Only validate if provided
+                if len(first_name) > 25:
+                    return jsonify({'message': 'Field first_name cannot exceed 25 characters.'}), 400
+                if not re.match(r"^[a-zA-Z-]+$", first_name):
+                    return jsonify({'message': 'Field first_name can only contain letters and hyphens.'}), 400
+            
+            # Validation for last_name
+            if last_name: # Only validate if provided
+                if len(last_name) > 25:
+                    return jsonify({'message': 'Field last_name cannot exceed 25 characters.'}), 400
+                if not re.match(r"^[a-zA-Z-]+$", last_name):
+                    return jsonify({'message': 'Field last_name can only contain letters and hyphens.'}), 400
+
+            existing_user_by_email = User.query.filter_by(email=email).first()
+            if existing_user_by_email:
                 return jsonify({'message': 'An account with this email already exists.'}), 400
+
+            existing_user_by_username = User.query.filter_by(username=username).first()
+            if existing_user_by_username:
+                return jsonify({'message': 'This username is already taken. Please choose another.'}), 400
 
             password = request.form['new-password']
             hashed_password = generate_password_hash(password)
             joined_at = datetime.utcnow()
-            new_user = User(email=email, password=hashed_password, username=email, joined_at=joined_at)
+            new_user = User(
+                email=email,
+                username=username,
+                password=hashed_password,
+                first_name=first_name,
+                last_name=last_name,
+                joined_at=joined_at
+            )
             db.session.add(new_user)
             db.session.commit()
 

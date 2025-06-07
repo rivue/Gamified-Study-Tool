@@ -53,13 +53,7 @@ export default {
   left: -2px;
   right: -2px;
   bottom: -2px;
-  background: linear-gradient(
-    90deg,
-    var(--element-color-1),
-    var(--highlight-color),
-    var(--element-color-2),
-    var(--element-color-1)
-  );
+ 
   background-size: 200% 200%;
   border-radius: inherit;
   z-index: -1;
@@ -81,13 +75,5 @@ export default {
   animation: gradientBorder 4s linear infinite;
 }
 
-@keyframes gradientBorder {
-  0% {
-    background-position: 0% 50%;
-  }
-  100% {
-    background-position: 200% 50%;
-  }
-}
 </style>
 

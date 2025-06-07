@@ -6,21 +6,17 @@ from flask_login import current_user, login_required, AnonymousUserMixin
 from bleach import clean
 from flask_executor import Executor
 import concurrent.futures
-from app import InvalidJoinCodeError, UserAlreadyMemberError, UserAlreadyMemberError, InvalidJoinCodeError, MaxUnitsReachedError, NotFoundError
-
-from io import BytesIO
+from app import InvalidJoinCodeError, UserAlreadyMemberError, UserAlreadyMemberError, InvalidJoinCodeError, NotFoundError
 
 from openapi import moderate
 from utils import mask_email, parse_group_structure
 import database.library_handlers as lbh
 import knowledge_net.library_generator as lgn
-from images.library_imager import generate_images_task, save_image
-from database.user_handler import increment_violations, is_within_limit, check_generation_allowed, mark_generation_done
+from images.library_imager import generate_images_task
+from database.user_handler import increment_violations
 from database.models import Library, LibrarySection, LibraryUnit, db
 from vector_processing.file_handler import process_document
 from vector_processing.retrieval import query_and_respond_pinecone
-import app
-from sqlalchemy.exc import IntegrityError
 import time
 
 def init_library_routes(app):
@@ -82,8 +78,8 @@ def init_library_routes(app):
             if language_difficulty not in VALID_LANGUAGE_DIFFICULTIES:
                 language_difficulty = "Normal"
 
-        print(request.form.get("visibility"))
         is_public = request.form.get("visibility", "false").lower() == "true"
+        print(is_public)
 
         # Extra context checks
         extra_context = request.form.get("extraContent")
@@ -218,38 +214,48 @@ def init_library_routes(app):
         try:
 
             library_topic = request.args.get("library_topic", None)
-
+            print("before user_id")
             user_id = current_user.id if not isinstance(current_user, AnonymousUserMixin) else None
+
+            print("after user_id")
             library = lbh.get_library(library_id, user_id)
             if not library:
                 return jsonify(status="error", message="Library not found"), 404
+            print("before room_data check")
 
             # Check if the library has a default image and possibly trigger image generation
             response, status_code = lbh.has_default_image(library_id)
+            print("before room_data check")
 
             if status_code != 200:
                 return response
+            print("before room_data check")
             
             # If there's a default image and the click count is divisible by 4, queue up image generation
             if response.json['has_default_image'] and library.get_json().get("clicks") % 4 == 0:
                 executor.submit(generate_images_task, library_id)
+            print("before room_data check")
             
             # Retrieve library data
             library_data = library.get_json()
+            print("before room_data check")
 
             # Attempt to retrieve existing room contents
             room_data = None
             if library_topic:
-
+                print("before unit_id, section_id")
                 unit_id, section_id = library_data.get('section_to_unit_map').get(library_topic)
+                print("before room_data")
+                print(f"unit_id: {unit_id}, section_id: {section_id}")
                 room_data = lbh.retrieve_library_room_contents(library_id, section_id, user_id)
-
+                print("before room_data check")
                 if not room_data:
                     return jsonify(status="error", message="Room not found"), 404
             else:
                 room_data = lbh.get_library_room_state(user_id, library_id)
-
+            print("before library_data")
             library_data["show_settings"] = user_id == library_data.get("owner_id")
+            
             return jsonify(status="success", data=library_data, room_data=room_data)
         except: 
             return jsonify(status="error", message="Failed to retrieve library data"), 500
@@ -355,7 +361,7 @@ def init_library_routes(app):
         try:
             
             new_unit_response, new_unit_status_code = lbh.create_unit_and_add(library_id, unit_name, position=position)
-            
+        
             new_unit = new_unit_response.get_json()
 
             if new_unit_status_code != 201:
@@ -456,10 +462,10 @@ def init_library_routes(app):
                 # Generate new content for this subtopic
                 last_section = None
                 try:
+                    print(f"subtopic: {subtopic}, library_id: {library_id}")
                     rag_context = query_and_respond_pinecone(subtopic, library_id)
 
                     print(f"rag context: {rag_context}")
-                    # TODO: figure out why rag context is E M P T Y
                     
                     future = executor.submit(lgn.generate_libroom_content, user_id, subtopic, library_id, rag_context)
 
@@ -510,39 +516,42 @@ def init_library_routes(app):
     @app.route("/api/library/section/<int:section_id>", methods=['DELETE'])
     @login_required
     def delete_section(section_id):
-        
-        section = LibrarySection.query.get_or_404(section_id)
+        section = LibrarySection.query.get_or_404(section_id) # Let Flask handle 404 if not found
         
         if section.unit.library.owner_id != current_user.id:
-           raise PermissionError("You do not own this library.")
+            # Explicitly handle permission error for ownership
+            return jsonify(status="error", message="You do not own this library."), 403
         
-        print("before delete")
-        
-        section.delete_and_reindex()
-        print("after delete")
-        # user_id needs to point to a user, 
-        # user needs to be owner of the library (section = section_id; section.unit_id = unit_id; unit.library_id = library_id)
-        # verify owner in frontend as well as here, don't send library_id bc thats not RESTful
-        # library = db.session.query(Library).filter_by(id=library_id).first()  
-        # position reordering
-        # delete:
-        # factoid --> questions --> question choices
-        # room state
-        # factoid
-        # SEE CLAUDE!!!
-        # SEE CHATGPT FOR BACKREF THINGS!!!
-            # AND FOR CASCADE IN LIBRARY ROOM STATE AS WELL!!!
-            # SEE delete_and_reindex IN LIBRARYSECTION AND GO TO CLAUDE IF THAT DOESN'T WORK
-
         try:
-            db.session.commit()
-        except PermissionError as e:
-            return jsonify(status="error", message=f"{str(e)}"), 403
-        except Exception as e:
-            db.session.rollback()
-            return jsonify(status="error", message="An Error occurred"), 400
+            print("before delete")
+            print(section)
+            section.delete_and_reindex()
+            print("after delete")
+            # user_id needs to point to a user, 
+            # user needs to be owner of the library (section = section_id; section.unit_id = unit_id; unit.library_id = library_id)
+            # verify owner in frontend as well as here, don't send library_id bc thats not RESTful
+            # library = db.session.query(Library).filter_by(id=library_id).first()  
+            # position reordering
+            # delete:
+            # factoid --> questions --> question choices
+            # room state
+            # factoid
+            # SEE CLAUDE!!!
+            # SEE CHATGPT FOR BACKREF THINGS!!!
+                # AND FOR CASCADE IN LIBRARY ROOM STATE AS WELL!!!
+                # SEE delete_and_reindex IN LIBRARYSECTION AND GO TO CLAUDE IF THAT DOESN'T WORK
 
-        return jsonify(status="success", message="Section successfully deleted")
+            db.session.commit()
+            return jsonify(status="success", message="Section successfully deleted")
+
+        except PermissionError as e: # Handles PermissionError from delete_and_reindex or commit
+            db.session.rollback()
+            print(f"Permission Error during section deletion/commit: {str(e)}")
+            return jsonify(status="error", message=f"{str(e)}"), 403
+        except Exception as e: # Handles other errors from delete_and_reindex or commit
+            db.session.rollback()
+            print(f"Error deleting section: {str(e)}")
+            return jsonify(status="error", message="An Error occurred during section deletion"), 400
         
     @app.route('/api/library/available-generated-rooms', methods=['POST'])
     def get_available_generated_rooms():
@@ -565,7 +574,6 @@ def init_library_routes(app):
 
         except Exception as e:
             return jsonify(status="error", message=f"Failed to generate content {e}"), 500
-
 
     @app.route("/api/library/end", methods=["POST"])
     def end_game():
@@ -623,7 +631,7 @@ def init_library_routes(app):
         except Exception as e:
             return jsonify(status="error", message=f"Failed to update library favorited status: {str(e)}"), 500
         
-    @app.route("/api/library/visibility_status/<int:library_id>", methods=["GET", "POST"])
+    @app.route("/api/library/visibility_status/<int:library_id>", methods=["GET", "PUT"])
     def library_visibility_status(library_id):
         try:
             if request.method == "GET":
@@ -646,7 +654,7 @@ def init_library_routes(app):
                 
                 return jsonify({'is_public': visibility_status}), 200
             
-            elif request.method == "POST":
+            elif request.method == "PUT":
                 
                 data = request.get_json()
                 new_status = data.get('newStatus')
@@ -672,6 +680,7 @@ def init_library_routes(app):
         browse = request.args.get("browse", type=bool)
         user_id = current_user.id if not isinstance(current_user, AnonymousUserMixin) else None
         return lbh.get_libraries_info(user_id, browse=browse)
+    
     # @app.route("/api/libraries/browse", methods=["GET"])
     # def get_libraries_browse():
     #     user_id = current_user.id if not isinstance(current_user, AnonymousUserMixin) else None

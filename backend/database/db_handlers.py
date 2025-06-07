@@ -291,6 +291,9 @@ def get_complete_user_data(user_id):
         "user": user.profile,
         "tutor": user.ai_tutor_profile,
         "timezone": user.timezone,
+        "username": user.username,
+        "first_name": user.first_name,
+        "last_name": user.last_name,
         "joined_at": formatted_date,
     }
     return user_data

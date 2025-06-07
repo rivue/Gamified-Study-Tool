@@ -356,7 +356,7 @@
     if (nodeData.category.includes("lesson")) {
       path = `/lesson/${nodeData.id}`;
     } else if (nodeData.category.includes("librar")) {
-      path = `/library/${nodeData.id}`;
+      path = `/create/${nodeData.id}`;
     }
     if (path) {
       router.push(path);

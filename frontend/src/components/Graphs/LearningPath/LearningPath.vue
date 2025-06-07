@@ -1,68 +1,72 @@
 <template>
-      
+
     <div class="fixed left-8 right-8 top-0 bottom-0 overflow-hidden">
         <div class="fixed top-20 right-6 flex gap-6 z-10">
 
-            <button v-if="isOwner" @click="toggleEditMode"
-                class="bg-black/30 backdrop-blur-sm shadow-md rounded-full p-4 hover:bg-black/40"
+            <button @click="goToExperiments"
+                class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg p-4 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200"
                 style="color: var(--highlight-color);">
-                <PencilIcon class="w-12 h-12" />
+                <LightBulbIcon class="w-6 h-6" />
+            </button>
+
+            <button v-if="isOwner" @click="toggleEditMode"
+                class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg p-4 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200"
+                style="color: var(--highlight-color);">
+                <PencilIcon class="w-6 h-6" />
             </button>
 
             <button @click="goToLeaderboard"
-                class="bg-black/30 backdrop-blur-sm shadow-md rounded-full p-4 hover:bg-black/40"
+                class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg p-4 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200"
                 style="color: var(--highlight-color);">
-                <ChartBarIcon class="w-12 h-12" />
+                <ChartBarIcon class="w-6 h-6" />
             </button>
 
             <button v-if="isOwner" @click="toggleSettings"
-                class="bg-black/30 backdrop-blur-sm shadow-md rounded-full p-4 hover:bg-black/40"
+                class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg p-4 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200"
                 style="color: var(--highlight-color);">
-                <CogIcon class="w-12 h-12" />
+                <CogIcon class="w-6 h-6" />
             </button>
         </div>
-        
+
         <div class="fixed top-20 left-6 flex gap-6 z-10">
-
-            <button @click="goToHome"
-                class="bg-black/30 backdrop-blur-sm shadow-md rounded-full p-4 hover:bg-black/40"
+            <button @click="goToCourseList"
+                class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg px-6 py-4 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200 font-medium"
                 style="color: var(--highlight-color);">
-                <HomeIcon class="w-12 h-12" />
+                <ArrowLeftIcon class="w-6 h-6" />
             </button>
-
+            
             <button v-if="!isOwner" @click="handleLeaveCourseClick"
-                class="bg-black/30 backdrop-blur-sm shadow-md rounded-full p-4 hover:bg-black/40"
+                class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg p-4 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200"
                 style="color: var(--highlight-color);">
-                <ArrowLeftOnRectangleIcon class="w-12 h-12" />
+                <span class="text-lg">Remove Course</span>
             </button>
-
         </div>
 
         <div class="relative flex flex-col w-full h-full">
-            
+
             <div ref="scrollContainer"
-            class="scrollContainer flex-1 overflow-x-auto overflow-y-hidden cursor-grab active:cursor-grabbing"
-            @mousedown="startDragging" @mousemove="drag" @mouseup="stopDragging" @mouseleave="stopDragging"
-            @touchstart="startDragging" @touchmove="drag" @touchend="stopDragging" @scroll="handleScroll">
-            <div class="flex items-center gap-24 min-h-screen py-24 relative">
-                
-                <!-- Left padding so first node is visible -->
-                <div class="w-24 flex-shrink-0"></div>
-                
-                <!-- Add Unit at the beginning -->
-                <AddUnit v-if="editModeEnabled" :library-id="libraryId" :position="0"
-                :existing-units="Object.keys(rawUnitData)" :can-add-unit="isOwner"
-                @unit-added="handleUnitAdded" />
-                
-                <!-- Unit Headers -->
-                <template v-for="([unit], unitName, unitIndex) in rawUnitData" :key="unitIndex">
-                    <div class="relative -mx-12 my-12 px-16 pt-40 pb-36 border-t-2 border-b-2 flex-shrink-0"
-                    :class="['unit-box', { 'unit--first': unitIndex === 0, 'unit--last': unitIndex === Object.keys(rawUnitData).length - 1 }]"
-                    :style="{
+                class="scrollContainer flex-1 overflow-x-auto overflow-y-hidden cursor-grab active:cursor-grabbing"
+                @mousedown="startDragging" @mousemove="drag" @mouseup="stopDragging" @mouseleave="stopDragging"
+                @touchstart="startDragging" @touchmove="drag" @touchend="stopDragging" @scroll="handleScroll">
+                <div class="flex items-center gap-24 min-h-screen py-24 relative">
+
+                    <!-- Left padding so first node is visible -->
+                    <div class="w-24 flex-shrink-0"></div>
+
+                    <!-- Add Unit at the beginning -->
+                    <AddUnit v-if="editModeEnabled" :library-id="libraryId" :position="0"
+                        :existing-units="Object.keys(rawUnitData)" :can-add-unit="isOwner"
+                        @unit-added="handleUnitAdded" />
+
+                    <!-- Unit Headers -->
+                    <template v-for="([unit], unitName, unitIndex) in rawUnitData" :key="unitIndex">
+                        <div class="relative -mx-12 my-12 px-16 pt-40 pb-36 border-t-2 border-b-2 flex-shrink-0"
+                            :class="['unit-box', { 'unit--first': unitIndex === 0, 'unit--last': unitIndex === Object.keys(rawUnitData).length - 1 }]"
+                            :style="{
                                 borderColor: getUnitColor(unitIndex),
                                 backgroundColor: 'var(--background-color-1t)',
                             }">
-                             
+
 
                             <!-- Unit name header -->
                             <div class="absolute -top-5 left-1/2 transform -translate-x-1/2 px-6 py-2 rounded-lg font-bold text-xl whitespace-nowrap shadow-md"
@@ -77,20 +81,19 @@
                                     :key="sectionIndex">
 
                                     <AddSection v-if="editModeEnabled && isOwner" class="-mx-8" :library-id="libraryId"
-                                        :unit-id="props.unitPositionMap[unitName][1]" :position="sectionIndex"
-                                        :offset="getNodeOffset(getGlobalSectionIndex(unitIndex, sectionIndex)-.6)"
+                                        :unit-id="getUnitIdByName(unitName)" :position="sectionIndex"
+                                        :offset="getNodeOffset(getGlobalSectionIndex(unitIndex, sectionIndex) - .6)"
                                         :unit-color="getUnitColor(unitIndex)" @nodes-added="onSectionAdd" />
 
-                                        <div class="relative flex-shrink-0 mx-12" 
-                                            :style="{
-                                                transform: `translateY(${getNodeOffset(getGlobalSectionIndex(unitIndex, sectionIndex))}px)`,
-                                                filter: editModeEnabled ? 'grayscale(1) brightness(0.9)' : 'none',
-                                            }" 
-                                            @click="editModeEnabled ? handleEditNodeClick() : handleNodeClick(sectionId)">
-                                        
+                                    <div class="relative flex-shrink-0 mx-12" :style="{
+                                        transform: `translateY(${getNodeOffset(getGlobalSectionIndex(unitIndex, sectionIndex))}px)`,
+                                    }"
+                                        @click="editModeEnabled ? handleEditNodeClick() : handleNodeClick(sectionId)">
 
 
-                                        <DeleteSection v-if="editModeEnabled && isOwner" :section-id="sectionId" :section-name="sectionName"/>
+
+                                        <DeleteSection v-if="editModeEnabled && isOwner" :section-id="sectionId"
+                                            :section-name="sectionName" />
 
                                         <!-- Tooltip -->
                                         <div v-if="selectedRoomId && selectedRoomId === sectionId"
@@ -136,12 +139,13 @@
                                                 </div>
                                                 <!-- Triangle pointer -->
                                                 <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 transform rotate-45"
-                                                style="background-color: var(--element-color-1);" />
+                                                    style="background-color: var(--element-color-1);" />
                                             </div>
                                         </div>
 
                                         <!-- Icon button with hover group -->
-                                        <div class="group perspective-1000">
+                                        <div class="group perspective-1000"
+                                            :style="{ filter: editModeEnabled ? 'grayscale(1) brightness(0.9)' : 'none' }">
                                             <!-- Main button container with enhanced 3D transforms -->
                                             <div class="
                                             relative 
@@ -227,9 +231,11 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <AddSection v-if="editModeEnabled && isOwner && sectionIndex === rawUnitData[unitName].length - 1" class="-mx-8" :library-id="libraryId"
+                                    <AddSection
+                                        v-if="editModeEnabled && isOwner && sectionIndex === rawUnitData[unitName].length - 1"
+                                        class="-mx-8" :library-id="libraryId"
                                         :unit-id="props.unitPositionMap[unitName][1]" :position="sectionIndex + 1"
-                                        :offset="getNodeOffset(getGlobalSectionIndex(unitIndex, sectionIndex)+.5)"
+                                        :offset="getNodeOffset(getGlobalSectionIndex(unitIndex, sectionIndex) + .5)"
                                         :unit-color="getUnitColor(unitIndex)" @nodes-added="onSectionAdd" />
                                 </template>
 
@@ -243,7 +249,8 @@
 
                                         <!-- owner sees the AddSection bubble -->
                                         <AddSection v-if="isOwner" :library-id="libraryId"
-                                            :unit-id="props.unitPositionMap[unitName][1]" :position="0" :empty-unit="true"
+                                            :unit-id="props.unitPositionMap[unitName][1]" :position="0"
+                                            :empty-unit="true"
                                             :offset="getNodeOffset(getGlobalSectionIndex(unitIndex, 20))"
                                             :unit-color="getUnitColor(unitIndex)" @nodes-added="onSectionAdd" />
 
@@ -273,10 +280,10 @@
                 </div>
             </div>
 
-            <div class="flex justify-between mt-4 px-8 pb-32">
+            <div class="flex justify-between items-center mt-4 px-8 pb-32 relative">
 
                 <!-- left side -->
-                <div class="flex gap-2 pointer-events-auto">
+                <div class="flex gap-2 pointer-events-auto h-16">
                     <button v-if="scrollPosition > 300" @click="scrollToStart(); $nextTick(handleScroll)"
                         class="p-4 rounded-full bg-black/30 backdrop-blur-sm hover:bg-black/40 shadow-md flex items-center gap-2"
                         style="color: var(--highlight-color);">
@@ -290,8 +297,17 @@
                     </button>
                 </div>
 
+                <!-- middle (save for later) -->
+                <!-- <div class="absolute inset-0 flex justify-center items-center pointer-events-auto mb-32 h-16">
+                    <button @click="scrollToStart(); $nextTick(handleScroll)"
+                        class="menu-button p-4 rounded-full bg-black/30 backdrop-blur-sm hover:bg-black/40 shadow-md flex items-center gap-2"
+                        style="color: var(--highlight-color);">
+                        <ChevronDoubleLeftIcon class="w-6 h-6" />
+                    </button>
+                </div> -->
+
                 <!-- right side -->
-                <div class="flex gap-2 pointer-events-auto">
+                <div class="flex gap-2 pointer-events-auto h-16">
                     <button v-if="scrollPosition < (maxLeft - 300)" @click="scroll('right'); $nextTick(handleScroll)"
                         class="p-4 rounded-full bg-black/30 backdrop-blur-sm hover:bg-black/40 shadow-md"
                         style="color: var(--highlight-color);">
@@ -311,9 +327,7 @@
     <LibrarySettings v-model:showSettingsModal="showSettingsModal" :library-id="libraryId"
         :library-is-public="libraryIsPublic" :library-join-code="libraryJoinCode" :can-modify="isOwner" />
 
-    <LeaveCourse
-        v-model:showModal="showLeaveCourseModal" 
-        :library-id="props.libraryId"
+    <LeaveCourse v-model:showModal="showLeaveCourseModal" :library-id="props.libraryId"
         :library-topic="props.libraryTopic" />
 
 </template>
@@ -339,8 +353,8 @@ import {
     ChartBarIcon,
     PencilIcon,
     PlusIcon,
-    HomeIcon,
-    ArrowLeftOnRectangleIcon
+    ArrowLeftIcon,
+    LightBulbIcon
 } from '@heroicons/vue/24/solid';
 import { useGameStore } from '@/store/gameStore'
 import { useRouter } from 'vue-router';
@@ -390,6 +404,21 @@ const props = defineProps({
     }
 })
 
+const getUnitIdByName = (unitName: string) => {
+  if (
+    props.unitPositionMap &&
+    props.unitPositionMap[unitName] &&
+    Array.isArray(props.unitPositionMap[unitName]) &&
+    props.unitPositionMap[unitName].length > 1
+  ) {
+    return props.unitPositionMap[unitName][1];
+  }
+  console.warn(
+    `Unit ID not found for unitName: ${unitName} in unitPositionMap. This might indicate a data synchronization issue.`
+  );
+  return null;
+};
+
 const rawUnitData = ref();
 
 watch(() => props.unitSectionMap, async (newVal) => {
@@ -403,6 +432,7 @@ const showSettingsModal = ref(false)
 const showLeaveCourseModal = ref(false); // State for the leave course modal
 const isOwner = ref(false)
 const editModeEnabled = ref(false);
+const emit = defineEmits(['unitAdded']) // Add this if not already present
 
 // Track selected room for tooltip
 const selectedRoomId = ref(null)
@@ -494,8 +524,13 @@ function goToLeaderboard() {
     router.push(`/lessons/${props.libraryId}/leaderboard`)
 }
 
-function goToHome() {
-    router.push("/library");
+function goToExperiments() {
+    router.push(`/lessons/${props.libraryId}/experiments`)
+
+}
+
+function goToCourseList() {
+    router.push("/courses");
 }
 
 function handleLeaveCourseClick() {
@@ -624,38 +659,6 @@ onUnmounted(() => {
         console.debug("LearningPath unmounting, cleared initial scroll timeout.");
     }
 });
-
-// Add to your script section
-const handleUnitAdded = (unitData) => {
-    // Create a new object to store the updated unit data
-    const updatedUnitData = {};
-    const unitKeys = Object.keys(rawUnitData.value);
-
-    // Insert the new unit at the specified position
-    let inserted = false;
-
-    // Loop through existing units to maintain order
-    for (let i = 0; i < unitKeys.length; i++) {
-        if (i === unitData.position && !inserted) {
-            // Add the new unit at this position
-            updatedUnitData[unitData.name] = [];
-            inserted = true;
-        }
-
-        // Add the existing unit
-        updatedUnitData[unitKeys[i]] = rawUnitData.value[unitKeys[i]];
-    }
-
-    // If the new unit should be at the end and wasn't inserted yet
-    if (!inserted) {
-        updatedUnitData[unitData.name] = [];
-    }
-
-    // Update the raw unit data
-    rawUnitData.value = updatedUnitData;
-
-    recalcMaxLeft()
-}
 
 // Add these variables
 const startY = ref(0)
@@ -834,4 +837,27 @@ const handleScroll = () => {
     border-bottom-right-radius: 0.625rem;
 }
 
+.menu-button {
+    border-radius: 10px;
+    background-color: var(--background-color-1t);
+    color: var(--highlight-color);
+    border: 1px solid var(--color-primary-dark);
+    transition: all 0.2s ease;
+}
+
+.menu-button:hover {
+    background-color: var(--element-color-1);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.menu-button:active {
+    transform: translateY(0);
+}
+
+.menu-button.selected {
+    background-color: var(--element-color-1);
+    border-color: var(--color-primary);
+    color: var(--light-text);
+}
 </style>

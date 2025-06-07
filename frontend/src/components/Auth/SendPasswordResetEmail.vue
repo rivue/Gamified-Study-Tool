@@ -1,9 +1,7 @@
 <!-- TODO: fix weird vue warn messages that come up when someone types -->
 <template>
     <h1>Password Reset</h1>
-    <div class="inspirational-quote">
-        Even the best magicians lose their wands sometimes. Let's conjure up a little magic to get you back on stage!
-    </div>
+ 
     <form @submit.prevent="handleSubmit">
         <div class="form-field">
             <label for="email">Email:</label>
@@ -56,13 +54,6 @@ form {
     flex-direction: column;
     align-items: center;
     width: 100%;
-}
-
-.inspirational-quote {
-    text-align: center;
-    font-style: italic;
-    margin-bottom: 20px;
-    color: #555;
 }
 
 .form-field {
