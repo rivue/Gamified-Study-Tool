@@ -12,7 +12,7 @@
             </div>
             <div class="search-bar-container">
                 <input type="text" v-model="searchQuery" @keyup.enter="handleSearch" placeholder="Search courses..." class="search-input"/>
-                <button @click="handleSearch" class="search-button">Search</button>
+                <button @click="handleSearch" class="search-button">Start Learning</button>
             </div>
             <div class="dropdown-menus">
                 <div v-for="(item, index) in items" :key="index" class="dropdown">
