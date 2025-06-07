@@ -22,7 +22,6 @@
             <div v-for="experiment in experiments" :key="experiment.id" class="experiment-card"
                 @click="navigateToExperiment(experiment.route)">
                 <div class="card-icon">
-                    <i :class="experiment.icon"></i>
                 </div>
                 <h3 style="color: var(--text-color);">{{ experiment.route === "undefined" ? "Coming Soon!" : experiment.title }}</h3>
                 <p>{{ experiment.route === "undefined" ? "" : experiment.description }}</p>
@@ -48,7 +47,6 @@ interface Experiment {
     id: number;
     title: string;
     description: string;
-    icon: string;
     difficulty: string;
     duration: string;
     route: string;
@@ -62,34 +60,46 @@ const experiments: Experiment[] = [
         id: 1,
         title: 'Brain Dump',
         description: 'Recall everything you remember about a topic',
-        icon: 'fas fa-layer-group',
         difficulty: 'easy',
         duration: '3 min',
         route: 'braindump'
-    },
+    }, 
     {
         id: 2,
+        title: 'Process Master',
+        description: 'Remember the steps of various processes',
+        difficulty: 'easy',
+        duration: '1-5 min',
+        route: 'process-master'
+    },
+    {
+        id: 3,
+        title: 'Fact Sprint',
+        description: 'How fast can you answer questions?',
+        difficulty: 'medium',
+        duration: '1 min',
+        route: 'fact-sprint'
+    },
+    {
+        id: 4,
         title: 'Flashcards',
         description: 'Quick-fire question and answer sessions',
-        icon: 'fas fa-layer-group',
         difficulty: 'easy',
         duration: '5-15 min',
         route: 'undefined',
     },
     {
-        id: 3,
+        id: 5,
         title: 'Quiz Mode',
         description: 'Timed multiple choice questions',
-        icon: 'fas fa-clock',
         difficulty: 'medium',
         duration: '10-30 min',
         route: 'undefined',
     },
     {
-        id: 4,
+        id: 6,
         title: 'Study Games',
         description: 'Gamified learning with points and rewards',
-        icon: 'fas fa-gamepad',
         difficulty: 'easy',
         duration: '15-45 min',
         route: 'undefined',
@@ -98,7 +108,6 @@ const experiments: Experiment[] = [
     //     id: 5,
     //     title: 'Practice Tests',
     //     description: 'Full-length exam simulations',
-    //     icon: 'fas fa-file-alt',
     //     difficulty: 'hard',
     //     duration: '30-120 min',
     //     route: 'undefined',
@@ -107,7 +116,6 @@ const experiments: Experiment[] = [
     //     id: 6,
     //     title: 'Spaced Repetition',
     //     description: 'AI-powered review scheduling',
-    //     icon: 'fas fa-brain',
     //     difficulty: 'medium',
     //     duration: '10-20 min',
     //     route: 'undefined',
@@ -116,7 +124,6 @@ const experiments: Experiment[] = [
     //     id: 7,
     //     title: 'Memory Palace',
     //     description: 'Visual learning and memory techniques',
-    //     icon: 'fas fa-building',
     //     difficulty: 'hard',
     //     duration: '20-60 min',
     //     route: 'undefined',
