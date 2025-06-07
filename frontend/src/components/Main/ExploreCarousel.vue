@@ -23,10 +23,33 @@
             </div> -->
         </div>
 
-        <div class="search-container">
-            <Search class="search-icon" />
-            <Input v-model="searchQuery" @input="filterLibraries" @keydown="handleSearchKeydown"
-                placeholder="Search courses..." class="search-input" />
+        <div class="filters-container">
+            <div class="search-container">
+                <Search class="search-icon" />
+                <Input v-model="searchQuery" @input="filterLibraries" @keydown="handleSearchKeydown"
+                    placeholder="Search courses..." class="search-input" />
+            </div>
+            
+            <div class="filter-buttons">
+                <button 
+                    @click="setVisibilityFilter('all')" 
+                    :class="['filter-btn', { 'active': visibilityFilter === 'all' }]"
+                >
+                    All Courses
+                </button>
+                <button 
+                    @click="setVisibilityFilter('public')" 
+                    :class="['filter-btn', { 'active': visibilityFilter === 'public' }]"
+                >
+                    Public Courses
+                </button>
+                <button 
+                    @click="setVisibilityFilter('private')" 
+                    :class="['filter-btn', { 'active': visibilityFilter === 'private' }]"
+                >
+                    Private Courses
+                </button>
+            </div>
         </div>
 
         <!-- Course cards container -->
@@ -133,6 +156,7 @@ const searchQuery = ref("");
 const filteredLibraries = ref<Array<any>>([]);
 const displayedLibraries = ref<Array<any>>([]);
 const joinCode = ref("");
+const visibilityFilter = ref<'all' | 'public' | 'private'>('all');
 
 // actual list of courses 
 const joinPublicMessages = ref(new Map());
@@ -152,6 +176,14 @@ const hasMoreToLoad = ref(true);
 function filterLibraries() {
     let libraries = [...props.libraries];
 
+    // Apply visibility filter
+    if (visibilityFilter.value === 'public') {
+        libraries = libraries.filter(library => library.is_public === true);
+    } else if (visibilityFilter.value === 'private') {
+        libraries = libraries.filter(library => library.is_public === false);
+    }
+
+    // Apply search filter
     if (!searchQuery.value.trim()) {
         filteredLibraries.value = libraries;
     } else {
@@ -164,6 +196,12 @@ function filterLibraries() {
     // Reset infinite scroll when filtering
     resetInfiniteScroll();
     loadMoreItems();
+}
+
+// Set visibility filter
+function setVisibilityFilter(filter: 'all' | 'public' | 'private') {
+    visibilityFilter.value = filter;
+    filterLibraries();
 }
 
 function resetInfiniteScroll() {
@@ -194,7 +232,7 @@ function loadMoreItems() {
         }
 
         isLoading.value = false;
-    }, 600);
+    }, 320);
 }
 
 // Infinite scroll handler
@@ -211,17 +249,6 @@ function handleScroll() {
     }
 }
 
-// Get appropriate CSS class based on difficulty
-// function getDifficultyClass(difficulty: string | undefined) {
-//     if (!difficulty) return 'all-levels';
-
-//     const lowercaseDifficulty = difficulty.toLowerCase();
-//     if (lowercaseDifficulty.includes('beginner')) return 'beginner';
-//     if (lowercaseDifficulty.includes('intermediate')) return 'intermediate';
-//     if (lowercaseDifficulty.includes('advanced')) return 'advanced';
-//     return 'all-levels';
-// }
-
 // Watch for changes to the libraries prop
 watch(() => props.libraries, (newLibraries) => {
     // Update filtered libraries when props change
@@ -237,49 +264,6 @@ onMounted(() => {
 onUnmounted(() => {
     window.removeEventListener('scroll', handleScroll);
 });
-
-// async function joinCourse() {
-//     if (!joinCode.value.trim()) return; 
-
-//     joinPrivateLoading.value = true;
-//     joinPrivateMessage.value = "";
-
-//     axios
-//         .post('/api/library/join', {
-//             joinCode: joinCode.value.trim(),
-//         })
-//         .then((response) => {
-//             if (response.status === 200) {
-//                 // Update the local favorites map
-//                 joinPrivateMessageType.value = "success";
-//                 joinPrivateMessage.value = "Successfully joined course!";
-//                 joinCode.value = "";
-
-//                 // Add to local libraries array if needed
-//                 if (response.data.library) {
-//                     const newLibrary = response.data.library;
-//                     const libraryExists = props.libraries.some(lib => lib.id === newLibrary.id);
-//                     if (!libraryExists) {
-//                         filteredLibraries.value.unshift(newLibrary);
-//                         filterLibraries();
-//                     }
-//                 }
-//             }
-//         })
-//         .catch((error) => {
-//             console.error("Error updating favorite status:", error);
-//             joinPrivateMessageType.value = "error";
-//             joinPrivateMessage.value = error.response?.data?.message || "Failed to join course";
-//         })
-//         .finally(() => {
-//             joinPrivateLoading.value = false;
-
-//             // Auto-hide message after 5 seconds
-//             setTimeout(() => {
-//                 joinPrivateMessage.value = "";
-//             }, 5000);
-//         });
-// }
 
 async function joinSpecificCourse(id: number) {
     joinPublicLoading.value.set(id, true);
@@ -378,6 +362,53 @@ function handleSearchKeydown(event: KeyboardEvent) {
     /*  the text */
 }
 
+.filters-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+@media (min-width: 768px) {
+    .filters-container {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+    }
+}
+
+.filter-buttons {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.filter-btn {
+    padding: 0.5rem 1rem;
+    border: 1px solid rgba(26, 139, 127, 0.3);
+    background: rgba(26, 139, 127, 0.1);
+    color: var(--text-color);
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.filter-btn:hover {
+    background: rgba(26, 139, 127, 0.2);
+    border-color: var(--color-primary);
+}
+
+.filter-btn.active {
+    background: var(--button-gradient);
+    color: white;
+    border-color: var(--color-primary);
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(26, 139, 127, 0.3);
+}
+
 .join-course-container {
     width: 100%;
     max-width: 400px;
@@ -440,7 +471,7 @@ function handleSearchKeydown(event: KeyboardEvent) {
 
 .search-container {
     position: relative;
-    margin-bottom: 2rem;
+    flex: 1;
 }
 
 .search-icon {

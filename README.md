@@ -246,14 +246,11 @@ TODO list:
             - have some sort of warning on the database model level if an owner tries to leave a course?
             - make contact page not require login to send feedback
             - go through all models and make sure cascade / ondelete=cascade are in sync w/ each other (ideally use ondelete cascade)
-            - if courses are empty, add a "create" button which links to create page
+            - if courses are empty, add a "create" button which links to create page - jules
             - add a "leave" course button in Explore Courses screen after the user clicks "join course"
 
         hard probably (goal: 2 high level bullet points / wk):
-        - ⭐️ remove alert message in library creator (not hard but have to remember)
-
         - ✅ ⭐️ (would like to implement visibility of different courses first or at least a many:one for non-owners in library model)
-            - ⭐️ Delete sections (requires entering the name of the unit / course just for accidental reasons) <-- come back to
             - ⭐️ Delete Units (requires entering the name of the unit / course just for accidental reasons)
             - ⭐️ Delete courses / libraries (whatever they're called) (requires entering the name of the unit / course just for accidental reasons)
                - ⭐️ Remember to delete from both DB and pinecone as well, as well as respective child / parent courses / units / sections / libraries, roomNameState, LibraryFavorites, question, question_choice, LibraryMembership, etc...
@@ -326,7 +323,7 @@ TODO list:
         - analogy mini / mega games - have to get like 20 right or whatever
 
         - add ability change font and how it speaks to library generator (cursive = harder to read and higher learning rates, or apply font at user's' setting level), it could speak like gen z, like a pirate, etc...
-        - catch phrase for now: studying, nade 
+        - catch phrase for now: studying made simple
         - (later) add support for links / pdfs / other things and get rid of things like difficulty, tutor, etc... then actually start generating stuff to study
         - (later) add support for multiple file upload as well
         - add logic for multiple flame emojis w/ streaks of 1, 5, 10, 25, 50, 100
@@ -403,10 +400,6 @@ TODO list:
         - give estimations based on file input size (ex: 500kb --> 10 minutes, etc... make them highly conservative,)
             - we could also section it off, like load part of it at a time, or load it in the background 
                 while the user it playing an already unlocked game or something
-        - make a better loading screen / bar / wheel while the courses are being created
-            - make it like not able to navigate away or something idk
-            - maybe even tell users not to navigate away from the page or something
-            - for improving textbook loading, maybe make textbook take a long time, but load users with similar sections / libraries while it still loads - like just direct them to actual section games of public libraries while they wait, or do a survey or something while they wait like who it is for or something
         - improve prompt generation a great fold (make sure as many of the quesitons relate to the section name as possible)
         - eventually combine library_question model with library_factoid model (why are they seperate to begin with?)
         - get student verification on Mobbin pro (UI library)
@@ -448,8 +441,7 @@ TODO list:
         - reduce bundle (currently @ 261 KiB, want to be ideally below 244)
         - add other routes back in, eventually
         - include question prompt generation (e.g. make the answer choices very similar to what you think the user would think so the questions are a little more challenging, etc...)
-        - change theme / color / name
-        - make footer even smaller and look better
+        - change theme / color
         - contact image on main sidebar?
         - add about route back in (could be something about how I want to help students study, or I could just not add it back in)
         - change gpt 4o-mini to deepseek (deepseek once I test reliable function calling or parsing) or other model for cost
@@ -459,7 +451,6 @@ TODO list:
         - center "Courses" text in create screen
 
     game page:
-        - break up error checking in frontend for unit creation
         - investigate into what clouds and diamonds in game screen were used for so I can probably use them later
         - remove time from db then remove all references to "timer", "end time" or "starting time" in gameStore.js
         - add possibly a hint button as well (3 hints per question?)
