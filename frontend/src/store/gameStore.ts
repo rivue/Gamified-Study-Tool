@@ -270,13 +270,6 @@ export const useGameStore = defineStore("gameStore", {
                         this.completed = true;
                         this.setSectionId(DEFAULT_SECTIONID_VALUE);
 
-                        const userStats = useUserStatsStore();
-                        const currentStreak = response.data.current_streak;
-                        const highestStreak = response.data.highest_streak;
-
-                        if (currentStreak !== undefined && highestStreak !== undefined) {
-                            userStats.setStreakData(currentStreak, highestStreak);
-                        }
                     } else {
                         console.error("Failed to end game:", response.data.message);
                     }

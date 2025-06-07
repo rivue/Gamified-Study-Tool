@@ -7,7 +7,7 @@ from flask_login import login_required, current_user
 from database.models import db, User # db is already imported here
 import database.db_handlers as dbh
 # from stats import get_total_user_exp, get_streak # get_streak is no longer needed
-from database.user_handler import get_user_tier, set_user_tier
+from stats import get_total_user_exp, get_streak
 from message_handler import update_system_role, initialize_messages
 
 def init_profile_routes(app):
@@ -16,12 +16,11 @@ def init_profile_routes(app):
     @login_required
     def get_user_streak():
         try:
-            current_user.update_daily_streak()
-            db.session.commit()
-            return jsonify({'current_streak': current_user.streak_count, 'highest_streak': current_user.highest_streak})
-        except Exception as e:
-            # It's good practice to log the exception e
-            app.logger.error(f"Error in /api/user/streak: {e}")
+            streak_count, highest_streak = get_streak(current_user.id)
+            if streak_count is None or highest_streak is None:
+                return jsonify({'error': 'Failed to retrieve streak data'}), 500
+            return jsonify({'current_streak': streak_count, 'max_streak': highest_streak})
+        except Exception:
             return jsonify({'error': 'Failed to retrieve streak data'}), 500
 
     @app.route("/api/profile", methods=["GET"])

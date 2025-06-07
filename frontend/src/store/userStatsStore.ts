@@ -36,11 +36,6 @@ export const useUserStatsStore = defineStore('user', {
             this.currentStreak = null;
             this.bestStreak = null;
             this.streakLoaded = false;
-        },
-        setStreakData(currentStreak: number, highestStreak: number) {
-            this.currentStreak = currentStreak;
-            this.bestStreak = highestStreak;
-            this.streakLoaded = true;
         }
     }
 });

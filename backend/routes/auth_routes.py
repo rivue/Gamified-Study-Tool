@@ -66,17 +66,13 @@ def init_auth_routes(app):
                     db.session.commit()
 
                 login_result = login_user(user, remember=True)
-                user.update_daily_streak()
-                db.session.commit()
                 
                 user_data = {
                     'id': user.id,
                     'username': user.username,
                     'email': user.email,
                     'first_name': user.first_name,
-                    'last_name': user.last_name,
-                    'current_streak': user.streak_count,
-                    'highest_streak': user.highest_streak
+                    'last_name': user.last_name                  
                 }
                 
                 print(f"login resulf: {user_data}")

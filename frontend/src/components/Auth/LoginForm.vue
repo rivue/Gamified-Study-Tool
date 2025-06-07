@@ -91,6 +91,8 @@ const handleSubmit = () => {
                     username: response.data.user.email,
                     firstName: response.data.user.first_name,
                     lastName: response.data.user.last_name,
+                    current_streak: response.data.user.current_streak,
+                    highest_streak: response.data.user.highest_streak,
                 }
                 emit("loginSuccess", user);
             }
