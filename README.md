@@ -403,7 +403,6 @@ TODO list:
         - improve prompt generation a great fold (make sure as many of the quesitons relate to the section name as possible)
         - eventually combine library_question model with library_factoid model (why are they seperate to begin with?)
         - get student verification on Mobbin pro (UI library)
-        - add ability to reset password for users who are logged in
         - change the name of all functions in library_handlers to use get, update, create, delete only
         - maybe ask users how knowledgeable they are with a unit / course / section before they start?
             not sure how many extra questions I would need to generate for this to work though...
@@ -417,7 +416,7 @@ TODO list:
         - add two buttons right next to each other and right above "play"
             1) video button where a manim video is generated about the subject possibly
             2) other resources button where other youtube videos / articles are researched in relation to the topic (grab the resources based on content, not necessarily the name of the section)
-
+f\
         - in “pomodoro / focus mode” dim out the corners of the screen like in minecraft
         bigger idea —> make the library super customizable like with sdks and images, backgrounds, pictures, etc… just like discord and make it easy to make it super long or super short
         so that way ppl can make courses on like say the entire bible or five decades of cooking experience or tutorials on a car or something, literally anything

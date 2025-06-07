@@ -40,6 +40,26 @@
             </div>
         </div>
 
+
+        <div class="profile-section">
+            <h2 class="section-title">Change Password</h2>
+            <div class="form-field">
+                <label for="currentPassword">Current Password:</label>
+                <input type="password" id="currentPassword" v-model="currentPassword" class="profile-input" />
+            </div>
+            <div class="form-field">
+                <label for="newPassword">New Password:</label>
+                <input type="password" id="newPassword" v-model="newPassword" class="profile-input" />
+            </div>
+            <div class="form-field">
+                <label for="confirmNewPassword">Confirm New Password:</label>
+                <input type="password" id="confirmNewPassword" v-model="confirmNewPassword" class="profile-input" />
+            </div>
+            <div class="settings-buttons">
+                <MenuButton label="Change Password" @click="changePassword" customClass="action-button" />
+            </div>
+        </div>
+
         <div class="settings-buttons half-n-half">
             <MenuButton label="Save Profile" @click="saveUserProfile" customClass="action-button" />
             <MenuButton label="Logout" @click="logout" customClass="danger-button" />
@@ -108,6 +128,10 @@ const editableProfile = ref({
     timezone: "UTC",
     profile_text: "" // For the generic profile text field
 });
+
+const currentPassword = ref("");
+const newPassword = ref("");
+const confirmNewPassword = ref("");
 
 const timezonesList = ref<string[]>([]);
 
@@ -245,6 +269,46 @@ onMounted(() => {
     fetchProfile();
     fetchTimezones();
 });
+
+
+const changePassword = async () => {
+    if (!newPassword.value) {
+        popupStore.showPopup("New password cannot be empty.");
+        return;
+    }
+    if (newPassword.value !== confirmNewPassword.value) {
+        popupStore.showPopup("New passwords do not match.");
+        return;
+    }
+    // Optional: Add password strength validation (e.g., min length)
+    if (newPassword.value.length < 8) {
+        popupStore.showPopup("New password must be at least 8 characters long.");
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("current_password", currentPassword.value);
+    formData.append("new_password", newPassword.value);
+
+    try {
+        const response = await axios.post("/api/change-password", formData);
+        if (response.data.status === "success") {
+            popupStore.showPopup("Password changed successfully.");
+            currentPassword.value = "";
+            newPassword.value = "";
+            confirmNewPassword.value = "";
+        } else {
+            popupStore.showPopup(response.data.message || "Failed to change password.");
+        }
+    } catch (error: any) {
+        if (error.response && error.response.data && error.response.data.message) {
+            popupStore.showPopup(error.response.data.message);
+        } else {
+            popupStore.showPopup("An unexpected error occurred while changing password.");
+        }
+        console.error("Error changing password:", error);
+    }
+};
 </script>
 
 <style scoped>
@@ -350,12 +414,12 @@ onMounted(() => {
 }
 
 .danger-button {
-    background-color: var(--danger-color, #e53e3e) !important;
+    background-color: var(red) !important;
     /* Ensure high specificity */
-    color: white !important;
+    color: red !important;
 }
 
 .danger-button:hover {
-    background-color: var(--danger-color-hover, #c53030) !important;
+    background-color: var(red) !important;
 }
 </style>
