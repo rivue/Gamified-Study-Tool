@@ -139,7 +139,7 @@
 
 <script setup lang="ts">
 import { ref, watch, onMounted, onUnmounted } from "vue";
-import { useRouter } from "vue-router";
+import { useRouter, useRoute } from "vue-router";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { LoaderCircle, Search, Heart, UserCircle, BookOpen, Lock } from "lucide-vue-next";
@@ -168,6 +168,7 @@ const props = defineProps<{
 
 // State
 const router = useRouter();
+const route = useRoute();
 const searchQuery = ref("");
 const filteredLibraries = ref<Array<any>>([]);
 const displayedLibraries = ref<Array<any>>([]);
@@ -286,6 +287,7 @@ function isNewCourse(library: any) {
 
 // Initialize on component mount
 onMounted(() => {
+    searchQuery.value = route.query.search?.toString() || "";
     filterLibraries();
     window.addEventListener('scroll', handleScroll);
 });

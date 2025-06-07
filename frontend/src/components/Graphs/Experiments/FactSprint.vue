@@ -121,8 +121,8 @@
     </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue'
+<script setup lang="ts">
+import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 
 interface Question {
     question: string
@@ -139,205 +139,206 @@ interface Comparison {
 type GameState = 'playing' | 'finished'
 type FeedbackType = 'correct' | 'incorrect' | ''
 
-export default defineComponent({
-    name: 'FactSprint',
-    data() {
-        return {
-            gameState: 'playing' as GameState,
-            score: 0,
-            streak: 0,
-            maxStreak: 0,
-            currentQuestionIndex: 0,
-            userAnswer: '',
-            showingFeedback: false,
-            feedbackType: '' as FeedbackType,
-            feedbackMessage: '',
-            pointsEarned: 0,
-            totalPoints: 0,
-            timeLeft: 15,
-            timer: null as NodeJS.Timeout | null,
-            responseTimes: [] as number[],
-            startTime: null as number | null,
-            
-            // Mock questions data
-            questions: [
-                { question: "What year did World War II end?", answer: "1945", category: "History" },
-                { question: "What is the speed of light in vacuum (m/s)?", answer: "299792458", category: "Physics" },
-                { question: "What is the capital of Australia?", answer: "Canberra", category: "Geography" },
-                { question: "Who wrote 'Romeo and Juliet'?", answer: "Shakespeare", category: "Literature" },
-                { question: "What is the atomic number of Carbon?", answer: "6", category: "Chemistry" },
-                { question: "In what year was the iPhone first released?", answer: "2007", category: "Technology" },
-                { question: "What is the largest planet in our solar system?", answer: "Jupiter", category: "Astronomy" },
-                { question: "What is 15 × 7?", answer: "105", category: "Math" },
-                { question: "What is the chemical symbol for Gold?", answer: "Au", category: "Chemistry" },
-                { question: "Who painted the Mona Lisa?", answer: "Leonardo da Vinci", category: "Art" },
-                { question: "What is the square root of 144?", answer: "12", category: "Math" },
-                { question: "What year did the Berlin Wall fall?", answer: "1989", category: "History" },
-                { question: "What is the hardest natural substance?", answer: "Diamond", category: "Science" },
-                { question: "What is the smallest prime number?", answer: "2", category: "Math" },
-                { question: "What gas makes up about 78% of Earth's atmosphere?", answer: "Nitrogen", category: "Science" },
-                { question: "Who invented the telephone?", answer: "Alexander Graham Bell", category: "History" },
-                { question: "What is the currency of Japan?", answer: "Yen", category: "Geography" },
-                { question: "What is H2O commonly known as?", answer: "Water", category: "Chemistry" },
-                { question: "How many continents are there?", answer: "7", category: "Geography" },
-                { question: "What is the boiling point of water in Celsius?", answer: "100", category: "Science" }
-            ] as Question[],
+// Reactive state
+const gameState = ref<GameState>('playing')
+const score = ref(0)
+const streak = ref(0)
+const maxStreak = ref(0)
+const currentQuestionIndex = ref(0)
+const userAnswer = ref('')
+const showingFeedback = ref(false)
+const feedbackType = ref<FeedbackType>('')
+const feedbackMessage = ref('')
+const pointsEarned = ref(0)
+const totalPoints = ref(0)
+const timeLeft = ref(15)
+const timer = ref<NodeJS.Timeout | null>(null)
+const responseTimes = ref<number[]>([])
+const startTime = ref<number | null>(null)
+const answerInput = ref<HTMLInputElement>()
 
-            // Mock comparison data
-            comparisons: [
-                { label: "Your Score", value: 0, percentage: 0 },
-                { label: "Library Average", value: 12, percentage: 60 },
-                { label: "Top Player", value: 18, percentage: 90 }
-            ] as Comparison[]
+// Mock questions data
+const questions = ref<Question[]>([
+    { question: "What year did World War II end?", answer: "1945", category: "History" },
+    { question: "What is the speed of light in vacuum (m/s)?", answer: "299792458", category: "Physics" },
+    { question: "What is the capital of Australia?", answer: "Canberra", category: "Geography" },
+    { question: "Who wrote 'Romeo and Juliet'?", answer: "Shakespeare", category: "Literature" },
+    { question: "What is the atomic number of Carbon?", answer: "6", category: "Chemistry" },
+    { question: "In what year was the iPhone first released?", answer: "2007", category: "Technology" },
+    { question: "What is the largest planet in our solar system?", answer: "Jupiter", category: "Astronomy" },
+    { question: "What is 15 × 7?", answer: "105", category: "Math" },
+    { question: "What is the chemical symbol for Gold?", answer: "Au", category: "Chemistry" },
+    { question: "Who painted the Mona Lisa?", answer: "Leonardo da Vinci", category: "Art" },
+    { question: "What is the square root of 144?", answer: "12", category: "Math" },
+    { question: "What year did the Berlin Wall fall?", answer: "1989", category: "History" },
+    { question: "What is the hardest natural substance?", answer: "Diamond", category: "Science" },
+    { question: "What is the smallest prime number?", answer: "2", category: "Math" },
+    { question: "What gas makes up about 78% of Earth's atmosphere?", answer: "Nitrogen", category: "Science" },
+    { question: "Who invented the telephone?", answer: "Alexander Graham Bell", category: "History" },
+    { question: "What is the currency of Japan?", answer: "Yen", category: "Geography" },
+    { question: "What is H2O commonly known as?", answer: "Water", category: "Chemistry" },
+    { question: "How many continents are there?", answer: "7", category: "Geography" },
+    { question: "What is the boiling point of water in Celsius?", answer: "100", category: "Science" }
+])
+
+// Mock comparison data
+const comparisons = ref<Comparison[]>([
+    { label: "Your Score", value: 0, percentage: 0 },
+    { label: "Library Average", value: 12, percentage: 60 },
+    { label: "Top Player", value: 18, percentage: 90 }
+])
+
+// Computed properties
+const currentQuestion = computed((): Question => {
+    return questions.value[currentQuestionIndex.value] || {} as Question
+})
+
+const circumference = computed((): number => {
+    return 2 * Math.PI * 45
+})
+
+const timerOffset = computed((): number => {
+    return circumference.value - (timeLeft.value / 15) * circumference.value
+})
+
+const averageTime = computed((): number => {
+    return responseTimes.value.length > 0 
+        ? responseTimes.value.reduce((a, b) => a + b, 0) / responseTimes.value.length 
+        : 0
+})
+
+// Methods
+const startTimer = (): void => {
+    timeLeft.value = 15
+    startTime.value = Date.now()
+    timer.value = setInterval(() => {
+        timeLeft.value--
+        if (timeLeft.value <= 0) {
+            handleTimeout()
         }
-    },
-    computed: {
-        currentQuestion(): Question {
-            return this.questions[this.currentQuestionIndex] || {} as Question;
-        },
-        circumference(): number {
-            return 2 * Math.PI * 45;
-        },
-        timerOffset(): number {
-            return this.circumference - (this.timeLeft / 15) * this.circumference;
-        },
-        averageTime(): number {
-            return this.responseTimes.length > 0 
-                ? this.responseTimes.reduce((a, b) => a + b, 0) / this.responseTimes.length 
-                : 0;
-        }
-    },
-    mounted() {
-        this.startTimer();
-        this.$nextTick(() => {
-            (this.$refs.answerInput as HTMLInputElement)?.focus();
-        });
-    },
-    beforeUnmount() {
-        if (this.timer) {
-            clearInterval(this.timer);
-        }
-    },
-    methods: {
-        startTimer(): void {
-            this.timeLeft = 15;
-            this.startTime = Date.now();
-            this.timer = setInterval(() => {
-                this.timeLeft--;
-                if (this.timeLeft <= 0) {
-                    this.handleTimeout();
-                }
-            }, 1000);
-        },
-        
-        submitAnswer(): void {
-            if (!this.userAnswer.trim() || this.showingFeedback) return;
-            
-            if (this.timer) {
-                clearInterval(this.timer);
-            }
-            const responseTime = (Date.now() - (this.startTime || 0)) / 1000;
-            this.responseTimes.push(responseTime);
-            
-            const isCorrect = this.userAnswer.toLowerCase().trim() === 
-                                                                             this.currentQuestion.answer.toLowerCase().trim();
-            
-            if (isCorrect) {
-                this.handleCorrectAnswer(responseTime);
-            } else {
-                this.handleIncorrectAnswer();
-            }
-            
-            this.showFeedback();
-        },
-        
-        handleCorrectAnswer(responseTime: number): void {
-            this.score++;
-            this.streak++;
-            this.maxStreak = Math.max(this.maxStreak, this.streak);
-            
-            // Calculate points based on speed and streak
-            const speedBonus = Math.max(0, 15 - responseTime) * 10;
-            const streakBonus = this.streak * 50;
-            this.pointsEarned = Math.round(100 + speedBonus + streakBonus);
-            this.totalPoints += this.pointsEarned;
-            
-            this.feedbackType = 'correct';
-            this.feedbackMessage = responseTime < 5 ? 'Lightning fast! ⚡' : 'Correct!';
-        },
-        
-        handleIncorrectAnswer(): void {
-            this.streak = 0;
-            this.pointsEarned = 0;
-            this.feedbackType = 'incorrect';
-            this.feedbackMessage = `Correct answer: ${this.currentQuestion.answer}`;
-        },
-        
-        handleTimeout(): void {
-            this.streak = 0;
-            this.pointsEarned = 0;
-            this.feedbackType = 'incorrect';
-            this.feedbackMessage = `Time's up! Answer: ${this.currentQuestion.answer}`;
-            this.showFeedback();
-        },
-        
-        showFeedback(): void {
-            this.showingFeedback = true;
-            setTimeout(() => {
-                this.nextQuestion();
-            }, 2000);
-        },
-        
-        clearFeedback(): void {
-            this.showingFeedback = false;
-            this.feedbackType = '';
-        },
-        
-        nextQuestion(): void {
-            if (this.score >= 20 || this.currentQuestionIndex >= this.questions.length - 1) {
-                this.endGame();
-                return;
-            }
-            
-            this.currentQuestionIndex++;
-            this.userAnswer = '';
-            this.showingFeedback = false;
-            this.feedbackType = '';
-            this.startTimer();
-            
-            this.$nextTick(() => {
-                (this.$refs.answerInput as HTMLInputElement)?.focus();
-            });
-        },
-        
-        endGame(): void {
-            this.gameState = 'finished';
-            // Update comparison data
-            this.comparisons[0].value = this.score;
-            this.comparisons[0].percentage = (this.score / 20) * 100;
-        },
-        
-        restartGame(): void {
-            this.gameState = 'playing';
-            this.score = 0;
-            this.streak = 0;
-            this.maxStreak = 0;
-            this.currentQuestionIndex = 0;
-            this.userAnswer = '';
-            this.totalPoints = 0;
-            this.responseTimes = [];
-            this.startTimer();
-            
-            this.$nextTick(() => {
-                (this.$refs.answerInput as HTMLInputElement)?.focus();
-            });
-        }
+    }, 1000)
+}
+
+const submitAnswer = (): void => {
+    if (!userAnswer.value.trim() || showingFeedback.value) return
+    
+    if (timer.value) {
+        clearInterval(timer.value)
+    }
+    const responseTime = (Date.now() - (startTime.value || 0)) / 1000
+    responseTimes.value.push(responseTime)
+    
+    const isCorrect = userAnswer.value.toLowerCase().trim() === 
+        currentQuestion.value.answer.toLowerCase().trim()
+    
+    if (isCorrect) {
+        handleCorrectAnswer(responseTime)
+    } else {
+        handleIncorrectAnswer()
+    }
+    
+    showFeedback()
+}
+
+const handleCorrectAnswer = (responseTime: number): void => {
+    score.value++
+    streak.value++
+    maxStreak.value = Math.max(maxStreak.value, streak.value)
+    
+    // Calculate points based on speed and streak
+    const speedBonus = Math.max(0, 15 - responseTime) * 10
+    const streakBonus = streak.value * 50
+    pointsEarned.value = Math.round(100 + speedBonus + streakBonus)
+    totalPoints.value += pointsEarned.value
+    
+    feedbackType.value = 'correct'
+    feedbackMessage.value = responseTime < 5 ? 'Lightning fast! ⚡' : 'Correct!'
+}
+
+const handleIncorrectAnswer = (): void => {
+    streak.value = 0
+    pointsEarned.value = 0
+    feedbackType.value = 'incorrect'
+    feedbackMessage.value = `Correct answer: ${currentQuestion.value.answer}`
+}
+
+const handleTimeout = (): void => {
+    streak.value = 0
+    pointsEarned.value = 0
+    feedbackType.value = 'incorrect'
+    feedbackMessage.value = `Time's up! Answer: ${currentQuestion.value.answer}`
+    showFeedback()
+}
+
+const showFeedback = (): void => {
+    showingFeedback.value = true
+    setTimeout(() => {
+        nextQuestion()
+    }, 2000)
+}
+
+const clearFeedback = (): void => {
+    showingFeedback.value = false
+    feedbackType.value = ''
+}
+
+const nextQuestion = (): void => {
+    if (score.value >= 20 || currentQuestionIndex.value >= questions.value.length - 1) {
+        endGame()
+        return
+    }
+    
+    currentQuestionIndex.value++
+    userAnswer.value = ''
+    showingFeedback.value = false
+    feedbackType.value = ''
+    startTimer()
+    
+    nextTick(() => {
+        answerInput.value?.focus()
+    })
+}
+
+const endGame = (): void => {
+    gameState.value = 'finished'
+    // Update comparison data
+    comparisons.value[0].value = score.value
+    comparisons.value[0].percentage = (score.value / 20) * 100
+}
+
+const restartGame = (): void => {
+    gameState.value = 'playing'
+    score.value = 0
+    streak.value = 0
+    maxStreak.value = 0
+    currentQuestionIndex.value = 0
+    userAnswer.value = ''
+    totalPoints.value = 0
+    responseTimes.value = []
+    startTimer()
+    
+    nextTick(() => {
+        answerInput.value?.focus()
+    })
+}
+
+// Lifecycle hooks
+onMounted(() => {
+    startTimer()
+    nextTick(() => {
+        answerInput.value?.focus()
+    })
+})
+
+onUnmounted(() => {
+    if (timer.value) {
+        clearInterval(timer.value)
     }
 })
 </script>
 
-
 <style scoped>
+/* Keep the existing styles unchanged */
 .fact-sprint-container {
     max-width: 800px;
     margin: 0 auto;

@@ -10,8 +10,9 @@
             <div class="features-container1">
                 <FeaturesComponent />
             </div>
-            <div class="cta-container" @click="redirectLogin">
-                <CtaButton />
+            <div class="search-bar-container">
+                <input type="text" v-model="searchQuery" @keyup.enter="handleSearch" placeholder="Search courses..." class="search-input"/>
+                <button @click="handleSearch" class="search-button">Search</button>
             </div>
             <div class="dropdown-menus">
                 <div v-for="(item, index) in items" :key="index" class="dropdown">
@@ -54,9 +55,9 @@ import { useRoute, useRouter } from 'vue-router';
 import { usePopupStore } from "@/store/popupStore";
 import { useThemeStore } from "@/store/themeStore";
 import { useAuthStore } from "@/store/authStore";
-import CtaButton from "./Footer/LandingPageComponents/CtaButton.vue"
 import FaqComponent from "./Footer/LandingPageComponents/FaqComponent.vue";
 import FeaturesComponent from "./Footer/LandingPageComponents/FeaturesComponent.vue";
+const searchQuery = ref("");
 
 // Component name is automatically inferred from the filename when using <script setup>
 
@@ -80,13 +81,6 @@ const themeStore = useThemeStore();
 const authStore = useAuthStore();
 const popupStore = usePopupStore();
 
-// Computed property
-const openaiPath = computed(() => {
-    return themeStore.darkMode
-        ? require("@/assets/images/powered-by-openai-badge-outlined-on-light.svg")
-        : require("@/assets/images/powered-by-openai-badge-outlined-on-dark.svg");
-});
-
 // Methods
 const handleMessageCode = (code: string | null) => {
     const messages: Record<string, string> = {
@@ -98,6 +92,15 @@ const handleMessageCode = (code: string | null) => {
     popupMessage.value = code && messages[code] ? messages[code] : "";
     if (popupMessage.value !== "") {
         popupStore.showPopup(popupMessage.value);
+    }
+};
+
+const handleSearch = () => {
+    if (searchQuery.value.trim() !== "") {
+        router.push({ 
+            path: '/explore', 
+            query: { search: searchQuery.value } // Pass as state
+        });
     }
 };
 
@@ -337,10 +340,61 @@ body {
     opacity: 0.85;
 }
 
-.cta-container {
-    margin-top: 2em;
-    margin-bottom: 2em;
 
+.search-bar-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 2em 0;
+    padding: 0 1em; /* Add some padding for smaller screens */
+}
+
+.search-input {
+    width: 70%; /* Make input take more width */
+    max-width: 500px; /* Maximum width for the input */
+    padding: 15px 20px; /* Increase padding for better visual */
+    font-size: 1.2em; /* Increase font size */
+    border: 2px solid var(--element-color-1); /* Prominent border */
+    border-radius: 30px 0 0 30px; /* Rounded corners on the left */
+    outline: none;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    transition: border-color 0.3s ease;
+}
+
+.search-input:focus {
+    border-color: var(--highlight-color); /* Highlight border on focus */
+}
+
+.search-button {
+    padding: 15px 25px; /* Increase padding */
+    font-size: 1.2em; /* Increase font size */
+    background-color: var(--element-color-1);
+    color: var(--background-color);
+    border: 2px solid var(--element-color-1);
+    border-left: none; /* Remove left border to blend with input */
+    border-radius: 0 30px 30px 0; /* Rounded corners on the right */
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.search-button:hover {
+    background-color: var(--highlight-color);
+    border-color: var(--highlight-color);
+    color: var(--light-text); /* Change text color on hover for better contrast */
+}
+
+
+/* Responsive adjustments for search bar */
+@media only screen and (max-width: 600px) {
+    .search-input {
+        font-size: 1em; /* Adjust font size for smaller screens */
+        padding: 12px 15px;
+    }
+    .search-button {
+        font-size: 1em; /* Adjust font size for smaller screens */
+        padding: 12px 20px;
+    }
 }
 
 .stat-infos {

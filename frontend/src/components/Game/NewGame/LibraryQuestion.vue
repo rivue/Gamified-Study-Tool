@@ -127,11 +127,11 @@ function closeQuestion() {
 }
 
 function format(content: string): string {
-    return content
-        .replace(/\*\*([^*]*?)\*\*/g, "<strong>$1</strong>")
-        .replace(/_([^_]*?)_|\*([^*]*?)\*/g, "<em>$1$2</em>");
+    content = content.replace(/_+/g, '___');
+    content = content.replace(/\*\*([^*]*?)\*\*/g, '<strong>$1</strong>');
+    content = content.replace(/\*([^*]*?)\*/g, '<em>$1</em>');
+    return content;
 }
-
 const question = computed(() => {
     if (store.currentQuestion === null) return null;
 
