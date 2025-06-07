@@ -9,7 +9,6 @@ import database.db_handlers as dbh
 def init_feedback_routes(app):
 
     @app.route("/api/feedback", methods=["POST"])
-    @login_required
     def handle_feedback():
         # sanitize & length
         userInput = request.form.get("message", "")
@@ -30,7 +29,12 @@ def init_feedback_routes(app):
         except ValueError:
             return jsonify({"error": "Invalid lesson or challenge id."}), 400
         
-        dbh.add_feedback(current_user.id, userInput, lesson_id, challenge_id, rating)
+        if current_user.is_authenticated:
+            user_id = current_user.id
+        else:
+            user_id = None
+        
+        dbh.add_feedback(user_id, userInput, lesson_id, challenge_id, rating)
         return jsonify({"message": "Feedback submitted successfully."}), 200
     
     @app.route("/api/share", methods=["POST"])

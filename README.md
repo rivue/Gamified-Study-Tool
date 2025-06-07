@@ -184,22 +184,26 @@ TODO list:
 
         last / harder:
         - ⭐️ obfuscate / minimize prod code
+            - how do I do this lol
         - ⭐️ for LibraryCreator, outline the rules clearly somewhere, like in an i-card next to "create a course to explore" 
         or just put in text "rules for creating courses" or something
-            - also, make room / course / unit / section consistent in frontend
-                - not sure exactly where it is inconsistent
+            - also, make room / course / unit / section consistent everywhere in frontend
+                - not sure exactly where it is inconsistent, just do a quick look around, this might already be done
         - ⭐️ vvvmaybe ask for feedback before doing vvv
-            - also make sure it works well(ish) for mobile
+            - also make sure it works well(ish) for mobile AND START ACCOUNTING FOR IT WHEN I MAKE SOMETHING
         - ⭐️ add google auth
             - note: probably has to make rivue email work first
         - ⭐️ Terms of use / Policy Page legal agreement thing - ask gpt if I actually need, maybe ask jake how to do but maybe not
             - ⭐️ There are probably websites and stuff for this --> do this before Stripe
+            - add in a user's profile section
         - ⭐️ Stripe implementation
             - have to think abt what different payment levels mean / how I want to do it
             - maybe think of business profit levels given llm api costs or something
+            - research into this before I do anything
         - ⭐️ ⭐️ ⭐️ (might take at least a couple weeks) UI redesign / rehaul *** --> kinnu, duolingo, saved instagram design reels etc...) --> ask nc state entreprenuership ppl for tips while i'm designing
             - Note: 1) try to see what horizontal --> vertical learning path looks like, and possibly make a vertical bar on the side for settings, i-card, files list, adding a new stepping stone, etc... but maybe keep lesson name and current unit name at the top?
             - COPY QUIZLET???
+            - REDO COLOR IF I HAVEN'T ALREADY
             - change popups --> toast, possibly with bar that displays when it will leave
             - note: maybe change top navbar to be a constant hovering side menu on the side / bottom of the screen maybe similar to duolingo and possibly replace "my library", "settings", etc.. with actual icons
                 - maybe move name of library to top left corner, then add a box for the actual map, with buttons / settings / leaderboard outside of the bo
@@ -221,7 +225,6 @@ TODO list:
                     - (maybe?) ⭐️ add ability to see uploaded files in library (list of their names) and maybe even file preview (would require nosql db or something maybe)
                         - should I limit file size for this? like can only display files < 50 MB or something?
 
-            - ⭐️ after user submits something and is waiting, display a loading bar or wheel or different rotating facts (maybe relevant to the library?) letting the user know that it is generating
             - also note: ask gemini / grok / gpt / claude for some ui design tips like adding a menu bar, or ui tips / tricks / helpful websites / youtube videos, etc...
             use this maybe: https://www.shadcn-vue.com/docs/components/stepper.html
             - note: for main page, add two / 3 simple boxes, class you want, school, and possibly professor, and it gives you classes close to you like quizlet / rate my professor along with option for creating your own
@@ -246,14 +249,11 @@ TODO list:
             - have some sort of warning on the database model level if an owner tries to leave a course?
             - make contact page not require login to send feedback
             - go through all models and make sure cascade / ondelete=cascade are in sync w/ each other (ideally use ondelete cascade)
-            - if courses are empty, add a "create" button which links to create page
+            - if courses are empty, add a "create" button which links to create page - jules
             - add a "leave" course button in Explore Courses screen after the user clicks "join course"
 
         hard probably (goal: 2 high level bullet points / wk):
-        - ⭐️ remove alert message in library creator (not hard but have to remember)
-
         - ✅ ⭐️ (would like to implement visibility of different courses first or at least a many:one for non-owners in library model)
-            - ⭐️ Delete sections (requires entering the name of the unit / course just for accidental reasons) <-- come back to
             - ⭐️ Delete Units (requires entering the name of the unit / course just for accidental reasons)
             - ⭐️ Delete courses / libraries (whatever they're called) (requires entering the name of the unit / course just for accidental reasons)
                - ⭐️ Remember to delete from both DB and pinecone as well, as well as respective child / parent courses / units / sections / libraries, roomNameState, LibraryFavorites, question, question_choice, LibraryMembership, etc...
@@ -326,7 +326,7 @@ TODO list:
         - analogy mini / mega games - have to get like 20 right or whatever
 
         - add ability change font and how it speaks to library generator (cursive = harder to read and higher learning rates, or apply font at user's' setting level), it could speak like gen z, like a pirate, etc...
-        - catch phrase for now: studying, nade 
+        - catch phrase for now: studying made simple
         - (later) add support for links / pdfs / other things and get rid of things like difficulty, tutor, etc... then actually start generating stuff to study
         - (later) add support for multiple file upload as well
         - add logic for multiple flame emojis w/ streaks of 1, 5, 10, 25, 50, 100
@@ -403,14 +403,9 @@ TODO list:
         - give estimations based on file input size (ex: 500kb --> 10 minutes, etc... make them highly conservative,)
             - we could also section it off, like load part of it at a time, or load it in the background 
                 while the user it playing an already unlocked game or something
-        - make a better loading screen / bar / wheel while the courses are being created
-            - make it like not able to navigate away or something idk
-            - maybe even tell users not to navigate away from the page or something
-            - for improving textbook loading, maybe make textbook take a long time, but load users with similar sections / libraries while it still loads - like just direct them to actual section games of public libraries while they wait, or do a survey or something while they wait like who it is for or something
         - improve prompt generation a great fold (make sure as many of the quesitons relate to the section name as possible)
         - eventually combine library_question model with library_factoid model (why are they seperate to begin with?)
         - get student verification on Mobbin pro (UI library)
-        - add ability to reset password for users who are logged in
         - change the name of all functions in library_handlers to use get, update, create, delete only
         - maybe ask users how knowledgeable they are with a unit / course / section before they start?
             not sure how many extra questions I would need to generate for this to work though...
@@ -424,7 +419,7 @@ TODO list:
         - add two buttons right next to each other and right above "play"
             1) video button where a manim video is generated about the subject possibly
             2) other resources button where other youtube videos / articles are researched in relation to the topic (grab the resources based on content, not necessarily the name of the section)
-
+f\
         - in “pomodoro / focus mode” dim out the corners of the screen like in minecraft
         bigger idea —> make the library super customizable like with sdks and images, backgrounds, pictures, etc… just like discord and make it easy to make it super long or super short
         so that way ppl can make courses on like say the entire bible or five decades of cooking experience or tutorials on a car or something, literally anything
@@ -448,8 +443,7 @@ TODO list:
         - reduce bundle (currently @ 261 KiB, want to be ideally below 244)
         - add other routes back in, eventually
         - include question prompt generation (e.g. make the answer choices very similar to what you think the user would think so the questions are a little more challenging, etc...)
-        - change theme / color / name
-        - make footer even smaller and look better
+        - change theme / color
         - contact image on main sidebar?
         - add about route back in (could be something about how I want to help students study, or I could just not add it back in)
         - change gpt 4o-mini to deepseek (deepseek once I test reliable function calling or parsing) or other model for cost
@@ -459,7 +453,6 @@ TODO list:
         - center "Courses" text in create screen
 
     game page:
-        - break up error checking in frontend for unit creation
         - investigate into what clouds and diamonds in game screen were used for so I can probably use them later
         - remove time from db then remove all references to "timer", "end time" or "starting time" in gameStore.js
         - add possibly a hint button as well (3 hints per question?)

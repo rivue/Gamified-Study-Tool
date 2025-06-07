@@ -18,7 +18,7 @@
             </div>
         </div>
 
-        <div v-if="loggedIn" class="form-container">
+        <div class="form-container">
             <form @submit.prevent="handleSubmit" class="feedback-form">
                 <textarea 
                     id="message" 
@@ -33,12 +33,6 @@
                     <span class="button-text">Submit Feedback</span>
                 </Button>
             </form>
-        </div>
-
-        <div v-else class="login-prompt">
-            <p class="login-text">
-                Please <a href="/login" class="login-link">log in</a> to submit feedback and bugs.
-            </p>
         </div>
 
         <div class="contact-info">

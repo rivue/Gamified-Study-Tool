@@ -9,7 +9,7 @@ interface UserStatsState {
 
 interface StreakResponse {
     current_streak: number;
-    max_streak: number;
+    highest_streak: number;
 }
 
 export const useUserStatsStore = defineStore('user', {
@@ -24,7 +24,7 @@ export const useUserStatsStore = defineStore('user', {
                 const { data } = await axios.get<StreakResponse>('/api/user/streak');
                 if (data) {
                     this.currentStreak = data.current_streak;
-                    this.bestStreak = data.max_streak;
+                    this.bestStreak = data.highest_streak;
                 }
             } catch (e) {
                 console.error('Error fetching stats from backend', e);
@@ -36,6 +36,11 @@ export const useUserStatsStore = defineStore('user', {
             this.currentStreak = null;
             this.bestStreak = null;
             this.streakLoaded = false;
+        },
+        setStreakData(currentStreak: number | null, highestStreak: number | null) {
+            this.currentStreak = currentStreak;
+            this.bestStreak = highestStreak;
+            this.streakLoaded = true;
         }
     }
 });

@@ -34,6 +34,7 @@ function fetchLibraries() {
             myLibraries.value = response.data.explore_libraries.map(([library, username]) => ({
                 ...library,
                 owner_username: username,
+                created_at: library.created_at,
                 // library_topic: library.library_topic.charAt(0).toUpperCase() + library.library_topic.slice(1)
             })).sort((a, b) => 
                 a.library_topic.localeCompare(b.library_topic)

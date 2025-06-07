@@ -65,14 +65,19 @@ def init_auth_routes(app):
                     user.timezone = timezone
                     db.session.commit()
 
-                login_result = login_user(user, remember=True)
+                login_user(user, remember=True)
+                user.update_daily_streak(True) # --> THIS NEEDS TO BE CHANGED!!!
+                db.session.commit()
                 
+                print(f" streak: {user.streak_count}, highest_streak: {user.highest_streak}")
                 user_data = {
                     'id': user.id,
                     'username': user.username,
                     'email': user.email,
                     'first_name': user.first_name,
-                    'last_name': user.last_name                  
+                    'last_name': user.last_name,
+                    'current_streak': user.streak_count,
+                    'highest_streak': user.highest_streak              
                 }
                 
                 print(f"login resulf: {user_data}")
@@ -267,6 +272,31 @@ def init_auth_routes(app):
         except Exception as e:
             app.logger.error(f"Unexpected error: {e}")
             return jsonify({'status': 'error', 'message': 'An unexpected error occurred'}), 500
+        
+    # ability to change password only for users who are logged in
+    @app.route('/api/change-password', methods=['POST'])
+    @login_required
+    def change_password():
+        try:
+            current_password = request.form['current_password']
+            new_password = request.form['new_password']
+
+            if not current_user.is_authenticated:
+                return jsonify({'status': 'fail', 'message': 'User not logged in'}), 401
+
+            if not check_password_hash(current_user.password, current_password):
+                return jsonify({'status': 'fail', 'message': 'Incorrect current password'}), 400
+
+            current_user.password = generate_password_hash(new_password)
+            db.session.commit()
+
+            return jsonify({'status': 'success', 'message': 'Password changed successfully'})
+        except KeyError:
+            return jsonify({'status': 'fail', 'message': 'Missing current_password or new_password in request'}), 400
+        except Exception as e:
+            app.logger.error(f"Error changing password: {e}")
+            return jsonify({'status': 'fail', 'message': 'An unexpected error occurred. Please try again later.'}), 500
+        
         
     @app.route('/api/check-auth', methods=['GET'])
     def check_auth():

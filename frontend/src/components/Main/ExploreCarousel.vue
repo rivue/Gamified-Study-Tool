@@ -23,10 +23,33 @@
             </div> -->
         </div>
 
-        <div class="search-container">
-            <Search class="search-icon" />
-            <Input v-model="searchQuery" @input="filterLibraries" @keydown="handleSearchKeydown"
-                placeholder="Search courses..." class="search-input" />
+        <div class="filters-container">
+            <div class="search-container">
+                <Search class="search-icon" />
+                <Input v-model="searchQuery" @input="filterLibraries" @keydown="handleSearchKeydown"
+                    placeholder="Search courses..." class="search-input" />
+            </div>
+            
+            <div class="filter-buttons">
+                <button 
+                    @click="setVisibilityFilter('all')" 
+                    :class="['filter-btn', { 'active': visibilityFilter === 'all' }]"
+                >
+                    All Courses
+                </button>
+                <button 
+                    @click="setVisibilityFilter('public')" 
+                    :class="['filter-btn', { 'active': visibilityFilter === 'public' }]"
+                >
+                    Public Courses
+                </button>
+                <button 
+                    @click="setVisibilityFilter('private')" 
+                    :class="['filter-btn', { 'active': visibilityFilter === 'private' }]"
+                >
+                    Private Courses
+                </button>
+            </div>
         </div>
 
         <!-- Course cards container -->
@@ -37,6 +60,7 @@
                         <h3 class="course-title">
                             {{ library.library_topic }}
                             <Lock v-if="!library.is_public" class="lock-icon" />
+                            <span v-if="isNewCourse(library)" class="new-tag">New</span>
                         </h3>
 
                         <div class="card-stats">
@@ -66,6 +90,10 @@
                         <Button v-else @click="goToCourse(library.id)" class="joined-card-button">
                             Go to Course
                         </Button>
+                        <Button v-if="joinedCourses.has(library.id)" @click="openLeaveModal(library)" class="leave-card-button ml-2">
+                            Leave Course
+                        </Button>
+
                     </div>
                     <Transition name="fade">
                         <div v-if="joinPublicMessages.has(library.id)"
@@ -98,14 +126,24 @@
             </p>
         </div>
     </div>
+    <LeaveCourse 
+      v-if="selectedLibraryToLeave"
+      :showModal="showLeaveModal" 
+      :libraryId="selectedLibraryToLeave.id" 
+      :libraryTopic="selectedLibraryToLeave.library_topic" 
+      :fromExplore="true"
+      @update:showModal="showLeaveModal = $event" 
+      @course-left="handleCourseLeft" 
+    />
 </template>
 
 <script setup lang="ts">
 import { ref, watch, onMounted, onUnmounted } from "vue";
-import { useRouter } from "vue-router";
+import { useRouter, useRoute } from "vue-router";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { LoaderCircle, Search, Heart, UserCircle, BookOpen, Lock } from "lucide-vue-next";
+import LeaveCourse from "@/components/Graphs/LearningPath/LeaveCourse.vue";
 import axios from "axios";
 
 // Props
@@ -124,15 +162,18 @@ const props = defineProps<{
         owner_id: string;
         owner_username: string;
         is_public: boolean;
+        created_at: string;
     }>;
 }>();
 
 // State
 const router = useRouter();
+const route = useRoute();
 const searchQuery = ref("");
 const filteredLibraries = ref<Array<any>>([]);
 const displayedLibraries = ref<Array<any>>([]);
 const joinCode = ref("");
+const visibilityFilter = ref<'all' | 'public' | 'private'>('all');
 
 // actual list of courses 
 const joinPublicMessages = ref(new Map());
@@ -141,9 +182,12 @@ const joinPublicLoading = ref(new Map());
 
 const libraryContainer = ref<HTMLElement | null>(null);
 const joinedCourses = ref(new Set());
+const showLeaveModal = ref(false);
+const selectedLibraryToLeave = ref<any>(null); // Using any for now, can be more specific
+
 
 // Infinite scroll states
-const itemsPerLoad = 6;
+const itemsPerLoad = 100;
 const currentLoadIndex = ref(0);
 const isLoading = ref(false);
 const hasMoreToLoad = ref(true);
@@ -152,6 +196,14 @@ const hasMoreToLoad = ref(true);
 function filterLibraries() {
     let libraries = [...props.libraries];
 
+    // Apply visibility filter
+    if (visibilityFilter.value === 'public') {
+        libraries = libraries.filter(library => library.is_public === true);
+    } else if (visibilityFilter.value === 'private') {
+        libraries = libraries.filter(library => library.is_public === false);
+    }
+
+    // Apply search filter
     if (!searchQuery.value.trim()) {
         filteredLibraries.value = libraries;
     } else {
@@ -164,6 +216,12 @@ function filterLibraries() {
     // Reset infinite scroll when filtering
     resetInfiniteScroll();
     loadMoreItems();
+}
+
+// Set visibility filter
+function setVisibilityFilter(filter: 'all' | 'public' | 'private') {
+    visibilityFilter.value = filter;
+    filterLibraries();
 }
 
 function resetInfiniteScroll() {
@@ -194,7 +252,7 @@ function loadMoreItems() {
         }
 
         isLoading.value = false;
-    }, 600);
+    }, 320);
 }
 
 // Infinite scroll handler
@@ -204,23 +262,11 @@ function handleScroll() {
     const container = libraryContainer.value;
     const bottomOfWindow = window.innerHeight + window.scrollY;
     const distanceFromBottom = container.getBoundingClientRect().bottom - window.innerHeight;
-
     // Load more when approaching the bottom
     if (distanceFromBottom < 200 && hasMoreToLoad.value && !isLoading.value) {
         loadMoreItems();
     }
 }
-
-// Get appropriate CSS class based on difficulty
-// function getDifficultyClass(difficulty: string | undefined) {
-//     if (!difficulty) return 'all-levels';
-
-//     const lowercaseDifficulty = difficulty.toLowerCase();
-//     if (lowercaseDifficulty.includes('beginner')) return 'beginner';
-//     if (lowercaseDifficulty.includes('intermediate')) return 'intermediate';
-//     if (lowercaseDifficulty.includes('advanced')) return 'advanced';
-//     return 'all-levels';
-// }
 
 // Watch for changes to the libraries prop
 watch(() => props.libraries, (newLibraries) => {
@@ -228,8 +274,20 @@ watch(() => props.libraries, (newLibraries) => {
     filterLibraries();
 }, { deep: true });
 
+// Method to check if a course is new
+function isNewCourse(library: any) {
+    if (!library.created_at) {
+        return false;
+    }
+    const courseDate = new Date(library.created_at);
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    return courseDate > sevenDaysAgo;
+}
+
 // Initialize on component mount
 onMounted(() => {
+    searchQuery.value = route.query.search?.toString() || "";
     filterLibraries();
     window.addEventListener('scroll', handleScroll);
 });
@@ -237,49 +295,6 @@ onMounted(() => {
 onUnmounted(() => {
     window.removeEventListener('scroll', handleScroll);
 });
-
-// async function joinCourse() {
-//     if (!joinCode.value.trim()) return; 
-
-//     joinPrivateLoading.value = true;
-//     joinPrivateMessage.value = "";
-
-//     axios
-//         .post('/api/library/join', {
-//             joinCode: joinCode.value.trim(),
-//         })
-//         .then((response) => {
-//             if (response.status === 200) {
-//                 // Update the local favorites map
-//                 joinPrivateMessageType.value = "success";
-//                 joinPrivateMessage.value = "Successfully joined course!";
-//                 joinCode.value = "";
-
-//                 // Add to local libraries array if needed
-//                 if (response.data.library) {
-//                     const newLibrary = response.data.library;
-//                     const libraryExists = props.libraries.some(lib => lib.id === newLibrary.id);
-//                     if (!libraryExists) {
-//                         filteredLibraries.value.unshift(newLibrary);
-//                         filterLibraries();
-//                     }
-//                 }
-//             }
-//         })
-//         .catch((error) => {
-//             console.error("Error updating favorite status:", error);
-//             joinPrivateMessageType.value = "error";
-//             joinPrivateMessage.value = error.response?.data?.message || "Failed to join course";
-//         })
-//         .finally(() => {
-//             joinPrivateLoading.value = false;
-
-//             // Auto-hide message after 5 seconds
-//             setTimeout(() => {
-//                 joinPrivateMessage.value = "";
-//             }, 5000);
-//         });
-// }
 
 async function joinSpecificCourse(id: number) {
     joinPublicLoading.value.set(id, true);
@@ -319,6 +334,17 @@ async function joinSpecificCourse(id: number) {
 
 function goToCourse(libraryId: number) {
     router.push(`/lessons/${libraryId}`);
+}
+
+function openLeaveModal(library: any) {
+  selectedLibraryToLeave.value = library;
+  showLeaveModal.value = true;
+}
+
+function handleCourseLeft(libraryId: number) {
+  joinedCourses.value.delete(libraryId);
+  showLeaveModal.value = false;
+  // selectedLibraryToLeave.value = null; // Optional: Reset if not needed
 }
 
 function handleSearchKeydown(event: KeyboardEvent) {
@@ -376,6 +402,53 @@ function handleSearchKeydown(event: KeyboardEvent) {
     color: var(--text-color-secondary);
     text-align: center;
     /*  the text */
+}
+
+.filters-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+@media (min-width: 768px) {
+    .filters-container {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+    }
+}
+
+.filter-buttons {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.filter-btn {
+    padding: 0.5rem 1rem;
+    border: 1px solid rgba(26, 139, 127, 0.3);
+    background: rgba(26, 139, 127, 0.1);
+    color: var(--text-color);
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.filter-btn:hover {
+    background: rgba(26, 139, 127, 0.2);
+    border-color: var(--color-primary);
+}
+
+.filter-btn.active {
+    background: var(--button-gradient);
+    color: white;
+    border-color: var(--color-primary);
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(26, 139, 127, 0.3);
 }
 
 .join-course-container {
@@ -440,7 +513,7 @@ function handleSearchKeydown(event: KeyboardEvent) {
 
 .search-container {
     position: relative;
-    margin-bottom: 2rem;
+    flex: 1;
 }
 
 .search-icon {
@@ -709,5 +782,17 @@ function handleSearchKeydown(event: KeyboardEvent) {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
+}
+
+.new-tag {
+    display: inline-block;
+    background-color: var(--color-primary-light);
+    color: white;
+    font-size: 0.75rem; /* Small font size */
+    font-weight: 600;
+    padding: 0.25rem 0.5rem; /* Small padding */
+    border-radius: 9999px; /* Fully rounded */
+    line-height: 1;
+    white-space: nowrap;
 }
 </style>

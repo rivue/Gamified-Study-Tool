@@ -6,12 +6,17 @@
                 <p class="subtitle">Courses you've joined or created</p>
             </div>
             <div class="join-course-container">
+                <div class="actions-form">
                 <div class="join-form">
                     <Input class="join-input" type="text" v-model="joinCode" placeholder="Enter course code..."
                         @keydown.enter="joinCourse" />
                     <Button class="join-button" @click="joinCourse" :disabled="joinLoading">
                         <LoaderCircle v-if="joinLoading" class="mr-2 h-4 w-4 animate-spin" />
                         Join
+                    </Button>
+                    </div>
+                    <Button class="create-button" @click="goToCreateLibrary">
+                        Create Course
                     </Button>
                 </div>
                 <Transition name="fade">
@@ -51,8 +56,14 @@
             </div>
         </div>
 
+        <!-- Show loading state during filter change -->
+        <div v-if="filterLoading" class="loading-state">
+            <LoaderCircle class="loading-icon animate-spin" />
+            <p class="loading-text">Loading courses...</p>
+        </div>
+
         <!-- Conditional rendering based on library count -->
-        <div v-if="libraries.length > 0" class="courses-container">
+        <div v-else-if="libraries.length > 0" class="courses-container">
             <div class="courses-grid">
                 <div v-for="library in paginatedLibraries" :key="library.id" class="course-card">
                     <div class="card-content">
@@ -84,14 +95,14 @@
         <!-- Display this when there are no libraries -->
         <div v-else class="empty-state">
             <BookOpen class="empty-icon" />
-            <h3 class="empty-title">No Courses Found</h3>
+            <h3 class="empty-title">No Courses Yet?</h3>
             <p class="empty-description">
-                You don't have any courses yet! Use the form above to join your first course and start learning.
+                You haven't created or joined any courses yet. Create your own course or use the form above to join an existing one.
             </p>
         </div>
 
         <!-- Pagination only shows if there are libraries -->
-        <div class="pagination" v-if="totalItems > 0">
+        <div class="pagination" v-if="totalItems > 0 && !filterLoading">
             <div class="pagination-info">
                 Showing {{ startIndex + 1 }}-{{ endIndex }} of {{ totalItems }} courses
             </div>
@@ -140,6 +151,7 @@ const joinCode = ref("");
 const joinMessage = ref("");
 const joinMessageType = ref("");
 const joinLoading = ref(false);
+const filterLoading = ref(false);
 const authStore = useAuthStore();
 const ownerFilter = ref<'all' | 'owned' | 'joined'>('all');
 
@@ -147,7 +159,7 @@ const ownerFilter = ref<'all' | 'owned' | 'joined'>('all');
 const emit = defineEmits(['libraryJoined']);
 
 // Filtering function
-function filterLibraries() {
+async function filterLibraries() {
     let libraries = [...props.libraries];
 
     if (ownerFilter.value === 'owned') {
@@ -179,22 +191,34 @@ function filterLibraries() {
     currentPage.value = 1;
 }
 
-// Set owner filter
-function setOwnerFilter(filter: 'all' | 'owned' | 'joined') {
+// Set owner filter with loading delay
+async function setOwnerFilter(filter: 'all' | 'owned' | 'joined') {
+    if (ownerFilter.value === filter) return; // Don't reload if same filter
+    
+    filterLoading.value = true;
     ownerFilter.value = filter;
-    filterLibraries();
+    
+    // Simulate loading delay for better UX
+    await new Promise(resolve => setTimeout(resolve, 300));
+    
+    await filterLibraries();
+    filterLoading.value = false;
 }
 
 // Watch for changes to the libraries prop
 watch(() => props.libraries, () => {
     // Update filtered libraries when props change
-    filterLibraries();
+    if (!filterLoading.value) {
+        filterLibraries();
+    }
 }, { deep: true });
 
 // Watch for changes to the favorites map to re-sort when favorites change
 watch(() => props.libraryFavoritesMap, () => {
     // Re-sort libraries when favorites change
-    filterLibraries();
+    if (!filterLoading.value) {
+        filterLibraries();
+    }
 }, { deep: true });
 
 // Initialize on component mount
@@ -241,6 +265,10 @@ const displayedPages = computed(() => {
 // Methods
 function goToLibrary(id: number) {
     router.push(`/lessons/${id}`);
+}
+
+function goToCreateLibrary() {
+    router.push('/create');
 }
 
 async function joinCourse() {
@@ -337,6 +365,30 @@ function goToPage(page: number) {
 
 <style scoped>
 
+.loading-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 4rem 2rem;
+    background: var(--background-color-1t);
+    border-radius: 16px;
+    border: 1px solid rgba(26, 139, 127, 0.2);
+}
+
+.loading-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    color: var(--color-primary);
+    margin-bottom: 1rem;
+}
+
+.loading-text {
+    color: var(--text-color-secondary);
+    font-size: 1rem;
+    font-weight: 500;
+}
 
 .filters-container {
     display: flex;
@@ -376,6 +428,7 @@ function goToPage(page: number) {
     transition: all 0.2s ease;
     white-space: nowrap;
 }
+
 
 .filter-btn:hover {
     background: rgba(26, 139, 127, 0.2);
@@ -439,12 +492,54 @@ function goToPage(page: number) {
 
 .join-course-container {
     width: 100%;
-    max-width: 400px;
+    max-width: 400px; /* Adjusted to fit both buttons if necessary, or rely on flex-wrap */
+}
+
+.actions-form {
+    display: flex;
+    flex-direction: column; /* Stack join and create vertically */
+    gap: 0.75rem; /* Add some space between join form and create button */
 }
 
 .join-form {
     display: flex;
     gap: 0.5rem;
+}
+
+
+.create-button { /* Style like join-button */
+    height: 44px;
+    border-radius: 8px;
+    background: var(--button-gradient); /* Or a different style if preferred */
+    color: var(--text-color);
+    font-weight: 600;
+    padding: 0 1.25rem;
+    transition: all 0.2s;
+    border: none;
+    width: 100%; /* Make create button full width of its container */
+}
+
+.create-button:hover:not(:disabled) {
+    background: linear-gradient(135deg, var(--color-primary-dark), var(--color-primary));
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(26, 139, 127, 0.3);
+}
+
+
+@media (min-width: 768px) { /* Adjust for larger screens */
+    .actions-form {
+        flex-direction: row; /* Place join and create side-by-side */
+        align-items: center;
+    }
+
+    .join-form {
+        flex: 1; /* Allow join form to take available space */
+    }
+
+    .create-button {
+        width: auto; /* Adjust width for side-by-side layout */
+        margin-left: 0.5rem; /* Add space between join and create buttons */
+    }
 }
 
 .join-input {
