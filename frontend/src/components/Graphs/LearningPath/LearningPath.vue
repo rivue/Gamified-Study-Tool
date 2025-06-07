@@ -34,7 +34,7 @@
                 style="color: var(--highlight-color);">
                 <ArrowLeftIcon class="w-6 h-6" />
             </button>
-            
+
             <button v-if="!isOwner" @click="handleLeaveCourseClick"
                 class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg p-4 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200"
                 style="color: var(--highlight-color);">
@@ -87,8 +87,7 @@
 
                                     <div class="relative flex-shrink-0 mx-12" :style="{
                                         transform: `translateY(${getNodeOffset(getGlobalSectionIndex(unitIndex, sectionIndex))}px)`,
-                                    }"
-                                        @click="editModeEnabled ? handleEditNodeClick() : handleNodeClick(sectionId)">
+                                    }" @click="editModeEnabled ? handleEditNodeClick() : handleNodeClick(sectionId)">
 
 
 
@@ -283,43 +282,35 @@
             <div class="flex justify-between items-center mt-4 px-8 pb-32 relative">
 
                 <!-- left side -->
-                <div class="flex gap-2 pointer-events-auto h-16">
+                <div class="flex gap-4 pointer-events-auto h-16 items-center">
                     <button v-if="scrollPosition > 300" @click="scrollToStart(); $nextTick(handleScroll)"
-                        class="p-4 rounded-full bg-black/30 backdrop-blur-sm hover:bg-black/40 shadow-md flex items-center gap-2"
+                        class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg p-4 flex items-center gap-2 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200"
                         style="color: var(--highlight-color);">
                         <ChevronDoubleLeftIcon class="w-6 h-6" />
-                        <span class="mx-1">To Start</span>
+                        <span>To Start</span>
                     </button>
                     <button v-if="scrollPosition > 300" @click="scroll('left'); $nextTick(handleScroll)"
-                        class="p-4 rounded-full bg-black/30 backdrop-blur-sm hover:bg-black/40 shadow-md flex items-center gap-2"
+                        class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg p-4 flex items-center gap-2 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200"
                         style="color: var(--highlight-color);">
                         <ChevronLeftIcon class="w-6 h-6" />
                     </button>
                 </div>
 
-                <!-- middle (save for later) -->
-                <!-- <div class="absolute inset-0 flex justify-center items-center pointer-events-auto mb-32 h-16">
-                    <button @click="scrollToStart(); $nextTick(handleScroll)"
-                        class="menu-button p-4 rounded-full bg-black/30 backdrop-blur-sm hover:bg-black/40 shadow-md flex items-center gap-2"
-                        style="color: var(--highlight-color);">
-                        <ChevronDoubleLeftIcon class="w-6 h-6" />
-                    </button>
-                </div> -->
-
                 <!-- right side -->
-                <div class="flex gap-2 pointer-events-auto h-16">
+                <div class="flex gap-4 pointer-events-auto h-16 items-center">
                     <button v-if="scrollPosition < (maxLeft - 300)" @click="scroll('right'); $nextTick(handleScroll)"
-                        class="p-4 rounded-full bg-black/30 backdrop-blur-sm hover:bg-black/40 shadow-md"
+                        class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg p-4 flex items-center gap-2 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200"
                         style="color: var(--highlight-color);">
                         <ChevronRightIcon class="w-6 h-6" />
                     </button>
                     <button v-if="scrollPosition < (maxLeft - 300)" @click="scrollToEnd(); $nextTick(handleScroll)"
-                        class="p-4 rounded-full bg-black/30 backdrop-blur-sm hover:bg-black/40 shadow-md flex items-center gap-2"
+                        class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg p-4 flex items-center gap-2 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200"
                         style="color: var(--highlight-color);">
                         <span>To End</span>
                         <ChevronDoubleRightIcon class="w-6 h-6" />
                     </button>
                 </div>
+
             </div>
         </div>
     </div>
@@ -405,18 +396,18 @@ const props = defineProps({
 })
 
 const getUnitIdByName = (unitName: string) => {
-  if (
-    props.unitPositionMap &&
-    props.unitPositionMap[unitName] &&
-    Array.isArray(props.unitPositionMap[unitName]) &&
-    props.unitPositionMap[unitName].length > 1
-  ) {
-    return props.unitPositionMap[unitName][1];
-  }
-  console.warn(
-    `Unit ID not found for unitName: ${unitName} in unitPositionMap. This might indicate a data synchronization issue.`
-  );
-  return null;
+    if (
+        props.unitPositionMap &&
+        props.unitPositionMap[unitName] &&
+        Array.isArray(props.unitPositionMap[unitName]) &&
+        props.unitPositionMap[unitName].length > 1
+    ) {
+        return props.unitPositionMap[unitName][1];
+    }
+    console.warn(
+        `Unit ID not found for unitName: ${unitName} in unitPositionMap. This might indicate a data synchronization issue.`
+    );
+    return null;
 };
 
 const rawUnitData = ref();

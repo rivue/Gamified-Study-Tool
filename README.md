@@ -184,22 +184,26 @@ TODO list:
 
         last / harder:
         - ⭐️ obfuscate / minimize prod code
+            - how do I do this lol
         - ⭐️ for LibraryCreator, outline the rules clearly somewhere, like in an i-card next to "create a course to explore" 
         or just put in text "rules for creating courses" or something
-            - also, make room / course / unit / section consistent in frontend
-                - not sure exactly where it is inconsistent
+            - also, make room / course / unit / section consistent everywhere in frontend
+                - not sure exactly where it is inconsistent, just do a quick look around, this might already be done
         - ⭐️ vvvmaybe ask for feedback before doing vvv
-            - also make sure it works well(ish) for mobile
+            - also make sure it works well(ish) for mobile AND START ACCOUNTING FOR IT WHEN I MAKE SOMETHING
         - ⭐️ add google auth
             - note: probably has to make rivue email work first
         - ⭐️ Terms of use / Policy Page legal agreement thing - ask gpt if I actually need, maybe ask jake how to do but maybe not
             - ⭐️ There are probably websites and stuff for this --> do this before Stripe
+            - add in a user's profile section
         - ⭐️ Stripe implementation
             - have to think abt what different payment levels mean / how I want to do it
             - maybe think of business profit levels given llm api costs or something
+            - research into this before I do anything
         - ⭐️ ⭐️ ⭐️ (might take at least a couple weeks) UI redesign / rehaul *** --> kinnu, duolingo, saved instagram design reels etc...) --> ask nc state entreprenuership ppl for tips while i'm designing
             - Note: 1) try to see what horizontal --> vertical learning path looks like, and possibly make a vertical bar on the side for settings, i-card, files list, adding a new stepping stone, etc... but maybe keep lesson name and current unit name at the top?
             - COPY QUIZLET???
+            - REDO COLOR IF I HAVEN'T ALREADY
             - change popups --> toast, possibly with bar that displays when it will leave
             - note: maybe change top navbar to be a constant hovering side menu on the side / bottom of the screen maybe similar to duolingo and possibly replace "my library", "settings", etc.. with actual icons
                 - maybe move name of library to top left corner, then add a box for the actual map, with buttons / settings / leaderboard outside of the bo
@@ -221,7 +225,6 @@ TODO list:
                     - (maybe?) ⭐️ add ability to see uploaded files in library (list of their names) and maybe even file preview (would require nosql db or something maybe)
                         - should I limit file size for this? like can only display files < 50 MB or something?
 
-            - ⭐️ after user submits something and is waiting, display a loading bar or wheel or different rotating facts (maybe relevant to the library?) letting the user know that it is generating
             - also note: ask gemini / grok / gpt / claude for some ui design tips like adding a menu bar, or ui tips / tricks / helpful websites / youtube videos, etc...
             use this maybe: https://www.shadcn-vue.com/docs/components/stepper.html
             - note: for main page, add two / 3 simple boxes, class you want, school, and possibly professor, and it gives you classes close to you like quizlet / rate my professor along with option for creating your own
