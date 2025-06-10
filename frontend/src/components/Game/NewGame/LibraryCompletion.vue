@@ -31,7 +31,7 @@
                 <div class="xp-badge animate-pulse">+25 XP</div>
                 <div class="cta-container">
                     <button class="primary-cta animate-pulse" @click="nextPage">
-                        Continue to next Lesson
+                        Back to course path
                     </button>
                 </div>
             </div>

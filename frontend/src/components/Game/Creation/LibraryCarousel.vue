@@ -107,8 +107,8 @@
                 Showing {{ startIndex + 1 }}-{{ endIndex }} of {{ totalItems }} courses
             </div>
             <div class="pagination-controls">
-                <button class="pagination-btn" :disabled="currentPage === 1" @click="prevPage">
-                    <span class="pagination-icon">←</span> Prev
+                <button class="pagination-btn" :disabled="currentPage === 1" @click="firstPage">
+                    <span class="pagination-icon">←</span> First
                 </button>
                 <div class="page-numbers">
                     <button v-for="page in displayedPages" :key="page" class="page-btn"
@@ -116,8 +116,8 @@
                         {{ page }}
                     </button>
                 </div>
-                <button class="pagination-btn" :disabled="currentPage === totalPages" @click="nextPage">
-                    Next <span class="pagination-icon">→</span>
+                <button class="pagination-btn" :disabled="currentPage === totalPages" @click="lastPage">
+                    Last <span class="pagination-icon">→</span>
                 </button>
             </div>
         </div>
@@ -346,16 +346,12 @@ function handleSearchKeydown(event: KeyboardEvent) {
     }
 }
 
-function prevPage() {
-    if (currentPage.value > 1) {
-        currentPage.value--;
-    }
+function firstPage() {
+    currentPage.value = 1;
 }
 
-function nextPage() {
-    if (currentPage.value < totalPages.value) {
-        currentPage.value++;
-    }
+function lastPage() {
+    currentPage.value = totalPages.value;
 }
 
 function goToPage(page: number) {
