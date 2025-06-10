@@ -3,7 +3,7 @@
         <div v-if="questionVisible" class="question-overlay">
             <div class="question-backdrop">
 
-                <LeaveGameWarning />
+                <LeaveGameWarning/>
 
                 <div class="info-icon" @click="flipQuestion">i</div>
                 <!-- Completion message when no more questions -->

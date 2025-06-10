@@ -2,9 +2,8 @@
     <div class="landing-container">
         <div class="landing-page-1">
             <div class="landing-titles-container">
-                <div class="landing-title">Grades Go Up. Stress Goes Down.</div>
-                <div class="landing-subtitle">Transform lonely, late-night cramming into vibrant, gamified adventures.
-                    Connect, learn, and level up with your personal study community.
+                <div class="landing-title">Studying. Made. Fun.</div>
+                <div class="landing-subtitle">Transform late-night cramming into fun adventures with your personal study community.
                 </div>
             </div>
         </div>

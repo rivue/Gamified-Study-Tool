@@ -79,8 +79,12 @@
                                     library.owner_username.slice(0, 9) + "..." : library.owner_username }}</span>
                         </div>
 
-                        <Input v-if="!library.is_public" v-model="joinCode" placeholder="Enter private library code"
-                            @keydown.enter="joinSpecificCourse(library.id)" class="join-input m-2 h-10 p-4" />
+                        <Input v-if="!library.is_public && !joinedCourses.has(library.id)"
+                            :model-value="getJoinCode(library.id)" 
+                            @update:model-value="setJoinCode(library.id, $event)"
+                            placeholder="Enter private library code"
+                            @keydown.enter="joinSpecificCourse(library.id)" 
+                            class="join-input m-2 h-10 p-4" />
 
                         <Button v-if="!joinedCourses.has(library.id)" @click="joinSpecificCourse(library.id)"
                             :disabled="joinPublicLoading.has(library.id)" class="join-card-button h-10 p-4">
@@ -172,7 +176,7 @@ const route = useRoute();
 const searchQuery = ref("");
 const filteredLibraries = ref<Array<any>>([]);
 const displayedLibraries = ref<Array<any>>([]);
-const joinCode = ref("");
+const joinCodes = ref(new Map<number, string>()); // Individual join codes per course
 const visibilityFilter = ref<'all' | 'public' | 'private'>('all');
 
 // actual list of courses 
@@ -185,12 +189,20 @@ const joinedCourses = ref(new Set());
 const showLeaveModal = ref(false);
 const selectedLibraryToLeave = ref<any>(null); // Using any for now, can be more specific
 
-
 // Infinite scroll states
 const itemsPerLoad = 100;
 const currentLoadIndex = ref(0);
 const isLoading = ref(false);
 const hasMoreToLoad = ref(true);
+
+// Join code management functions
+function getJoinCode(libraryId: number): string {
+    return joinCodes.value.get(libraryId) || '';
+}
+
+function setJoinCode(libraryId: number, value: string) {
+    joinCodes.value.set(libraryId, value);
+}
 
 // Filtering function
 function filterLibraries() {
@@ -303,7 +315,7 @@ async function joinSpecificCourse(id: number) {
     axios
         .post('/api/library/join', {
             libraryId: id,
-            joinCode: joinCode.value.trim(),
+            joinCode: getJoinCode(id), // Use the specific join code for this course
         })
         .then((response) => {
             if (response.status === 200) {
@@ -312,15 +324,15 @@ async function joinSpecificCourse(id: number) {
                 joinPublicMessages.value.set(id, "Successfully joined course!");
 
                 joinedCourses.value.add(id);
-
+                
+                // Clear the join code after successful join
+                setJoinCode(id, '');
             }
         })
         .catch((error) => {
-
             console.error("Error updating favorite status:", error);
             joinPublicMessageTypes.value.set(id, "error");
             joinPublicMessages.value.set(id, error.response?.data?.message || "Failed to join course");
-
         })
         .finally(() => {
             joinPublicLoading.value.delete(id);

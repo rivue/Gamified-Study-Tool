@@ -1,5 +1,5 @@
 <template>
-    <div class="close-button" @click="showLeavePopup">x</div>
+    <div class="close-button -top-24 -left-72" @click="showLeavePopup">x</div>
     <Transition name="modal">
         <div v-if="showPopup" class="fixed inset-0 flex items-center justify-center z-50 p-4"
             style="background-color: var(--background-haze); pointer-events: auto;">
@@ -83,8 +83,6 @@ function handleLeave() {
 
 .close-button {
     position: absolute;
-    top: 10px;
-    left: 10px;
     width: 30px;
     height: 30px;
     background: rgba(255, 0, 0, 0.8);

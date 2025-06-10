@@ -18,7 +18,7 @@
             <button @click="goToLeaderboard"
                 class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg p-4 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200"
                 style="color: var(--highlight-color);">
-                <ChartBarIcon class="w-6 h-6" />
+                <Trophy class="w-6 h-6" />
             </button>
 
             <button v-if="isOwner" @click="toggleSettings"
@@ -341,12 +341,12 @@ import {
     XMarkIcon,
     ChevronDoubleLeftIcon,
     ChevronDoubleRightIcon,
-    ChartBarIcon,
     PencilIcon,
     PlusIcon,
     ArrowLeftIcon,
     LightBulbIcon
 } from '@heroicons/vue/24/solid';
+import { Trophy } from 'lucide-vue-next';
 import { useGameStore } from '@/store/gameStore'
 import { useRouter } from 'vue-router';
 import { toast } from 'vue-sonner'

@@ -141,7 +141,7 @@ function handleSubmit() {
 }
 
 .info-card {
-    background: var(--background-color-1t);
+    background: var(--background-color-2t);
     backdrop-filter: blur(10px);
     border-radius: 12px;
     padding: 1.5rem;
@@ -165,7 +165,7 @@ function handleSubmit() {
 .info-list li {
     position: relative;
     padding-left: 1.5rem;
-    color: var(--text-color-secondary);
+    color: var(--text-color);
     line-height: 1.5;
     margin-bottom: 0.5rem;
 }
