@@ -125,7 +125,7 @@ interface UserNode {
 
 // Game state
 const centralConcept = ref<string>('Statistics')
-const timeLeft = ref<number>(5) // 3 minutes in seconds
+const timeLeft = ref<number>(180) // 3 minutes in seconds
 const gameEnded = ref<boolean>(false)
 const userNodes = ref<UserNode[]>([])
 const nodeIdCounter = ref<number>(1)
