@@ -96,7 +96,7 @@
                             <div class="section-card">
                                 <div class="card-header">
                                     <h2 class="section-title">Course Information</h2>
-                                    <p class="section-description">Give your course a name and upload your source
+                                    <p class="section-description text-lg">Give your course a name and upload your source
                                         material
                                     </p>
                                 </div>
@@ -107,7 +107,7 @@
                                         :class="['form-input', { 'error': formattedErrors.topic?._errors?.length }]"
                                         placeholder="e.g., Introduction to Biology, Advanced Calculus..."
                                         maxlength="100" @focus="selectInputText" @paste="handlePaste" />
-                                    <div class="input-hint">Must be 4-25 characters long</div>
+                                    <div class="input-hint text-md">Must be 4-25 characters long</div>
                                     <div v-if="formattedErrors.topic?._errors?.length" class="error-text">
                                         {{ formattedErrors.topic._errors[0] }}
                                     </div>
@@ -141,7 +141,7 @@
                                     <div v-if="formattedErrors.selectedFile?._errors?.length" class="error-text">
                                         {{ formattedErrors.selectedFile._errors[0] }}
                                     </div>
-                                    <div class="input-hint">This file will be used to generate content for your course
+                                    <div class="input-hint text-md">This file will be used to generate content for your course
                                         topics</div>
                                 </div>
                             </div>
@@ -152,7 +152,7 @@
                             <div class="section-card">
                                 <div class="card-header">
                                     <h2 class="section-title">Course Structure</h2>
-                                    <p class="section-description">Organize your course into topics and subtopics</p>
+                                    <p class="section-description text-lg">Organize your course into topics and subtopics</p>
                                 </div>
 
                                 <!-- Example Structure -->
@@ -220,8 +220,8 @@
                                 </div>
 
                                 <div class="structure-hints">
-                                    <div class="hint">📝 You can create up to 10 topics with 15 subtopics each</div>
-                                    <div class="hint">✨ Don't worry about adding everything now - you can expand later!
+                                    <div class="hint text-md">📝 You can create up to 10 topics with 15 subtopics each</div>
+                                    <div class="hint text-md">✨ Don't worry about adding everything now - you can expand later!
                                     </div>
                                 </div>
                             </div>
@@ -232,7 +232,7 @@
                             <div class="section-card">
                                 <div class="card-header">
                                     <h2 class="section-title">Course Settings</h2>
-                                    <p class="section-description">Configure how others can access your course</p>
+                                    <p class="section-description text-lg">Configure how others can access your course</p>
                                 </div>
 
                                 <div class="visibility-section">
@@ -870,6 +870,7 @@ onUnmounted(() => {
     color: var(--text-color-secondary);
     opacity: 0.7;
     line-height: 1.3;
+    font-weight: bold;
 }
 
 .step-info.active .step-title,
@@ -975,7 +976,6 @@ onUnmounted(() => {
 }
 
 .input-hint {
-    font-size: 0.875rem;
     color: var(--text-color-secondary);
     margin-top: 0.5rem;
 }
@@ -1285,7 +1285,6 @@ onUnmounted(() => {
 }
 
 .hint {
-    font-size: 0.875rem;
     color: var(--text-color-secondary);
     text-align: center;
 }
