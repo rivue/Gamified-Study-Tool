@@ -7,41 +7,95 @@
                 <ArrowLeftIcon class="w-6 h-6" />
             </button>
         </div>
+
+        <!-- Timer Display -->
+        <div v-if="!gameEnded" class="timer-display">
+            <div class="timer-card">
+                <span class="timer-label">Time Remaining</span>
+                <span class="timer-value">{{ formatTime(timeLeft) }}</span>
+            </div>
+        </div>
+
         <!-- Game Area -->
         <div v-if="!gameEnded" class="game-area">
-            <BrainDumpConcepts />
+            <BrainDumpConcepts ref="brainDumpRef" />
         </div>
 
         <!-- Results Screen -->
         <div v-else class="results-screen">
-            <h1>Time's Up!</h1>
-            <h2>Your Brain Dump for: {{ centralConcept }}</h2>
+            <div class="results-container">
+                <div class="results-header">
+                    <h1 class="results-title">Time's Up!</h1>
+                    <h2 class="results-subtitle">Your Brain Dump for: {{ centralConcept }}</h2>
+                </div>
 
-            <div class="results-summary">
-                <p><strong>Concepts Added:</strong> {{ totalConcepts }}</p>
-                <p><strong>Parent Concepts:</strong> {{ userNodes.length }}</p>
-                <p><strong>Child Concepts:</strong> {{ totalChildConcepts }}</p>
-                <p><strong>Total Words:</strong> {{ totalWords }}</p>
-            </div>
-
-            <div class="concepts-list">
-                <div v-for="node in userNodes" :key="node.id" class="concept-card">
-                    <h3>{{ node.title || 'Untitled Concept' }}</h3>
-                    <p>{{ node.content || 'No content added' }}</p>
-                    
-                    <div v-if="node.children && node.children.length > 0" class="child-concepts">
-                        <h4>Sub-concepts:</h4>
-                        <div v-for="child in node.children" :key="child.id" class="child-concept-card">
-                            <h5>{{ child.title || 'Untitled Sub-concept' }}</h5>
-                            <p>{{ child.content || 'No content added' }}</p>
+                <div class="results-summary">
+                    <div class="summary-stats">
+                        <div class="stat-card">
+                            <span class="stat-number">{{ totalConcepts }}</span>
+                            <span class="stat-label">Total Concepts</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-number">{{ conceptsData.length }}</span>
+                            <span class="stat-label">Main Concepts</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-number">{{ totalChildConcepts }}</span>
+                            <span class="stat-label">Child Concepts</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-number">{{ totalWords }}</span>
+                            <span class="stat-label">Total Words</span>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="action-buttons">
-                <button @click="restartGame" class="restart-btn">Try Again</button>
-                <button @click="shareResults" class="share-btn">Share with Friends</button>
+                <div class="concepts-display">
+                    <h3 class="concepts-display-title">Your Concepts:</h3>
+                    
+                    <div v-if="conceptsData.length === 0" class="no-concepts">
+                        <p>No concepts were added during this session.</p>
+                    </div>
+
+                    <div v-else class="concepts-grid">
+                        <div v-for="(concept, index) in conceptsData" :key="index" class="concept-result-card">
+                            <div class="concept-header">
+                                <h4 class="concept-title">
+                                    {{ concept.concept || 'Untitled Concept' }}
+                                </h4>
+                            </div>
+                            
+                            <div v-if="concept.description" class="concept-description">
+                                <p>{{ concept.description }}</p>
+                            </div>
+
+                            <div v-if="concept.childConcepts && concept.childConcepts.length > 0" class="child-concepts-section">
+                                <h5 class="child-concepts-header">Child Concepts:</h5>
+                                <div class="child-concepts-grid">
+                                    <div v-for="(child, childIndex) in concept.childConcepts" 
+                                         :key="childIndex" 
+                                         class="child-concept-card">
+                                        <h6 class="child-concept-title">
+                                            {{ child.name || 'Untitled' }}
+                                        </h6>
+                                        <p v-if="child.description" class="child-concept-description">
+                                            {{ child.description }}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button @click="restartGame" class="action-btn restart-btn">
+                        <span>Try Again</span>
+                    </button>
+                    <button @click="shareResults" class="action-btn share-btn">
+                        <span>Share Results</span>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -55,37 +109,29 @@ import { useRoute, useRouter } from 'vue-router'
 import { showExperimentsToast } from '@/utils/toasts';
 import axios from 'axios';
 
-interface ChildNode {
-    id: number
-    title: string
-    content: string
+interface ChildConcept {
+    name: string;
+    description?: string;
 }
 
-interface UserNode {
-    id: number
-    title: string
-    content: string
-    x: number
-    y: number
-    children: ChildNode[]
+interface Concept {
+    concept: string;
+    description: string;
+    childConcepts: ChildConcept[];
+    collapsed: boolean;
 }
 
 // Game state
 const centralConcept = ref<string>('Statistics')
-const timeLeft = ref<number>(5) // 3 minutes in seconds
+const timeLeft = ref<number>(50) // 3 minutes in seconds
 const gameEnded = ref<boolean>(false)
-const userNodes = ref<UserNode[]>([])
-const nodeIdCounter = ref<number>(1)
-const childIdCounter = ref<number>(1)
+const brainDumpRef = ref<InstanceType<typeof BrainDumpConcepts> | null>(null)
+const conceptsData = ref<Concept[]>([])
 let gameTimer: NodeJS.Timeout | null = null
 const route = useRoute();
 const params = ref(route.params);
 const router = useRouter();
 const abortController = new AbortController();
-
-// Drag state
-const draggedNodeId = ref<number | null>(null)
-const dragOffset = ref<{ x: number, y: number }>({ x: 0, y: 0 })
 
 function capitalizeWords(str: string | null | undefined): string {
     if (!str) return str || ''; // Handle null or undefined input
@@ -93,26 +139,26 @@ function capitalizeWords(str: string | null | undefined): string {
 }
 
 const totalWords = computed(() => {
-    return userNodes.value.reduce((total, node) => {
-        const titleWords = node.title.trim().split(/\s+/).filter(word => word.length > 0).length
-        const contentWords = node.content.trim().split(/\s+/).filter(word => word.length > 0).length
+    return conceptsData.value.reduce((total, concept) => {
+        const conceptWords = (concept.concept || '').trim().split(/\s+/).filter(word => word.length > 0).length
+        const descriptionWords = (concept.description || '').trim().split(/\s+/).filter(word => word.length > 0).length
         
-        const childWords = node.children.reduce((childTotal, child) => {
-            const childTitleWords = child.title.trim().split(/\s+/).filter(word => word.length > 0).length
-            const childContentWords = child.content.trim().split(/\s+/).filter(word => word.length > 0).length
-            return childTotal + childTitleWords + childContentWords
+        const childWords = concept.childConcepts.reduce((childTotal, child) => {
+            const childNameWords = (child.name || '').trim().split(/\s+/).filter(word => word.length > 0).length
+            const childDescWords = (child.description || '').trim().split(/\s+/).filter(word => word.length > 0).length
+            return childTotal + childNameWords + childDescWords
         }, 0)
         
-        return total + titleWords + contentWords + childWords
+        return total + conceptWords + descriptionWords + childWords
     }, 0)
 })
 
 const totalConcepts = computed(() => {
-    return userNodes.value.length + totalChildConcepts.value
+    return conceptsData.value.length + totalChildConcepts.value
 })
 
 const totalChildConcepts = computed(() => {
-    return userNodes.value.reduce((total, node) => total + node.children.length, 0)
+    return conceptsData.value.reduce((total, concept) => total + concept.childConcepts.length, 0)
 })
 
 const fetchLibraryInfo = async (): Promise<void> => {
@@ -154,6 +200,11 @@ const startTimer = (): void => {
 }
 
 const endGame = (): void => {
+    // Capture data from BrainDumpConcepts component
+    if (brainDumpRef.value && brainDumpRef.value.concepts) {
+        conceptsData.value = [...brainDumpRef.value.concepts]
+    }
+    
     gameEnded.value = true
     if (gameTimer) {
         clearInterval(gameTimer)
@@ -161,123 +212,16 @@ const endGame = (): void => {
     }
 }
 
-const addNode = (): void => {
-    if (gameEnded.value) return
-
-    const newNode: UserNode = {
-        id: nodeIdCounter.value++,
-        title: '',
-        content: '',
-        x: -100 + (10 * userNodes.value.length),
-        y: 70 + (10 * userNodes.value.length),
-        children: []
-    }
-
-    userNodes.value.push(newNode)
-}
-
-const addChildNode = (parentId: number): void => {
-    if (gameEnded.value) return
-
-    const parentNode = userNodes.value.find(node => node.id === parentId)
-    if (!parentNode) return
-
-    const newChild: ChildNode = {
-        id: childIdCounter.value++,
-        title: '',
-        content: ''
-    }
-
-    parentNode.children.push(newChild)
-}
-
-const updateChildNode = (parentId: number, childId: number, field: keyof ChildNode, value: string): void => {
-    const parentNode = userNodes.value.find(node => node.id === parentId)
-    if (!parentNode) return
-
-    const childNode = parentNode.children.find(child => child.id === childId)
-    if (childNode && (field === 'title' || field === 'content')) {
-        childNode[field] = value
-    }
-}
-
-const removeChildNode = (parentId: number, childId: number): void => {
-    const parentNode = userNodes.value.find(node => node.id === parentId)
-    if (!parentNode) return
-
-    const childIndex = parentNode.children.findIndex(child => child.id === childId)
-    if (childIndex > -1) {
-        parentNode.children.splice(childIndex, 1)
-    }
-}
-
-
-const removeNode = (nodeId: number): void => {
-    const index = userNodes.value.findIndex(node => node.id === nodeId)
-    if (index > -1) {
-        userNodes.value.splice(index, 1)
-    }
-}
-
-const updateNode = (nodeId: number, field: keyof UserNode, value: string): void => {
-    const node = userNodes.value.find(n => n.id === nodeId)
-    if (node && (field === 'title' || field === 'content')) {
-        node[field] = value
-    }
-}
-
-// Drag functionality
-const startDrag = (event: MouseEvent, nodeId: number): void => {
-    if (gameEnded.value) return
-
-    const node = userNodes.value.find(n => n.id === nodeId)
-    if (!node) return
-
-    draggedNodeId.value = nodeId
-    dragOffset.value = {
-        x: event.clientX - node.x,
-        y: event.clientY - node.y
-    }
-
-    document.addEventListener('mousemove', onMouseMove)
-    document.addEventListener('mouseup', onMouseUp)
-
-    // Prevent text selection while dragging
-    event.preventDefault()
-}
-
-const onMouseMove = (event: MouseEvent): void => {
-    if (draggedNodeId.value === null) return
-
-    const node = userNodes.value.find(n => n.id === draggedNodeId.value)
-    if (!node) return
-
-    node.x = event.clientX - dragOffset.value.x
-    node.y = event.clientY - dragOffset.value.y
-
-    // Keep nodes within reasonable bounds
-    node.x = Math.max(Math.min(node.x, window.innerWidth + 270), Math.min(node.x, window.innerWidth - 270))
-    node.y = Math.max(0, Math.min(node.y, window.innerHeight - 200))
-}
-
-const onMouseUp = (): void => {
-    draggedNodeId.value = null
-    dragOffset.value = { x: 0, y: 0 }
-
-    document.removeEventListener('mousemove', onMouseMove)
-    document.removeEventListener('mouseup', onMouseUp)
-}
-
 const restartGame = (): void => {
     timeLeft.value = 180
     gameEnded.value = false
-    userNodes.value = []
-    nodeIdCounter.value = 1
+    conceptsData.value = []
     startTimer()
 }
+
 const shareResults = (): void => {
     const resultsText = `I just completed a Brain Dump on "${centralConcept.value}"! 
-Added ${userNodes.value.length} concepts with ${totalWords.value} total words in 3 minutes! 🧠💪`
+Added ${totalConcepts.value} concepts with ${totalWords.value} total words in 3 minutes! 🧠💪`
 
     if (navigator.share) {
         navigator.share({
@@ -294,6 +238,16 @@ Added ${userNodes.value.length} concepts with ${totalWords.value} total words in
 onMounted(() => {
     startTimer()
     fetchLibraryInfo();
+    
+    setTimeout(() => { // TODO: FIGURE THIS SHIT OUT (get library title to display on top of the page. all of this timeout code can be deleted and stuff)
+        if  (brainDumpRef.value && brainDumpRef.value.title) {
+            brainDumpRef.value.title = centralConcept.value; // Assuming you want to set this somewhere
+            console.log(centralConcept.value);
+            console.log(brainDumpRef.value.title)
+        }
+    }, 200);
+  
+    
 })
 
 onUnmounted(() => {
@@ -301,150 +255,238 @@ onUnmounted(() => {
     if (gameTimer) {
         clearInterval(gameTimer)
     }
-    // Clean up event listeners
-    document.removeEventListener('mousemove', onMouseMove)
-    document.removeEventListener('mouseup', onMouseUp)
 })
 
 </script>
 
 <style scoped>
 .brain-dump-container {
-    /* min-height: 100vh; */
-    /* background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); */
     padding: 20px;
     font-family: 'Arial', sans-serif;
-}
-.menu-button {
-    border-radius: 10px;
-    background-color: var(--background-color-1t);
-    color: var(--highlight-color);
-    border: 1px solid var(--color-primary-dark);
-    transition: all 0.2s ease;
+    min-height: 100vh;
 }
 
-.menu-button:hover {
-    background-color: var(--element-color-1);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+.timer-display {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 10;
 }
 
-.menu-button:active {
-    transform: translateY(0);
-}
-
-.menu-button.selected {
-    background-color: var(--element-color-1);
-    border-color: var(--color-primary);
-    color: var(--light-text);
-}
-.game-area {
-    position: relative;
-    min-height: 600px;
-}
-.results-screen {
-    text-align: center;
-    color: white;
-    max-width: 800px;
-    margin: 0 auto;
-}
-.results-screen h1 {
-    font-size: 3rem;
-    margin-bottom: 10px;
-}
-.results-screen h2 {
-    font-size: 1.5rem;
-    margin-bottom: 30px;
-}
-.results-summary {
-    background: rgba(255, 255, 255, 0.1);
-    padding: 20px;
-    border-radius: 15px;
-    margin-bottom: 30px;
-    backdrop-filter: blur(10px);
-}
-.results-summary p {
-    font-size: 1.2rem;
-    margin: 10px 0;
-}
-.concepts-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 20px;
-    margin-bottom: 30px;
-}
-.concept-card {
-    background: white;
-    color: #333;
-    padding: 20px;
+.timer-card {
+    background: var(--background-color-1);
+    border: 1px solid var(--color-primary);
     border-radius: 12px;
-    text-align: left;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    padding: 1rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-.concept-card h3 {
-    margin: 0 0 10px 0;
-    color: #667eea;
+.timer-label {
+    font-size: 0.875rem;
+    color: var(--text-color-secondary);
+    font-weight: 500;
 }
-.concept-card p {
-    margin: 0;
-    line-height: 1.5;
+
+.timer-value {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--color-primary);
 }
-.child-concepts {
-    margin-top: 15px;
-    padding-top: 15px;
-    border-top: 1px solid #e0e0e0;
-}
-.child-concepts h4 {
-    margin: 0 0 10px 0;
-    color: #555;
-    font-size: 1rem;
-}
-.child-concept-card {
-    background: #f8f9fa;
-    padding: 12px;
-    border-radius: 6px;
-    margin-bottom: 8px;
-    border-left: 3px solid #667eea;
-}
-.child-concept-card h5 {
-    margin: 0 0 6px 0;
-    color: #333;
-    font-size: 0.9rem;
-}
-.child-concept-card p {
-    margin: 0;
-    font-size: 0.85rem;
-    color: #666;
-    line-height: 1.4;
-}
-.action-buttons {
+
+.results-screen {
+    padding: 2rem 0;
+    min-height: 100vh;
     display: flex;
-    gap: 20px;
+    align-items: center;
     justify-content: center;
 }
-.restart-btn,
-.share-btn {
-    padding: 15px 30px;
+
+.results-container {
+    max-width: 1000px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+.results-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.results-title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: var(--text-color);
+    margin-bottom: 0.5rem;
+}
+
+.results-subtitle {
+    font-size: 1.25rem;
+    color: var(--text-color-secondary);
+    margin: 0;
+}
+
+.results-summary {
+    background: var(--background-color-1);
+    border: 1px solid rgba(26, 139, 127, 0.2);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 3rem;
+}
+
+.summary-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1.5rem;
+}
+
+.stat-card {
+    text-align: center;
+    padding: 1rem;
+    background: rgba(26, 139, 127, 0.05);
+    border-radius: 12px;
+    border: 1px solid rgba(26, 139, 127, 0.1);
+}
+
+.stat-number {
+    display: block;
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--color-primary);
+    margin-bottom: 0.5rem;
+}
+
+.stat-label {
+    font-size: 0.875rem;
+    color: var(--text-color-secondary);
+    font-weight: 500;
+}
+
+.concepts-display {
+    margin-bottom: 3rem;
+}
+
+.concepts-display-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--text-color);
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.no-concepts {
+    text-align: center;
+    padding: 3rem;
+    color: var(--text-color-secondary);
+    font-style: italic;
+}
+
+.concepts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 1.5rem;
+}
+
+.concept-result-card {
+    background: var(--background-color-1);
+    border: 1px solid rgba(26, 139, 127, 0.2);
+    border-radius: 12px;
+    padding: 1.5rem;
+}
+
+.concept-header {
+    margin-bottom: 1rem;
+}
+
+.concept-title {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: var(--color-primary);
+    margin: 0;
+}
+
+.concept-description {
+    margin-bottom: 1.5rem;
+}
+
+.concept-description p {
+    color: var(--text-color);
+    line-height: 1.6;
+    margin: 0;
+}
+
+.child-concepts-section {
+    border-top: 1px solid rgba(26, 139, 127, 0.2);
+    padding-top: 1rem;
+}
+
+.child-concepts-header {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-color);
+    margin: 0 0 1rem 0;
+}
+
+.child-concepts-grid {
+    display: grid;
+    gap: 0.75rem;
+}
+
+.child-concept-card {
+    background: rgba(26, 139, 127, 0.05);
+    border: 1px solid rgba(26, 139, 127, 0.15);
+    border-radius: 8px;
+    padding: 1rem;
+}
+
+.child-concept-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-color);
+    margin: 0 0 0.5rem 0;
+}
+
+.child-concept-description {
+    font-size: 0.875rem;
+    color: var(--text-color-secondary);
+    line-height: 1.5;
+    margin: 0;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.action-btn {
+    padding: 1rem 2rem;
     border: none;
-    border-radius: 25px;
-    font-size: 1.1rem;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
     cursor: pointer;
-    transition: transform 0.2s ease;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
+
 .restart-btn {
-    background: #4CAF50;
+    background: var(--color-primary);
     color: white;
 }
+
 .share-btn {
-    background: #2196F3;
+    background: var(--text-color-secondary);
     color: white;
 }
 
-
-.restart-btn:hover,
-.share-btn:hover {
+.action-btn:hover {
     transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
-
 </style>

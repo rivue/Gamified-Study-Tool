@@ -1,19 +1,22 @@
 <template>
-
 <div class="section-card">
-    <div class="card-header">
-        <h2 class="section-title">Course Structure</h2>
-        <p class="section-description text-lg">Organize your course into topics and subtopics</p>
-    </div>
+    <h2 class="section-title text-3xl">{{title}}</h2>
+    <p class="section-description text-2xl pb-4">Write down as much information on each concept as you can remember!</p>
 
     <!-- Example Structure -->
-    <div class="example-card">
-        <div class="example-header">Example Structure</div>
-        <div class="example-content">
-            <div class="example-topic">
-                <strong>Topic:</strong> "Cell Biology"
+    <div class="example-card mt-8">
+        <div class="example-header">Example
+            <div class="example-topic pt-4">Mitosis
+                <div class="example-description">
+                    Mitosis is the process by which a single cell divides to produce two genetically identical diploid daughter cells. It's essential for growth, repair, and asexual reproduction in multicellular organisms.
+                </div>
                 <div class="example-subtopics">
-                    <strong>Subtopics:</strong> "Cell Membrane", "Mitochondria", "Nucleus"
+                    <div class="example-child-concept">
+                        <strong>Stages of Mitosis:</strong> Prophase, Prometaphase, Metaphase, Anaphase, Telophase
+                    </div>
+                    <div class="example-child-concept">
+                        <strong>Cytokinesis:</strong> The cell divides into two identical daughter cells.
+                    </div>
                 </div>
             </div>
         </div>
@@ -21,46 +24,68 @@
 
     <!-- Topics List -->
     <div class="topics-list">
-        <div v-for="(group, groupIndex) in groups" :key="groupIndex" class="topic-card">
-            <div class="topic-header">
-                <input type="text" v-model="group.concept" placeholder="Enter a concept" />
-                <button class="remove-topic-btn" @click="removeGroup(groupIndex)"
-                    type="button">✕</button>
+        <div v-for="(concept, conceptIndex) in concepts" :key="conceptIndex" class="topic-card">
+            <div class="concept-header">
+                <input type="text" v-model="concept.concept" placeholder="Enter concept title" class="concept-title-input" />
+                <button class="collapse-concept-btn" @click="toggleCollapse(conceptIndex)" type="button">
+                    {{ concept.collapsed ? 'Expand' : 'Collapse' }}
+                </button>
+                <button class="remove-concept-btn" @click="removeGroup(conceptIndex)" type="button">✕</button>
             </div>
 
-
-            <div class="subtopics-section">
-                <div v-if="group.childConcepts.length > 0" class="subtopics-list">
-                    <div v-for="(section, sectionIndex) in group.childConcepts"
-                        :key="sectionIndex" class="subtopic-item">
-                        <input type="text" v-model="group.childConcepts[sectionIndex]"
-                            placeholder="Enter subtopic name..." maxlength="40"
-                            class="subtopic-input" />
-                        <button class="remove-subtopic-btn"
-                            @click="removeSection(groupIndex, sectionIndex)"
-                            type="button">✕</button>
-                    </div>
+            <div v-show="!concept.collapsed">
+                <div class="concept-description-section">
+                    <textarea 
+                        v-model="concept.description" 
+                        placeholder="Enter concept description..." 
+                        class="concept-description-input"
+                        rows="3"
+                    ></textarea>
                 </div>
 
-                <button class="add-subtopic-btn" @click="addSection(groupIndex)" type="button">
-                    + Add Subtopic
-                </button>
+                <div class="child-concepts-section">
+                    <h4 v-if="concept.childConcepts.length > 0" class="child-concepts-header pl-4">Child Concepts:</h4>
+                    
+                    <div v-if="concept.childConcepts.length > 0" class="child-concepts-list">
+                        <div v-for="(childConcept, childIndex) in concept.childConcepts"
+                            :key="childIndex" class="child-concept-item mx-4 mb-4">
+                            <div class="child-concept-header text-lg">
+                                <input type="text" 
+                                    v-model="childConcept.name"
+                                    placeholder="Child concept title..." 
+                                    class="child-concept-title-input font-bold" />
+                                <button class="remove-child-concept-btn"
+                                    @click="removeSection(conceptIndex, childIndex)"
+                                    type="button">✕</button>
+                            </div>
+                            <textarea 
+                                v-model="childConcept.description" 
+                                placeholder="Child concept description..." 
+                                class="child-concept-description-input"
+                                rows="2"
+                            ></textarea>
+                        </div>
+                    </div>
 
+                    <button class="add-child-concept-btn" @click="addSection(conceptIndex)" type="button">
+                        + Add Child Concept
+                    </button>
+                </div>
             </div>
         </div>
 
         <!-- Add Topic Button -->
-        <button class="add-topic-btn" @click="addGroup" type="button">
-            + Add Topic
+        <button class="add-topic-btn" @click="addConcept" type="button">
+            + Add Concept
         </button>
     </div>
-
 </div>
 </template>
 
 <script setup lang="ts">
-
 import { ref } from 'vue';
+
+const title = ref<string>(''); // Define the title property
 
 interface childConcept {
     name: string;
@@ -71,44 +96,52 @@ interface Concept {
     concept: string;
     description: string;
     childConcepts: childConcept[];
+    collapsed: boolean;
 }
 
-
-const groups = ref<Concept[]>(
-    [{
-        concept: "",
-        description: "",
-        childConcepts: [],
-    }]
-);
+const concepts = ref<Concept[]>([{
+    concept: "",
+    description: "",
+    childConcepts: [],
+    collapsed: false,
+}]);
 
 const removeGroup = (groupIndex: number) => {
-    groups.value.splice(groupIndex, 1);
+    concepts.value.splice(groupIndex, 1);
 };
 
 const removeSection = (groupIndex: number, sectionIndex: number) => {
-    groups.value[groupIndex].childConcepts.splice(sectionIndex, 1);
+    concepts.value[groupIndex].childConcepts.splice(sectionIndex, 1);
 };
 
 const addSection = (groupIndex: number) => {
-    const group = groups.value[groupIndex];
-        group.childConcepts.push({ name: "", description: "" });
+    const group = concepts.value[groupIndex];
+    group.childConcepts.push({ name: "", description: "" });
 };
 
-const addGroup = () => {
-        groups.value.push({
-            concept: "",
-            childConcepts: [],
-            description: "",
-        });
+const addConcept = () => {
+    concepts.value.push({
+        concept: "",
+        childConcepts: [],
+        description: "",
+        collapsed: false,
+    });
 };
+
+const toggleCollapse = (groupIndex: number) => {
+    concepts.value[groupIndex].collapsed = !concepts.value[groupIndex].collapsed;
+};
+
+// Expose concepts to parent component
+defineExpose({
+    concepts,
+    title
+});
 
 </script>
 
-
 <style scoped>
 .section-card {
-    flex: 1;
     background: rgba(26, 139, 127, 0.05);
     border-radius: 16px;
     padding: 2rem;
@@ -117,47 +150,73 @@ const addGroup = () => {
     flex-direction: column;
     min-height: 500px;
     justify-content: space-between;
-    width: 100%;
-    /* Ensure full width */
+    width: 80%;
+    max-width: 1200px;
+    margin: 0 auto;
 }
+
 .section-title {
-    font-size: 1.5rem;
-    font-weight: 700;
+    justify-content: center;
+    display: flex;
+    font-weight: bold;
     margin-bottom: 0.5rem;
     color: var(--text-color);
 }
+
 .section-description {
     color: var(--text-color-secondary);
     margin: 0;
+    justify-content: center;
+    display: flex;
 }
+
 .example-card {
     background: rgba(26, 139, 127, 0.1);
     border: 1px solid rgba(26, 139, 127, 0.2);
     border-radius: 12px;
     padding: 1.5rem;
     margin-bottom: 2rem;
-    flex-shrink: 0;
 }
+
 .example-header {
     font-weight: 600;
     margin-bottom: 1rem;
     color: var(--color-primary);
 }
+
 .example-topic {
     color: var(--text-color);
+    font-weight: 600;
+}
+
+.example-description {
+    margin: 0.5rem 0 1rem 0;
+    color: var(--text-color-secondary);
+    font-size: 0.95rem;
+    line-height: 1.4;
 }
 
 .example-subtopics {
-    margin-left: 1rem;
-    margin-top: 0.5rem;
-    color: var(--text-color-secondary);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
 }
+
+.example-child-concept {
+    color: var(--text-color-secondary);
+    font-size: 0.9rem;
+    line-height: 1.3;
+    padding-left: 1rem;
+    border-left: 2px solid rgba(26, 139, 127, 0.3);
+}
+
 .topics-list {
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
     flex: 1;
 }
+
 .topic-card {
     background: var(--background-color-1);
     border: 1px solid rgba(26, 139, 127, 0.2);
@@ -165,59 +224,132 @@ const addGroup = () => {
     padding: 1.5rem;
     flex: 1;
 }
-.topic-header {
+
+.concept-header {
     display: flex;
     gap: 0.75rem;
     align-items: flex-start;
     margin-bottom: 1rem;
 }
-.remove-topic-btn {
-    background: none;
-    border: none;
-    color: var(--text-color-secondary);
-    cursor: pointer;
+
+.concept-title-input {
+    flex: 1;
     padding: 0.75rem;
-    border-radius: 6px;
-    transition: all 0.2s;
+    border: 1px solid rgba(26, 139, 127, 0.3);
+    border-radius: 8px;
+    background: rgba(26, 139, 127, 0.1);
+    color: var(--text-color);
+    font-size: 1.1rem;
+    font-weight: 600;
 }
 
-.remove-topic-btn:hover {
-    color: var(--error-color);
-    background: rgba(255, 0, 0, 0.1);
+.concept-title-input:focus {
+    outline: none;
+    border-color: var(--color-primary);
 }
 
-.subtopics-section {
+.concept-description-section {
+    margin-bottom: 1.5rem;
+}
+
+.concept-description-input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid rgba(26, 139, 127, 0.3);
+    border-radius: 8px;
+    background: rgba(26, 139, 127, 0.1);
+    color: var(--text-color);
+    resize: vertical;
+    min-height: 80px;
+}
+
+.concept-description-input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+}
+
+.child-concepts-section {
     flex: 1;
     display: flex;
     flex-direction: column;
 }
-.subtopics-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
+
+.child-concepts-header {
     margin-bottom: 1rem;
-    flex: 1;
+    color: var(--text-color);
+    font-size: 1rem;
+    font-weight: 600;
 }
-.subtopic-item {
+
+.child-concepts-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.child-concept-item {
+    background: rgba(26, 139, 127, 0.05);
+    border: 1px solid rgba(26, 139, 127, 0.15);
+    border-radius: 8px;
+    padding: 1.25rem;
+}
+
+.child-concept-header {
     display: flex;
     gap: 0.5rem;
-    align-items: center;
+    align-items: flex-start;
+    margin-bottom: 0.75rem;
 }
 
-.subtopic-input {
+.child-concept-title-input {
     flex: 1;
-    padding: 0.625rem;
+    padding: 0.5rem;
     border: 1px solid rgba(26, 139, 127, 0.3);
     border-radius: 6px;
     background: rgba(26, 139, 127, 0.1);
     color: var(--text-color);
+    font-size: 0.95rem;
 }
 
-.subtopic-input:focus {
+.child-concept-title-input:focus {
     outline: none;
     border-color: var(--color-primary);
 }
-.add-subtopic-btn {
+
+.child-concept-description-input {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid rgba(26, 139, 127, 0.3);
+    border-radius: 6px;
+    background: rgba(26, 139, 127, 0.1);
+    color: var(--text-color);
+    resize: vertical;
+    min-height: 60px;
+    font-size: 0.9rem;
+}
+
+.child-concept-description-input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+}
+
+.remove-concept-btn, .remove-child-concept-btn {
+    background: none;
+    border: none;
+    color: var(--text-color-secondary);
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 6px;
+    transition: all 0.2s;
+}
+
+.remove-concept-btn:hover, .remove-child-concept-btn:hover {
+    color: var(--error-color);
+    background: rgba(255, 0, 0, 0.1);
+}
+
+.add-child-concept-btn {
     width: 100%;
     padding: 0.75rem;
     border: 1px dashed rgba(26, 139, 127, 0.5);
@@ -229,15 +361,11 @@ const addGroup = () => {
     margin-top: auto;
 }
 
-.add-subtopic-btn:hover:not(:disabled) {
+.add-child-concept-btn:hover:not(:disabled) {
     background: rgba(26, 139, 127, 0.1);
     border-style: solid;
 }
 
-.add-subtopic-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
 .add-topic-btn {
     width: 100%;
     padding: 2rem;
@@ -257,9 +385,18 @@ const addGroup = () => {
     background: rgba(26, 139, 127, 0.05);
 }
 
-.add-topic-btn:disabled {
-    opacity: 0.3;
-    cursor: not-allowed;
+.collapse-concept-btn {
+    background: none;
+    border: none;
+    color: var(--text-color-secondary);
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 6px;
+    transition: all 0.2s;
 }
 
+.collapse-concept-btn:hover {
+    color: var(--color-primary);
+    background: rgba(26, 139, 127, 0.1);
+}
 </style>
