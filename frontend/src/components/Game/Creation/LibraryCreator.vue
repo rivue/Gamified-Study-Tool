@@ -1333,6 +1333,7 @@ onUnmounted(() => {
 
 .option-content {
     text-align: left;
+    max-height: 200px;
 }
 
 .option-title {
