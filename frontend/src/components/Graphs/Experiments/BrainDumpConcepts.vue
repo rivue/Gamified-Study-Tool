@@ -1,7 +1,7 @@
 <template>
 <div class="section-card">
     <h2 class="section-title text-3xl">{{title}}</h2>
-    <p class="section-description text-2xl pb-4">Write down as much information on each concept as you can remember!</p>
+    <p class="section-description text-2xl pt-2 pb-4">Recall as many terms and concepts about {{title}} as you remember!</p>
 
     <!-- Example Structure -->
     <div class="example-card mt-8">
@@ -26,7 +26,7 @@
     <div class="topics-list">
         <div v-for="(concept, conceptIndex) in concepts" :key="conceptIndex" class="topic-card">
             <div class="concept-header">
-                <input type="text" v-model="concept.concept" placeholder="Enter concept title" class="concept-title-input" />
+                <input type="text" v-model="concept.concept" placeholder="Enter title" class="concept-title-input" />
                 <button class="collapse-concept-btn" @click="toggleCollapse(conceptIndex)" type="button">
                     {{ concept.collapsed ? 'Expand' : 'Collapse' }}
                 </button>
@@ -37,7 +37,7 @@
                 <div class="concept-description-section">
                     <textarea 
                         v-model="concept.description" 
-                        placeholder="Enter concept description..." 
+                        placeholder="Enter description..." 
                         class="concept-description-input"
                         rows="3"
                     ></textarea>
@@ -68,7 +68,7 @@
                     </div>
 
                     <button class="add-child-concept-btn" @click="addSection(conceptIndex)" type="button">
-                        + Add Child Concept
+                        + Add Sub-term / Sub-concept
                     </button>
                 </div>
             </div>
@@ -76,15 +76,19 @@
 
         <!-- Add Topic Button -->
         <button class="add-topic-btn" @click="addConcept" type="button">
-            + Add Concept
+            + Add Term / Concept
         </button>
     </div>
+
+    
 </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
+import { useRouter } from 'vue-router';
 
+const router = useRouter();
 const title = ref<string>(''); // Define the title property
 
 interface childConcept {
@@ -132,12 +136,18 @@ const toggleCollapse = (groupIndex: number) => {
     concepts.value[groupIndex].collapsed = !concepts.value[groupIndex].collapsed;
 };
 
-// Expose concepts to parent component
-defineExpose({
-    concepts,
-    title
-});
+const props = defineProps<{
+    title: string;
+}>();
 
+onMounted(() => {
+    if (props.title) {
+        title.value = props.title;
+    }
+    else {
+        router.back();
+    }
+});
 </script>
 
 <style scoped>
@@ -399,4 +409,5 @@ defineExpose({
     color: var(--color-primary);
     background: rgba(26, 139, 127, 0.1);
 }
+
 </style>

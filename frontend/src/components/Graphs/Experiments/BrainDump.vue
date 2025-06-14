@@ -17,8 +17,8 @@
         </div>
 
         <!-- Game Area -->
-        <div v-if="!gameEnded" class="game-area">
-            <BrainDumpConcepts ref="brainDumpRef" />
+        <div v-if="!gameEnded && centralConcept" class="game-area">
+            <BrainDumpConcepts ref="brainDumpRef" :title="centralConcept"/>
         </div>
 
         <!-- Results Screen -->
@@ -47,6 +47,7 @@
                             <span class="stat-number">{{ totalWords }}</span>
                             <span class="stat-label">Total Words</span>
                         </div>
+                       
                     </div>
                 </div>
 
@@ -122,7 +123,7 @@ interface Concept {
 }
 
 // Game state
-const centralConcept = ref<string>('Statistics')
+const centralConcept = ref<string | null>(null)
 const timeLeft = ref<number>(50) // 3 minutes in seconds
 const gameEnded = ref<boolean>(false)
 const brainDumpRef = ref<InstanceType<typeof BrainDumpConcepts> | null>(null)
@@ -161,25 +162,26 @@ const totalChildConcepts = computed(() => {
     return conceptsData.value.reduce((total, concept) => total + concept.childConcepts.length, 0)
 })
 
+
 const fetchLibraryInfo = async (): Promise<void> => {
     try {
-        const response = await axios.get(`/api/library/${params.value.id}`, {
+        const response = await axios.get(`/api/library/${route.params.id}`, {
             signal: abortController.signal
         });
-        if (response.data && response.data.data && response.data.data.library_topic) {
+        if (response.data?.data?.library_topic) {
             centralConcept.value = capitalizeWords(response.data.data.library_topic);
         } else {
             router.back();
             showExperimentsToast();
         }
-    } catch (error: any) {
+    } catch (error) {
         router.back();
         showExperimentsToast();
-    } 
+    }
 };
 
 const back = () => {
-    router.push(`/lessons/${params.value.id}/experiments`)
+    router.push(`/lessons/${params.value.id}`)
 }
 
 // Methods
@@ -236,17 +238,13 @@ Added ${totalConcepts.value} concepts with ${totalWords.value} total words in 3 
 
 // Lifecycle
 onMounted(() => {
-    startTimer()
-    fetchLibraryInfo();
-    
-    setTimeout(() => { // TODO: FIGURE THIS SHIT OUT (get library title to display on top of the page. all of this timeout code can be deleted and stuff)
-        if  (brainDumpRef.value && brainDumpRef.value.title) {
-            brainDumpRef.value.title = centralConcept.value; // Assuming you want to set this somewhere
-            console.log(centralConcept.value);
-            console.log(brainDumpRef.value.title)
+    fetchLibraryInfo().then(() => {
+        if (!centralConcept.value) {
+            router.back();
+            showExperimentsToast();
         }
-    }, 200);
-  
+    });
+    startTimer();
     
 })
 
@@ -488,5 +486,29 @@ onUnmounted(() => {
 .action-btn:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.menu-button {
+    border-radius: 10px;
+    background-color: var(--background-color-1t);
+    color: var(--highlight-color);
+    border: 1px solid var(--color-primary-dark);
+    transition: all 0.2s ease;
+}
+
+.menu-button:hover {
+    background-color: var(--element-color-1);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.menu-button:active {
+    transform: translateY(0);
+}
+
+.menu-button.selected {
+    background-color: var(--element-color-1);
+    border-color: var(--color-primary);
+    color: var(--light-text);
 }
 </style>

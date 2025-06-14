@@ -6,7 +6,7 @@
             <button @click="goToExperiments"
                 class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg p-4 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200"
                 style="color: var(--highlight-color);">
-                <LightBulbIcon class="w-6 h-6" />
+                Brain Dump (experimental)
             </button>
 
             <button v-if="isOwner" @click="toggleEditMode"
@@ -343,7 +343,6 @@ import {
     PencilIcon,
     PlusIcon,
     ArrowLeftIcon,
-    LightBulbIcon
 } from '@heroicons/vue/24/solid';
 import { Trophy } from 'lucide-vue-next';
 import { useGameStore } from '@/store/gameStore'
@@ -514,7 +513,7 @@ function goToLeaderboard() {
 }
 
 function goToExperiments() {
-    router.push(`/lessons/${props.libraryId}/experiments`)
+    router.push(`/lessons/${props.libraryId}/braindump`)
 
 }
 

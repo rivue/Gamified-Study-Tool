@@ -19,6 +19,7 @@ export const useGameStore = defineStore("gameStore", {
         currentQuestion: 0,
         answeredQuestions: [],
         incorrectQuestionAnswers: [] as any[],
+        skippedQuestions: [] as any[],
         questionVisible: false,
         factoidVisible: null as any,
         finalTest: false,
@@ -114,6 +115,24 @@ export const useGameStore = defineStore("gameStore", {
                 }
                 this.multiplier = Math.round(5 + Math.sqrt(Math.max(0, this.multiplier - 5)));
             }
+            return true;
+        },
+        skipQuestion() {
+            const currentFactoid = this.factoids[this.currentQuestion];
+            if (!this.skippedQuestions.includes(currentFactoid)) {
+                this.skippedQuestions.push(currentFactoid);
+            }
+            this.currentQuestion += 1;
+            
+            if (this.currentQuestion === this.factoids.length) {
+                this.questionVisible = false;
+                this.factoidVisible = null;
+                this.endGame();
+                this.completed = true;
+                return true;
+            }
+            
+            this.multiplier = Math.max(5, this.multiplier - 2); // Reduce multiplier for skipping
             return true;
         },
         async fetchLibraryDetails(libraryId: string, roomNameThing: string) {
@@ -294,6 +313,7 @@ export const useGameStore = defineStore("gameStore", {
             this.currentQuestion = 0;
             this.answeredQuestions = [];
             this.incorrectQuestionAnswers = [];
+            this.skippedQuestions = [];
             this.questionVisible = false;
             this.factoidVisible = null;
             this.score = 0;
