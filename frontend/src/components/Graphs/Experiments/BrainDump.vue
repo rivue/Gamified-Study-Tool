@@ -124,7 +124,7 @@ interface Concept {
 
 // Game state
 const centralConcept = ref<string | null>(null)
-const timeLeft = ref<number>(50) // 3 minutes in seconds
+const timeLeft = ref<number>(180) // 3 minutes in seconds
 const gameEnded = ref<boolean>(false)
 const brainDumpRef = ref<InstanceType<typeof BrainDumpConcepts> | null>(null)
 const conceptsData = ref<Concept[]>([])
