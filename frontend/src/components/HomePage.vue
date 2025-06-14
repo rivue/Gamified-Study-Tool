@@ -3,8 +3,9 @@
         <div class="landing-page-1">
             <div class="landing-titles-container">
                 <div class="landing-title">Studying. Made. Fun.</div>
-                <div class="landing-subtitle">Transform late-night cramming into fun adventures with your personal study community.
-                </div>
+                <div class="landing-subtitle">
+  Stop cramming alone the night before. Join a community where studying feels like leveling up, not burning out.
+</div>
             </div>
         </div>
         <div class="landing-page-2">
@@ -68,7 +69,6 @@
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from "@/store/authStore";
-import FaqComponent from "./Footer/LandingPageComponents/FaqComponent.vue";
 import FeaturesComponent from "./Footer/LandingPageComponents/FeaturesComponent.vue";
 const searchQuery = ref("");
 
@@ -77,9 +77,18 @@ const searchQuery = ref("");
 // Data properties
 const items = ref(["Have Fun", "Discover", "Level Up"]);
 const content = ref([
-    ["Your personal learning journey.", "<b>You</b> decide what to learn. Choose any topic you can describe in a few words. Or let our tutor suggest based on your goals and interests."],
-    ["Learn anything, challenge yourself.", "Embark on a personalized learning adventure with interactive lessons and fun quizzes."],
-    ["Stats, graphs, streaks...", "Seeing progress gives us the rewarding feeling hard work deserves. Track your gains with graphs and stats."]
+  [
+    "Make learning feel like a game.",
+    "Set goals, earn achievements, and compete with friends — or just with yourself. Studying doesn’t have to suck."
+  ],
+  [
+    "Explore courses that match your curiosity.",
+    "Search for anything — from ‘intro to calculus’ to ‘the mitochondria is the powerhouse’ — or join courses made by your peers."
+  ],
+  [
+    "Track progress that actually motivates you.",
+    "Visualize your streaks, XP, and personal growth over time. Every session builds momentum."
+  ]
 ]);
 const activeIndex = ref<number | null>(null);
 const activeDropdown = ref<number | null>(null);

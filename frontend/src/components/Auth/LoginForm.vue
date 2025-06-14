@@ -1,11 +1,11 @@
 <template>
     <div class="header-content">
-                <h1 class="title">Welcome Back</h1>
-                <p class="subtitle">Sign in to continue your learning journey</p>
-            </div>
+        <h1 class="title">Welcome Back</h1>
+        <p class="subtitle">Sign in to continue your learning journey</p>
+    </div>
     <form @submit.prevent="handleSubmit">
         <div class="form-field">
-            <label for="email">Email:</label>
+            <label for="email">Email</label>
             <input
                 type="text"
                 id="email"
@@ -16,7 +16,12 @@
             />
         </div>
         <div class="form-field">
-            <label for="password">Password:</label>
+            <div class="password-label-container">
+                <label for="password">Password</label>
+                <button type="button" class="forgot-password-link" @click="toggleForms('passwordReset')">
+                    Forgot password?
+                </button>
+            </div>
             <div class="password-input-container">
                 <input
                     :type="showPassword ? 'text' : 'password'"
@@ -26,32 +31,44 @@
                     autocomplete="current-password"
                     required
                 />
-                
                 <EyeIcon 
                     type="button"
                     class="password-toggle w-7 h-7"
                     @click="togglePasswordVisibility"
-                    :aria-label="showPassword ? 'Hide password' : 'Show password'"v-if="showPassword"/>
+                    :aria-label="showPassword ? 'Hide password' : 'Show password'"
+                    v-if="showPassword"/>
                 <EyeSlashIcon 
                     type="button"
                     class="password-toggle w-7 h-7"
                     @click="togglePasswordVisibility"
-                    :aria-label="showPassword ? 'Hide password' : 'Show password'" v-else/>
+                    :aria-label="showPassword ? 'Hide password' : 'Show password'" 
+                    v-else/>
             </div>
         </div>
         <div class="button-container">
             <input type="submit" id="submit" :disabled="isSubmitting" :value="buttonText" />
         </div>
     </form>
+    
+    <div class="divider-container">
+        <div class="divider-line"></div>
+        <span class="divider-text">Or continue with</span>
+        <div class="divider-line"></div>
+    </div>
+    
+    <div ref="googleButton" class="google-button-container"></div>
 </template>
     
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onMounted, nextTick } from 'vue';
 import axios from 'axios';
 import { usePopupStore } from "@/store/popupStore";
 import { UserData } from "@/store/authStore";
 import { EyeIcon, EyeSlashIcon } from '@heroicons/vue/24/solid';
- 
+
+const props = defineProps<{
+    toggleForms: (form: string) => void
+}>();
 
 const emit = defineEmits<{
     (e: 'loginSuccess', user: UserData): void
@@ -59,9 +76,10 @@ const emit = defineEmits<{
 
 const email = ref("");
 const password = ref("");
-const buttonText = ref("Log in");
+const buttonText = ref("Login");
 const isSubmitting = ref(false);
 const showPassword = ref(false);
+const googleButton = ref<HTMLDivElement | null>(null);
 
 const togglePasswordVisibility = () => {
     showPassword.value = !showPassword.value;
@@ -106,6 +124,20 @@ const handleSubmit = () => {
             isSubmitting.value = false;
         });
 };
+
+onMounted(async () => {
+    // Wait for the next DOM update cycle to ensure googleButton.value is available
+    await nextTick();
+
+    if (googleButton.value && typeof google !== 'undefined' && google.accounts && google.accounts.id) {
+        google.accounts.id.renderButton(
+            googleButton.value,
+            { theme: "outline", size: "large", width: "300" } 
+        );
+    } else {
+        console.error('Google Identity Services library not loaded or googleButton ref not found.');
+    }
+});
 </script>
 
 <style>
@@ -169,5 +201,56 @@ form {
 
 .password-toggle:hover {
     opacity: 0.7;
+}
+
+.password-label-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 6px;
+}
+
+.forgot-password-link {
+    background: none;
+    border: none;
+    color: var(--color-primary-light);
+    font-size: 0.8rem;
+    cursor: pointer;
+    text-decoration: underline;
+    padding: 0;
+}
+
+.forgot-password-link:hover {
+    color: var(--color-primary);
+    text-decoration: none;
+}
+
+.divider-container {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    max-width: 300px;
+    margin: 1.5rem 0 1rem 0;
+}
+
+.divider-line {
+    flex: 1;
+    height: 1px;
+    background-color: var(--text-color);
+}
+
+.divider-text {
+    margin: 0 1rem;
+    font-size: 0.875rem;
+    color: var(--highlight-color);
+    white-space: nowrap;
+}
+
+.google-button-container {
+    width: 100%;
+    max-width: 300px;
+    display: flex;
+    justify-content: center;
 }
 </style>

@@ -101,7 +101,7 @@
 </template>
   
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onMounted, nextTick } from 'vue';
 import axios from 'axios';
 import { usePopupStore } from "@/store/popupStore";
 import { EyeIcon, EyeSlashIcon } from '@heroicons/vue/24/solid';
@@ -119,6 +119,7 @@ const password = ref("");
 const confirmPassword = ref("");
 const buttonText = ref("Sign up");
 const showPassword = ref(false);
+const googleButton = ref<HTMLDivElement | null>(null);
 
 const togglePasswordVisibility = () => {
     showPassword.value = !showPassword.value;
@@ -160,6 +161,20 @@ const handleSubmit = () => {
       buttonText.value = "Sign up";
     });
 };
+
+onMounted(async () => {
+    // Wait for the next DOM update cycle to ensure googleButton.value is available
+    await nextTick();
+
+    if (googleButton.value && typeof google !== 'undefined' && google.accounts && google.accounts.id) {
+        google.accounts.id.renderButton(
+            googleButton.value,
+            { theme: "outline", size: "large", width: "300" } 
+        );
+    } else {
+        console.error('Google Identity Services library not loaded or googleButton ref not found.');
+    }
+});
 </script>
   
 <style>
@@ -224,5 +239,34 @@ form {
 
 .password-toggle:hover {
     opacity: 0.7;
+}
+
+.divider-container {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    max-width: 300px;
+    margin: 1.5rem 0 1rem 0;
+}
+
+.divider-line {
+    flex: 1;
+    height: 1px;
+    background-color: var(--text-color-secondary);
+    opacity: 0.3;
+}
+
+.divider-text {
+    margin: 0 1rem;
+    font-size: 0.875rem;
+    color: var(--text-color-secondary);
+    white-space: nowrap;
+}
+
+.google-button-container {
+    width: 100%;
+    max-width: 300px;
+    display: flex;
+    justify-content: center;
 }
 </style>
