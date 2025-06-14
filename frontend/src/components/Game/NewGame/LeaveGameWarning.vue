@@ -82,20 +82,24 @@ function handleLeave() {
 }
 
 .close-button {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    width: 30px;
-    height: 30px;
+    position: fixed; /* Change from absolute to fixed */
+    width: 40px; /* Slightly larger for better touch targets */
+    height: 40px;
     background: rgba(255, 0, 0, 0.8);
     color: white;
     border-radius: 50%;
     text-align: center;
-    line-height: 30px;
+    line-height: 40px;
     font-size: 1.3em;
     font-weight: bold;
     cursor: pointer;
     transition: background-color 0.2s;
+    top: 80px; /* Position from top of viewport */
+    left: 20px; /* Position from left of viewport */
+    z-index: 120;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .close-button:hover {

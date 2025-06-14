@@ -7,95 +7,96 @@
                 <ArrowLeftIcon class="w-6 h-6" />
             </button>
         </div>
-        
-        <!-- Timer and Add Node Button Container -->
-        <div class="timer-add-container">
-            <div class="timer-container">
-                <div class="timer" :class="{ 'timer-warning': timeLeft <= 30, 'timer-danger': timeLeft <= 10 }">
-                    {{ formatTime(timeLeft) }}
-                </div>
+
+        <!-- Timer Display -->
+        <div v-if="!gameEnded" class="timer-display">
+            <div class="timer-card">
+                <span class="timer-label">Time Remaining</span>
+                <span class="timer-value">{{ formatTime(timeLeft) }}</span>
             </div>
-            
-            <!-- Add Node Button - updated styling -->
-            <button v-if="!gameEnded" @click="addNode" 
-                class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg p-4 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200"
-                style="color: var(--highlight-color);"
-                :disabled="gameEnded">
-                + Add Concept
-            </button>
         </div>
 
         <!-- Game Area -->
-        <div v-if="!gameEnded" class="game-area">
-            <!-- Central Concept Node -->
-            <div class="central-node p-8">
-                <h2>{{ centralConcept }}</h2>
-            </div>
-
-            <!-- User Nodes -->
-            <div v-for="node in userNodes" :key="node.id" class="user-node"
-                :class="{ 'dragging': draggedNodeId === node.id }" 
-                :style="{ left: node.x + 'px', top: node.y + 'px' }"
-                @mousedown="startDrag($event, node.id)">
-                <div class="node-header drag-handle">
-                    <input v-model="node.title" placeholder="Concept title..." class="node-title-input"
-                        @input="updateNode(node.id, 'title', $event.target.value)" @mousedown.stop />
-                    <button @click="addChildNode(node.id)" class="add-child-btn" @mousedown.stop title="Add child concept">+</button>
-                    <button @click="removeNode(node.id)" class="remove-btn" @mousedown.stop>×</button>
-                </div>
-                <textarea v-model="node.content"
-                    placeholder="Recall as much detailed information you know about this concept"
-                    class="node-content-textarea" @input="updateNode(node.id, 'content', $event.target.value)"
-                    @mousedown.stop></textarea>
-                
-                <!-- Child Nodes -->
-                <div v-if="node.children && node.children.length > 0" class="children-container">
-                    <div v-for="child in node.children" :key="child.id" class="child-node"
-                        @mousedown.stop>
-                        <div class="child-node-header">
-                            <input v-model="child.title" placeholder="Child concept..." class="child-title-input"
-                                @input="updateChildNode(node.id, child.id, 'title', $event.target.value)" />
-                            <button @click="removeChildNode(node.id, child.id)" class="remove-child-btn">×</button>
-                        </div>
-                        <textarea v-model="child.content"
-                            placeholder="Details about this sub-concept..."
-                            class="child-content-textarea" 
-                            @input="updateChildNode(node.id, child.id, 'content', $event.target.value)"></textarea>
-                    </div>
-                </div>
-            </div>
+        <div v-if="!gameEnded && centralConcept" class="game-area">
+            <BrainDumpConcepts ref="brainDumpRef" :title="centralConcept"/>
         </div>
 
         <!-- Results Screen -->
         <div v-else class="results-screen">
-            <h1>Time's Up!</h1>
-            <h2>Your Brain Dump for: {{ centralConcept }}</h2>
+            <div class="results-container">
+                <div class="results-header">
+                    <h1 class="results-title">Time's Up!</h1>
+                    <h2 class="results-subtitle">Your Brain Dump for: {{ centralConcept }}</h2>
+                </div>
 
-            <div class="results-summary">
-                <p><strong>Concepts Added:</strong> {{ totalConcepts }}</p>
-                <p><strong>Parent Concepts:</strong> {{ userNodes.length }}</p>
-                <p><strong>Child Concepts:</strong> {{ totalChildConcepts }}</p>
-                <p><strong>Total Words:</strong> {{ totalWords }}</p>
-            </div>
+                <div class="results-summary">
+                    <div class="summary-stats">
+                        <div class="stat-card">
+                            <span class="stat-number">{{ totalConcepts }}</span>
+                            <span class="stat-label">Total Concepts</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-number">{{ conceptsData.length }}</span>
+                            <span class="stat-label">Main Concepts</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-number">{{ totalChildConcepts }}</span>
+                            <span class="stat-label">Child Concepts</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-number">{{ totalWords }}</span>
+                            <span class="stat-label">Total Words</span>
+                        </div>
+                       
+                    </div>
+                </div>
 
-            <div class="concepts-list">
-                <div v-for="node in userNodes" :key="node.id" class="concept-card">
-                    <h3>{{ node.title || 'Untitled Concept' }}</h3>
-                    <p>{{ node.content || 'No content added' }}</p>
+                <div class="concepts-display">
+                    <h3 class="concepts-display-title">Your Concepts:</h3>
                     
-                    <div v-if="node.children && node.children.length > 0" class="child-concepts">
-                        <h4>Sub-concepts:</h4>
-                        <div v-for="child in node.children" :key="child.id" class="child-concept-card">
-                            <h5>{{ child.title || 'Untitled Sub-concept' }}</h5>
-                            <p>{{ child.content || 'No content added' }}</p>
+                    <div v-if="conceptsData.length === 0" class="no-concepts">
+                        <p>No concepts were added during this session.</p>
+                    </div>
+
+                    <div v-else class="concepts-grid">
+                        <div v-for="(concept, index) in conceptsData" :key="index" class="concept-result-card">
+                            <div class="concept-header">
+                                <h4 class="concept-title">
+                                    {{ concept.concept || 'Untitled Concept' }}
+                                </h4>
+                            </div>
+                            
+                            <div v-if="concept.description" class="concept-description">
+                                <p>{{ concept.description }}</p>
+                            </div>
+
+                            <div v-if="concept.childConcepts && concept.childConcepts.length > 0" class="child-concepts-section">
+                                <h5 class="child-concepts-header">Child Concepts:</h5>
+                                <div class="child-concepts-grid">
+                                    <div v-for="(child, childIndex) in concept.childConcepts" 
+                                         :key="childIndex" 
+                                         class="child-concept-card">
+                                        <h6 class="child-concept-title">
+                                            {{ child.name || 'Untitled' }}
+                                        </h6>
+                                        <p v-if="child.description" class="child-concept-description">
+                                            {{ child.description }}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="action-buttons">
-                <button @click="restartGame" class="restart-btn">Try Again</button>
-                <button @click="shareResults" class="share-btn">Share with Friends</button>
+                <div class="action-buttons">
+                    <button @click="restartGame" class="action-btn restart-btn">
+                        <span>Try Again</span>
+                    </button>
+                    <button @click="shareResults" class="action-btn share-btn">
+                        <span>Share Results</span>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -104,41 +105,34 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { ArrowLeftIcon } from '@heroicons/vue/24/solid';
+import BrainDumpConcepts from '@/components/Graphs/Experiments/BrainDumpConcepts.vue';
 import { useRoute, useRouter } from 'vue-router'
 import { showExperimentsToast } from '@/utils/toasts';
 import axios from 'axios';
 
-interface ChildNode {
-    id: number
-    title: string
-    content: string
+interface ChildConcept {
+    name: string;
+    description?: string;
 }
 
-interface UserNode {
-    id: number
-    title: string
-    content: string
-    x: number
-    y: number
-    children: ChildNode[]
+interface Concept {
+    concept: string;
+    description: string;
+    childConcepts: ChildConcept[];
+    collapsed: boolean;
 }
 
 // Game state
-const centralConcept = ref<string>('Statistics')
+const centralConcept = ref<string | null>(null)
 const timeLeft = ref<number>(180) // 3 minutes in seconds
 const gameEnded = ref<boolean>(false)
-const userNodes = ref<UserNode[]>([])
-const nodeIdCounter = ref<number>(1)
-const childIdCounter = ref<number>(1)
+const brainDumpRef = ref<InstanceType<typeof BrainDumpConcepts> | null>(null)
+const conceptsData = ref<Concept[]>([])
 let gameTimer: NodeJS.Timeout | null = null
 const route = useRoute();
 const params = ref(route.params);
 const router = useRouter();
 const abortController = new AbortController();
-
-// Drag state
-const draggedNodeId = ref<number | null>(null)
-const dragOffset = ref<{ x: number, y: number }>({ x: 0, y: 0 })
 
 function capitalizeWords(str: string | null | undefined): string {
     if (!str) return str || ''; // Handle null or undefined input
@@ -146,47 +140,48 @@ function capitalizeWords(str: string | null | undefined): string {
 }
 
 const totalWords = computed(() => {
-    return userNodes.value.reduce((total, node) => {
-        const titleWords = node.title.trim().split(/\s+/).filter(word => word.length > 0).length
-        const contentWords = node.content.trim().split(/\s+/).filter(word => word.length > 0).length
+    return conceptsData.value.reduce((total, concept) => {
+        const conceptWords = (concept.concept || '').trim().split(/\s+/).filter(word => word.length > 0).length
+        const descriptionWords = (concept.description || '').trim().split(/\s+/).filter(word => word.length > 0).length
         
-        const childWords = node.children.reduce((childTotal, child) => {
-            const childTitleWords = child.title.trim().split(/\s+/).filter(word => word.length > 0).length
-            const childContentWords = child.content.trim().split(/\s+/).filter(word => word.length > 0).length
-            return childTotal + childTitleWords + childContentWords
+        const childWords = concept.childConcepts.reduce((childTotal, child) => {
+            const childNameWords = (child.name || '').trim().split(/\s+/).filter(word => word.length > 0).length
+            const childDescWords = (child.description || '').trim().split(/\s+/).filter(word => word.length > 0).length
+            return childTotal + childNameWords + childDescWords
         }, 0)
         
-        return total + titleWords + contentWords + childWords
+        return total + conceptWords + descriptionWords + childWords
     }, 0)
 })
 
 const totalConcepts = computed(() => {
-    return userNodes.value.length + totalChildConcepts.value
+    return conceptsData.value.length + totalChildConcepts.value
 })
 
 const totalChildConcepts = computed(() => {
-    return userNodes.value.reduce((total, node) => total + node.children.length, 0)
+    return conceptsData.value.reduce((total, concept) => total + concept.childConcepts.length, 0)
 })
+
 
 const fetchLibraryInfo = async (): Promise<void> => {
     try {
-        const response = await axios.get(`/api/library/${params.value.id}`, {
+        const response = await axios.get(`/api/library/${route.params.id}`, {
             signal: abortController.signal
         });
-        if (response.data && response.data.data && response.data.data.library_topic) {
+        if (response.data?.data?.library_topic) {
             centralConcept.value = capitalizeWords(response.data.data.library_topic);
         } else {
             router.back();
             showExperimentsToast();
         }
-    } catch (error: any) {
+    } catch (error) {
         router.back();
         showExperimentsToast();
-    } 
+    }
 };
 
 const back = () => {
-    router.push(`/lessons/${params.value.id}/experiments`)
+    router.push(`/lessons/${params.value.id}`)
 }
 
 // Methods
@@ -207,6 +202,11 @@ const startTimer = (): void => {
 }
 
 const endGame = (): void => {
+    // Capture data from BrainDumpConcepts component
+    if (brainDumpRef.value && brainDumpRef.value.concepts) {
+        conceptsData.value = [...brainDumpRef.value.concepts]
+    }
+    
     gameEnded.value = true
     if (gameTimer) {
         clearInterval(gameTimer)
@@ -214,123 +214,16 @@ const endGame = (): void => {
     }
 }
 
-const addNode = (): void => {
-    if (gameEnded.value) return
-
-    const newNode: UserNode = {
-        id: nodeIdCounter.value++,
-        title: '',
-        content: '',
-        x: -100 + (10 * userNodes.value.length),
-        y: 70 + (10 * userNodes.value.length),
-        children: []
-    }
-
-    userNodes.value.push(newNode)
-}
-
-const addChildNode = (parentId: number): void => {
-    if (gameEnded.value) return
-
-    const parentNode = userNodes.value.find(node => node.id === parentId)
-    if (!parentNode) return
-
-    const newChild: ChildNode = {
-        id: childIdCounter.value++,
-        title: '',
-        content: ''
-    }
-
-    parentNode.children.push(newChild)
-}
-
-const updateChildNode = (parentId: number, childId: number, field: keyof ChildNode, value: string): void => {
-    const parentNode = userNodes.value.find(node => node.id === parentId)
-    if (!parentNode) return
-
-    const childNode = parentNode.children.find(child => child.id === childId)
-    if (childNode && (field === 'title' || field === 'content')) {
-        childNode[field] = value
-    }
-}
-
-const removeChildNode = (parentId: number, childId: number): void => {
-    const parentNode = userNodes.value.find(node => node.id === parentId)
-    if (!parentNode) return
-
-    const childIndex = parentNode.children.findIndex(child => child.id === childId)
-    if (childIndex > -1) {
-        parentNode.children.splice(childIndex, 1)
-    }
-}
-
-
-const removeNode = (nodeId: number): void => {
-    const index = userNodes.value.findIndex(node => node.id === nodeId)
-    if (index > -1) {
-        userNodes.value.splice(index, 1)
-    }
-}
-
-const updateNode = (nodeId: number, field: keyof UserNode, value: string): void => {
-    const node = userNodes.value.find(n => n.id === nodeId)
-    if (node && (field === 'title' || field === 'content')) {
-        node[field] = value
-    }
-}
-
-// Drag functionality
-const startDrag = (event: MouseEvent, nodeId: number): void => {
-    if (gameEnded.value) return
-
-    const node = userNodes.value.find(n => n.id === nodeId)
-    if (!node) return
-
-    draggedNodeId.value = nodeId
-    dragOffset.value = {
-        x: event.clientX - node.x,
-        y: event.clientY - node.y
-    }
-
-    document.addEventListener('mousemove', onMouseMove)
-    document.addEventListener('mouseup', onMouseUp)
-
-    // Prevent text selection while dragging
-    event.preventDefault()
-}
-
-const onMouseMove = (event: MouseEvent): void => {
-    if (draggedNodeId.value === null) return
-
-    const node = userNodes.value.find(n => n.id === draggedNodeId.value)
-    if (!node) return
-
-    node.x = event.clientX - dragOffset.value.x
-    node.y = event.clientY - dragOffset.value.y
-
-    // Keep nodes within reasonable bounds
-    node.x = Math.max(Math.min(node.x, window.innerWidth + 270), Math.min(node.x, window.innerWidth - 270))
-    node.y = Math.max(0, Math.min(node.y, window.innerHeight - 200))
-}
-
-const onMouseUp = (): void => {
-    draggedNodeId.value = null
-    dragOffset.value = { x: 0, y: 0 }
-
-    document.removeEventListener('mousemove', onMouseMove)
-    document.removeEventListener('mouseup', onMouseUp)
-}
-
 const restartGame = (): void => {
     timeLeft.value = 180
     gameEnded.value = false
-    userNodes.value = []
-    nodeIdCounter.value = 1
+    conceptsData.value = []
     startTimer()
 }
+
 const shareResults = (): void => {
     const resultsText = `I just completed a Brain Dump on "${centralConcept.value}"! 
-Added ${userNodes.value.length} concepts with ${totalWords.value} total words in 3 minutes! 🧠💪`
+Added ${totalConcepts.value} concepts with ${totalWords.value} total words in 3 minutes! 🧠💪`
 
     if (navigator.share) {
         navigator.share({
@@ -345,8 +238,14 @@ Added ${userNodes.value.length} concepts with ${totalWords.value} total words in
 
 // Lifecycle
 onMounted(() => {
-    startTimer()
-    fetchLibraryInfo();
+    fetchLibraryInfo().then(() => {
+        if (!centralConcept.value) {
+            router.back();
+            showExperimentsToast();
+        }
+    });
+    startTimer();
+    
 })
 
 onUnmounted(() => {
@@ -354,260 +253,239 @@ onUnmounted(() => {
     if (gameTimer) {
         clearInterval(gameTimer)
     }
-    // Clean up event listeners
-    document.removeEventListener('mousemove', onMouseMove)
-    document.removeEventListener('mouseup', onMouseUp)
 })
 
 </script>
 
 <style scoped>
 .brain-dump-container {
-    /* min-height: 100vh; */
-    /* background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); */
     padding: 20px;
     font-family: 'Arial', sans-serif;
+    min-height: 100vh;
 }
 
-.timer-container {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 20px;
-}
-
-.timer {
-    background: white;
-    padding: 15px 30px;
-    border-radius: 25px;
-    font-size: 2rem;
-    font-weight: bold;
-    color: #333;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
-}
-
-.timer-warning {
-    background: #fff3cd;
-    color: #856404;
-}
-
-.timer-danger {
-    background: #f8d7da;
-    color: #721c24;
-    animation: pulse 1s infinite;
-}
-
-@keyframes pulse {
-    0% {
-        transform: scale(1);
-    }
-
-    50% {
-        transform: scale(1.05);
-    }
-
-    100% {
-        transform: scale(1);
-    }
-}
-
-.game-area {
-    position: relative;
-    min-height: 600px;
-}
-
-.central-node {
-    position: absolute;
-    top: 50%;
-    left: -25%;
-    /* transform: translate(-50%, -50%); */
-    background: white;
-    border-radius: 20px;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+.timer-display {
+    position: fixed;
+    top: 20px;
+    right: 20px;
     z-index: 10;
 }
 
-.central-node h2 {
-    margin: 0;
-    color: #333;
-    font-size: 1.8rem;
-    text-align: center;
-}
-
-.user-node {
-    position: absolute;
-    background: rgba(255, 255, 255, 0.95);
+.timer-card {
+    background: var(--background-color-1);
+    border: 1px solid var(--color-primary);
     border-radius: 12px;
-    padding: 15px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    /* width: 250px; */
-    z-index: 5;
-    cursor: move;
-    transition: box-shadow 0.2s ease;
-}
-
-.user-node:hover {
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-}
-
-.user-node.dragging {
-    z-index: 15;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
-    transform: rotate(2deg);
-}
-
-.node-header {
+    padding: 1rem 1.5rem;
     display: flex;
-    gap: 10px;
-    margin-bottom: 10px;
-    color: black;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-.drag-handle {
-    cursor: move;
+.timer-label {
+    font-size: 0.875rem;
+    color: var(--text-color-secondary);
+    font-weight: 500;
 }
 
-.node-title-input {
-    flex: 1;
-    padding: 8px;
-    border: 1px solid black;
-    border-radius: 6px;
+.timer-value {
+    font-size: 1.5rem;
     font-weight: bold;
-    cursor: text;
-}
-
-.remove-btn {
-    background: #ff4757;
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 25px;
-    height: 25px;
-    cursor: pointer;
-    font-size: 16px;
-}
-
-.node-content-textarea {
-    /* width: 100%; */
-    min-height: 90px;
-    padding: 8px;
-    border: 1px solid black;
-    border-radius: 6px;
-    resize: vertical;
-    font-family: inherit;
-    color: black;
-    cursor: text;
-}
-
-.add-node-btn {
-    position: fixed;
-    bottom: 30px;
-    right: 30px;
-    background: #4CAF50;
-    color: white;
-    border: none;
-    padding: 15px 25px;
-    border-radius: 25px;
-    font-size: 1.1rem;
-    cursor: pointer;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    transition: transform 0.2s ease;
-}
-
-.add-node-btn:hover {
-    transform: translateY(-2px);
-}
-
-.add-node-btn:disabled {
-    background: #ccc;
-    cursor: not-allowed;
+    color: var(--color-primary);
 }
 
 .results-screen {
-    text-align: center;
-    color: white;
-    max-width: 800px;
+    padding: 2rem 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.results-container {
+    max-width: 1000px;
+    width: 100%;
     margin: 0 auto;
 }
 
-.results-screen h1 {
-    font-size: 3rem;
-    margin-bottom: 10px;
+.results-header {
+    text-align: center;
+    margin-bottom: 3rem;
 }
 
-.results-screen h2 {
-    font-size: 1.5rem;
-    margin-bottom: 30px;
+.results-title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: var(--text-color);
+    margin-bottom: 0.5rem;
+}
+
+.results-subtitle {
+    font-size: 1.25rem;
+    color: var(--text-color-secondary);
+    margin: 0;
 }
 
 .results-summary {
-    background: rgba(255, 255, 255, 0.1);
-    padding: 20px;
-    border-radius: 15px;
-    margin-bottom: 30px;
-    backdrop-filter: blur(10px);
+    background: var(--background-color-1);
+    border: 1px solid rgba(26, 139, 127, 0.2);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 3rem;
 }
 
-.results-summary p {
-    font-size: 1.2rem;
-    margin: 10px 0;
-}
-
-.concepts-list {
+.summary-stats {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 20px;
-    margin-bottom: 30px;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1.5rem;
 }
 
-.concept-card {
-    background: white;
-    color: #333;
-    padding: 20px;
+.stat-card {
+    text-align: center;
+    padding: 1rem;
+    background: rgba(26, 139, 127, 0.05);
     border-radius: 12px;
-    text-align: left;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(26, 139, 127, 0.1);
 }
 
-.concept-card h3 {
-    margin: 0 0 10px 0;
-    color: #667eea;
+.stat-number {
+    display: block;
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--color-primary);
+    margin-bottom: 0.5rem;
 }
 
-.concept-card p {
+.stat-label {
+    font-size: 0.875rem;
+    color: var(--text-color-secondary);
+    font-weight: 500;
+}
+
+.concepts-display {
+    margin-bottom: 3rem;
+}
+
+.concepts-display-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--text-color);
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.no-concepts {
+    text-align: center;
+    padding: 3rem;
+    color: var(--text-color-secondary);
+    font-style: italic;
+}
+
+.concepts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 1.5rem;
+}
+
+.concept-result-card {
+    background: var(--background-color-1);
+    border: 1px solid rgba(26, 139, 127, 0.2);
+    border-radius: 12px;
+    padding: 1.5rem;
+}
+
+.concept-header {
+    margin-bottom: 1rem;
+}
+
+.concept-title {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: var(--color-primary);
     margin: 0;
+}
+
+.concept-description {
+    margin-bottom: 1.5rem;
+}
+
+.concept-description p {
+    color: var(--text-color);
+    line-height: 1.6;
+    margin: 0;
+}
+
+.child-concepts-section {
+    border-top: 1px solid rgba(26, 139, 127, 0.2);
+    padding-top: 1rem;
+}
+
+.child-concepts-header {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-color);
+    margin: 0 0 1rem 0;
+}
+
+.child-concepts-grid {
+    display: grid;
+    gap: 0.75rem;
+}
+
+.child-concept-card {
+    background: rgba(26, 139, 127, 0.05);
+    border: 1px solid rgba(26, 139, 127, 0.15);
+    border-radius: 8px;
+    padding: 1rem;
+}
+
+.child-concept-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-color);
+    margin: 0 0 0.5rem 0;
+}
+
+.child-concept-description {
+    font-size: 0.875rem;
+    color: var(--text-color-secondary);
     line-height: 1.5;
+    margin: 0;
 }
 
 .action-buttons {
     display: flex;
-    gap: 20px;
+    gap: 1rem;
     justify-content: center;
 }
 
-.restart-btn,
-.share-btn {
-    padding: 15px 30px;
+.action-btn {
+    padding: 1rem 2rem;
     border: none;
-    border-radius: 25px;
-    font-size: 1.1rem;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
     cursor: pointer;
-    transition: transform 0.2s ease;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
 .restart-btn {
-    background: #4CAF50;
+    background: var(--color-primary);
     color: white;
 }
 
 .share-btn {
-    background: #2196F3;
+    background: var(--text-color-secondary);
     color: white;
 }
 
-.restart-btn:hover,
-.share-btn:hover {
+.action-btn:hover {
     transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .menu-button {
@@ -632,158 +510,5 @@ onUnmounted(() => {
     background-color: var(--element-color-1);
     border-color: var(--color-primary);
     color: var(--light-text);
-}
-
-/* Child Node Container */
-.children-container {
-    margin-top: 15px;
-    padding-top: 15px;
-    border-top: 2px solid #e0e0e0;
-}
-
-/* Individual Child Node */
-.child-node {
-    background: rgba(240, 248, 255, 0.8);
-    border: 1px solid #d0d0d0;
-    border-radius: 8px;
-    padding: 12px;
-    margin-bottom: 10px;
-    transition: background-color 0.2s ease;
-}
-
-.child-node:hover {
-    background: rgba(230, 240, 255, 0.9);
-}
-
-/* Child Node Header */
-.child-node-header {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 8px;
-    align-items: center;
-}
-
-/* Child Node Title Input */
-.child-title-input {
-    flex: 1;
-    padding: 6px 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 0.9rem;
-    font-weight: 600;
-    background: white;
-    color: #333;
-    cursor: text;
-}
-
-.child-title-input:focus {
-    outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
-}
-
-/* Remove Child Button */
-.remove-child-btn {
-    background: #ff6b6b;
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 20px;
-    height: 20px;
-    cursor: pointer;
-    font-size: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background-color 0.2s ease;
-}
-
-.remove-child-btn:hover {
-    background: #ff5252;
-}
-
-/* Child Node Content Textarea */
-.child-content-textarea {
-    width: 100%;
-    min-height: 60px;
-    padding: 6px 8px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    resize: vertical;
-    font-family: inherit;
-    font-size: 0.85rem;
-    background: white;
-    color: #555;
-    cursor: text;
-}
-
-.child-content-textarea:focus {
-    outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
-}
-
-/* Add Child Button */
-.add-child-btn {
-    background: #4CAF50;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    width: 24px;
-    height: 24px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background-color 0.2s ease;
-}
-
-.add-child-btn:hover {
-    background: #45a049;
-}
-
-/* Timer and Add Container */
-.timer-add-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 20px;
-    margin-bottom: 30px;
-}
-
-/* Child Concepts in Results */
-.child-concepts {
-    margin-top: 15px;
-    padding-top: 15px;
-    border-top: 1px solid #e0e0e0;
-}
-
-.child-concepts h4 {
-    margin: 0 0 10px 0;
-    color: #555;
-    font-size: 1rem;
-}
-
-.child-concept-card {
-    background: #f8f9fa;
-    padding: 12px;
-    border-radius: 6px;
-    margin-bottom: 8px;
-    border-left: 3px solid #667eea;
-}
-
-.child-concept-card h5 {
-    margin: 0 0 6px 0;
-    color: #333;
-    font-size: 0.9rem;
-}
-
-.child-concept-card p {
-    margin: 0;
-    font-size: 0.85rem;
-    color: #666;
-    line-height: 1.4;
 }
 </style>

@@ -13,34 +13,24 @@
   
   const features = ref([
     {
-      icon: '🆓',
-      title: 'Free',
-      description: 'The generous free plan lets you enjoy all the content on Rivue.ai'
-    },
-    {
-      icon: '🎓',
-      title: 'Tutor',
-      description: 'Your personal tutor ready to teach and explain anything, at any time.'
-    },
-    {
       icon: '🧠',
-      title: 'Quizzes',
-      description: 'Challenge yourself with quizzes that help you master what you\'ve learned.'
+      title: 'Interactive Quizzes',
+      description: 'Test your skills, reinforce your memory, and master tough concepts—effortlessly.'
     },
     {
-      icon: '🗺️',
-      title: 'Knowledge Map',
-      description: 'Make your own path or follow suggestions to discover new knowledge.'
+      icon: '📖',
+      title: 'Dynamic Study Modules',
+      description: 'Learn at your pace, from bite-sized refreshers to deep dives—tailored exactly to you.'
     },
     {
-      icon: '📈',
-      title: 'Grow',
-      description: 'Keep your streak alive, level up, and track your growth with stats and graphs!'
+      icon: '👥',
+      title: 'Community Connection',
+      description: 'Never study alone again. Join supportive groups that celebrate your progress every step of the way.'
     },
     {
-      icon: '🏅',
-      title: 'Compete',
-      description: 'Challenge your friends and climb the leaderboard as you learn together.'
+      icon: '🏆',
+      title: 'Friendly Competition',
+      description: 'Challenge your friends, climb the ranks, and turn studying into a game you can\'t stop playing.'
     },
   ]);
   
@@ -64,16 +54,16 @@
   </script>
   
   <style scoped>
-  .features-component {
+ .features-component {
     max-width: 1200px;
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 20px;
     padding-top: 3em;
     padding-bottom: 1em;
-  }
-  
-  .feature {
+}
+
+.feature {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -84,48 +74,47 @@
     opacity: 0;
     transform: translateY(-60px);
     background: var(--background-color-2t);
-    transition: opacity 0.8s ease-out, transform 0.8s ease-out,
-      border-color 0.3s ease, background-color 0.3s ease;
-  }
-  
-  .feature:hover,
-  .feature.selected {
+    /* Remove transition properties that suggest interactivity */
+}
+
+/* Remove hover effect */
+.feature.selected {
     background: var(--background-color-1t);
     border: 1px solid #ccc;
-  }
-  
-  .feature.visible {
+}
+
+.feature.visible {
     animation: fadeSlideIn 0.3s ease-out forwards;
-  }
-  
-  .feature-title {
+}
+
+.feature-title {
     font-weight: 700;
     padding-bottom: 0.5em;
-  }
-  
-  .feature-icon {
+}
+
+.feature-icon {
     left: 3px;
     top: 3px;
     font-size: 24px;
     position: absolute;
-  }
-  
-  @media (max-width: 1000px) {
+}
+
+@media (max-width: 1000px) {
     .features-component {
-      grid-template-columns: 1fr;
+        grid-template-columns: 1fr;
     }
-  }
-  
-  @keyframes fadeSlideIn {
+}
+
+@keyframes fadeSlideIn {
     from {
-      opacity: 0;
-      transform: translateY(-60px);
+        opacity: 0;
+        transform: translateY(-60px);
     }
-  
+
     to {
-      opacity: 1;
-      transform: translateY(-40px);
+        opacity: 1;
+        transform: translateY(-40px);
     }
-  }
+}
   </style>
   

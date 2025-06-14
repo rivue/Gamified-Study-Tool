@@ -2,8 +2,9 @@
     <div class="landing-container">
         <div class="landing-page-1">
             <div class="landing-titles-container">
-                <div class="landing-title">Learning. Made. Simple.</div>
-                <div class="landing-subtitle">Revolutionize your learning routine with our gamified course creator.</div>
+                <div class="landing-title">Studying. Made. Fun.</div>
+                <div class="landing-subtitle">Transform late-night cramming into fun adventures with your personal study community.
+                </div>
             </div>
         </div>
         <div class="landing-page-2">
@@ -11,8 +12,9 @@
                 <FeaturesComponent />
             </div>
             <div class="search-bar-container">
-                <input type="text" v-model="searchQuery" @keyup.enter="handleSearch" placeholder="Search courses..." class="search-input"/>
-                <button @click="handleSearch" class="search-button">Start Learning</button>
+                <input type="text" v-model="searchQuery" @keyup.enter="handleSearch" placeholder="Search courses..."
+                    class="search-input" />
+                <button @click="handleSearch" class="search-button">Start Learning Now</button>
             </div>
             <div class="dropdown-menus">
                 <div v-for="(item, index) in items" :key="index" class="dropdown">
@@ -28,6 +30,20 @@
                     </div>
                 </div>
             </div>
+
+            <!-- UNCOMMENT for launch -->
+            <!-- <div class="why-this-matters">
+                <h2>Why Rivue</h2>
+                <blockquote>
+                    “When I started college, I felt alone, overwhelmed, and my grades showed it.
+                    Studying felt impossible, boring, and isolating.
+                    <strong>I built this tool because I believe studying doesn't have to feel like punishment—it should
+                        feel like play.</strong>
+                    Here, you’re not just improving your grades; you’re discovering friends, finding community, and
+                    finally feeling like you belong.” - Founder
+                </blockquote>
+            </div> -->
+
             <div class="social-links-container">
                 <h3>Connect With Us</h3>
                 <div class="social-links">
@@ -35,25 +51,22 @@
                         <img :src="require('@/assets/images/x-logo-white.png')" alt="X (Twitter)" class="social-icon" />
                         <span>Follow us on X</span>
                     </a>
-                    <a href="https://discord.gg/33yAcp2qDf" target="_blank" rel="noopener noreferrer" class="social-link">
+                    <a href="https://discord.gg/33yAcp2qDf" target="_blank" rel="noopener noreferrer"
+                        class="social-link">
                         <img :src="require('@/assets/images/discord-mark-white.png')" alt="Discord"
                             class="social-icon" />
                         <span>Join our Discord</span>
                     </a>
                 </div>
             </div>
-            <div class="faq-container">
-                <FaqComponent />
-            </div>
+
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
-import { usePopupStore } from "@/store/popupStore";
-import { useThemeStore } from "@/store/themeStore";
+import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 import { useAuthStore } from "@/store/authStore";
 import FaqComponent from "./Footer/LandingPageComponents/FaqComponent.vue";
 import FeaturesComponent from "./Footer/LandingPageComponents/FeaturesComponent.vue";
@@ -70,35 +83,17 @@ const content = ref([
 ]);
 const activeIndex = ref<number | null>(null);
 const activeDropdown = ref<number | null>(null);
-const popupMessage = ref("");
 
 // Route and router
-const route = useRoute();
 const router = useRouter();
 
 // Store instances
-const themeStore = useThemeStore();
 const authStore = useAuthStore();
-const popupStore = usePopupStore();
-
-// Methods
-const handleMessageCode = (code: string | null) => {
-    const messages: Record<string, string> = {
-        expired_registration_token:
-            "This registration token was expired. A new one has been sent to your email.",
-        invalid_registration_token:
-            "The registration token you provided is invalid. Please check your email for the correct link or contact support.",
-    };
-    popupMessage.value = code && messages[code] ? messages[code] : "";
-    if (popupMessage.value !== "") {
-        popupStore.showPopup(popupMessage.value);
-    }
-};
 
 const handleSearch = () => {
     if (searchQuery.value.trim() !== "") {
-        router.push({ 
-            path: '/explore', 
+        router.push({
+            path: '/explore',
             query: { search: searchQuery.value } // Pass as state
         });
     }
@@ -140,10 +135,6 @@ const observeFeatures = () => {
     const features = document.querySelectorAll(".feature");
     features.forEach((feature) => observer.observe(feature));
 };
-
-// Lifecycle hooks
-// Created lifecycle hook equivalent
-handleMessageCode(route.query.message as string | null);
 
 // Mounted lifecycle hook
 onMounted(() => {
@@ -346,16 +337,23 @@ body {
     justify-content: center;
     align-items: center;
     margin: 2em 0;
-    padding: 0 1em; /* Add some padding for smaller screens */
+    padding: 0 1em;
+    /* Add some padding for smaller screens */
 }
 
 .search-input {
-    width: 70%; /* Make input take more width */
-    max-width: 500px; /* Maximum width for the input */
-    padding: 15px 20px; /* Increase padding for better visual */
-    font-size: 1.2em; /* Increase font size */
-    border: 2px solid var(--element-color-1); /* Prominent border */
-    border-radius: 30px 0 0 30px; /* Rounded corners on the left */
+    width: 70%;
+    /* Make input take more width */
+    max-width: 500px;
+    /* Maximum width for the input */
+    padding: 15px 20px;
+    /* Increase padding for better visual */
+    font-size: 1.2em;
+    /* Increase font size */
+    border: 2px solid var(--element-color-1);
+    /* Prominent border */
+    border-radius: 30px 0 0 30px;
+    /* Rounded corners on the left */
     outline: none;
     background-color: var(--background-color);
     color: var(--text-color);
@@ -363,17 +361,22 @@ body {
 }
 
 .search-input:focus {
-    border-color: var(--highlight-color); /* Highlight border on focus */
+    border-color: var(--highlight-color);
+    /* Highlight border on focus */
 }
 
 .search-button {
-    padding: 15px 25px; /* Increase padding */
-    font-size: 1.2em; /* Increase font size */
+    padding: 15px 25px;
+    /* Increase padding */
+    font-size: 1.2em;
+    /* Increase font size */
     background-color: var(--element-color-1);
     color: var(--background-color);
     border: 2px solid var(--element-color-1);
-    border-left: none; /* Remove left border to blend with input */
-    border-radius: 0 30px 30px 0; /* Rounded corners on the right */
+    border-left: none;
+    /* Remove left border to blend with input */
+    border-radius: 0 30px 30px 0;
+    /* Rounded corners on the right */
     cursor: pointer;
     transition: background-color 0.3s ease, color 0.3s ease;
 }
@@ -381,18 +384,22 @@ body {
 .search-button:hover {
     background-color: var(--highlight-color);
     border-color: var(--highlight-color);
-    color: var(--light-text); /* Change text color on hover for better contrast */
+    color: var(--light-text);
+    /* Change text color on hover for better contrast */
 }
 
 
 /* Responsive adjustments for search bar */
 @media only screen and (max-width: 600px) {
     .search-input {
-        font-size: 1em; /* Adjust font size for smaller screens */
+        font-size: 1em;
+        /* Adjust font size for smaller screens */
         padding: 12px 15px;
     }
+
     .search-button {
-        font-size: 1em; /* Adjust font size for smaller screens */
+        font-size: 1em;
+        /* Adjust font size for smaller screens */
         padding: 12px 20px;
     }
 }
@@ -438,10 +445,6 @@ body {
     justify-content: center;
 }
 
-.faq-container {
-    z-index: 1;
-}
-
 .openai {
     margin: 0 auto;
     padding: 64px 25%;
@@ -469,6 +472,7 @@ body {
     }
 
 }
+
 @media only screen and (max-width: 600px) {
     .landing-title {
         font-size: 3em;
@@ -750,5 +754,25 @@ body {
         width: 100%;
         justify-content: center;
     }
+}
+
+.why-this-matters {
+    background: var(--background-color-2t);
+    padding: 2rem;
+    margin: 2rem 0;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.why-this-matters h2 {
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.why-this-matters blockquote {
+    font-style: italic;
+    line-height: 1.6;
+    color: var(--text-color-muted);
 }
 </style>

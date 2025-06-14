@@ -224,7 +224,7 @@ TODO list:
                     - should I replace the proposed "i-card" with some icon that links to library details like discord has with their profile page where I would put files, members, and everything else in the menu, or should I keep it as is?
                     - (maybe?) ⭐️ add ability to see uploaded files in library (list of their names) and maybe even file preview (would require nosql db or something maybe)
                         - should I limit file size for this? like can only display files < 50 MB or something?
-
+            - uncomment "why this matters" section on home page - or completely rewrite it
             - also note: ask gemini / grok / gpt / claude for some ui design tips like adding a menu bar, or ui tips / tricks / helpful websites / youtube videos, etc...
             use this maybe: https://www.shadcn-vue.com/docs/components/stepper.html
             - note: for main page, add two / 3 simple boxes, class you want, school, and possibly professor, and it gives you classes close to you like quizlet / rate my professor along with option for creating your own
@@ -249,8 +249,6 @@ TODO list:
             - have some sort of warning on the database model level if an owner tries to leave a course?
             - make contact page not require login to send feedback
             - go through all models and make sure cascade / ondelete=cascade are in sync w/ each other (ideally use ondelete cascade)
-            - if courses are empty, add a "create" button which links to create page - jules
-            - add a "leave" course button in Explore Courses screen after the user clicks "join course"
 
         hard probably (goal: 2 high level bullet points / wk):
         - ✅ ⭐️ (would like to implement visibility of different courses first or at least a many:one for non-owners in library model)

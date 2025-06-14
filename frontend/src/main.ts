@@ -92,44 +92,44 @@ const routes = [
             }
         },
     },
-    {
-        path: '/lessons/:id/process-master',
-        component: defineAsyncComponent(() => import('./components/Graphs/Experiments/Processes.vue')),
-        meta: { title: 'Rivue.ai', hideHeaderFooter: true },
-        beforeEnter: async (to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext) => {
-            try {
-                const response = await axios.get(`/api/library/${to.params.id}`);
-                if (response.data?.status === "success") {
-                    next();
-                } else {
-                    showExperimentsToast();
+    // {
+    //     path: '/lessons/:id/process-master',
+    //     component: defineAsyncComponent(() => import('./components/Graphs/Experiments/Processes.vue')),
+    //     meta: { title: 'Rivue.ai', hideHeaderFooter: true },
+    //     beforeEnter: async (to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext) => {
+    //         try {
+    //             const response = await axios.get(`/api/library/${to.params.id}`);
+    //             if (response.data?.status === "success") {
+    //                 next();
+    //             } else {
+    //                 showExperimentsToast();
 
-                }
-            } catch (error) {
-                showExperimentsToast();
+    //             }
+    //         } catch (error) {
+    //             showExperimentsToast();
 
-            }
-        },
-    },
-    {
-        path: '/lessons/:id/fact-sprint',
-        component: defineAsyncComponent(() => import('./components/Graphs/Experiments/FactSprint.vue')),
-        meta: { title: 'Rivue.ai', hideHeaderFooter: true },
-        beforeEnter: async (to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext) => {
-            try {
-                const response = await axios.get(`/api/library/${to.params.id}`);
-                if (response.data?.status === "success") {
-                    next();
-                } else {
-                    showExperimentsToast();
+    //         }
+    //     },
+    // },
+    // {
+    //     path: '/lessons/:id/fact-sprint',
+    //     component: defineAsyncComponent(() => import('./components/Graphs/Experiments/FactSprint.vue')),
+    //     meta: { title: 'Rivue.ai', hideHeaderFooter: true },
+    //     beforeEnter: async (to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext) => {
+    //         try {
+    //             const response = await axios.get(`/api/library/${to.params.id}`);
+    //             if (response.data?.status === "success") {
+    //                 next();
+    //             } else {
+    //                 showExperimentsToast();
 
-                }
-            } catch (error) {
-                showExperimentsToast();
+    //             }
+    //         } catch (error) {
+    //             showExperimentsToast();
 
-            }
-        },
-    },
+    //         }
+    //     },
+    // },
     {
         path: '/lessons/:id',
         component: defineAsyncComponent(() => import('./components/Backstage/MapPage.vue')),

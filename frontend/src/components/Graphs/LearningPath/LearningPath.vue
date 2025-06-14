@@ -6,7 +6,7 @@
             <button @click="goToExperiments"
                 class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg p-4 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200"
                 style="color: var(--highlight-color);">
-                <LightBulbIcon class="w-6 h-6" />
+                Brain Dump (experimental)
             </button>
 
             <button v-if="isOwner" @click="toggleEditMode"
@@ -18,7 +18,7 @@
             <button @click="goToLeaderboard"
                 class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg p-4 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200"
                 style="color: var(--highlight-color);">
-                <ChartBarIcon class="w-6 h-6" />
+                <Trophy class="w-6 h-6" />
             </button>
 
             <button v-if="isOwner" @click="toggleSettings"
@@ -87,9 +87,8 @@
 
                                     <div class="relative flex-shrink-0 mx-12" :style="{
                                         transform: `translateY(${getNodeOffset(getGlobalSectionIndex(unitIndex, sectionIndex))}px)`,
-                                    }" @click="editModeEnabled ? handleEditNodeClick() : handleNodeClick(sectionId)">
-
-
+                                    }" @mouseenter="!editModeEnabled && handleNodeHover(sectionId)" @mouseleave="!editModeEnabled && handleNodeLeave()"
+                                        @click="editModeEnabled ? handleEditNodeClick() : undefined">
 
                                         <DeleteSection v-if="editModeEnabled && isOwner" :section-id="sectionId"
                                             :section-name="sectionName" />
@@ -341,12 +340,11 @@ import {
     XMarkIcon,
     ChevronDoubleLeftIcon,
     ChevronDoubleRightIcon,
-    ChartBarIcon,
     PencilIcon,
     PlusIcon,
     ArrowLeftIcon,
-    LightBulbIcon
 } from '@heroicons/vue/24/solid';
+import { Trophy } from 'lucide-vue-next';
 import { useGameStore } from '@/store/gameStore'
 import { useRouter } from 'vue-router';
 import { toast } from 'vue-sonner'
@@ -424,9 +422,8 @@ const showLeaveCourseModal = ref(false); // State for the leave course modal
 const isOwner = ref(false)
 const editModeEnabled = ref(false);
 const emit = defineEmits(['unitAdded']) // Add this if not already present
-
-// Track selected room for tooltip
 const selectedRoomId = ref(null)
+const hoverTimeout = ref(null)
 
 // File input handling
 const scrollPosition = ref(0)
@@ -516,7 +513,7 @@ function goToLeaderboard() {
 }
 
 function goToExperiments() {
-    router.push(`/lessons/${props.libraryId}/experiments`)
+    router.push(`/lessons/${props.libraryId}/braindump`)
 
 }
 
@@ -646,8 +643,13 @@ onMounted(() => {
 
 onUnmounted(() => {
     if (scrollTimeoutId) {
-        clearTimeout(scrollTimeoutId); // Clear the timeout if it hasn't run yet
+        clearTimeout(scrollTimeoutId);
         console.debug("LearningPath unmounting, cleared initial scroll timeout.");
+    }
+    
+    // Clean up hover timeout
+    if (hoverTimeout.value) {
+        clearTimeout(hoverTimeout.value)
     }
 });
 
@@ -691,10 +693,32 @@ const drag = (e) => {
 const stopDragging = () => {
     isDragging.value = false
 }
-const handleNodeClick = (sectionId) => {
-    if (!hasMoved.value) {
-        selectedRoomId.value = selectedRoomId.value && selectedRoomId.value === sectionId ? null : sectionId
+
+const handleNodeHover = (sectionId) => {
+    // Clear any existing timeout
+    if (hoverTimeout.value) {
+        clearTimeout(hoverTimeout.value)
+        hoverTimeout.value = null
     }
+    
+    // Set a small delay before showing tooltip to prevent flickering
+    hoverTimeout.value = setTimeout(() => {
+        selectedRoomId.value = sectionId
+        hoverTimeout.value = null
+    }, 150)
+}
+
+const handleNodeLeave = () => {
+    // Clear the timeout if user leaves before delay completes
+    if (hoverTimeout.value) {
+        clearTimeout(hoverTimeout.value)
+        hoverTimeout.value = null
+    }
+    
+    // Add a small delay before hiding to allow moving to tooltip
+    setTimeout(() => {
+        selectedRoomId.value = null
+    }, 150)
 }
 
 const handleEditNodeClick = () => {

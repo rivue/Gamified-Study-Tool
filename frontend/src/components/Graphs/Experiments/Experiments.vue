@@ -20,17 +20,18 @@
 
         <div class="experiments-grid ">
             <div v-for="experiment in experiments" :key="experiment.id" class="experiment-card"
-                @click="navigateToExperiment(experiment.route)">
-                <div class="card-icon">
-                </div>
-                <h3 style="color: var(--text-color);">{{ experiment.route === "undefined" ? "Coming Soon!" : experiment.title }}</h3>
-                <p>{{ experiment.route === "undefined" ? "" : experiment.description }}</p>
-                <div v-if="experiment.route && experiment.route != 'undefined'" class="card-footer">
-                    <span class="difficulty" :class="experiment.difficulty">
-                        {{ experiment.route === "undefined" ? "" : experiment.difficulty }}
-                    </span>
-                    <span class="duration">{{ experiment.route === "undefined" ? "" : experiment.duration }}</span>
-                </div>
+            :class="{ 'disabled-card': experiment.route === 'undefined' }"
+            @click="experiment.route !== 'undefined' && navigateToExperiment(experiment.route)">
+            <div class="card-icon">
+            </div>
+            <h3 style="color: var(--text-color);">{{ experiment.route === "undefined" ? "Coming Soon!" : experiment.title }}</h3>
+            <p>{{ experiment.route === "undefined" ? "" : experiment.description }}</p>
+            <div v-if="experiment.route && experiment.route != 'undefined'" class="card-footer">
+                <span class="difficulty" :class="experiment.difficulty">
+                {{ experiment.route === "undefined" ? "" : experiment.difficulty }}
+                </span>
+                <span class="duration">{{ experiment.route === "undefined" ? "" : experiment.duration }}</span>
+            </div>
             </div>
         </div>
     </div>
@@ -64,22 +65,22 @@ const experiments: Experiment[] = [
         duration: '3 min',
         route: 'braindump'
     }, 
-    {
-        id: 2,
-        title: 'Process Master',
-        description: 'Remember the steps of various processes',
-        difficulty: 'easy',
-        duration: '1-5 min',
-        route: 'process-master'
-    },
-    {
-        id: 3,
-        title: 'Fact Sprint',
-        description: 'How fast can you answer questions?',
-        difficulty: 'medium',
-        duration: '1 min',
-        route: 'fact-sprint'
-    },
+    // {
+    //     id: 2,
+    //     title: 'Process Master',
+    //     description: 'Remember the steps of various processes',
+    //     difficulty: 'easy',
+    //     duration: '1-5 min',
+    //     route: 'process-master'
+    // },
+    // {
+    //     id: 3,
+    //     title: 'Fact Sprint',
+    //     description: 'How fast can you answer questions?',
+    //     difficulty: 'medium',
+    //     duration: '1 min',
+    //     route: 'fact-sprint'
+    // },
     {
         id: 4,
         title: 'Flashcards',
