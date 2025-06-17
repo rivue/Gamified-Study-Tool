@@ -31,7 +31,7 @@
                             style="color: var(--highlight-color);">Unit Name</label>
                         <input id="unit-name-input" v-model="newUnitName" type="text"
                             class="w-full p-2 border rounded-lg"
-                            style="background-color: var(--background-color-1t); color: var(--light-text); border-color: var(--color-primary-dark);"
+                            style="background-color: var(--background-color-1t); font-size: 16px; color: var(--light-text); border-color: var(--color-primary-dark);"
                             placeholder="Enter unit name" maxlength="40" autocomplete="off" />
                         <p v-if="unitNameError" class="mt-1 text-sm" style="color: var(--color-primary-light);">
                             {{ unitNameError }}

@@ -63,7 +63,6 @@ onMounted(() => {
     }
 });
 </script>
-
 <style scoped>
 .top-bar {
     position: -webkit-sticky;
@@ -73,13 +72,14 @@ onMounted(() => {
     z-index: 200;
     background-color: var(--background-color);
     color: var(--text-color);
-    padding: 8px 16px;
+    padding: 12px 16px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     backdrop-filter: blur(8px);
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
     border-bottom: 1px solid var(--color-primary-dark);
+    min-height: 60px;
 }
 
 .logo {
@@ -91,20 +91,27 @@ onMounted(() => {
     display: block;
     margin: 0;
     font-size: 24px;
-    text-align: center;
+    text-align: left; /* Changed from center for better flex behavior */
     font-weight: 700;
     cursor: pointer;
     color: var(--text-color);
+    /* Allow title to shrink but not grow excessively */
+    flex: 0 1 auto;
+    min-width: 0; /* Allows shrinking below content size */
+    white-space: nowrap; /* Prevents title from wrapping to a new line */
+    overflow: hidden; /* Hides any part of the title that doesn't fit */
+    text-overflow: ellipsis; /* Adds "..." if the title is too long */
 }
 
 .menu-buttons {
     display: flex;
-    gap: 16px;
+    gap: 12px;
     align-items: center;
+    flex-shrink: 0; /* A key change: prevents this container from shrinking */
 }
 
 .login-button {
-    padding: 10px 16px;
+    padding: 12px 16px;
     border-radius: 10px;
     background-color: var(--background-color-1t);
     color: var(--highlight-color);
@@ -113,6 +120,9 @@ onMounted(() => {
     font-weight: 500;
     cursor: pointer;
     font-size: 14px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
 }
 
 .login-button:hover {
@@ -128,12 +138,16 @@ onMounted(() => {
 .menu-btn {
     display: flex;
     cursor: pointer;
-    padding: 4px 0;
+    padding: 12px;
     border: none;
     background: transparent;
     color: var(--text-color);
     font-size: 14px;
     transition: all 0.2s ease;
+    min-height: 44px;
+    min-width: 44px;
+    align-items: center;
+    justify-content: center;
 }
 
 .menu-btn.primary {
@@ -153,7 +167,7 @@ onMounted(() => {
     display: flex;
     flex-direction: column;
     gap: 4px;
-    padding: 8px;
+    padding: 12px;
 }
 
 .menu-line {
@@ -183,20 +197,15 @@ onMounted(() => {
     position: relative;
     display: inline-flex;
     align-items: center;
-    padding: 4px 8px;
-    border-radius: 4px;
+    padding: 8px 12px;
+    border-radius: 8px;
     cursor: pointer;
     transition: background-color 0.2s ease;
+    min-height: 44px;
 }
 
 .streak-container:hover {
     background-color: var(--background-color-2t);
-}
-
-.streak-container:hover .streak-dropdown {
-    display: block;
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
 }
 
 .streak-wrapper {
@@ -224,6 +233,9 @@ onMounted(() => {
 }
 
 .streak-container:hover .streak-dropdown {
+    display: block;
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
     pointer-events: auto;
 }
 
@@ -249,5 +261,112 @@ onMounted(() => {
     border-left: 1px solid var(--color-primary-dark);
     border-top: 1px solid var(--color-primary-dark);
     transform: translateX(-50%) rotate(45deg);
+}
+
+/* Mobile Optimizations */
+@media only screen and (max-width: 768px) {
+    .top-bar {
+        padding: 8px 12px;
+        gap: 12px; /* Add gap to ensure spacing */
+    }
+    
+    .app-title {
+        font-size: 20px;
+    }
+    
+    .menu-buttons {
+        gap: 8px;
+    }
+    
+    .login-button {
+        padding: 10px 12px;
+        font-size: 13px;
+    }
+    
+    .streak-dropdown {
+        left: -50%;
+        min-width: 160px;
+    }
+}
+
+@media only screen and (max-width: 480px) {
+    .top-bar {
+        padding: 8px;
+        min-height: 56px;
+        gap: 8px; /* Reduce gap for smaller screens */
+    }
+    
+    .app-title {
+        font-size: 18px;
+    }
+    
+    .menu-buttons {
+        gap: 4px; /* Tighter gap for the buttons */
+    }
+    
+    .login-button {
+        padding: 8px 10px;
+        font-size: 12px;
+        min-height: 40px;
+    }
+    
+    .streak-container {
+        padding: 6px 8px;
+        min-height: 40px;
+    }
+    
+    .menu-btn {
+        padding: 8px;
+        min-height: 40px;
+        min-width: 40px;
+    }
+    
+    .streak-count {
+        font-size: 14px;
+        margin-left: -8px; /* Reduced the aggressive negative margin */
+    }
+    
+    .logo {
+        max-height: 20px;
+        margin-right: 8px;
+    }
+    
+    .streak-dropdown {
+        left: -80%;
+        min-width: 140px;
+        font-size: 12px;
+    }
+    
+    .streak-info p {
+        font-size: 12px;
+        padding: 8px 6px;
+    }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+    .streak-container:active {
+        background-color: var(--background-color-2t);
+    }
+    
+    .streak-container:active .streak-dropdown {
+        display: block;
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+        pointer-events: auto;
+    }
+    
+    .login-button:hover {
+        transform: none;
+        box-shadow: none;
+    }
+    
+    .menu-btn:hover {
+        transform: none;
+    }
+    
+    .menu-btn:hover .menu-line {
+        width: 20px;
+    }
 }
 </style>

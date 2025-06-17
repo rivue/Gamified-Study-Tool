@@ -249,7 +249,7 @@ onMounted(() => {
     border-radius: 8px;
     background: rgba(26, 139, 127, 0.1);
     color: var(--text-color);
-    font-size: 1.1rem;
+    font-size: 17px;
     font-weight: 600;
 }
 
@@ -319,7 +319,7 @@ onMounted(() => {
     border-radius: 6px;
     background: rgba(26, 139, 127, 0.1);
     color: var(--text-color);
-    font-size: 0.95rem;
+    font-size: 16px;
 }
 
 .child-concept-title-input:focus {
@@ -336,7 +336,7 @@ onMounted(() => {
     color: var(--text-color);
     resize: vertical;
     min-height: 60px;
-    font-size: 0.9rem;
+    font-size: 16px;
 }
 
 .child-concept-description-input:focus {

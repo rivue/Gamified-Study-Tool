@@ -344,29 +344,26 @@ body {
 .search-bar-container {
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: stretch; /* Change from center to stretch */
     margin: 2em 0;
     padding: 0 1em;
-    /* Add some padding for smaller screens */
+    flex-wrap: wrap; /* Add this to allow wrapping on very small screens */
+    gap: 10px; /* Add gap for when items wrap */
 }
 
 .search-input {
     width: 70%;
-    /* Make input take more width */
     max-width: 500px;
-    /* Maximum width for the input */
     padding: 15px 20px;
-    /* Increase padding for better visual */
     font-size: 1.2em;
-    /* Increase font size */
     border: 2px solid var(--element-color-1);
-    /* Prominent border */
     border-radius: 30px 0 0 30px;
-    /* Rounded corners on the left */
     outline: none;
     background-color: var(--background-color);
     color: var(--text-color);
     transition: border-color 0.3s ease;
+    flex: 1; /* Add this to allow input to grow */
+    min-width: 200px; /* Add minimum width */
 }
 
 .search-input:focus {
@@ -376,18 +373,15 @@ body {
 
 .search-button {
     padding: 15px 25px;
-    /* Increase padding */
     font-size: 1.2em;
-    /* Increase font size */
     background-color: var(--element-color-1);
     color: var(--background-color);
     border: 2px solid var(--element-color-1);
     border-left: none;
-    /* Remove left border to blend with input */
     border-radius: 0 30px 30px 0;
-    /* Rounded corners on the right */
     cursor: pointer;
-    transition: background-color 0.3s ease, color 0.3s ease;
+    transition: all 0.3s ease;
+    white-space: nowrap; /* Prevent button text from wrapping */
 }
 
 .search-button:hover {
@@ -540,6 +534,22 @@ body {
 
     .landing-subtitle {
         font-size: 1.1em;
+    }
+}
+@media only screen and (max-width: 600px) {
+    .search-bar-container {
+        flex-direction: column; /* Stack items on very small screens */
+    }
+    
+    .search-input {
+        width: 100%; /* Full width on small screens */
+        border-radius: 30px; /* Full rounded corners when stacked */
+    }
+    
+    .search-button {
+        width: 100%; /* Full width on small screens */
+        border-radius: 30px; /* Full rounded corners when stacked */
+        border-left: 2px solid var(--element-color-1); /* Restore left border when stacked */
     }
 }
 

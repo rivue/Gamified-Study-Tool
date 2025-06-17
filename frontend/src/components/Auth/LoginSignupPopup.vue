@@ -7,7 +7,7 @@
 
             <transition name="fade" mode="out-in">
                 <div :key="activeForm" class="form-container">
-                    <LoginForm v-if="activeForm === 'login'" @loginSuccess="handleLoginSuccess" :toggleForms="toggleForms" />
+                    <LoginForm v-if="activeForm === 'login'" @loginSuccess="handleLoginSuccess" />
                     <SignupForm v-else-if="activeForm === 'signup'" @signupSuccess="handleSignupSuccess"/>
                     <SendPasswordResetEmail v-else-if="activeForm === 'passwordReset'" @resetSuccess="handleResetSuccess" />
                     <div ref="googleButton" class="google-button-container"></div>
@@ -26,7 +26,7 @@
                                 Don't have an account? <span class="underline-text">Sign up</span>
                             </button>
                             <button class="toggle-btn" @click="toEmailVerificationScreen()">
-                                Not verified? <span class="underline-text">Send me a new email</span>
+                                Email not verified? <span class="underline-text">Send me a new email</span>
                             </button>
                         </div>
                     </div>

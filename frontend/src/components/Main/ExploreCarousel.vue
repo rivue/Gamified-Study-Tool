@@ -479,7 +479,7 @@ function handleSearchKeydown(event: KeyboardEvent) {
     border: 1px solid rgba(26, 139, 127, 0.3);
     background-color: rgba(26, 139, 127, 0.1);
     color: var(--text-color);
-    font-size: 0.9rem;
+    font-size: 16px;
 }
 
 .join-input::placeholder {
@@ -546,7 +546,7 @@ function handleSearchKeydown(event: KeyboardEvent) {
     border: 1px solid rgba(26, 139, 127, 0.3);
     background-color: rgba(26, 139, 127, 0.1);
     color: var(--text-color);
-    font-size: 1rem;
+    font-size: 16px !important;
     transition: all 0.2s;
 }
 
