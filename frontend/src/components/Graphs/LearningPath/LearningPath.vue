@@ -1,8 +1,10 @@
 <template>
 
-    <div class="fixed left-8 right-8 top-0 bottom-0 overflow-hidden">
-        <div class="fixed top-20 right-6 flex gap-6 z-10">
+    <div class="page-wrapper">
+        <header class="map-header">
+        <div class="left-controls">
 
+            
             <button @click="goToExperiments"
                 class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg p-4 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200"
                 style="color: var(--highlight-color);">
@@ -28,7 +30,7 @@
             </button>
         </div>
 
-        <div class="fixed top-20 left-6 flex gap-6 z-10">
+        <div class="right-controls">
             <button @click="goToCourseList"
                 class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg px-6 py-4 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200 font-medium"
                 style="color: var(--highlight-color);">
@@ -41,6 +43,7 @@
                 <span class="text-lg">Remove Course</span>
             </button>
         </div>
+    </header>
 
         <div class="relative flex flex-col w-full h-full">
 
@@ -278,10 +281,11 @@
                 </div>
             </div>
 
-            <div class="flex justify-between items-center mt-4 px-8 pb-32 relative">
+
+            <footer class="map-footer">
 
                 <!-- left side -->
-                <div class="flex gap-4 pointer-events-auto h-16 items-center">
+                <div class="nav-group left">
                     <button v-if="scrollPosition > 300" @click="scrollToStart(); $nextTick(handleScroll)"
                         class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg p-4 flex items-center gap-2 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200"
                         style="color: var(--highlight-color);">
@@ -296,7 +300,7 @@
                 </div>
 
                 <!-- right side -->
-                <div class="flex gap-4 pointer-events-auto h-16 items-center">
+                <div class="nav-group right">
                     <button v-if="scrollPosition < (maxLeft - 300)" @click="scroll('right'); $nextTick(handleScroll)"
                         class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg p-4 flex items-center gap-2 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200"
                         style="color: var(--highlight-color);">
@@ -310,7 +314,7 @@
                     </button>
                 </div>
 
-            </div>
+            </footer>
         </div>
     </div>
 
@@ -770,6 +774,27 @@ const handleScroll = () => {
 
 </script>
 <style scoped>
+.page-wrapper {
+  position: fixed;
+  inset: 0;                  /* shorthand for top/right/bottom/left: 0 */
+  overflow: hidden;
+  padding: 1rem;             /* mobile: small gutters */
+}
+
+@media (min-width: 768px) {
+  .page-wrapper {
+    padding: 2rem 4rem;      /* desktop: wider gutters */
+  }
+}.map-header {
+  position: sticky;
+  top: 0;
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem;
+  background: var(--background-color);
+  z-index: 20;
+}
+
 .overflow-x-auto {
     -webkit-overflow-scrolling: touch;
     scroll-behavior: smooth;
@@ -779,6 +804,11 @@ const handleScroll = () => {
     -ms-user-select: none;
 }
 
+.left-controls,
+.right-controls {
+  display: flex;
+  gap: 0.5rem;
+}
 .overflow-x-auto::-webkit-scrollbar {
     display: none;
 }
@@ -833,13 +863,71 @@ const handleScroll = () => {
         justify-content: center;
         /* center the items horizontally */
     }
+    .scrollContainer > .flex {
+     gap: 1.5rem;            /* was 6rem on desktop */
+     padding-top: 1rem;      /* was 6rem */
+     padding-bottom: 1rem;
+     min-height: 50vh;
+   }
+   .map-footer {
+    position: fixed;
+    bottom: env(safe-area-inset-bottom, 0.5rem);
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 1rem;
+    background: var(--background-color);
+    z-index: 20;
+  }
+  .map-footer .nav-group span {
+    display: none;
+  }
+  .group > .relative.w-48.h-48 {
+    width: 3.5rem;
+    height: 3.5rem;
+  }
+    
 }
-
+ /* ── DESKTOP DEFAULT ── */
+ .scrollContainer > .flex {
+   /* your original “gap-24 py-24” style */
+   gap: 6rem;
+   padding-top: 6rem;
+   padding-bottom: 6rem;
+   min-height: calc(100vh - 10rem);
+ }
+ @media (min-width: 601px) {
+ /* ── DESKTOP FOOTER ── */
+  .map-footer {
+    position: static;
+    margin-top: 2rem;
+    padding: 0;
+    background: transparent;
+  }
+  .map-footer .nav-group span {
+    display: inline; /* show labels again */
+  }
+}
+@media (min-width: 768px) {
+  .scrollContainer > .flex {
+    padding-top: 6rem;       /* your original “py-24” */
+    padding-bottom: 6rem;
+    min-height: calc(100vh - 10rem);
+    gap: 6rem;
+  }
+}
 .unit-box {
     border-top: 2px solid currentColor;
     border-bottom: 2px solid currentColor;
 }
 
+/* hide the text labels on very small screens to save space */
+@media (max-width: 480px) {
+  .map-footer .nav-group span {
+    display: none;
+  }
+}
 .unit--first {
     border-left: 2px solid currentColor;
     border-top-left-radius: 0.625rem;
