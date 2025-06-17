@@ -167,6 +167,7 @@ form {
     margin-bottom: 16px; /* Re-add this for spacing between fields */
     margin-left: auto; /* Keep these for horizontal centering */
     margin-right: auto;
+    font-size: 17px;
 }
 
 .form-field label {
@@ -183,6 +184,7 @@ form {
     border-radius: 4px;
     width: 100%;
     box-sizing: border-box;
+    font-size: 17px;
 }
 .password-toggle {
     position: absolute;

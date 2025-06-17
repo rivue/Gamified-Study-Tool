@@ -3,11 +3,9 @@
     <div v-if="!loggedIn" class="popup-overlay">
         <div v-if="loggingIn" id="loadingCloud" class="cloud-animation">☁️</div>
         <div v-else class="popup-content">
-            
-
             <transition name="fade" mode="out-in">
                 <div :key="activeForm" class="form-container">
-                    <LoginForm v-if="activeForm === 'login'" @loginSuccess="handleLoginSuccess" />
+                    <LoginForm v-if="activeForm === 'login'" @loginSuccess="handleLoginSuccess" :toggleForms="toggleForms" />
                     <SignupForm v-else-if="activeForm === 'signup'" @signupSuccess="handleSignupSuccess"/>
                     <SendPasswordResetEmail v-else-if="activeForm === 'passwordReset'" @resetSuccess="handleResetSuccess" />
                     <div ref="googleButton" class="google-button-container"></div>
@@ -26,7 +24,7 @@
                                 Don't have an account? <span class="underline-text">Sign up</span>
                             </button>
                             <button class="toggle-btn" @click="toEmailVerificationScreen()">
-                                Email not verified? <span class="underline-text">Send me a new email</span>
+                                Not verified? <span class="underline-text">Send me a new email</span>
                             </button>
                         </div>
                     </div>
@@ -150,7 +148,6 @@ const handleResetSuccess = () => {
 <style scoped>
 .popup-overlay {
     position: fixed;
-    top: 0;
     left: 0;
     width: 100%;
     height: 100%;
@@ -159,24 +156,37 @@ const handleResetSuccess = () => {
     justify-content: center;
     align-items: center;
     z-index: 95;
-    padding: 25px;
+    padding: 20px;
+    box-sizing: border-box;
+    overflow-y: auto;
 }
 
 .popup-content {
     background: var(--background-color);
     backdrop-filter: blur(10px);
     border-radius: 16px;
+    /* padding-bottom: 5rem;        ensure room to scroll past last field */
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
     border: 1px solid rgba(26, 139, 127, 0.2);
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
     flex-direction: column;
     padding: 2rem;
     max-width: 450px;
     width: 100%;
-    min-height: 400px;
+    max-height: calc(100vh - 20px);
+    overflow-y: auto;
     color: var(--text-color);
+    margin: auto;
+}
+
+.popup-content .form-actions {
+  position: sticky;
+  bottom: 10px;
+  background: var(--background-color);
+  padding: 1rem 2rem;
+  z-index: 10;
 }
 
 .header-content {
@@ -376,11 +386,19 @@ const handleResetSuccess = () => {
 }
 
 @media (max-width: 640px) {
+    .popup-overlay {
+        padding: 10px;
+        align-items: flex-start;
+        padding-top: 20px;
+    }
+    
     .popup-content {
         padding: 1.5rem;
         border-radius: 12px;
-        max-width: 350px;
-        min-height: 350px;
+        max-width: 100%;
+        width: calc(100% - 20px);
+        max-height: calc(100vh - 40px);
+        margin-top: 0;
     }
 
     .title {
@@ -397,6 +415,26 @@ const handleResetSuccess = () => {
 
     .google-button-container {
         max-width: 100%;
+    }
+}
+
+ /* on desktop, lift the popup higher in the viewport */
+ @media (min-width: 641px) {
+   .popup-overlay {
+    align-items: flex-start;
+      padding-top: 0;  /* control vertical placement */
+   }
+ }
+
+/* Specific mobile viewport adjustments */
+@media (max-height: 700px) and (max-width: 640px) {
+    .popup-overlay {
+        align-items: flex-start;
+        padding-top: 10px;
+    }
+    
+    .popup-content {
+        max-height: calc(100vh - 20px);
     }
 }
 </style>

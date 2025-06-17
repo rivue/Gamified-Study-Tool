@@ -1,103 +1,106 @@
+<!-- SignupForm.vue -->
 <template>
-    <h1>Signup</h1>
+    <div class="signup-form-container">
+        <h1 class="signup-title">Signup</h1>
 
-    <form @submit.prevent="handleSubmit">
-    
-        <div class="flex flex-col sm:flex-row gap-4 w-full max-w-md mb-4">
-            <div class="form-field flex-1">
-                <label for="first_name">First Name:</label>
-                <input
-                type="text"
-                id="first_name"
-                name="first_name"
-                v-model="firstName"
-                autocomplete="given-name"
-                />
+        <form @submit.prevent="handleSubmit">
+        
+            <div class="flex flex-col sm:flex-row gap-4 w-full max-w-md mb-4">
+                <div class="form-field flex-1">
+                    <label for="first_name">First Name:</label>
+                    <input
+                    type="text"
+                    id="first_name"
+                    name="first_name"
+                    v-model="firstName"
+                    autocomplete="given-name"
+                    />
+                </div>
+                <div class="form-field flex-1">
+                    <label for="last_name">Last Name:</label>
+                    <input
+                    type="text"
+                    id="last_name"
+                    name="last_name"
+                    v-model="lastName"
+                    autocomplete="family-name"
+                    />
+                </div>
             </div>
-            <div class="form-field flex-1">
-                <label for="last_name">Last Name:</label>
-                <input
-                type="text"
-                id="last_name"
-                name="last_name"
-                v-model="lastName"
-                autocomplete="family-name"
-                />
-            </div>
-        </div>
 
-    <div class="form-field">
-        <label for="new-email">Email:</label>
-        <input
-        type="text"
-        id="new-email"
-        name="new-email"
-        v-model="email"
-        autocomplete="email"
-        required
-        />
-    </div>
-    <div class="form-field">
-        <label for="username">Username: (Must be unique)</label>
-        <input
-        type="text"
-        id="username"
-        name="username"
-        v-model="username"
-        autocomplete="username"
-        required
-        />
-    </div>
-    <div class="form-field">
-        <label for="new-password">Password:</label>
-        <div class="password-input-container">
+        <div class="form-field">
+            <label for="new-email">Email:</label>
             <input
-            :type="showPassword ? 'text' : 'password'"
-            id="new-password"
-            name="new-password"
-            v-model="password"
-            autocomplete="new-password"
+            type="text"
+            id="new-email"
+            name="new-email"
+            v-model="email"
+            autocomplete="email"
             required
             />
-            <EyeIcon 
-                class="password-toggle w-7 h-7"
-                @click="togglePasswordVisibility"
-                :aria-label="showPassword ? 'Hide password' : 'Show password'"
-                v-if="showPassword"/>
-            <EyeSlashIcon 
-                class="password-toggle w-7 h-7"
-                @click="togglePasswordVisibility"
-                :aria-label="showPassword ? 'Hide password' : 'Show password'"
-                v-else/>
         </div>
-    </div>
-    <div class="form-field">
-        <label for="confirm-password">Confirm Password:</label>
-        <div class="password-input-container">
+        <div class="form-field">
+            <label for="username">Username: (Must be unique)</label>
             <input
-            :type="showPassword ? 'text' : 'password'"
-            id="confirm-password"
-            name="confirm-password"
-            v-model="confirmPassword"
-            autocomplete="new-password"
+            type="text"
+            id="username"
+            name="username"
+            v-model="username"
+            autocomplete="username"
             required
             />
-            <EyeIcon 
-                class="password-toggle w-7 h-7"
-                @click="togglePasswordVisibility"
-                :aria-label="showPassword ? 'Hide password' : 'Show password'"
-                v-if="showPassword"/>
-            <EyeSlashIcon 
-                class="password-toggle w-7 h-7"
-                @click="togglePasswordVisibility"
-                :aria-label="showPassword ? 'Hide password' : 'Show password'"
-                v-else/>
         </div>
+        <div class="form-field">
+            <label for="new-password">Password:</label>
+            <div class="password-input-container">
+                <input
+                :type="showPassword ? 'text' : 'password'"
+                id="new-password"
+                name="new-password"
+                v-model="password"
+                autocomplete="new-password"
+                required
+                />
+                <EyeIcon 
+                    class="password-toggle w-7 h-7"
+                    @click="togglePasswordVisibility"
+                    :aria-label="showPassword ? 'Hide password' : 'Show password'"
+                    v-if="showPassword"/>
+                <EyeSlashIcon 
+                    class="password-toggle w-7 h-7"
+                    @click="togglePasswordVisibility"
+                    :aria-label="showPassword ? 'Hide password' : 'Show password'"
+                    v-else/>
+            </div>
+        </div>
+        <div class="form-field">
+            <label for="confirm-password">Confirm Password:</label>
+            <div class="password-input-container">
+                <input
+                :type="showPassword ? 'text' : 'password'"
+                id="confirm-password"
+                name="confirm-password"
+                v-model="confirmPassword"
+                autocomplete="new-password"
+                required
+                />
+                <EyeIcon 
+                    class="password-toggle w-7 h-7"
+                    @click="togglePasswordVisibility"
+                    :aria-label="showPassword ? 'Hide password' : 'Show password'"
+                    v-if="showPassword"/>
+                <EyeSlashIcon 
+                    class="password-toggle w-7 h-7"
+                    @click="togglePasswordVisibility"
+                    :aria-label="showPassword ? 'Hide password' : 'Show password'"
+                    v-else/>
+            </div>
+        </div>
+        <div class="button-container">
+          <input type="submit" id="submit" :value="buttonText" />
+        </div>
+      </form>
     </div>
-    <div class="button-container">
-      <input type="submit" id="submit" :value="buttonText" />
-    </div>
-  </form>
 </template>
   
 <script setup lang="ts">
@@ -177,7 +180,23 @@ onMounted(async () => {
 });
 </script>
   
-<style>
+<style scoped>
+.signup-form-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: (100vh - 10px);
+}
+
+.signup-title {
+  font-size: 2rem;
+  font-weight: 800;
+  margin-bottom: 1.5rem;
+  color: var(--text-color);
+  text-align: center;
+}
+
 .button-container {
   text-align: center;
 }
@@ -189,10 +208,6 @@ form {
   width: 100%;
 }
 
-.button-container {
-    text-align: center;
-}
-
 .form-field {
   display: flex;
   flex-direction: column;
@@ -202,6 +217,7 @@ form {
   margin-bottom: 16px;
   margin-left: auto;
   margin-right: auto;
+  font-size: 16px;
 }
 
 .form-field label {
@@ -219,6 +235,7 @@ form {
   border-radius: 4px;
   width: 100%;
   box-sizing: border-box;
+  font-size: 16px;
 }
 
 .password-input-container {
@@ -268,5 +285,18 @@ form {
     max-width: 300px;
     display: flex;
     justify-content: center;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 640px) {
+  .signup-title {
+    font-size: 1.75rem;
+    margin-bottom: 1rem;
+  }
+  
+  .form-field {
+    max-width: 100%;
+    margin-bottom: 12px;
+  }
 }
 </style>

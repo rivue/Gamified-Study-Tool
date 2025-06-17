@@ -171,7 +171,7 @@ const handleSendNewVerificationEmail = () => {
 
 .form-field label {
     margin-bottom: 6px;
-    font-size: 0.9em;
+    font-size: 16px;
     color: var(--text-color);
 }
 
@@ -198,7 +198,7 @@ input[type="submit"] {
     transition: all 0.2s;
     text-align: center;
     font-weight: 600;
-    font-size: 1rem;
+    font-size: 16px;
     display: block;
     margin-left: auto;
     margin-right: auto;
@@ -218,7 +218,7 @@ input[type="email"] {
     border: 1px solid rgba(26, 139, 127, 0.3);
     background-color: rgba(26, 139, 127, 0.1);
     color: var(--text-color);
-    font-size: 1rem;
+    font-size: 16px;
     transition: all 0.2s;
 }
 
