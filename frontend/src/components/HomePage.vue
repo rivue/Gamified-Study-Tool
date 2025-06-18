@@ -3,8 +3,9 @@
         <div class="landing-page-1">
             <div class="landing-titles-container">
                 <div class="landing-title">Studying. Made. Fun.</div>
-                <div class="landing-subtitle">Transform late-night cramming into fun adventures with your personal study community.
-                </div>
+                <div class="landing-subtitle">
+  Stop cramming alone the night before. Join a community where studying feels like leveling up, not burning out.
+</div>
             </div>
         </div>
         <div class="landing-page-2">
@@ -12,8 +13,7 @@
                 <FeaturesComponent />
             </div>
             <div class="search-bar-container">
-                <input type="text" v-model="searchQuery" @keyup.enter="handleSearch" placeholder="Search courses..."
-                    class="search-input" />
+                <input type="text" class="search-input" v-model="searchQuery" @keyup.enter="handleSearch" placeholder="Search courses..." />
                 <button @click="handleSearch" class="search-button">Start Learning Now</button>
             </div>
             <div class="dropdown-menus">
@@ -68,7 +68,6 @@
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from "@/store/authStore";
-import FaqComponent from "./Footer/LandingPageComponents/FaqComponent.vue";
 import FeaturesComponent from "./Footer/LandingPageComponents/FeaturesComponent.vue";
 const searchQuery = ref("");
 
@@ -77,9 +76,18 @@ const searchQuery = ref("");
 // Data properties
 const items = ref(["Have Fun", "Discover", "Level Up"]);
 const content = ref([
-    ["Your personal learning journey.", "<b>You</b> decide what to learn. Choose any topic you can describe in a few words. Or let our tutor suggest based on your goals and interests."],
-    ["Learn anything, challenge yourself.", "Embark on a personalized learning adventure with interactive lessons and fun quizzes."],
-    ["Stats, graphs, streaks...", "Seeing progress gives us the rewarding feeling hard work deserves. Track your gains with graphs and stats."]
+  [
+    "Make learning feel like a game.",
+    "Set goals, earn achievements, and compete with friends — or just with yourself. Studying doesn’t have to suck."
+  ],
+  [
+    "Explore courses that match your curiosity.",
+    "Search for anything — from ‘intro to calculus’ to ‘the mitochondria is the powerhouse’ — or join courses made by your peers."
+  ],
+  [
+    "Track progress that actually motivates you.",
+    "Visualize your streaks, XP, and personal growth over time. Every session builds momentum."
+  ]
 ]);
 const activeIndex = ref<number | null>(null);
 const activeDropdown = ref<number | null>(null);
@@ -335,29 +343,26 @@ body {
 .search-bar-container {
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: stretch; /* Change from center to stretch */
     margin: 2em 0;
     padding: 0 1em;
-    /* Add some padding for smaller screens */
+    flex-wrap: wrap; /* Add this to allow wrapping on very small screens */
+    gap: 10px; /* Add gap for when items wrap */
 }
 
 .search-input {
     width: 70%;
-    /* Make input take more width */
     max-width: 500px;
-    /* Maximum width for the input */
     padding: 15px 20px;
-    /* Increase padding for better visual */
-    font-size: 1.2em;
-    /* Increase font size */
+    font-size: 19px;
     border: 2px solid var(--element-color-1);
-    /* Prominent border */
     border-radius: 30px 0 0 30px;
-    /* Rounded corners on the left */
     outline: none;
     background-color: var(--background-color);
     color: var(--text-color);
     transition: border-color 0.3s ease;
+    flex: 1; /* Add this to allow input to grow */
+    min-width: 200px; /* Add minimum width */
 }
 
 .search-input:focus {
@@ -367,18 +372,15 @@ body {
 
 .search-button {
     padding: 15px 25px;
-    /* Increase padding */
     font-size: 1.2em;
-    /* Increase font size */
     background-color: var(--element-color-1);
     color: var(--background-color);
     border: 2px solid var(--element-color-1);
     border-left: none;
-    /* Remove left border to blend with input */
     border-radius: 0 30px 30px 0;
-    /* Rounded corners on the right */
     cursor: pointer;
-    transition: background-color 0.3s ease, color 0.3s ease;
+    transition: all 0.3s ease;
+    white-space: nowrap; /* Prevent button text from wrapping */
 }
 
 .search-button:hover {
@@ -531,6 +533,22 @@ body {
 
     .landing-subtitle {
         font-size: 1.1em;
+    }
+}
+@media only screen and (max-width: 600px) {
+    .search-bar-container {
+        flex-direction: column; /* Stack items on very small screens */
+    }
+    
+    .search-input {
+        width: 100%; /* Full width on small screens */
+        border-radius: 30px; /* Full rounded corners when stacked */
+    }
+    
+    .search-button {
+        width: 100%; /* Full width on small screens */
+        border-radius: 30px; /* Full rounded corners when stacked */
+        border-left: 2px solid var(--element-color-1); /* Restore left border when stacked */
     }
 }
 

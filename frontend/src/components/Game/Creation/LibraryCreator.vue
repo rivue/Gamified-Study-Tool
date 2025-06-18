@@ -961,7 +961,7 @@ onUnmounted(() => {
     border-radius: 8px;
     background: rgba(26, 139, 127, 0.1);
     color: var(--text-color);
-    font-size: 1rem;
+    font-size: 16px;
     transition: all 0.2s;
 }
 
@@ -1153,7 +1153,7 @@ onUnmounted(() => {
     background: rgba(26, 139, 127, 0.1);
     color: var(--text-color);
     font-weight: 600;
-    font-size: 1.1rem;
+    font-size: 17px;
 }
 
 .topic-input:focus {
@@ -1207,6 +1207,7 @@ onUnmounted(() => {
     border-radius: 6px;
     background: rgba(26, 139, 127, 0.1);
     color: var(--text-color);
+    font-size: 16px;
 }
 
 .subtopic-input:focus {

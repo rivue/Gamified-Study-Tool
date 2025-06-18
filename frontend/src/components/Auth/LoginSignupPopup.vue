@@ -3,13 +3,12 @@
     <div v-if="!loggedIn" class="popup-overlay">
         <div v-if="loggingIn" id="loadingCloud" class="cloud-animation">☁️</div>
         <div v-else class="popup-content">
-            
-
             <transition name="fade" mode="out-in">
                 <div :key="activeForm" class="form-container">
-                    <LoginForm v-if="activeForm === 'login'" @loginSuccess="handleLoginSuccess" />
+                    <LoginForm v-if="activeForm === 'login'" @loginSuccess="handleLoginSuccess" :toggleForms="toggleForms" />
                     <SignupForm v-else-if="activeForm === 'signup'" @signupSuccess="handleSignupSuccess"/>
                     <SendPasswordResetEmail v-else-if="activeForm === 'passwordReset'" @resetSuccess="handleResetSuccess" />
+                    <div ref="googleButton" class="google-button-container"></div>
 
                     <!-- Buttons under each form -->
                     <div class="form-actions">
@@ -20,27 +19,24 @@
                         </div>
 
                         <div v-else-if="activeForm === 'login'" class="login-actions">
-                            <button class="forgot-password" @click="toggleForms('passwordReset')">
-                                Forgot your password? <span class="underline-text">Reset Here</span>
-                            </button>
+                           
                             <button class="toggle-btn" @click="toggleForms('signup')">
                                 Don't have an account? <span class="underline-text">Sign up</span>
                             </button>
                             <button class="toggle-btn" @click="toEmailVerificationScreen()">
-                                Email not verified? <span class="underline-text">Send me a new email</span>
+                                Not verified? <span class="underline-text">Send me a new email</span>
                             </button>
                         </div>
                     </div>
                 </div>
             </transition>
 
-            <div ref="googleButton" class="google-button-container"></div>
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, nextTick, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import LoginForm from "./LoginForm.vue";
 import SignupForm from "./SignupForm.vue";
@@ -48,26 +44,93 @@ import SendPasswordResetEmail from "./SendPasswordResetEmail.vue";
 import { usePopupStore } from "@/store/popupStore";
 import { useAuthStore, UserData } from "@/store/authStore";
 import { showSignupToast } from "@/utils/toasts";
+import axios from 'axios';
 
 const router = useRouter();
 const route = useRoute();
-const googleButton = ref<HTMLDivElement | null>(null);
+const googleButton = ref<HTMLDivElement | null>(null); // Ref for the Google button container
 const activeForm = ref('login');
 const loggingIn = ref(false);
 const authStore = useAuthStore();
+
+// Ensure this is declared to be accessible in the global scope for the callback
+declare global {
+  interface Window {
+    handleGoogleSignIn: (response: any) => void;
+  }
+}
 
 const loggedIn = computed(() => {
     return authStore.loggedIn;
 });
 
-onMounted(() => {
+// Google Sign In Handler
+const handleGoogleSignIn = async (response: any) => {
+    loggingIn.value = true;
+    try {
+        const { data } = await axios.post('/api/auth/google/callback', {
+           id_token: response.credential,
+        });
+
+        if (data.status === 'success') {
+            authStore.login(data.user); // Assuming data.user contains the user info
+            const redirectPath = route.query.redirect?.toString() || '/';
+            router.push(redirectPath);
+        } else {
+            const popupStore = usePopupStore();
+            popupStore.showPopup(data.message || 'Google Sign-In failed. Please try again.');
+        }
+    } catch (error) {
+        console.error('Google Sign-In error:', error);
+        const popupStore = usePopupStore();
+        popupStore.showPopup('An error occurred during Google Sign-In. Please try again.');
+    } finally {
+        loggingIn.value = false;
+    }
+};
+
+
+onMounted(async () => {
     if (loggedIn.value) {
         const popupStore = usePopupStore();
         popupStore.showPopup(
             "You are already signed in. Visit settings to log out."
         );
         router.push("/");
+        return; // Exit if already logged in
     }
+
+    // Make handleGoogleSignIn globally accessible
+    window.handleGoogleSignIn = handleGoogleSignIn;
+
+    // Wait for the next DOM update cycle to ensure googleButton.value is available
+    await nextTick();
+
+    if (googleButton.value && typeof google !== 'undefined' && google.accounts && google.accounts.id) {
+        google.accounts.id.initialize({
+            client_id: process.env.VUE_APP_GOOGLE_CLIENT_ID, // Ensure this is set in your .env file
+            callback: window.handleGoogleSignIn,
+        });
+        google.accounts.id.renderButton(
+            googleButton.value,
+            { theme: "outline", size: "large", width: "300" } 
+        );
+    } else {
+        console.error('Google Identity Services library not loaded or googleButton ref not found.');
+    }
+});
+
+watch(activeForm, async (newForm) => {
+  if (newForm === 'signup' || newForm === 'login') {
+    await nextTick();
+
+    if (googleButton.value && typeof google !== 'undefined' && google.accounts && google.accounts.id) {
+      google.accounts.id.renderButton(
+        googleButton.value,
+        { theme: 'outline', size: 'large', width: '300' }
+      );
+    }
+  }
 });
 
 const toggleForms = (form: string) => {
@@ -98,7 +161,6 @@ const handleResetSuccess = () => {
 <style scoped>
 .popup-overlay {
     position: fixed;
-    top: 0;
     left: 0;
     width: 100%;
     height: 100%;
@@ -107,24 +169,37 @@ const handleResetSuccess = () => {
     justify-content: center;
     align-items: center;
     z-index: 95;
-    padding: 25px;
+    padding: 20px;
+    box-sizing: border-box;
+    overflow-y: auto;
 }
 
 .popup-content {
     background: var(--background-color);
     backdrop-filter: blur(10px);
     border-radius: 16px;
+    /* padding-bottom: 5rem;        ensure room to scroll past last field */
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
     border: 1px solid rgba(26, 139, 127, 0.2);
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
     flex-direction: column;
     padding: 2rem;
     max-width: 450px;
     width: 100%;
-    min-height: 400px;
+    max-height: calc(100vh - 20px);
+    overflow-y: auto;
     color: var(--text-color);
+    margin: auto;
+}
+
+.popup-content .form-actions {
+  position: sticky;
+  bottom: 10px;
+  background: var(--background-color);
+  padding: 1rem 2rem;
+  z-index: 10;
 }
 
 .header-content {
@@ -223,7 +298,7 @@ const handleResetSuccess = () => {
     border: 1px solid rgba(26, 139, 127, 0.3);
     background-color: rgba(26, 139, 127, 0.1);
     color: var(--text-color);
-    font-size: 1rem;
+    font-size: 16px;
     transition: all 0.2s;
 }
 
@@ -324,11 +399,19 @@ const handleResetSuccess = () => {
 }
 
 @media (max-width: 640px) {
+    .popup-overlay {
+        padding: 10px;
+        align-items: flex-start;
+        padding-top: 20px;
+    }
+    
     .popup-content {
         padding: 1.5rem;
         border-radius: 12px;
-        max-width: 350px;
-        min-height: 350px;
+        max-width: 100%;
+        width: calc(100% - 20px);
+        max-height: calc(100vh - 40px);
+        margin-top: 0;
     }
 
     .title {
@@ -345,6 +428,26 @@ const handleResetSuccess = () => {
 
     .google-button-container {
         max-width: 100%;
+    }
+}
+
+ /* on desktop, lift the popup higher in the viewport */
+ @media (min-width: 641px) {
+   .popup-overlay {
+    align-items: flex-start;
+      padding-top: 0;  /* control vertical placement */
+   }
+ }
+
+/* Specific mobile viewport adjustments */
+@media (max-height: 700px) and (max-width: 640px) {
+    .popup-overlay {
+        align-items: flex-start;
+        padding-top: 10px;
+    }
+    
+    .popup-content {
+        max-height: calc(100vh - 20px);
     }
 }
 </style>

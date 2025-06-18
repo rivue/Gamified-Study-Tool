@@ -23,6 +23,10 @@ class User(db.Model, UserMixin):
     last_name = db.Column(db.String(25), nullable=True)
     timezone = db.Column(db.String(50), default='UTC', nullable=False, server_default='UTC')
     joined_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False, server_default=db.func.now())
+    auth_provider = db.Column(db.String(20), default='local', nullable=False)
+
+    # Google-specific unique user ID (from Google's `sub` field in the ID token)
+    google_id = db.Column(db.String(100), nullable=True, unique=True)
 
     mentor_name = db.Column(db.String(100), default='Azalea') # TODO: not using
     system_role = db.Column(db.String(100), default='') # TODO: not using

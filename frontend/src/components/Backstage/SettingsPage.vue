@@ -343,6 +343,7 @@ const changePassword = async () => {
     border: 1px solid var(--element-color-1);
     border-radius: 8px;
     background-color: var(--background-color-2); /* Consistent background */
+    font-size: 16px;
 }
 
 .profile-input-readonly {
@@ -363,7 +364,7 @@ const changePassword = async () => {
 }
 
 .form-field label {
-  font-size: 0.9em;
+  font-size: 16px;
   color: var(--text-color-secondary); /* Softer color for label */
   margin-bottom: 4px;
 }

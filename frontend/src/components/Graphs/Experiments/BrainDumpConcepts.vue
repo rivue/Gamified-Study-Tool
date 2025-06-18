@@ -160,7 +160,7 @@ onMounted(() => {
     flex-direction: column;
     min-height: 500px;
     justify-content: space-between;
-    width: 80%;
+    width: 95%;
     max-width: 1200px;
     margin: 0 auto;
 }
@@ -237,11 +237,10 @@ onMounted(() => {
 
 .concept-header {
     display: flex;
-    gap: 0.75rem;
+    gap: 0.5rem; /* Reduced from 0.75rem */
     align-items: flex-start;
     margin-bottom: 1rem;
 }
-
 .concept-title-input {
     flex: 1;
     padding: 0.75rem;
@@ -249,10 +248,10 @@ onMounted(() => {
     border-radius: 8px;
     background: rgba(26, 139, 127, 0.1);
     color: var(--text-color);
-    font-size: 1.1rem;
+    font-size: 17px;
     font-weight: 600;
+    min-width: 0; /* Allow shrinking */
 }
-
 .concept-title-input:focus {
     outline: none;
     border-color: var(--color-primary);
@@ -302,7 +301,8 @@ onMounted(() => {
     background: rgba(26, 139, 127, 0.05);
     border: 1px solid rgba(26, 139, 127, 0.15);
     border-radius: 8px;
-    padding: 1.25rem;
+    padding: 1rem; /* Reduced padding */
+    overflow: hidden; /* Prevent overflow */
 }
 
 .child-concept-header {
@@ -319,7 +319,8 @@ onMounted(() => {
     border-radius: 6px;
     background: rgba(26, 139, 127, 0.1);
     color: var(--text-color);
-    font-size: 0.95rem;
+    font-size: 16px;
+    min-width: 0; /* Allow shrinking */
 }
 
 .child-concept-title-input:focus {
@@ -336,7 +337,7 @@ onMounted(() => {
     color: var(--text-color);
     resize: vertical;
     min-height: 60px;
-    font-size: 0.9rem;
+    font-size: 16px;
 }
 
 .child-concept-description-input:focus {
@@ -345,18 +346,26 @@ onMounted(() => {
 }
 
 .remove-concept-btn, .remove-child-concept-btn {
-    background: none;
-    border: none;
+    background: rgba(255, 0, 0, 0.1);
+    border: 1px solid rgba(255, 0, 0, 0.3);
     color: var(--text-color-secondary);
     cursor: pointer;
-    padding: 0.5rem;
-    border-radius: 6px;
+    padding: 0.25rem 0.5rem; /* Smaller padding */
+    border-radius: 4px;
     transition: all 0.2s;
+    width: 28px; /* Smaller fixed width */
+    height: 28px; /* Smaller fixed height */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0; /* Prevent shrinking */
+    font-size: 0.875rem; /* Smaller font */
 }
 
 .remove-concept-btn:hover, .remove-child-concept-btn:hover {
-    color: var(--error-color);
-    background: rgba(255, 0, 0, 0.1);
+    color: #dc2626;
+    background: rgba(255, 0, 0, 0.2);
+    border-color: #dc2626;
 }
 
 .add-child-concept-btn {
@@ -396,18 +405,22 @@ onMounted(() => {
 }
 
 .collapse-concept-btn {
-    background: none;
-    border: none;
-    color: var(--text-color-secondary);
+    background: rgba(26, 139, 127, 0.1);
+    border: 1px solid rgba(26, 139, 127, 0.3);
+    color: var(--color-primary);
     cursor: pointer;
-    padding: 0.5rem;
+    padding: 0.5rem 0.75rem; /* More compact padding */
     border-radius: 6px;
     transition: all 0.2s;
+    font-size: 0.875rem; /* Smaller font */
+    white-space: nowrap; /* Prevent text wrapping */
+    min-width: fit-content;
 }
 
 .collapse-concept-btn:hover {
     color: var(--color-primary);
-    background: rgba(26, 139, 127, 0.1);
+    background: rgba(26, 139, 127, 0.2);
+    border-color: var(--color-primary);
 }
 
 </style>

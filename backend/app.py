@@ -117,6 +117,12 @@ def forbidden(e):
 def bad_request(e):
     return jsonify({"error": "Bad request", "message": str(e)}), 400
     
+@app.after_request
+def add_cross_origin_headers(response):
+    print("this is triggered")
+    response.headers['Cross-Origin-Opener-Policy'] = 'same-origin-allow-popups'
+    return response
+    
 class UserAlreadyMemberError(Exception):
     pass
 

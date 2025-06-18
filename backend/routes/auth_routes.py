@@ -7,7 +7,8 @@ from flask_login import login_required, logout_user, current_user, login_user
 import pymysql.err as pymysql_err
 import os
 import re
-# from oauth2client import client, crypt
+from google.oauth2 import id_token
+from google.auth.transport import requests as google_requests
 
 from database.models import db, User
 from database.user_handler import confirm, generate_confirmation_token, get_user_tier, get_daily_request_count
@@ -15,7 +16,7 @@ from message_handler import initialize_messages
 from email_provider.resend_api import send_email
 from email_provider.email_templates import Registration, PasswordReset
 
-# GOOGLE_CLIENT_ID = "529262341360-9sq10od3qkro19jaavhgachkpviugfv3.apps.googleusercontent.com"
+GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID")
 
 def generate_token_and_send_verification_email(user):
         user.confirmation_token = generate_confirmation_token(user.id)
@@ -344,46 +345,85 @@ def init_auth_routes(app):
             'session': dict(session)
         })
         
-    # @app.route('/api/auth/google/callback', methods=['POST'])
-    # def google_auth_callback():
-    #     token = request.json.get('id_token')
+    @app.route('/api/auth/google/callback', methods=['POST'])
+    def google_auth_callback():
+        token = request.json.get('id_token')
+        try:
+            idinfo = id_token.verify_oauth2_token(token, google_requests.Request(), GOOGLE_CLIENT_ID)
 
-    #     try:
-    #         idinfo = client.verify_id_token(token, GOOGLE_CLIENT_ID)
+            if idinfo['iss'] not in ['accounts.google.com', 'https://accounts.google.com']:
+                raise ValueError('Wrong issuer.')
 
-    #         if idinfo['aud'] not in [GOOGLE_CLIENT_ID]:
-    #             raise crypt.AppIdentityError("Unrecognized client.")
+            google_sub = idinfo['sub']
+            print(idinfo)
+            email = idinfo.get('email')
+            first_name = idinfo.get('given_name')
+            last_name = idinfo.get('family_name')
+            username = idinfo.get('name')  # You can adjust how you set this
 
-    #         if idinfo['iss'] not in ['accounts.google.com', 'https://accounts.google.com']:
-    #             raise crypt.AppIdentityError("Wrong issuer.")
-            
-    #         userid = idinfo['sub']
-    #         email = idinfo.get('email')
-    #         name = idinfo.get('name')
-    #         # picture = idinfo.get('picture')
-            
-    #         if not idinfo.get('email_verified'):
-    #             raise ValueError('Email not verified by Google.')
+            if not idinfo.get('email_verified'):
+                raise ValueError('Email not verified by Google.')
 
-    #     except crypt.AppIdentityError:
-    #         return jsonify({'message': 'Invalid token'}), 401
+        except ValueError as e:
+            print("Google OAuth error:", e)
+            return jsonify({'message': 'Invalid token'}), 401
 
-        # user = User.query.filter_by(email=email).first()
-        # if not user:
-        #     user = User(
-        #         email=email,
-        #         username=name,
-        #         confirmed=True,
-        #     )
-        #     db.session.add(user)
-        #     db.session.commit()
-        #     login_user(user)
-        #     initialize_messages(user.id)
-        #     return jsonify({'status': "success", "message":"new_user"}), 200
-        # else:
-        #     user.username = name
-        #     user.confirmed = True
-        #     db.session.commit()
-        #     login_user(user)
-        #     return jsonify({'status': "success", "message":"existing_user"}), 200
+        user = User.query.filter_by(email=email).first()
 
+        if user:
+            # Check if user previously registered with Google
+            if user.auth_provider != 'google':
+                return jsonify({'status': "fail", "message": "Account already exists with password. Please login using email and password."}), 409
+
+            # Update google_id if missing (for legacy users)
+            if not user.google_id:
+                user.google_id = google_sub
+
+            # Optionally update first/last name if changed
+            if first_name and user.first_name != first_name:
+                user.first_name = first_name
+            if last_name and user.last_name != last_name:
+                user.last_name = last_name
+
+            user.confirmed = True
+            db.session.commit()
+            login_user(user)
+            initialize_messages(user.id)
+            user_data = {
+                'id': user.id,
+                'username': user.username,
+                'email': user.email,
+                'first_name': user.first_name,
+                'last_name': user.last_name,
+                'current_streak': user.streak_count,
+                'highest_streak': user.highest_streak
+            }
+            return jsonify({'status': "success", "message": "existing_user", "user": user_data}), 200
+
+        else:
+            # New Google user
+            user = User(
+                email=email,
+                username=username or email,
+                first_name=first_name or None,
+                last_name=last_name or None,
+                confirmed=True,
+                joined_at=datetime.utcnow(),
+                auth_provider='google',
+                google_id=google_sub,
+                password=None  # No password!
+            )
+            db.session.add(user)
+            db.session.commit()
+            login_user(user)
+            initialize_messages(user.id)
+            user_data = {
+                'id': user.id,
+                'username': user.username,
+                'email': user.email,
+                'first_name': user.first_name,
+                'last_name': user.last_name,
+                'current_streak': user.streak_count,
+                'highest_streak': user.highest_streak
+            }
+            return jsonify({'status': "success", "message": "new_user", "user": user_data}), 200

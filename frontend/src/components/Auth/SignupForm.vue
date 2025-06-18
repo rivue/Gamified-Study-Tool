@@ -1,107 +1,113 @@
+<!-- SignupForm.vue -->
 <template>
-    <h1>Signup</h1>
+    <div class="signup-form-container">
+        <h1 class="signup-title">Signup</h1>
 
-    <form @submit.prevent="handleSubmit">
-    
-        <div class="flex flex-col sm:flex-row gap-4 w-full max-w-md mb-4">
-            <div class="form-field flex-1">
-                <label for="first_name">First Name:</label>
-                <input
-                type="text"
-                id="first_name"
-                name="first_name"
-                v-model="firstName"
-                autocomplete="given-name"
-                />
+        <form @submit.prevent="handleSubmit">
+        
+            <div class="flex flex-col sm:flex-row gap-4 w-full max-w-md mb-4">
+                <div class="form-field flex-1">
+                    <label for="first_name">First Name:</label>
+                    <input
+                    type="text"
+                    id="first_name"
+                    name="first_name"
+                    v-model="firstName"
+                    autocomplete="given-name"
+                    />
+                </div>
+                <div class="form-field flex-1">
+                    <label for="last_name">Last Name:</label>
+                    <input
+                    type="text"
+                    id="last_name"
+                    name="last_name"
+                    v-model="lastName"
+                    autocomplete="family-name"
+                    />
+                </div>
             </div>
-            <div class="form-field flex-1">
-                <label for="last_name">Last Name:</label>
-                <input
-                type="text"
-                id="last_name"
-                name="last_name"
-                v-model="lastName"
-                autocomplete="family-name"
-                />
-            </div>
-        </div>
 
-    <div class="form-field">
-        <label for="new-email">Email:</label>
-        <input
-        type="text"
-        id="new-email"
-        name="new-email"
-        v-model="email"
-        autocomplete="email"
-        required
-        />
-    </div>
-    <div class="form-field">
-        <label for="username">Username: (Must be unique)</label>
-        <input
-        type="text"
-        id="username"
-        name="username"
-        v-model="username"
-        autocomplete="username"
-        required
-        />
-    </div>
-    <div class="form-field">
-        <label for="new-password">Password:</label>
-        <div class="password-input-container">
+        <div class="form-field">
+            <label for="new-email">Email:</label>
             <input
-            :type="showPassword ? 'text' : 'password'"
-            id="new-password"
-            name="new-password"
-            v-model="password"
-            autocomplete="new-password"
+            type="text"
+            id="new-email"
+            name="new-email"
+            v-model="email"
+            autocomplete="email"
             required
             />
-            <EyeIcon 
-                class="password-toggle w-7 h-7"
-                @click="togglePasswordVisibility"
-                :aria-label="showPassword ? 'Hide password' : 'Show password'"
-                v-if="showPassword"/>
-            <EyeSlashIcon 
-                class="password-toggle w-7 h-7"
-                @click="togglePasswordVisibility"
-                :aria-label="showPassword ? 'Hide password' : 'Show password'"
-                v-else/>
         </div>
-    </div>
-    <div class="form-field">
-        <label for="confirm-password">Confirm Password:</label>
-        <div class="password-input-container">
+        <div class="form-field">
+            <label for="username">Username: (Must be unique)</label>
             <input
-            :type="showPassword ? 'text' : 'password'"
-            id="confirm-password"
-            name="confirm-password"
-            v-model="confirmPassword"
-            autocomplete="new-password"
+            type="text"
+            id="username"
+            name="username"
+            v-model="username"
+            autocomplete="username"
             required
             />
-            <EyeIcon 
-                class="password-toggle w-7 h-7"
-                @click="togglePasswordVisibility"
-                :aria-label="showPassword ? 'Hide password' : 'Show password'"
-                v-if="showPassword"/>
-            <EyeSlashIcon 
-                class="password-toggle w-7 h-7"
-                @click="togglePasswordVisibility"
-                :aria-label="showPassword ? 'Hide password' : 'Show password'"
-                v-else/>
         </div>
+        <div class="form-field">
+            <label for="new-password">Password:</label>
+            <div class="password-input-container">
+                <input
+                :type="showPassword ? 'text' : 'password'"
+                id="new-password"
+                name="new-password"
+                v-model="password"
+                autocomplete="new-password"
+                required
+                />
+                <EyeIcon 
+                    class="password-toggle w-7 h-7"
+                    @click="togglePasswordVisibility"
+                    :aria-label="showPassword ? 'Hide password' : 'Show password'"
+                    v-if="showPassword"/>
+                <EyeSlashIcon 
+                    class="password-toggle w-7 h-7"
+                    @click="togglePasswordVisibility"
+                    :aria-label="showPassword ? 'Hide password' : 'Show password'"
+                    v-else/>
+            </div>
+        </div>
+        <div class="form-field">
+            <label for="confirm-password">Confirm Password:</label>
+            <div class="password-input-container">
+                <input
+                :type="showPassword ? 'text' : 'password'"
+                id="confirm-password"
+                name="confirm-password"
+                v-model="confirmPassword"
+                autocomplete="new-password"
+                required
+                />
+                <EyeIcon 
+                    class="password-toggle w-7 h-7"
+                    @click="togglePasswordVisibility"
+                    :aria-label="showPassword ? 'Hide password' : 'Show password'"
+                    v-if="showPassword"/>
+                <EyeSlashIcon 
+                    class="password-toggle w-7 h-7"
+                    @click="togglePasswordVisibility"
+                    :aria-label="showPassword ? 'Hide password' : 'Show password'"
+                    v-else/>
+            </div>
+        </div>
+        <div class="google-button-container">
+        <div ref="googleButton" class="google-button"></div>
     </div>
-    <div class="button-container">
-      <input type="submit" id="submit" :value="buttonText" />
+        <div class="button-container">
+          <input type="submit" id="submit" :value="buttonText" />
+        </div>
+      </form>
     </div>
-  </form>
 </template>
   
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onMounted, nextTick } from 'vue';
 import axios from 'axios';
 import { usePopupStore } from "@/store/popupStore";
 import { EyeIcon, EyeSlashIcon } from '@heroicons/vue/24/solid';
@@ -119,6 +125,7 @@ const password = ref("");
 const confirmPassword = ref("");
 const buttonText = ref("Sign up");
 const showPassword = ref(false);
+const googleButton = ref<HTMLDivElement | null>(null);
 
 const togglePasswordVisibility = () => {
     showPassword.value = !showPassword.value;
@@ -160,9 +167,57 @@ const handleSubmit = () => {
       buttonText.value = "Sign up";
     });
 };
+
+onMounted(async () => {
+    // Wait for the next DOM update cycle to ensure googleButton.value is available
+    await nextTick();
+
+    if (googleButton.value && typeof google !== 'undefined' && google.accounts && google.accounts.id) {
+        google.accounts.id.renderButton(
+            googleButton.value,
+            { theme: "outline", size: "large", width: "300" } 
+        );
+    } else {
+        console.error('Google Identity Services library not loaded or googleButton ref not found.');
+    }
+
+     // Load Google Sign-In
+     if (typeof window !== 'undefined' && window.google) {
+        await nextTick();
+        if (googleButton.value) {
+            window.google.accounts.id.initialize({
+                client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+                callback: handleGoogleSignIn,
+            });
+            
+            window.google.accounts.id.renderButton(googleButton.value, {
+                theme: 'outline',
+                size: 'large',
+                width: 300,
+                text: 'signin_with'
+            });
+        }
+    }
+});
 </script>
   
-<style>
+<style scoped>
+.signup-form-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: (100vh - 10px);
+}
+
+.signup-title {
+  font-size: 2rem;
+  font-weight: 800;
+  margin-bottom: 1.5rem;
+  color: var(--text-color);
+  text-align: center;
+}
+
 .button-container {
   text-align: center;
 }
@@ -174,10 +229,6 @@ form {
   width: 100%;
 }
 
-.button-container {
-    text-align: center;
-}
-
 .form-field {
   display: flex;
   flex-direction: column;
@@ -187,6 +238,7 @@ form {
   margin-bottom: 16px;
   margin-left: auto;
   margin-right: auto;
+  font-size: 16px;
 }
 
 .form-field label {
@@ -204,6 +256,7 @@ form {
   border-radius: 4px;
   width: 100%;
   box-sizing: border-box;
+  font-size: 16px;
 }
 
 .password-input-container {
@@ -224,5 +277,54 @@ form {
 
 .password-toggle:hover {
     opacity: 0.7;
+}
+
+.divider-container {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    max-width: 300px;
+    margin: 1.5rem 0 1rem 0;
+}
+
+.divider-line {
+    flex: 1;
+    height: 1px;
+    background-color: var(--text-color-secondary);
+    opacity: 0.3;
+}
+
+.divider-text {
+    margin: 0 1rem;
+    font-size: 0.875rem;
+    color: var(--text-color-secondary);
+    white-space: nowrap;
+}
+
+.google-button-container {
+    width: 100%;
+    max-width: 300px;
+    display: flex;
+    justify-content: center;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 640px) {
+  .signup-title {
+    font-size: 1.75rem;
+    margin-bottom: 1rem;
+  }
+  
+  .form-field {
+    max-width: 100%;
+    margin-bottom: 12px;
+  }
+}
+.google-button-container {
+    width: 100%;
+    max-width: 300px;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1rem;
 }
 </style>

@@ -176,7 +176,7 @@ function handleSubmit() {
     left: 0;
     color: var(--color-primary);
     font-weight: bold;
-    font-size: 1.2rem;
+    font-size: 20px;
 }
 
 .form-container {
@@ -202,7 +202,7 @@ function handleSubmit() {
     border: 1px solid rgba(26, 139, 127, 0.3);
     background-color: rgba(26, 139, 127, 0.1);
     color: var(--text-color);
-    font-size: 1rem;
+    font-size: 16px;
     resize: vertical;
     transition: all 0.2s;
     font-family: inherit;

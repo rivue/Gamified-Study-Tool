@@ -41,7 +41,7 @@
                             </label>
                             <div v-for="(node, index) in newNodeNames" :key="index"
                                 class="flex items-center gap-2 mb-2">
-                                <input v-model="newNodeNames[index]" type="text" class="w-full p-2 border rounded-lg"
+                                <input v-model="newNodeNames[index]" type="text" class="w-full p-2 border rounded-lg font-medium"
                                     style="background-color: var(--background-color-1t); color: var(--light-text); border-color: var(--color-primary-dark);"
                                     placeholder="Enter Stepping Stone name" maxlength="25" />
                                 <button v-if="newNodeNames.length > 1" @click="removeNodeName(index)"
