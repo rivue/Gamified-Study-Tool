@@ -36,7 +36,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, nextTick } from 'vue';
+import { ref, computed, onMounted, nextTick, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import LoginForm from "./LoginForm.vue";
 import SignupForm from "./SignupForm.vue";
@@ -118,6 +118,19 @@ onMounted(async () => {
     } else {
         console.error('Google Identity Services library not loaded or googleButton ref not found.');
     }
+});
+
+watch(activeForm, async (newForm) => {
+  if (newForm === 'signup' || newForm === 'login') {
+    await nextTick();
+
+    if (googleButton.value && typeof google !== 'undefined' && google.accounts && google.accounts.id) {
+      google.accounts.id.renderButton(
+        googleButton.value,
+        { theme: 'outline', size: 'large', width: '300' }
+      );
+    }
+  }
 });
 
 const toggleForms = (form: string) => {

@@ -96,6 +96,9 @@
                     v-else/>
             </div>
         </div>
+        <div class="google-button-container">
+        <div ref="googleButton" class="google-button"></div>
+    </div>
         <div class="button-container">
           <input type="submit" id="submit" :value="buttonText" />
         </div>
@@ -176,6 +179,24 @@ onMounted(async () => {
         );
     } else {
         console.error('Google Identity Services library not loaded or googleButton ref not found.');
+    }
+
+     // Load Google Sign-In
+     if (typeof window !== 'undefined' && window.google) {
+        await nextTick();
+        if (googleButton.value) {
+            window.google.accounts.id.initialize({
+                client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+                callback: handleGoogleSignIn,
+            });
+            
+            window.google.accounts.id.renderButton(googleButton.value, {
+                theme: 'outline',
+                size: 'large',
+                width: 300,
+                text: 'signin_with'
+            });
+        }
     }
 });
 </script>
@@ -298,5 +319,12 @@ form {
     max-width: 100%;
     margin-bottom: 12px;
   }
+}
+.google-button-container {
+    width: 100%;
+    max-width: 300px;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1rem;
 }
 </style>

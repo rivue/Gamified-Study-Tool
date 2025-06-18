@@ -52,11 +52,14 @@
     
     <div class="divider-container">
         <div class="divider-line"></div>
-        <span class="divider-text">Or continue with</span>
+        <span class="divider-text">or</span>
         <div class="divider-line"></div>
     </div>
     
-    <div ref="googleButton" class="google-button-container"></div>
+    <div class="google-button-container">
+        <div ref="googleButton" class="google-button"></div>
+    </div>
+
 </template>
     
 <script setup lang="ts">
@@ -65,6 +68,8 @@ import axios from 'axios';
 import { usePopupStore } from "@/store/popupStore";
 import { UserData } from "@/store/authStore";
 import { EyeIcon, EyeSlashIcon } from '@heroicons/vue/24/solid';
+import { useRouter, useRoute } from 'vue-router';
+import { useAuthStore } from "@/store/authStore";
 
 const props = defineProps<{
     toggleForms: (form: string) => void
@@ -80,6 +85,10 @@ const buttonText = ref("Login");
 const isSubmitting = ref(false);
 const showPassword = ref(false);
 const googleButton = ref<HTMLDivElement | null>(null);
+
+const router = useRouter();
+const route = useRoute();
+const authStore = useAuthStore();
 
 const togglePasswordVisibility = () => {
     showPassword.value = !showPassword.value;
@@ -125,6 +134,26 @@ const handleSubmit = () => {
         });
 };
 
+const handleGoogleSignIn = async (response: any) => {
+    const popupStore = usePopupStore();
+    try {
+        const { data } = await axios.post('/api/auth/google/callback', {
+           id_token: response.credential,
+        });
+
+        if (data.status === 'success') {
+            authStore.login(data.user);
+            const redirectPath = route.query.redirect?.toString() || '/';
+            router.push(redirectPath);
+        } else {
+            popupStore.showPopup(data.message || 'Google Sign-In failed. Please try again.');
+        }
+    } catch (error) {
+        console.error('Google Sign-In error:', error);
+        popupStore.showPopup('An error occurred during Google Sign-In. Please try again.');
+    }
+};
+
 onMounted(async () => {
     // Wait for the next DOM update cycle to ensure googleButton.value is available
     await nextTick();
@@ -136,6 +165,24 @@ onMounted(async () => {
         );
     } else {
         console.error('Google Identity Services library not loaded or googleButton ref not found.');
+    }
+
+    // Load Google Sign-In
+    if (typeof window !== 'undefined' && window.google) {
+        await nextTick();
+        if (googleButton.value) {
+            window.google.accounts.id.initialize({
+                client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+                callback: handleGoogleSignIn,
+            });
+            
+            window.google.accounts.id.renderButton(googleButton.value, {
+                theme: 'outline',
+                size: 'large',
+                width: 300,
+                text: 'signin_with'
+            });
+        }
     }
 });
 </script>
@@ -167,7 +214,6 @@ form {
     margin-bottom: 16px; /* Re-add this for spacing between fields */
     margin-left: auto; /* Keep these for horizontal centering */
     margin-right: auto;
-    font-size: 17px;
 }
 
 .form-field label {
@@ -184,7 +230,6 @@ form {
     border-radius: 4px;
     width: 100%;
     box-sizing: border-box;
-    font-size: 17px;
 }
 .password-toggle {
     position: absolute;
@@ -239,13 +284,14 @@ form {
 .divider-line {
     flex: 1;
     height: 1px;
-    background-color: var(--text-color);
+    background-color: var(--text-color-secondary);
+    opacity: 0.3;
 }
 
 .divider-text {
     margin: 0 1rem;
     font-size: 0.875rem;
-    color: var(--highlight-color);
+    color: var(--text-color-secondary);
     white-space: nowrap;
 }
 
@@ -254,5 +300,7 @@ form {
     max-width: 300px;
     display: flex;
     justify-content: center;
+    margin-bottom: 1rem;
 }
+
 </style>
