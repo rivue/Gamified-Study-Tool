@@ -96,7 +96,7 @@ function handleLeave() {
     transition: background-color 0.2s;
     top: 80px; /* Position from top of viewport */
     left: 20px; /* Position from left of viewport */
-    z-index: 120;
+    z-index: 10;
     display: flex;
     align-items: center;
     justify-content: center;
