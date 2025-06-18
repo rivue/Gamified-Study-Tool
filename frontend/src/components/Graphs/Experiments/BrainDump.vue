@@ -1,17 +1,17 @@
 <template>
     <div class="brain-dump-container">
-        <div class="fixed top-20 left-12 flex gap-6 z-10">
+        <div class="fixed top-4 left-4 flex gap-6 z-10 h-12">
             <button @click="back"
-                class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg p-4 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200"
-                style="color: var(--highlight-color);">
-                <ArrowLeftIcon class="w-6 h-6" />
+            class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg px-4 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200"
+            style="color: var(--highlight-color);">
+            <!-- <ArrowLeftIcon class="w-6 h-6" /> -->
+            Back
             </button>
         </div>
 
         <!-- Timer Display -->
         <div v-if="!gameEnded" class="timer-display">
             <div class="timer-card">
-                <span class="timer-label">Time Remaining</span>
                 <span class="timer-value">{{ formatTime(timeLeft) }}</span>
             </div>
         </div>
@@ -264,10 +264,15 @@ onUnmounted(() => {
     min-height: 100vh;
 }
 
+.game-area {
+    position: relative;
+    padding-top: 80px; /* Add space for timer */
+}
+
 .timer-display {
-    position: fixed;
-    top: 20px;
-    right: 20px;
+    position: absolute;
+    top: 0;
+    right: 0;
     z-index: 10;
 }
 
@@ -275,18 +280,14 @@ onUnmounted(() => {
     background: var(--background-color-1);
     border: 1px solid var(--color-primary);
     border-radius: 12px;
-    padding: 1rem 1.5rem;
+    padding: 0.5rem 1.5rem;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 0.5rem;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.timer-label {
-    font-size: 0.875rem;
-    color: var(--text-color-secondary);
-    font-weight: 500;
+    backdrop-filter: blur(10px); /* Adds a translucent effect */
+    /* background: rgba(255, 255, 255, 0.6); Semi-transparent white background */
 }
 
 .timer-value {
@@ -308,6 +309,7 @@ onUnmounted(() => {
     width: 100%;
     margin: 0 auto;
 }
+
 
 .results-header {
     text-align: center;
