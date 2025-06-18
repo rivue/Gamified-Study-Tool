@@ -785,14 +785,16 @@ const handleScroll = () => {
   .page-wrapper {
     padding: 2rem 4rem;      /* desktop: wider gutters */
   }
-}.map-header {
+}
+.map-header {
   position: sticky;
   top: 0;
   display: flex;
   justify-content: space-between;
-  padding: 0.5rem;
+  padding: 1rem 0.5rem;
   background: var(--background-color);
   z-index: 20;
+  margin-bottom: 1rem;
 }
 
 .overflow-x-auto {
@@ -847,7 +849,14 @@ const handleScroll = () => {
 .animate-pulse-slow {
     animation: pulse 3s ease-in-out infinite;
 }
-
+.nav-group {
+  display: flex;
+  gap: 0.75rem; /* Increase from 0.5rem */
+}
+.nav-group.left,
+.nav-group.right {
+  align-items: center;
+}
 @media (max-width: 600px) {
     .scrollContainer {
         position: static !important;
@@ -869,17 +878,21 @@ const handleScroll = () => {
      padding-bottom: 1rem;
      min-height: 50vh;
    }
+
    .map-footer {
-    position: fixed;
-    bottom: env(safe-area-inset-bottom, 0.5rem);
-    left: 0;
-    right: 0;
-    display: flex;
-    justify-content: space-between;
-    padding: 0.5rem 1rem;
-    background: var(--background-color);
-    z-index: 20;
-  }
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 1rem;
+  background: transparent; /* Remove solid background */
+  z-index: 20;
+}
+.map-footer .menu-button {
+  background-color: rgba(var(--background-color-rgb), 0.9); /* Semi-transparent */
+  backdrop-filter: blur(10px); /* Add blur effect */
+}
+  
   .map-footer .nav-group span {
     display: none;
   }
