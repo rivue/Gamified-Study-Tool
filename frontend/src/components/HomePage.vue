@@ -13,8 +13,7 @@
                 <FeaturesComponent />
             </div>
             <div class="search-bar-container">
-                <input type="text" v-model="searchQuery" @keyup.enter="handleSearch" placeholder="Search courses..."
-                    class="search-input" />
+                <input type="text" class="search-input" v-model="searchQuery" @keyup.enter="handleSearch" placeholder="Search courses..." />
                 <button @click="handleSearch" class="search-button">Start Learning Now</button>
             </div>
             <div class="dropdown-menus">
@@ -355,7 +354,7 @@ body {
     width: 70%;
     max-width: 500px;
     padding: 15px 20px;
-    font-size: 1.2em;
+    font-size: 19px;
     border: 2px solid var(--element-color-1);
     border-radius: 30px 0 0 30px;
     outline: none;
