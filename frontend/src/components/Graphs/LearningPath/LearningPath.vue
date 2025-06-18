@@ -2,48 +2,48 @@
 
     <div class="page-wrapper">
         <header class="map-header">
-        <div class="left-controls">
+            <div class="left-controls">
 
-            
-            <button @click="goToExperiments"
-                class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg p-4 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200"
-                style="color: var(--highlight-color);">
-                Brain Dump (experimental)
-            </button>
 
-            <button v-if="isOwner" @click="toggleEditMode"
-                class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg p-4 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200"
-                style="color: var(--highlight-color);">
-                <PencilIcon class="w-6 h-6" />
-            </button>
+                <button @click="goToExperiments"
+                    class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg p-4 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200"
+                    style="color: var(--highlight-color);">
+                    Brain Dump (experimental)
+                </button>
 
-            <button @click="goToLeaderboard"
-                class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg p-4 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200"
-                style="color: var(--highlight-color);">
-                <Trophy class="w-6 h-6" />
-            </button>
+                <button v-if="isOwner" @click="toggleEditMode"
+                    class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg p-4 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200"
+                    style="color: var(--highlight-color);">
+                    <PencilIcon class="w-6 h-6" />
+                </button>
 
-            <button v-if="isOwner" @click="toggleSettings"
-                class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg p-4 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200"
-                style="color: var(--highlight-color);">
-                <CogIcon class="w-6 h-6" />
-            </button>
-        </div>
+                <button @click="goToLeaderboard"
+                    class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg p-4 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200"
+                    style="color: var(--highlight-color);">
+                    <Trophy class="w-6 h-6" />
+                </button>
 
-        <div class="right-controls">
-            <button @click="goToCourseList"
-                class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg px-6 py-4 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200 font-medium"
-                style="color: var(--highlight-color);">
-                <ArrowLeftIcon class="w-6 h-6" />
-            </button>
+                <button v-if="isOwner" @click="toggleSettings"
+                    class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg p-4 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200"
+                    style="color: var(--highlight-color);">
+                    <CogIcon class="w-6 h-6" />
+                </button>
+            </div>
 
-            <button v-if="!isOwner" @click="handleLeaveCourseClick"
-                class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg p-4 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200"
-                style="color: var(--highlight-color);">
-                <span class="text-lg">Remove Course</span>
-            </button>
-        </div>
-    </header>
+            <div class="right-controls">
+                <button @click="goToCourseList"
+                    class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg px-6 py-4 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200 font-medium"
+                    style="color: var(--highlight-color);">
+                    <ArrowLeftIcon class="w-6 h-6" />
+                </button>
+
+                <button v-if="!isOwner" @click="handleLeaveCourseClick"
+                    class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg p-4 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200"
+                    style="color: var(--highlight-color);">
+                    <span class="text-lg">Remove Course</span>
+                </button>
+            </div>
+        </header>
 
         <div class="relative flex flex-col w-full h-full">
 
@@ -90,7 +90,8 @@
 
                                     <div class="relative flex-shrink-0 mx-12" :style="{
                                         transform: `translateY(${getNodeOffset(getGlobalSectionIndex(unitIndex, sectionIndex))}px)`,
-                                    }" @mouseenter="!editModeEnabled && handleNodeHover(sectionId)" @mouseleave="!editModeEnabled && handleNodeLeave()"
+                                    }" @mouseenter="!editModeEnabled && handleNodeHover(sectionId)"
+                                        @mouseleave="!editModeEnabled && handleNodeLeave()"
                                         @click="editModeEnabled ? handleEditNodeClick() : undefined">
 
                                         <DeleteSection v-if="editModeEnabled && isOwner" :section-id="sectionId"
@@ -286,13 +287,13 @@
 
                 <!-- left side -->
                 <div class="nav-group left">
-                    <button v-if="scrollPosition > 300" @click="scrollToStart(); $nextTick(handleScroll)"
+                    <button @click="scrollToStart(); $nextTick(handleScroll)"
                         class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg p-4 flex items-center gap-2 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200"
                         style="color: var(--highlight-color);">
                         <ChevronDoubleLeftIcon class="w-6 h-6" />
                         <span>To Start</span>
                     </button>
-                    <button v-if="scrollPosition > 300" @click="scroll('left'); $nextTick(handleScroll)"
+                    <button @click="scroll('left'); $nextTick(handleScroll)"
                         class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg p-4 flex items-center gap-2 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200"
                         style="color: var(--highlight-color);">
                         <ChevronLeftIcon class="w-6 h-6" />
@@ -301,12 +302,12 @@
 
                 <!-- right side -->
                 <div class="nav-group right">
-                    <button v-if="scrollPosition < (maxLeft - 300)" @click="scroll('right'); $nextTick(handleScroll)"
+                    <button @click="scroll('right'); $nextTick(handleScroll)"
                         class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg p-4 flex items-center gap-2 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200"
                         style="color: var(--highlight-color);">
                         <ChevronRightIcon class="w-6 h-6" />
                     </button>
-                    <button v-if="scrollPosition < (maxLeft - 300)" @click="scrollToEnd(); $nextTick(handleScroll)"
+                    <button @click="scrollToEnd(); $nextTick(handleScroll)"
                         class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg p-4 flex items-center gap-2 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200"
                         style="color: var(--highlight-color);">
                         <span>To End</span>
@@ -650,7 +651,7 @@ onUnmounted(() => {
         clearTimeout(scrollTimeoutId);
         console.debug("LearningPath unmounting, cleared initial scroll timeout.");
     }
-    
+
     // Clean up hover timeout
     if (hoverTimeout.value) {
         clearTimeout(hoverTimeout.value)
@@ -704,7 +705,7 @@ const handleNodeHover = (sectionId) => {
         clearTimeout(hoverTimeout.value)
         hoverTimeout.value = null
     }
-    
+
     // Set a small delay before showing tooltip to prevent flickering
     hoverTimeout.value = setTimeout(() => {
         selectedRoomId.value = sectionId
@@ -718,7 +719,7 @@ const handleNodeLeave = () => {
         clearTimeout(hoverTimeout.value)
         hoverTimeout.value = null
     }
-    
+
     // Add a small delay before hiding to allow moving to tooltip
     setTimeout(() => {
         selectedRoomId.value = null
@@ -775,26 +776,30 @@ const handleScroll = () => {
 </script>
 <style scoped>
 .page-wrapper {
-  position: fixed;
-  inset: 0;                  /* shorthand for top/right/bottom/left: 0 */
-  overflow: hidden;
-  padding: 1rem;             /* mobile: small gutters */
+    position: fixed;
+    inset: 0;
+    /* shorthand for top/right/bottom/left: 0 */
+    overflow: hidden;
+    padding: 1rem;
+    /* mobile: small gutters */
 }
 
 @media (min-width: 768px) {
-  .page-wrapper {
-    padding: 2rem 4rem;      /* desktop: wider gutters */
-  }
+    .page-wrapper {
+        padding: 2rem 4rem;
+        /* desktop: wider gutters */
+    }
 }
+
 .map-header {
-  position: sticky;
-  top: 0;
-  display: flex;
-  justify-content: space-between;
-  padding: 1rem 0.5rem;
-  background: var(--background-color);
-  z-index: 20;
-  margin-bottom: 1rem;
+    position: sticky;
+    top: 110px;
+    display: flex;
+    justify-content: space-between;
+    padding: 1rem 0.5rem;
+    background: var(--background-color);
+    z-index: 20;
+    margin-bottom: 1rem;
 }
 
 .overflow-x-auto {
@@ -808,9 +813,10 @@ const handleScroll = () => {
 
 .left-controls,
 .right-controls {
-  display: flex;
-  gap: 0.5rem;
+    display: flex;
+    gap: 0.5rem;
 }
+
 .overflow-x-auto::-webkit-scrollbar {
     display: none;
 }
@@ -849,14 +855,18 @@ const handleScroll = () => {
 .animate-pulse-slow {
     animation: pulse 3s ease-in-out infinite;
 }
+
 .nav-group {
-  display: flex;
-  gap: 0.75rem; /* Increase from 0.5rem */
+    display: flex;
+    gap: 0.75rem;
+    /* Increase from 0.5rem */
 }
+
 .nav-group.left,
 .nav-group.right {
-  align-items: center;
+    align-items: center;
 }
+
 @media (max-width: 600px) {
     .scrollContainer {
         position: static !important;
@@ -872,64 +882,80 @@ const handleScroll = () => {
         justify-content: center;
         /* center the items horizontally */
     }
-    .scrollContainer > .flex {
-     gap: 1.5rem;            /* was 6rem on desktop */
-     padding-top: 1rem;      /* was 6rem */
-     padding-bottom: 1rem;
-     min-height: 50vh;
-   }
 
-   .map-footer {
-  position: sticky;
-  bottom: 0;
-  display: flex;
-  justify-content: space-between;
-  padding: 0.5rem 1rem;
-  background: transparent; /* Remove solid background */
-  z-index: 20;
+    .scrollContainer>.flex {
+        gap: 1.5rem;
+        /* was 6rem on desktop */
+        padding-top: 1rem;
+        /* was 6rem */
+        padding-bottom: 1rem;
+        min-height: 50vh;
+    }
+
+    .map-footer {
+        position: sticky;
+        bottom: 0;
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem 1rem;
+        background: transparent;
+        /* Remove solid background */
+        z-index: 20;
+    }
+
+    .map-footer .menu-button {
+        background-color: rgba(var(--background-color-rgb), 0.9);
+        /* Semi-transparent */
+        backdrop-filter: blur(10px);
+        /* Add blur effect */
+    }
+
+    .map-footer .nav-group span {
+        display: none;
+    }
+
+    .group>.relative.w-48.h-48 {
+        width: 3.5rem;
+        height: 3.5rem;
+    }
+
 }
-.map-footer .menu-button {
-  background-color: rgba(var(--background-color-rgb), 0.9); /* Semi-transparent */
-  backdrop-filter: blur(10px); /* Add blur effect */
-}
-  
-  .map-footer .nav-group span {
-    display: none;
-  }
-  .group > .relative.w-48.h-48 {
-    width: 3.5rem;
-    height: 3.5rem;
-  }
-    
-}
- /* ── DESKTOP DEFAULT ── */
- .scrollContainer > .flex {
-   /* your original “gap-24 py-24” style */
-   gap: 6rem;
-   padding-top: 6rem;
-   padding-bottom: 6rem;
-   min-height: calc(100vh - 10rem);
- }
- @media (min-width: 601px) {
- /* ── DESKTOP FOOTER ── */
-  .map-footer {
-    position: static;
-    margin-top: 2rem;
-    padding: 0;
-    background: transparent;
-  }
-  .map-footer .nav-group span {
-    display: inline; /* show labels again */
-  }
-}
-@media (min-width: 768px) {
-  .scrollContainer > .flex {
-    padding-top: 6rem;       /* your original “py-24” */
+
+/* ── DESKTOP DEFAULT ── */
+.scrollContainer>.flex {
+    /* your original “gap-24 py-24” style */
+    gap: 6rem;
+    padding-top: 6rem;
     padding-bottom: 6rem;
     min-height: calc(100vh - 10rem);
-    gap: 6rem;
-  }
 }
+
+@media (min-width: 601px) {
+
+    /* ── DESKTOP FOOTER ── */
+    .map-footer {
+        position: static;
+        margin-top: 2rem;
+        padding: 20px;
+        margin-bottom: 4rem;
+        background: transparent;
+    }
+
+    /* .map-footer .nav-group span {
+    display: inline; 
+  } */
+}
+
+@media (min-width: 768px) {
+    .scrollContainer>.flex {
+        padding-top: 6rem;
+        /* your original “py-24” */
+        padding-bottom: 16rem;
+        min-height: calc(100vh - 10rem);
+        gap: 6rem;
+    }
+}
+
 .unit-box {
     border-top: 2px solid currentColor;
     border-bottom: 2px solid currentColor;
@@ -937,10 +963,11 @@ const handleScroll = () => {
 
 /* hide the text labels on very small screens to save space */
 @media (max-width: 480px) {
-  .map-footer .nav-group span {
-    display: none;
-  }
+    .map-footer .nav-group span {
+        display: none;
+    }
 }
+
 .unit--first {
     border-left: 2px solid currentColor;
     border-top-left-radius: 0.625rem;
