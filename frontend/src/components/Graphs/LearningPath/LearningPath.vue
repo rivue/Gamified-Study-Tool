@@ -2,7 +2,20 @@
 
     <div class="page-wrapper">
         <header class="map-header">
-            <div class="left-controls">
+            <div class="right-controls">
+                <button @click="goToCourseList"
+                    class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg px-6 py-4 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200 font-medium"
+                    style="color: var(--highlight-color);">
+                    <ArrowLeftIcon class="w-6 h-6" />
+                </button>
+
+                <button v-if="!isOwner" @click="handleLeaveCourseClick"
+                    class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg p-4 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200"
+                    style="color: var(--highlight-color);">
+                    <span class="text-lg">Remove Course</span>
+                </button>
+            </div>
+            <div class="right-controls">
 
 
                 <button @click="goToExperiments"
@@ -30,19 +43,6 @@
                 </button>
             </div>
 
-            <div class="right-controls">
-                <button @click="goToCourseList"
-                    class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg px-6 py-4 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200 font-medium"
-                    style="color: var(--highlight-color);">
-                    <ArrowLeftIcon class="w-6 h-6" />
-                </button>
-
-                <button v-if="!isOwner" @click="handleLeaveCourseClick"
-                    class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg p-4 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200"
-                    style="color: var(--highlight-color);">
-                    <span class="text-lg">Remove Course</span>
-                </button>
-            </div>
         </header>
 
         <div class="relative flex flex-col w-full h-full">
@@ -774,6 +774,7 @@ const handleScroll = () => {
 }
 
 </script>
+
 <style scoped>
 .page-wrapper {
     position: fixed;
@@ -866,7 +867,11 @@ const handleScroll = () => {
 .nav-group.right {
     align-items: center;
 }
-
+.nav-group.right {
+    display: flex;
+    gap: 0.75rem; /* Space between buttons */
+    justify-content: flex-end; /* Aligns buttons to the right */
+}
 @media (max-width: 600px) {
     .scrollContainer {
         position: static !important;
@@ -932,18 +937,29 @@ const handleScroll = () => {
 
 @media (min-width: 601px) {
 
-    /* ── DESKTOP FOOTER ── */
     .map-footer {
-        position: static;
-        margin-top: 2rem;
-        padding: 20px;
-        margin-bottom: 4rem;
-        background: transparent;
-    }
+    display: flex;
+    justify-content: space-between; /* Ensures left and right groups are on opposite sides */
+    align-items: center; /* Vertically aligns the buttons */
+    position: static; /* Keeps the footer in its normal flow */
+    margin-top: 2rem;
+    padding: 20px;
+    margin-bottom: 8rem;
+    background: transparent;
+}
 
-    /* .map-footer .nav-group span {
-    display: inline; 
-  } */
+.nav-group.left {
+    display: flex;
+    gap: 0.75rem; /* Space between buttons */
+    justify-content: flex-start; /* Aligns buttons to the left */
+}
+
+.nav-group.right {
+    display: flex;
+    gap: 0.75rem; /* Space between buttons */
+    justify-content: flex-end; /* Aligns buttons to the right */
+}
+
 }
 
 @media (min-width: 768px) {
