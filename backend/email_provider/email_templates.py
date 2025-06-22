@@ -65,7 +65,7 @@ Registration = {
                 <div class="footer">
                     <p>
                         Stay connected:<br>
-                        <a href="https://x.com/Rivueai">Twitter/X</a> | <a href="https://discord.gg/7h7DpTDc">Discord</a>
+                        <a href="https://x.com/Rivueai">Twitter/X</a> | <a href="https://discord.gg/33yAcp2qDf">Discord</a>
                     </p>
                 </div>
             </div>
@@ -152,7 +152,7 @@ PasswordReset = {
                 <div class="footer">
                     <p>
                         Stay connected:<br>
-                        <a href="https://x.com/Rivueai">Twitter/X</a> | <a href="https://discord.gg/7h7DpTDc">Discord</a>
+                        <a href="https://x.com/Rivueai">Twitter/X</a> | <a href="https://discord.gg/33yAcp2qDf">Discord</a>
                     </p>
                 </div>
             </div>
