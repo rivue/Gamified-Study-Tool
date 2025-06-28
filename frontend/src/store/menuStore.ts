@@ -28,6 +28,9 @@ export const useMenuStore = defineStore('menu', {
             this.sideMenuOpen = true;
             this.setupClickAwayListenerSideMenu();
         },
+        closeSideMenu() {  // Add new method
+            this.sideMenuOpen = false;
+        },
 
         toggleActionMenu() {
             this.actionsMenuOpen = !this.actionsMenuOpen;

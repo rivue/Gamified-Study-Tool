@@ -1,7 +1,15 @@
 <template>
+    <!-- Add overlay div that appears when menu is open -->
+    <div 
+        v-if="sideMenuOpen" 
+        class="menu-overlay"
+        @click="closeMenu"
+    ></div>
     <Transition name="slide"> 
-        <div v-if="sideMenuOpen" class="fixed top-16 right-0 w-64 h-auto z-50 p-4 rounded-l-2xl shadow-xl border"
-            style="background-color: var(--background-color); border-color: var(--color-primary-dark);">
+        <div v-if="sideMenuOpen" 
+            class="side-menu fixed top-16 right-0 w-64 h-auto p-4 rounded-l-2xl shadow-xl border"
+            style="background-color: var(--background-color); border-color: var(--color-primary-dark);"
+            @click.stop>
             <div class="space-y-3">
 
                 <!-- Menu Buttons -->
@@ -78,6 +86,10 @@ function openRoute(target: string) {
     router.push(target);
     menuStore.hideSideMenu();
 }
+
+const closeMenu = () => {
+    menuStore.hideSideMenu();
+};
 </script>
 
 <style scoped>
@@ -125,5 +137,20 @@ function openRoute(target: string) {
     background-color: var(--element-color-1);
     border-color: var(--color-primary);
     color: var(--light-text);
+}
+
+.menu-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.3);
+    z-index: 40;
+    backdrop-filter: blur(2px);
+}
+
+.side-menu {
+    z-index: 50;
 }
 </style>
