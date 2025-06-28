@@ -373,7 +373,7 @@ def init_auth_routes(app):
         if user:
             # Check if user previously registered with Google
             if user.auth_provider != 'google':
-                return jsonify({'status': "fail", "message": "Account already exists with password. Please login using email and password."}), 409
+                return jsonify({'status': "fail", "message": "Account was added with email and password, not Gmail signon. Please login using email and password."}), 409
 
             # Update google_id if missing (for legacy users)
             if not user.google_id:

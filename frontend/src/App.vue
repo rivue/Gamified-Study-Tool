@@ -12,7 +12,7 @@
         <div class="another" @scroll="onScroll">
                 <!-- Routes -->
                 <router-view v-if="shouldShowRouterView"></router-view>
-                <home-page v-else />
+                <!-- <home-page v-else /> -->
                 <InfoPopup />
                 <AdPopup />
             </div>

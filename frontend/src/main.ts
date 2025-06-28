@@ -43,7 +43,7 @@ import { showExperimentsToast } from './utils/toasts';
 
 const routes = [
     // Main routes
-    { path: '/', component: defineAsyncComponent(() => import('./components/HomePage.vue')), meta: { title: 'Rivue.ai' } },
+    // { path: '/', component: defineAsyncComponent(() => import('./components/HomePage.vue')), meta: { title: 'Rivue.ai' } },
     { path: '/explore', component: defineAsyncComponent(() => import('./components/Main/Explore.vue')), meta: { title: 'Rivue.ai' } },
     {
         name: 'GamePage',
@@ -181,6 +181,13 @@ const routes = [
 
     // Redirects
     // { path: '/lessons', redirect: '/' },
+    {
+        path: '/',
+        redirect: () => {
+            window.location.href = 'https://try.rivue.ai'; // Replace with your desired domain
+            return '/'; // Fallback to prevent errors
+        },
+    },
     // { path: '/lessons/:pathMatch(.*)*', redirect: '/' },
     { path: '/explore/:pathMatch(.*)*', redirect: '/explore' },
     { path: '/courses/:pathMatch(.*)*', redirect: '/courses' },

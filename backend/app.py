@@ -119,7 +119,6 @@ def bad_request(e):
     
 @app.after_request
 def add_cross_origin_headers(response):
-    print("this is triggered")
     response.headers['Cross-Origin-Opener-Policy'] = 'same-origin-allow-popups'
     return response
     
