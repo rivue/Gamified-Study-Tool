@@ -8,12 +8,14 @@
 
                 <!-- Info icon - positioned relative to backdrop -->
                 <div class="info-icon" @click="flipQuestion">
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <!-- <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="12" cy="12" r="11" />
                         <path d="M12 16v-4" />
                         <path d="M12 8h.01" />
                         <circle cx="12" cy="8" r="0.5" fill="currentColor" />
-                    </svg>
+                    </svg> -->
+                    <LightBulbIcon class="w-5 h-5" />
+                    hint
                 </div>
 
                 <!-- Skip button - positioned relative to backdrop, outside of shake container -->
@@ -82,6 +84,7 @@
 
 import LeaveGameWarning from "./LeaveGameWarning.vue";
 import { ref, computed } from "vue";
+import { LightBulbIcon } from "@heroicons/vue/24/solid";
 import { useRouter, useRoute } from "vue-router";
 import { useGameStore } from "@/store/gameStore";
 import stringSimilarity from "string-similarity";
@@ -283,24 +286,31 @@ const questionVisible = computed(() => store.questionVisible);
     position: absolute;
     top: 20px;
     right: 20px;
-    width: 44px;
     height: 44px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: white;
+    gap: 12px;
+    padding-right: 12px;
+    padding-left: 12px;
     background: var(--glass-bg);
     border: 1px solid var(--glass-border);
-    border-radius: 50%;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(10px);
+    min-width: 70px;
+    height: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--highlight-color);
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    backdrop-filter: blur(10px);
 }
 
 .info-icon:hover {
     background: rgba(255, 255, 255, 0.2);
-    transform: scale(1.05);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
 }
 
 .skip-btn {
