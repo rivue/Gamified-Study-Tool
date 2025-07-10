@@ -81,8 +81,9 @@ const handleGoogleSignIn = async (response: any) => {
             popupStore.showPopup(data.message || 'Google Sign-In failed. Please try again.');
         }
     } catch (error) {
+        console.log(error)
         const popupStore = usePopupStore();
-        const errorMessage = error.response?.data?.message || 'An error occurred during Google Sign-In. Please try again.';
+        const errorMessage = error.response?.data?.message || 'An error occurred during Google Sign-In. Please try again.' + error;
         popupStore.showPopup(errorMessage);
     } finally {
         loggingIn.value = false;

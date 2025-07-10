@@ -184,8 +184,8 @@ const routes = [
     {
         path: '/',
         redirect: () => {
-            window.location.href = 'https://try.rivue.ai'; // Replace with your desired domain
-            return '/'; // Fallback to prevent errors
+            window.location.href = 'https://try.rivue.ai';
+            return 'https://try.rivue.ai'; // this has to be the same as ^^^ for whatever reason
         },
     },
     // { path: '/lessons/:pathMatch(.*)*', redirect: '/' },
