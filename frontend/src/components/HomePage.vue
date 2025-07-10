@@ -107,14 +107,6 @@ const handleSearch = () => {
     }
 };
 
-const redirectLogin = () => {
-    if (authStore.loggedIn) {
-        router.push("/create");
-    } else {
-        router.push("/login");
-    }
-};
-
 const toggleDropdown = (index: number) => {
     if (activeDropdown.value === index) {
         activeDropdown.value = null;
