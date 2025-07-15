@@ -56,7 +56,8 @@
         "postinstall-postinstall": "^2.1.0",
         "ts-loader": "^9.5.2",
         "typescript": "^5.8.3",
-        "vue-loader": "^17.4.2"
+        "vue-loader": "^17.4.2",
+        "webpack-obfuscator": "^3.5.1"
     },
     "eslintConfig": {
         "root": true,
