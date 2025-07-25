@@ -182,6 +182,11 @@ const routes = [
     // Redirects
     // { path: '/lessons', redirect: '/' },
     {
+        path: '/legal',
+        component: defineAsyncComponent(() => import('./components/LegalDocuments.vue')),
+        meta: { title: 'Rivue.ai | Legal' }
+    },
+    {
         path: '/',
         redirect: () => {
             window.location.href = 'https://try.rivue.ai';
@@ -195,6 +200,7 @@ const routes = [
     // { path: '/progress/:pathMatch(.*)*', redirect: '/progress' },
     { path: '/contact/:pathMatch(.*)*', redirect: '/contact' },
     { path: '/settings/:pathMatch(.*)*', redirect: '/settings' },
+    { path: '/legal/:pathMatch(.*)*', redirect: '/legal' },
     // { path: '/terms/:pathMatch(.*)*', redirect: '/terms' },
     // { path: '/plan/:pathMatch(.*)*', redirect: '/plan' },
     { path: '/login/:pathMatch(.*)*', redirect: '/login' },
@@ -202,7 +208,7 @@ const routes = [
     // { path: '/admin/:pathMatch(.*)*', redirect: '/admin' },
 
     // Catch-all route - must be last!
-    { path: '/:pathMatch(.*)*', component: defineAsyncComponent(() => import('./components/Backstage/404.vue')), meta: { title: 'Rivue.ai' } },
+    { path: '/:pathMatch(.*)*', component: defineAsyncComponent(() => import('./components/Backstage/404.vue')), meta: { title: 'Page Not Found' }},
 
 ];
 
@@ -223,6 +229,7 @@ router.beforeEach(async (to, from, next) => {
         '/terms',
         '/contact',
         '/plan',
+        '/legal/',
         '/verify', // Explicitly add /verify as a public path
         '/verify/', // Make /verify/ a public path
     ];
@@ -276,20 +283,27 @@ router.beforeEach(async (to, from, next) => {
 
     if (authStore.loggedIn && to.path === '/login') {
         // Redirect authenticated users away from the login page
+        
         next('/');
+        console.log("a;lsdjf;laskjdf")
     } else if (!authStore.loggedIn && requiresAuth) {
         // Redirect unauthenticated users to the login page with redirect to the intended page
         next({
             path: '/login',
             query: { redirect: from.fullPath },
         });
+        console.log("a;lsdjf;laskjdf")
     } else if (to.path === '/login' && !to.query.redirect) {
+        
         // Ensure the redirect query is included when navigating to the login page from any route
         next({
             path: '/login',
             query: { redirect: from.fullPath },
         });
+        console.log("a;lsdjf;laskjdf")
     } else {
+        console.log("a;lsdjf;laskjdf")
+
         next();
     }
 

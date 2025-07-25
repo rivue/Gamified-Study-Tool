@@ -96,13 +96,18 @@
                     v-else/>
             </div>
         </div>
+        <div class="form-field terms-field">
+            <input type="checkbox" id="terms" v-model="termsAccepted" required />
+            <label for="terms">I agree to the <button type="button" @click="showLegalModal = true" class="link-button">Terms of Service and Privacy Policy</button></label>
+        </div>
         <div class="google-button-container">
         <div ref="googleButton" class="google-button"></div>
     </div>
         <div class="button-container">
-          <input type="submit" id="submit" :value="buttonText" />
+          <input type="submit" id="submit" :value="buttonText" :disabled="!termsAccepted" />
         </div>
       </form>
+      <LegalModal v-if="showLegalModal" @close="showLegalModal = false" />
     </div>
 </template>
   
@@ -112,6 +117,7 @@ import axios from 'axios';
 import { usePopupStore } from "@/store/popupStore";
 import { EyeIcon, EyeSlashIcon } from '@heroicons/vue/24/solid';
 import { maskEmailSecure } from "@/utils/general";
+import LegalModal from './LegalModal.vue';
 
 const emit = defineEmits<{
   (e: 'signupSuccess', email: string): void;
@@ -123,6 +129,8 @@ const firstName = ref("");
 const lastName = ref("");
 const password = ref("");
 const confirmPassword = ref("");
+const termsAccepted = ref(false);
+const showLegalModal = ref(false);
 const buttonText = ref("Sign up");
 const showPassword = ref(false);
 const googleButton = ref<HTMLDivElement | null>(null);
@@ -245,6 +253,25 @@ form {
   font-size: 0.9em;
   color: var(--text-color);
   align-self: flex-start;
+}
+
+.terms-field {
+    flex-direction: row;
+    align-items: center;
+}
+
+.terms-field input {
+    margin-right: 10px;
+}
+
+.link-button {
+    background: none;
+    border: none;
+    color: var(--accent-color-1);
+    cursor: pointer;
+    padding: 0;
+    font-size: inherit;
+    text-decoration: underline;
 }
 
 .form-field input[type="text"],
