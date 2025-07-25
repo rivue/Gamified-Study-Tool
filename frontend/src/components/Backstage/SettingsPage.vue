@@ -64,6 +64,10 @@
             <MenuButton label="Save Profile" @click="saveUserProfile" customClass="action-button" />
             <MenuButton label="Logout" @click="logout" customClass="danger-button" />
         </div>
+
+        <div class="profile-section" style="text-align: center;">
+            <router-link to="/legal">Terms of Service and Privacy Policy</router-link>
+        </div>
         
         <div class="profile-section">
             <p class="text-center opacity-70 pt-4">
