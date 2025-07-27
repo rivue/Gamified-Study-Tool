@@ -88,7 +88,7 @@ if app.config['FLASK_ENV'] == 'development':
     def _enable_sqlite_fk(dbapi_conn, conn_record):
         # Turn on enforcement of FOREIGN KEY constraints in SQLite
         dbapi_conn.execute("PRAGMA foreign_keys = ON;")
-        
+
 # Global error handler for all unhandled exceptions
 @app.errorhandler(Exception)
 def handle_exception(e):
@@ -198,7 +198,7 @@ init_library_routes(app)
 if app.config['FLASK_ENV'] not in ['migration', 'production']:
     with app.app_context():
         run_upgrades()
-
+        
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def serve_frontend(path):

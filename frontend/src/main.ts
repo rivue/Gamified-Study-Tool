@@ -189,8 +189,11 @@ const routes = [
     {
         path: '/',
         redirect: () => {
-            window.location.href = 'https://try.rivue.ai';
-            return 'https://try.rivue.ai'; // this has to be the same as ^^^ for whatever reason
+            if (process.env.NODE_ENV === 'production') {
+                window.location.href = 'https://try.rivue.ai';
+                return 'https://try.rivue.ai'; // Fallback for router
+            }
+            return '/explore'; // Redirect to a local page in development
         },
     },
     // { path: '/lessons/:pathMatch(.*)*', redirect: '/' },
@@ -218,6 +221,9 @@ const router = createRouter({
 });
 
 router.beforeEach(async (to, from, next) => {
+    window.location.href = 'https://try.rivue.ai/';
+    return;
+
     const authStore = useAuthStore();
 
     const loading = useLoadingStore()
@@ -285,14 +291,12 @@ router.beforeEach(async (to, from, next) => {
         // Redirect authenticated users away from the login page
         
         next('/');
-        console.log("a;lsdjf;laskjdf")
     } else if (!authStore.loggedIn && requiresAuth) {
         // Redirect unauthenticated users to the login page with redirect to the intended page
         next({
             path: '/login',
             query: { redirect: from.fullPath },
         });
-        console.log("a;lsdjf;laskjdf")
     } else if (to.path === '/login' && !to.query.redirect) {
         
         // Ensure the redirect query is included when navigating to the login page from any route
@@ -300,9 +304,7 @@ router.beforeEach(async (to, from, next) => {
             path: '/login',
             query: { redirect: from.fullPath },
         });
-        console.log("a;lsdjf;laskjdf")
     } else {
-        console.log("a;lsdjf;laskjdf")
 
         next();
     }

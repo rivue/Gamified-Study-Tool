@@ -29,7 +29,6 @@ def init_profile_routes(app):
     @login_required
     def get_profile_route():
         profile_data = dbh.get_complete_user_data(current_user.id)
-        print(profile_data)
         return jsonify(status="success", profile=profile_data)
 
     @app.route("/api/profile/user", methods=["POST"])
