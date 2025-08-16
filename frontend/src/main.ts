@@ -43,7 +43,7 @@ import { showExperimentsToast } from './utils/toasts';
 
 const routes = [
     // Main routes
-    // { path: '/', component: defineAsyncComponent(() => import('./components/HomePage.vue')), meta: { title: 'Rivue.ai' } },
+    { path: '/', component: defineAsyncComponent(() => import('./components/HomePage.vue')), meta: { title: 'Rivue.ai' } },
     { path: '/explore', component: defineAsyncComponent(() => import('./components/Main/Explore.vue')), meta: { title: 'Rivue.ai' } },
     {
         name: 'GamePage',
@@ -221,8 +221,8 @@ const router = createRouter({
 });
 
 router.beforeEach(async (to, from, next) => {
-    window.location.href = 'https://try.rivue.ai/';
-    return;
+    // window.location.href = 'https://try.rivue.ai/';
+    // return;
 
     const authStore = useAuthStore();
 

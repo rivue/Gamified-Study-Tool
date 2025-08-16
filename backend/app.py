@@ -78,7 +78,7 @@ app.config.update(
 db.init_app(app)
 migrate = Migrate(app, db)
 if os.getenv('FLASK_ENV') == 'production':
-    origins = "https://www.rivue.ai"
+    origins = ["https://www.rivue.ai", "https://rivue-s3xo7.ondigitalocean.app/"]
 else:
     origins = "*"
 CORS(app, origins=origins, supports_credentials=True)
