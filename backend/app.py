@@ -27,22 +27,23 @@ if app.config['FLASK_ENV'] != 'migration':
 
 print(f"app level secret key: {app.secret_key}")
 
-host = os.getenv('DB_HOST')
+session_pooler = True
+# if system is ipv6, do db host and db user, if ipv4 do db_host_ipv4 and db_user_ipv4
+if session_pooler:
+    host = os.getenv('DB_HOST_SESSION_POOLER')
+    user = os.getenv('DB_USER_SESSION_POOLER')
+else:
+    host = os.getenv('DB_HOST')
+    user = os.getenv('DB_USER')
+    
+password = os.getenv('DB_PASSWORD')
 port = os.getenv('SUPABASE_PORT')
 database = os.getenv('DATABASE')
-user = os.getenv('DB_USER')
-password = os.getenv('DB_PASSWORD')
-
-host_local = os.getenv('HOST_LOCAL')
-port_local = os.getenv('PORT_LOCAL')
-database_local = os.getenv('DATABASE_LOCAL')
-user_local = os.getenv('USER_LOCAL')
-password_local = os.getenv('PASSWORD_LOCAL')
 
 print(f"flask_env: {app.config['FLASK_ENV']}")
 if host and port and database and user and password and app.config["FLASK_ENV"] == "production":
     uri = f'postgresql+psycopg2://{user}:{password}@{host}:{port}/{database}'
-    
+    # DATABASE_URL=postgresql://postgres:[YOUR-PASSWORD]@db.lubdvjbtcknmyycjqyve.supabase.co:5432/postgres
 elif app.config["FLASK_ENV"] == "production":
     # throw an error because uri is not defined
     print("Database URI not defined")
@@ -57,12 +58,20 @@ print(f"SQLALCHEMY_DATABASE_URI: {app.config['SQLALCHEMY_DATABASE_URI']}")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['REMEMBER_COOKIE_DURATION'] = timedelta(days=7)
 app.config['FLASK_SECRET_KEY'] = os.getenv('FLASK_SECRET_KEY')
-app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
-    "pool_size": 5,          # how many persistent connections
-    "max_overflow": 10,      # extra connections on demand
-    "pool_timeout": 30,      # how long to wait for a connection
-    "pool_recycle": 1800     # recycle connections every 30 mins
+engine_options = {
+    "pool_size": 5,
+    "max_overflow": 10,
+    "pool_timeout": 30,
+    "pool_recycle": 1800
 }
+
+if session_pooler:
+    from sqlalchemy.pool import NullPool
+    # When using an external pooler like pgbouncer, 
+    # it's recommended to disable the application's own pooling.
+    engine_options['poolclass'] = NullPool
+
+app.config["SQLALCHEMY_ENGINE_OPTIONS"] = engine_options
 
 app.config.update(
     # SESSION_COOKIE_SECURE=True,  # for HTTPS only
