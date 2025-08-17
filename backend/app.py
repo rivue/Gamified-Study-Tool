@@ -40,6 +40,8 @@ database = os.getenv('DATABASE')
 print(f"flask_env: {app.config['FLASK_ENV']}")
 if host and port and database and user and password and app.config["FLASK_ENV"] == "production":
     uri = f'postgresql+psycopg2://{user}:{password}@{host}:{port}/{database}'
+    print(uri)
+    raise Exception(uri)
     # DATABASE_URL=postgresql://postgres:[YOUR-PASSWORD]@db.lubdvjbtcknmyycjqyve.supabase.co:5432/postgres
 elif app.config["FLASK_ENV"] == "production":
     # throw an error because uri is not defined
