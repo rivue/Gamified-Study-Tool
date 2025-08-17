@@ -1,5 +1,5 @@
 ## Old docker file (works) vvv
-Use a Python base image with Node.js for building the frontend
+# Use a Python base image with Node.js for building the frontend
 FROM python:3.11-slim
 
 # Set working directory
