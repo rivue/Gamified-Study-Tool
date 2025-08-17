@@ -1,0 +1,9 @@
+node_modules/
+.git/
+*.md
+.env*
+.vscode/
+__pycache__/
+*.pyc
+.pytest_cache/
+frontend/dist/ # Will be built inside container
