@@ -29,8 +29,8 @@ print(f"app level secret key: {app.secret_key}")
 
 session_pooler = True
 # supabase direct connection = ipv6 (I think?), supabase pooler connection = ipv4
-host = os.getenv('DB_HOST') if session_pooler else os.getenv('DB_HOST_SESSION_POOLER')
-user = os.getenv('DB_USER') if session_pooler else os.getenv('DB_USER_SESSION_POOLER')
+host = os.getenv('DB_HOST_SESSION_POOLER') if session_pooler else os.getenv('DB_HOST') 
+user = os.getenv('DB_USER_SESSION_POOLER') if session_pooler else os.getenv('DB_USER')
 
     
 password = os.getenv('DB_PASSWORD')
@@ -55,18 +55,25 @@ print(f"SQLALCHEMY_DATABASE_URI: {app.config['SQLALCHEMY_DATABASE_URI']}")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['REMEMBER_COOKIE_DURATION'] = timedelta(days=7)
 app.config['FLASK_SECRET_KEY'] = os.getenv('FLASK_SECRET_KEY')
-engine_options = {
-    "pool_size": 5,
-    "max_overflow": 10,
-    "pool_timeout": 30,
-    "pool_recycle": 1800
-}
 
 if session_pooler:
     from sqlalchemy.pool import NullPool
     # When using an external pooler like pgbouncer, 
     # it's recommended to disable the application's own pooling.
-    engine_options['poolclass'] = NullPool
+    # NullPool doesn't support pool_size, max_overflow, pool_timeout
+    engine_options = {
+        "poolclass": NullPool,
+        "pool_recycle": 1800  # This is still valid for NullPool
+    }
+else:
+    # Use normal pooling when not using session pooler
+    engine_options = {
+        "pool_size": 5,
+        "max_overflow": 10,
+        "pool_timeout": 30,
+        "pool_recycle": 1800
+    }
+
 
 app.config["SQLALCHEMY_ENGINE_OPTIONS"] = engine_options
 
