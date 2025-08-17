@@ -28,13 +28,10 @@ if app.config['FLASK_ENV'] != 'migration':
 print(f"app level secret key: {app.secret_key}")
 
 session_pooler = True
-# if system is ipv6, do db host and db user, if ipv4 do db_host_ipv4 and db_user_ipv4
-if session_pooler:
-    host = os.getenv('DB_HOST_SESSION_POOLER')
-    user = os.getenv('DB_USER_SESSION_POOLER')
-else:
-    host = os.getenv('DB_HOST')
-    user = os.getenv('DB_USER')
+# supabase direct connection = ipv6 (I think?), supabase pooler connection = ipv4
+host = os.getenv('DB_HOST') if session_pooler else os.getenv('DB_HOST_SESSION_POOLER')
+user = os.getenv('DB_USER') if session_pooler else os.getenv('DB_USER_SESSION_POOLER')
+
     
 password = os.getenv('DB_PASSWORD')
 port = os.getenv('SUPABASE_PORT')
