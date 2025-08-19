@@ -1,89 +1,58 @@
 <template>
-    <div class="rounded-2xl p-6 leaderboard-container">
-        <!-- Back Button -->
-        
-        <h2 class="text-xl font-semibold mb-6 text-center" style="color: var(--highlight-color);">Leaderboard</h2>
-        
-        <!-- Leaderboard Table -->
-        <div class="overflow-hidden rounded-lg shadow-lg border" style="border-color: var(--border-color-dark);">
-            
+    <div class="leaderboard-page">
+        <!-- Confetti Animation -->
+        <canvas id="confetti-canvas" v-show="showConfetti"></canvas>
+
+        <div class="leaderboard-container">
+            <!-- Header -->
+            <div class="leaderboard-header">
+                <h1 class="leaderboard-title">Leaderboard</h1>
+                <p class="leaderboard-subtitle">See who's on top of the game!</p>
+            </div>
+
             <!-- Loading State -->
-            <div v-if="loading" class="p-8 text-center">
-                <!-- <LottiePlayer
-                    src="https://lottie.host/9c0c9f3e-1fS9-4d07-bS20-37415505715f/c7b8gFA8A0.json"  
-                    background="transparent"
-                    speed="1"
-                    style="width: 150px; height: 150px; margin: auto;"
-                    loop
-                    autoplay
-                /> -->
-                <DotLottieVue autoplay loop
-                                src="https://lottie.host/b96a9b39-d99b-4f64-a92d-8b39aefc27ca/73Yl9OD4Tc.lottie" />
-                <p class="mt-4 text-lg" style="color: var(--text-color-secondary);">Loading leaderboard...</p>
+            <div v-if="loading" class="loading-container">
+                <DotLottieVue autoplay loop src="https://lottie.host/b96a9b39-d99b-4f64-a92d-8b39aefc27ca/73Yl9OD4Tc.lottie" />
+                <p>Loading Leaderboard...</p>
             </div>
-            
+
             <!-- Empty State -->
-            <div v-else-if="!leaderboardData || leaderboardData.length === 0 || !leaderboardData.members || leaderboardData.members.length === 0" class="p-8 text-center">
-                <p style="color: var(--text-color-secondary);">No data available to display.</p>
+            <div v-else-if="!leaderboardData || leaderboardData.length === 0 || !leaderboardData.members || leaderboardData.members.length === 0" class="empty-state">
+                <p>No data available to display.</p>
             </div>
-            
-            <!-- Leaderboard Table -->
-            <div v-else class="overflow-x-auto">
-                <table class="min-w-full divide-y" style="border-color: var(--border-color-light);">
-                    <thead style="background-color: var(--background-color-2);">
-                        <tr>
-                            <th scope="col" class="px-4 py-3 text-center text-xs font-medium uppercase tracking-wider" style="color: var(--text-color-primary);">Rank</th>
-                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider" style="color: var(--text-color-primary);">User</th>
-                            <th scope="col" class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider" style="color: var(--text-color-primary);">Points</th>
-                            <th scope="col" class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider th-completed" style="color: var(--text-color-primary);">Completed</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y" style="background-color: var(--background-color); border-color: var(--border-color-light);">
-                        <tr v-for="(entry, index) in leaderboardData.members" :key="entry.username"
-                            class="transition-all duration-300 ease-in-out user-row"
-                            :class="{
-                                'current-user-highlight': entry.username === currentUsername,
-                                'top-rank': index < 3
-                            }"
-                            :style="{ '--user-rank-color': getRankColor(index) }">
-                            
-                            <td class="px-4 py-3 whitespace-nowrap text-center">
-                                <div class="flex items-center justify-center">
-                                    <Trophy v-if="index === 0" class="h-6 w-6 icon-rank" :style="{ color: 'var(--user-rank-color)' }" />
-                                    <Award v-else-if="index === 1" class="h-6 w-6 icon-rank" :style="{ color: 'var(--user-rank-color)' }" />
-                                    <Medal v-else-if="index === 2" class="h-6 w-6 icon-rank" :style="{ color: 'var(--user-rank-color)' }" />
-                                    <span v-else class="font-medium text-lg rank-text" :style="{ color: 'var(--text-color-secondary)'}">{{ index + 1 }}</span>
-                                </div>
-                            </td>
-                                 
-                            <td class="px-4 py-3 whitespace-nowrap">
-                                <div class="flex items-center">
-                                    <!-- <img :src="entry.avatarUrl || defaultAvatar" alt="avatar" class="h-10 w-10 rounded-full mr-3 border-2" :style="{ borderColor: entry.username === currentUsername ? 'var(--highlight-color)' : 'var(--border-color-light)' }"/> -->
-                                    <div class="truncate">
-                                        <span class="font-semibold text-lg user-name" :style="{ color: entry.username === currentUsername ? 'var(--highlight-color)' : 'var(--text-color-primary)' }">{{ entry.name || entry.username }}</span>
-                                        <span v-if="entry.username === currentUsername" class="ml-2 text-xs px-2 py-0.5 rounded-full font-medium user-tag"
-                                              style="background-color: var(--highlight-color); color: var(--background-color);">You</span>
-                                    </div>
-                                </div>
-                            </td>
 
-                            <td class="px-4 py-3 whitespace-nowrap text-right font-medium text-lg score-text" :style="{ color: 'var(--text-color-primary)' }">
-                                {{ entry.points || 0 }}
-                            </td>
+            <!-- Leaderboard Content -->
+            <div v-else>
+                <!-- Top 3 Users -->
+                <div class="top-three-container">
+                    <div v-for="(user, index) in topThree" :key="user.username" :class="['rank-card', 'rank-' + (index + 1)]">
+                        <div class="rank-badge">{{ index + 1 }}</div>
+                        <img :src="user.avatarUrl || defaultAvatar" alt="avatar" class="rank-avatar">
+                        <p class="rank-name">{{ user.name || user.username }}</p>
+                        <p class="rank-points">{{ user.points || 0 }} pts</p>
+                    </div>
+                </div>
 
-                            <td class="px-4 py-3 whitespace-nowrap text-right text-sm completed-text" :style="{ color: 'var(--text-color-secondary)' }">
-                                {{ entry.lessons_completed_count || 0 }} lessons
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                <!-- Other Users -->
+                <ul class="leaderboard-list">
+                    <li v-for="(user, index) in otherUsers" :key="user.username" class="leaderboard-item" :class="{ 'current-user-highlight': user.username === currentUsername }">
+                        <div class="user-rank">{{ index + 4 }}</div>
+                        <img :src="user.avatarUrl || defaultAvatar" alt="avatar" class="user-avatar">
+                        <div class="user-info">
+                            <p class="user-name">{{ user.name || user.username }}</p>
+                            <span v-if="user.username === currentUsername" class="user-tag">You</span>
+                        </div>
+                        <div class="user-points">{{ user.points || 0 }} pts</div>
+                    </li>
+                </ul>
             </div>
-        </div>
-                
-        <div class="mt-8 text-center back-button-container">
-            <router-link :to="`/lessons/${libraryId}`" class="back-to-library-link inline-flex items-center px-6 py-3 rounded-lg text-lg font-medium transition-colors shadow-md hover:shadow-lg" style="background-color: var(--highlight-color); color: var(--background-color);">
-                <ArrowLeftCircle class="h-5 w-5 mr-2" /> Back to Library
-            </router-link>
+
+            <!-- Back Button -->
+            <div class="back-button-container">
+                <router-link :to="`/lessons/${libraryId}`" class="back-to-library-link">
+                    <ArrowLeftCircle class="h-5 w-5 mr-2" /> Back to Library
+                </router-link>
+            </div>
         </div>
     </div>
 </template>
@@ -93,202 +62,261 @@ import { ref, onMounted, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import axios from 'axios';
 import { useAuthStore } from '@/store/authStore';
-import { DotLottieVue } from '@lottiefiles/dotlottie-vue'
-import { Trophy, Award, Medal, ArrowLeftCircle } from 'lucide-vue-next';
+import { DotLottieVue } from '@lottiefiles/dotlottie-vue';
+import { ArrowLeftCircle } from 'lucide-vue-next';
+import confetti from 'canvas-confetti';
 
 // State variables
 const authStore = useAuthStore();
-const leaderboardData = ref<any>([]); // Using any for now, define a proper type later
+const leaderboardData = ref<any>({ members: [] });
 const loading = ref(true);
-// const sortCriteria = ref('score'); // Kept for potential future use
-// const showFilterModal = ref(false); // Kept for potential future use
-// const selectedTimePeriod = ref('week'); // Kept for potential future use
-// const highlightCurrentUser = ref(true); // Kept for potential future use
-
 const route = useRoute();
 const libraryId = ref(route.params.libraryId);
 const currentUsername = computed(() => authStore.username);
+const showConfetti = ref(false);
+
+const defaultAvatar = 'https://i.pravatar.cc/150?u=a042581f4e29026704d';
+
+// Computed properties for top 3 and other users
+const topThree = computed(() => leaderboardData.value.members.slice(0, 3));
+const otherUsers = computed(() => leaderboardData.value.members.slice(3));
 
 // Fetch leaderboard data
 const fetchLeaderboard = async () => {
     loading.value = true;
     try {
-        const response = await axios.get(`/api/library/${libraryId.value}/scores`, {
-            params: {
-                // No specific params needed for now based on current implementation
-            }
-        });
-        // Assuming the API returns data in the structure { members: [...] }
-        // And members are already sorted by score_sum descending
+        const response = await axios.get(`/api/library/${libraryId.value}/scores`);
         leaderboardData.value = response.data;
+        checkConfetti();
     } catch (error) {
         console.error('Error fetching leaderboard:', error);
-        leaderboardData.value = { members: [] }; // Ensure members array exists even on error
+        leaderboardData.value = { members: [] };
     } finally {
         loading.value = false;
     }
 };
 
-const getRankColor = (index: number) => {
-    if (index === 0) return 'var(--gold-color, #FFD700)';
-    if (index === 1) return 'var(--silver-color, #C0C0C0)';
-    if (index === 2) return 'var(--bronze-color, #CD7F32)';
-    return 'var(--text-color-secondary)';
+// Trigger confetti if the current user is in the top 3
+const checkConfetti = () => {
+    const currentUserRank = leaderboardData.value.members.findIndex(
+        (user: any) => user.username === currentUsername.value
+    );
+    if (currentUserRank !== -1 && currentUserRank < 3) {
+        showConfetti.value = true;
+        const canvas = document.getElementById('confetti-canvas') as HTMLCanvasElement;
+        if(canvas) {
+            const myConfetti = confetti.create(canvas, {
+                resize: true,
+                useWorker: true,
+            });
+            myConfetti({
+                particleCount: 150,
+                spread: 60,
+            });
+        }
+    }
 };
 
-// Initialize component
 onMounted(() => {
     fetchLeaderboard();
 });
 </script>
 
 <style scoped>
+.leaderboard-page {
+    background: linear-gradient(135deg, #1e1e2f 0%, #1d1b31 100%);
+    min-height: 100vh;
+    padding: 2rem;
+    color: #fff;
+}
+
 .leaderboard-container {
-    background-color: var(--background-color); /* Use site's main background */
-    color: var(--text-color-primary); /* Use site's primary text color */
-    max-width: 900px; /* Slightly wider for better table layout */
-    margin: 2rem auto; /* Add more margin for better page centering */
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08); /* Softer shadow */
+    max-width: 800px;
+    margin: auto;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
 }
 
-/* Table specific styles */
-table {
-    width: 100%;
-    border-collapse: collapse; /* Ensures borders are neat */
+.leaderboard-header {
+    text-align: center;
+    margin-bottom: 2rem;
 }
 
-th, td {
-    padding: 1rem 1rem; /* Standardized padding */
-    vertical-align: middle; /* Align content vertically */
-    transition: background-color 0.2s ease-in-out;
+.leaderboard-title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    text-shadow: 0 0 10px #fff, 0 0 20px #ff00ff, 0 0 30px #00ffff;
 }
 
-th {
-    background-color: var(--background-color-2t); /* Slightly different background for header */
-    color: var(--text-color-secondary); /* Header text color */
-    font-weight: 600; /* Bolder header text */
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
+.leaderboard-subtitle {
+    font-size: 1.2rem;
+    color: #a9a9c4;
 }
 
-.user-row:hover {
-    background-color: var(--background-color-hover, rgba(var(--highlight-color-rgb, 79, 70, 229), 0.05)); /* Subtle hover */
+.loading-container, .empty-state {
+    text-align: center;
+    padding: 4rem 0;
+}
+
+.top-three-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.rank-card {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    padding: 1.5rem;
+    text-align: center;
+    transition: transform 0.3s ease;
+    width: 150px;
+}
+
+.rank-card:hover {
+    transform: translateY(-10px);
+}
+
+.rank-1 {
+    order: 2;
+    width: 180px;
+    padding-bottom: 2.5rem;
+    background: linear-gradient(145deg, #ffdf00, #d4af37);
+    color: #000;
+}
+
+.rank-2 {
+    order: 1;
+    width: 160px;
+    background: linear-gradient(145deg, #c0c0c0, #a9a9a9);
+    color: #000;
+}
+
+.rank-3 {
+    order: 3;
+    width: 160px;
+    background: linear-gradient(145deg, #cd7f32, #a0522d);
+    color: #000;
+}
+
+.rank-badge {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+}
+
+.rank-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 3px solid #fff;
+    margin: 0 auto 1rem;
+}
+
+.rank-name {
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.rank-points {
+    font-size: 1rem;
+}
+
+.leaderboard-list {
+    list-style: none;
+    padding: 0;
+}
+
+.leaderboard-item {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    margin-bottom: 0.5rem;
+    transition: background-color 0.3s ease;
+}
+
+.leaderboard-item:hover {
+    background: rgba(255, 255, 255, 0.1);
 }
 
 .current-user-highlight {
-    background-color: var(--highlight-color-translucent, rgba(var(--highlight-color-rgb, 79, 70, 229), 0.1)) !important; /* More subtle highlight */
-    border-left: 5px solid var(--highlight-color); /* Prominent left border */
+    background: rgba(0, 255, 255, 0.2);
+    border: 1px solid #00ffff;
 }
 
-.current-user-highlight td:first-child {
-    padding-left: calc(1rem - 5px); /* Adjust for border */
+.user-rank {
+    font-size: 1.2rem;
+    font-weight: bold;
+    width: 40px;
+    text-align: center;
 }
 
-
-.current-user-highlight .user-name,
-.current-user-highlight .score-text {
-    color: var(--highlight-color) !important;
-    font-weight: 600;
+.user-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin: 0 1rem;
 }
 
-.icon-rank {
-    height: 1.75rem; /* Slightly larger icons */
-    width: 1.75rem;
-}
-.rank-text {
-    font-size: 1.125rem; /* lg */
+.user-info {
+    flex-grow: 1;
 }
 
 .user-name {
-    font-size: 1.125rem; /* lg */
+    font-weight: bold;
 }
+
 .user-tag {
-    font-size: 0.75rem; /* xs */
-    padding: 0.125rem 0.5rem; /* py-0.5 px-2 */
+    background: #00ffff;
+    color: #1e1e2f;
+    padding: 0.2rem 0.5rem;
+    border-radius: 5px;
+    font-size: 0.8rem;
+    margin-left: 0.5rem;
 }
 
-.score-text {
-     font-size: 1.125rem; /* lg */
-}
-.completed-text {
-    font-size: 0.875rem; /* sm */
+.user-points {
+    font-size: 1.1rem;
+    font-weight: bold;
 }
 
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-    .leaderboard-container {
-        margin: 1rem;
-        padding: 1rem; /* Reduced padding on smaller screens */
-    }
-
-    h2 {
-        font-size: 1.25rem; /* Reduced heading size */
-        margin-bottom: 1rem;
-    }
-
-    th, td {
-        padding: 0.75rem 0.5rem; /* Reduced cell padding */
-        font-size: 0.875rem; /* Smaller font for table content */
-    }
-    .icon-rank {
-        height: 1.25rem;
-        width: 1.25rem;
-    }
-    .rank-text, .user-name, .score-text {
-        font-size: 0.9rem;
-    }
-    .completed-text, .user-tag {
-        font-size: 0.7rem;
-    }
-
-    /* Hide "lessons" text part on very small screens if necessary */
-    .th-completed {
-        /* Consider hiding or abbreviating if space is very tight */
-    }
-    .completed-text span.lessons-suffix {
-         display: none; /* Example: hide " lessons" text */
-    }
-
-    .back-to-library-link {
-        padding: 0.5rem 1rem;
-        font-size: 0.875rem;
-    }
-    .back-to-library-link .h-5 { /* Target icon if needed */
-        height: 1rem;
-        width: 1rem;
-        margin-right: 0.25rem;
-    }
-
-     .overflow-x-auto {
-        overflow-x: auto; /* Ensure table scrolls horizontally if it's too wide */
-    }
+.back-button-container {
+    text-align: center;
+    margin-top: 2rem;
 }
 
-@media (max-width: 480px) {
-    .user-name {
-        max-width: 100px; /* Limit width of user name to prevent overflow */
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-    .th-completed, .completed-text {
-      /* Example: Make 'Completed' column less prominent or hide on very small screens */
-      /* display: none; */ /* Uncomment to hide */
-    }
+.back-to-library-link {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.8rem 1.5rem;
+    background: #00ffff;
+    color: #1e1e2f;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
 }
 
-/* Define rank colors if not globally available in :root of a global stylesheet */
-/* These are already defined in the previous step, but good to have them here for context if this style block was separate */
-:root {
-    --gold-color: #FFD700;
-    --silver-color: #C0C0C0;
-    --bronze-color: #CD7F32;
-    --highlight-color-translucent: rgba(var(--highlight-color-rgb, 79, 70, 229), 0.15);
+.back-to-library-link:hover {
+    background: #00cccc;
 }
 
-.animate-spin {
-    border-color: var(--highlight-color);
-    border-bottom-color: transparent;
+#confetti-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+    pointer-events: none;
 }
 </style>
