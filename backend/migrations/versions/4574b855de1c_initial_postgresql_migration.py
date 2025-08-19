@@ -1,8 +1,8 @@
-"""initial migration
+"""Initial PostgreSQL migration.
 
-Revision ID: f6e9c2d42fbd
+Revision ID: 4574b855de1c
 Revises: 
-Create Date: 2025-03-27 00:40:49.307705
+Create Date: 2025-08-18 20:51:36.333809
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'f6e9c2d42fbd'
+revision = '4574b855de1c'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -38,8 +38,14 @@ def upgrade():
     op.create_table('user',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('username', sa.String(length=50), nullable=False),
+    sa.Column('first_name', sa.String(length=25), nullable=True),
+    sa.Column('last_name', sa.String(length=25), nullable=True),
     sa.Column('password', sa.String(length=200), nullable=True),
     sa.Column('email', sa.String(length=100), nullable=False),
+    sa.Column('timezone', sa.String(length=50), server_default='UTC', nullable=False),
+    sa.Column('joined_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
+    sa.Column('auth_provider', sa.String(length=20), nullable=False),
+    sa.Column('google_id', sa.String(length=100), nullable=True),
     sa.Column('mentor_name', sa.String(length=100), nullable=True),
     sa.Column('system_role', sa.String(length=100), nullable=True),
     sa.Column('profile', sa.Text(), nullable=True),
@@ -49,12 +55,18 @@ def upgrade():
     sa.Column('tier', sa.String(length=50), nullable=True),
     sa.Column('daily_request_count', sa.Integer(), nullable=True),
     sa.Column('last_request_time', sa.DateTime(), nullable=True),
+    sa.Column('streak_count', sa.Integer(), nullable=False),
+    sa.Column('last_streak_date', sa.Date(), nullable=True),
+    sa.Column('highest_streak', sa.Integer(), nullable=False),
     sa.Column('violation_count', sa.Integer(), nullable=True),
     sa.Column('confirmed', sa.Boolean(), nullable=True),
     sa.Column('confirmation_token', sa.String(length=100), nullable=True),
     sa.Column('confirm_sent_at', sa.DateTime(), nullable=True),
+    sa.Column('password_reset_token', sa.String(length=100), nullable=True),
+    sa.Column('password_reset_sent_at', sa.DateTime(), nullable=True),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('email'),
+    sa.UniqueConstraint('google_id'),
     sa.UniqueConstraint('username')
     )
     op.create_table('challenge',
@@ -79,19 +91,23 @@ def upgrade():
     )
     op.create_table('library',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('user_id', sa.Integer(), nullable=True),
+    sa.Column('owner_id', sa.Integer(), nullable=False),
+    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
     sa.Column('library_topic', sa.String(length=200), nullable=False),
     sa.Column('difficulty', sa.String(length=50), nullable=False),
     sa.Column('guide', sa.String(length=50), nullable=False),
     sa.Column('language', sa.String(length=50), nullable=False),
     sa.Column('language_difficulty', sa.String(length=50), nullable=False),
     sa.Column('context', sa.String(length=200), nullable=True),
+    sa.Column('is_public', sa.Boolean(), nullable=False),
+    sa.Column('join_code', sa.String(length=8), nullable=True),
     sa.Column('clicks', sa.Integer(), nullable=True),
     sa.Column('likes', sa.Integer(), nullable=True),
     sa.Column('room_names', sa.JSON(), nullable=False),
     sa.Column('image_url', sa.String(length=200), nullable=False),
-    sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
-    sa.PrimaryKeyConstraint('id')
+    sa.ForeignKeyConstraint(['owner_id'], ['user.id'], ),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('join_code')
     )
     op.create_table('user_achievement',
     sa.Column('id', sa.Integer(), nullable=False),
@@ -145,26 +161,36 @@ def upgrade():
     sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_table('library_factoid',
-    sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('library_id', sa.Integer(), nullable=False),
-    sa.Column('room_name', sa.String(length=200), nullable=False),
-    sa.Column('lesson_name', sa.String(length=200), nullable=False),
-    sa.Column('factoid_content', sa.Text(), nullable=False),
-    sa.ForeignKeyConstraint(['library_id'], ['library.id'], ),
-    sa.PrimaryKeyConstraint('id')
-    )
-    op.create_table('library_room_state',
+    op.create_table('library_favorites',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=False),
     sa.Column('library_id', sa.Integer(), nullable=False),
-    sa.Column('room_name', sa.String(length=200), nullable=False),
-    sa.Column('num_lessons', sa.Integer(), nullable=False),
-    sa.Column('lesson_state', sa.Integer(), nullable=False),
+    sa.Column('is_favorited', sa.Boolean(), nullable=False),
     sa.ForeignKeyConstraint(['library_id'], ['library.id'], ),
     sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
-    sa.PrimaryKeyConstraint('id')
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('user_id', 'library_id', name='uq_user_library_fav')
     )
+    op.create_table('library_membership',
+    sa.Column('user_id', sa.Integer(), nullable=False),
+    sa.Column('library_id', sa.Integer(), nullable=False),
+    sa.Column('joined_at', sa.DateTime(), server_default=sa.text('now()'), nullable=True),
+    sa.ForeignKeyConstraint(['library_id'], ['library.id'], ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['user_id'], ['user.id'], ondelete='CASCADE'),
+    sa.PrimaryKeyConstraint('user_id', 'library_id')
+    )
+    op.create_table('library_unit',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('library_id', sa.Integer(), nullable=False),
+    sa.Column('unit_name', sa.String(length=200), nullable=False),
+    sa.Column('position', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['library_id'], ['library.id'], ),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('library_id', 'position', name='uq_library_unit_position')
+    )
+    with op.batch_alter_table('library_unit', schema=None) as batch_op:
+        batch_op.create_index(batch_op.f('ix_library_unit_position'), ['position'], unique=False)
+
     op.create_table('user_action',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=False),
@@ -172,6 +198,43 @@ def upgrade():
     sa.Column('action', sa.String(length=100), nullable=False),
     sa.ForeignKeyConstraint(['lesson_id'], ['lesson.id'], ),
     sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_table('library_section',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('unit_id', sa.Integer(), nullable=False),
+    sa.Column('section_name', sa.String(length=200), nullable=False),
+    sa.Column('position', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['unit_id'], ['library_unit.id'], name='fk_library_section__unit_id', ondelete='CASCADE'),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('unit_id', 'position', name='uq_unit_section_position')
+    )
+    with op.batch_alter_table('library_section', schema=None) as batch_op:
+        batch_op.create_index(batch_op.f('ix_library_section_position'), ['position'], unique=False)
+
+    op.create_table('library_factoid',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('library_id', sa.Integer(), nullable=True),
+    sa.Column('room_name', sa.String(length=200), nullable=True),
+    sa.Column('section_id', sa.Integer(), nullable=True),
+    sa.Column('lesson_name', sa.String(length=200), nullable=False),
+    sa.Column('factoid_content', sa.Text(), nullable=False),
+    sa.ForeignKeyConstraint(['library_id'], ['library.id'], ),
+    sa.ForeignKeyConstraint(['section_id'], ['library_section.id'], ondelete='CASCADE'),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_table('library_room_state',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('user_id', sa.Integer(), nullable=False),
+    sa.Column('library_id', sa.Integer(), nullable=False),
+    sa.Column('room_name', sa.String(length=200), nullable=False),
+    sa.Column('section_id', sa.Integer(), nullable=True),
+    sa.Column('num_lessons', sa.Integer(), nullable=False),
+    sa.Column('lesson_state', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['library_id'], ['library.id'], ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['section_id'], ['library_section.id'], ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['user_id', 'library_id'], ['library_membership.user_id', 'library_membership.library_id'], ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['user_id'], ['user.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('library_question',
@@ -198,9 +261,19 @@ def downgrade():
     # ### commands auto generated by Alembic - please adjust! ###
     op.drop_table('library_question_choice')
     op.drop_table('library_question')
-    op.drop_table('user_action')
     op.drop_table('library_room_state')
     op.drop_table('library_factoid')
+    with op.batch_alter_table('library_section', schema=None) as batch_op:
+        batch_op.drop_index(batch_op.f('ix_library_section_position'))
+
+    op.drop_table('library_section')
+    op.drop_table('user_action')
+    with op.batch_alter_table('library_unit', schema=None) as batch_op:
+        batch_op.drop_index(batch_op.f('ix_library_unit_position'))
+
+    op.drop_table('library_unit')
+    op.drop_table('library_membership')
+    op.drop_table('library_favorites')
     op.drop_table('library_completion')
     op.drop_table('feedback')
     op.drop_table('chat_history')

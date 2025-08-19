@@ -38,16 +38,14 @@ port = os.getenv('SUPABASE_PORT')
 database = os.getenv('DATABASE')
 
 print(f"flask_env: {app.config['FLASK_ENV']}")
-if host and port and database and user and password and app.config["FLASK_ENV"] == "production":
+if app.config["FLASK_ENV"] == "production":
+    if not all([host, port, database, user, password]):
+        print("Production database environment variables not fully set.")
+        raise Exception("Production database environment variables not fully set.")
     uri = f'postgresql+psycopg2://{user}:{password}@{host}:{port}/{database}'
-    # DATABASE_URL=postgresql://postgres:[YOUR-PASSWORD]@db.lubdvjbtcknmyycjqyve.supabase.co:5432/postgres
-elif app.config["FLASK_ENV"] == "production":
-    # throw an error because uri is not defined
-    print("Database URI not defined")
-    raise Exception("Database URI not defined")
-
 else:
-    uri = 'sqlite:///app.db'
+    # Default to local Supabase Postgres instance for development
+    uri = 'postgresql+psycopg2://postgres:postgres@127.0.0.1:54322/postgres' 
 
 # os.makedirs("instance", exist_ok=True)
 app.config['SQLALCHEMY_DATABASE_URI'] = uri
@@ -96,11 +94,7 @@ else:
     origins = "*"
 CORS(app, origins=origins, supports_credentials=True)
 
-if app.config['FLASK_ENV'] == 'development':
-    @event.listens_for(Engine, "connect")
-    def _enable_sqlite_fk(dbapi_conn, conn_record):
-        # Turn on enforcement of FOREIGN KEY constraints in SQLite
-        dbapi_conn.execute("PRAGMA foreign_keys = ON;")
+
 
 # Global error handler for all unhandled exceptions
 @app.errorhandler(Exception)
