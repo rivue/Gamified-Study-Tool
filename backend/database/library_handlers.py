@@ -299,27 +299,32 @@ def get_library(library_id, user_id=None, click=True):
     return jsonify(library_data)
 
 def get_library_scores(library_id):
-    
-    # TODO: update once I implement a points system
-
     try:
-
-        memberships = LibraryMembership.query.filter_by(library_id=library_id).options(
-            joinedload(LibraryMembership.user)
-        ).all()
+        memberships = (
+            LibraryMembership.query.filter_by(library_id=library_id)
+            .join(User)
+            .order_by(LibraryMembership.points.desc())
+            .options(joinedload(LibraryMembership.user))
+            .all()
+        )
 
         if not memberships:
             return jsonify({'error': 'No memberships found for the given library'}), 404
 
         member_list = [
-            {'username': membership.user.username}
-            for membership in memberships if membership.user
+            {
+                'username': membership.user.username,
+                'name': membership.user.first_name,
+                'points': membership.points or 0,
+            }
+            for membership in memberships
+            if membership.user
         ]
 
         return jsonify(member_list)
-    
+
     except Exception as e:
-        print("no")
+        print(f"Error in get_library_scores: {e}")
         return jsonify({'error': str(e)}), 500
     
 def get_library_details(library_id):
@@ -358,6 +363,25 @@ def get_library_room_state(user_id, library_id, section_id=None):
         print(f"{state}")
 
         return state.as_dict() if state else None
+
+def add_points_to_member(user_id, library_id, questions_right, total_questions):
+    if total_questions == 0:
+        return # Avoid division by zero
+
+    membership = LibraryMembership.query.filter_by(
+        user_id=user_id, library_id=library_id
+    ).first()
+
+    if not membership:
+        print(f"Warning: Could not find membership for user {user_id} in library {library_id} to add points.")
+        return
+
+    points_to_add = math.floor(100 * (questions_right / total_questions))
+    
+    if points_to_add > 0:
+        membership.points = (membership.points or 0) + points_to_add
+        db.session.commit()
+
 
 def save_library_room_contents(library_id, section_unit_map, section_contents_map, user_id):
 
@@ -555,8 +579,6 @@ def retrieve_library_room_contents(library_id, section_id, user_id):
         if not curr_state:
             return None
         
-        print("after curr_state check")
-        
         if curr_state["lesson_state"] > curr_state["num_lessons"]:
             # User has completed all lessons, randomly get 7-9 factoids
 
@@ -574,13 +596,9 @@ def retrieve_library_room_contents(library_id, section_id, user_id):
                 section_id=section_id, lesson_name=f"factoid_set_{curr_state['lesson_state']}"
             ).all()
         
-        print(f"length of factoids: {len(factoids)}")
-
         if len(factoids) < 3:
             return None
         
-        print(f"factoids: {factoids}")
-
         room_contents = []
         for factoid in factoids:
             questions = []

@@ -196,7 +196,6 @@ def moderate(user_input):
 ##### EMBEDDINGS #####
 
 def get_embeddings(strings_list):
-    # print(f"embedding {strings_list}")
     if not strings_list:
         return None
     headers = {

@@ -214,46 +214,36 @@ def init_library_routes(app):
         try:
 
             library_topic = request.args.get("library_topic", None)
-            print("before user_id")
             user_id = current_user.id if not isinstance(current_user, AnonymousUserMixin) else None
 
-            print("after user_id")
             library = lbh.get_library(library_id, user_id)
             if not library:
                 return jsonify(status="error", message="Library not found"), 404
-            print("before room_data check")
 
             # Check if the library has a default image and possibly trigger image generation
             response, status_code = lbh.has_default_image(library_id)
-            print("before room_data check")
 
             if status_code != 200:
                 return response
-            print("before room_data check")
             
             # If there's a default image and the click count is divisible by 4, queue up image generation
             if response.json['has_default_image'] and library.get_json().get("clicks") % 4 == 0:
                 executor.submit(generate_images_task, library_id)
-            print("before room_data check")
             
             # Retrieve library data
             library_data = library.get_json()
-            print("before room_data check")
 
             # Attempt to retrieve existing room contents
             room_data = None
             if library_topic:
-                print("before unit_id, section_id")
-                unit_id, section_id = library_data.get('section_to_unit_map').get(library_topic)
-                print("before room_data")
-                print(f"unit_id: {unit_id}, section_id: {section_id}")
+                # _ is unit_id
+                _, section_id = library_data.get('section_to_unit_map').get(library_topic)
                 room_data = lbh.retrieve_library_room_contents(library_id, section_id, user_id)
-                print("before room_data check")
+                print("check")
                 if not room_data:
                     return jsonify(status="error", message="Room not found"), 404
             else:
                 room_data = lbh.get_library_room_state(user_id, library_id)
-            print("before library_data")
             library_data["show_settings"] = user_id == library_data.get("owner_id")
             
             return jsonify(status="success", data=library_data, room_data=room_data)
@@ -580,21 +570,27 @@ def init_library_routes(app):
         data = request.get_json()
         library_id = data.get('libraryId')
         section_id = data.get('sectionId')
+        questions_right_on_first_try = data.get('questionsRightOnFirstTry')
+        total_questions = data.get('totalQuestions')
 
-        # score = data.get('score')
-        # time = data.get('time')
-        # completed_rooms = data.get('completed', []) 
-        
         user_id = current_user.id if not isinstance(current_user, AnonymousUserMixin) else None
 
         if not user_id:
             return jsonify({'status': 'error', 'message': "Not logged in..."}), 401
         
-        if library_id is None: # or score is None:
-            return jsonify({'status': 'error', 'message': 'Missing libraryId or score'}), 400
+        if library_id is None:
+            return jsonify({'status': 'error', 'message': 'Missing libraryId'}), 400
+        print("questions_right:", questions_right_on_first_try)
+        print("total_questions:", total_questions)
+        if questions_right_on_first_try is not None and total_questions is not None:
+            try:
+                lbh.add_points_to_member(user_id, library_id, questions_right_on_first_try, total_questions)
+            except Exception as e:
+                app.logger.error(f"Failed to add points for user {user_id} in library {library_id}: {e}")
+                # Not returning an error to the user, as failing to add points is not a critical failure
 
         try:
-            response, status = lbh.update_game_end(user_id, library_id, section_id) # score, time, completed_rooms, True)
+            response, status = lbh.update_game_end(user_id, library_id, section_id)
             return response, status
         except Exception as e:
             return jsonify({'status': 'error', 'message': str(e)}), 500

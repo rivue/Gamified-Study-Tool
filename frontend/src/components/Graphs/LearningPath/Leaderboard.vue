@@ -34,7 +34,7 @@
                         <tr>
                             <th scope="col" class="px-4 py-3 text-center text-xs font-medium uppercase tracking-wider" style="color: var(--text-color-primary);">Rank</th>
                             <th scope="col" class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider" style="color: var(--text-color-primary);">User</th>
-                            <th scope="col" class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider" style="color: var(--text-color-primary);">Score</th>
+                            <th scope="col" class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider" style="color: var(--text-color-primary);">Points</th>
                             <th scope="col" class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider th-completed" style="color: var(--text-color-primary);">Completed</th>
                         </tr>
                     </thead>
@@ -68,7 +68,7 @@
                             </td>
 
                             <td class="px-4 py-3 whitespace-nowrap text-right font-medium text-lg score-text" :style="{ color: 'var(--text-color-primary)' }">
-                                {{ entry.score_sum || 0 }}
+                                {{ entry.points || 0 }}
                             </td>
 
                             <td class="px-4 py-3 whitespace-nowrap text-right text-sm completed-text" :style="{ color: 'var(--text-color-secondary)' }">

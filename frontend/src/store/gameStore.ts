@@ -269,18 +269,15 @@ export const useGameStore = defineStore("gameStore", {
                 return;
             }
 
-            // const completedRooms = Object.keys(this.roomStates).filter(
-                // roomName => this.roomStates[roomName].state === 3
-            // );
+            // Calculate total questions attempted (answered + skipped)
+            const totalQuestions = this.currentQuestion;
+            const questionsRightOnFirstTry = totalQuestions - this.incorrectQuestionAnswers.length - this.skippedQuestions.length;
 
             let data = {
                 libraryId: this.libraryId,
                 sectionId: this.sectionId,
-                
-                // libraryId: this.libraryId,
-                // score: this.score,
-                // time: 500,
-                // completed: completedRooms
+                questionsRightOnFirstTry: questionsRightOnFirstTry,
+                totalQuestions: totalQuestions,
             };
             axios
                 .post(`/api/library/end`, data)

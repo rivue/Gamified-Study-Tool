@@ -133,9 +133,6 @@ def quiz_feedback(user_id, lesson_id):
         if 'score' in data and 'answers' in data:
             score = data['score']
             answers = data['answers']
-
-            print("Score:", score)
-            print("Answers:", answers)
         else:
             print("Error: Invalid data received.")
             return None, lesson_id

@@ -472,6 +472,7 @@ class LibraryMembership(db.Model):
 
     # extra information (just joined_at for now)
     joined_at = db.Column(db.DateTime, default=datetime.utcnow, server_default=db.func.now())
+    points = db.Column(db.Integer, default=0, nullable=False, server_default="0")
 
     user = db.relationship('User', back_populates='library_memberships')
     library = db.relationship('Library', back_populates='memberships')
