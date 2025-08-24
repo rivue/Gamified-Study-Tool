@@ -32,7 +32,6 @@ session_pooler = True
 host = os.getenv('DB_HOST_SESSION_POOLER') if session_pooler else os.getenv('DB_HOST') 
 user = os.getenv('DB_USER_SESSION_POOLER') if session_pooler else os.getenv('DB_USER')
 
-    
 password = os.getenv('DB_PASSWORD')
 port = os.getenv('SUPABASE_PORT')
 database = os.getenv('DATABASE')

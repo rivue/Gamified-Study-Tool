@@ -21,8 +21,6 @@ def progress_lesson(user_id, user_message, lesson_id):
 def progress_challenge(user_id, user_message, challenge_id):
     db.add_user_message(user_id, user_message, challenge_id=challenge_id)
     response = cts.challenge_progress(user_id, challenge_id)
-    if response:
-        db.add_ai_response(user_id, response, roles.ChallengeGuide, challenge_id=challenge_id)
 
 def progress(user_id, lesson_id, no_redirect = False):
     db.clear_user_actions(user_id, lesson_id)
@@ -32,11 +30,6 @@ def progress(user_id, lesson_id, no_redirect = False):
     response = "No response."
     if current_sys_role == roles.ProfileGather:
         response, lesson_id = cts.gather_profile(user_id)
-    elif current_sys_role == roles.SuggestContent:
-        if no_redirect:
-            response, lesson_id = cts.suggest_content(user_id, False, False)
-        else:
-            response, lesson_id = cts.suggest_content(user_id)
     elif current_sys_role == roles.AfterContent:
         response, lesson_id = cts.after_content(user_id)
     elif current_sys_role == roles.LessonCreate:
@@ -84,12 +77,6 @@ def progress(user_id, lesson_id, no_redirect = False):
         mh.update_system_role(user_id, roles.SuggestContent)
         current_sys_role = roles.SuggestContent
         db.add_action(user_id, "Suggest.")
-
-    if (current_sys_role == roles.LessonGuide) | (current_sys_role == roles.QuizFeedback):
-        db.add_ai_response(user_id, response, current_sys_role, lesson_id=lesson_id, message_type=message_type)
-        return lesson_id
-    else:
-        db.add_ai_response(user_id, response, current_sys_role, message_type=message_type)
 
 def detect_content_actions(user_id, user_message):
     current_sys_role = db.get_system_role(user_id)

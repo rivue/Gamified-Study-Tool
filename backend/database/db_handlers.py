@@ -1,5 +1,5 @@
 from database.models import db, User, ChatHistory, Challenge, Lesson, UserAction, Achievement, UserAchievement, Feedback,LibraryRoomState,LibraryCompletion
-from utils import decode_if_needed, extract_single_emoji
+from utils import extract_single_emoji
 from datetime import datetime
 from sqlalchemy.exc import SQLAlchemyError
 import pytz
@@ -16,23 +16,6 @@ def add_user_message(user_id, message_content, challenge_id=None, lesson_id=None
         system_role="User",
         challenge_id=challenge_id,
         lesson_id=lesson_id
-    )
-    db.session.add(message)
-    db.session.commit()
-
-def add_ai_response(user_id, response, sys_role, challenge_id=None, lesson_id=None, message_type="message"):
-    ai_message = response['choices'][0]['message']['content']
-    add_ai_message(user_id, ai_message, sys_role, challenge_id, lesson_id, message_type)
-
-def add_ai_message(user_id, message_content, sys_role, challenge_id=None, lesson_id=None, message_type="message"):
-    message = ChatHistory(
-        user_id=user_id, 
-        message=decode_if_needed(message_content), 
-        role="assistant", 
-        system_role=sys_role,
-        challenge_id=challenge_id,
-        lesson_id=lesson_id,
-        message_type=message_type
     )
     db.session.add(message)
     db.session.commit()
@@ -326,12 +309,6 @@ def get_user_content(user_id):
     user = User.query.get(user_id)
     return user.current_content if user else None
 
-def set_user_content(user_id, content_description):
-    user = User.query.get(user_id)
-    if user:
-        user.current_content = content_description
-        db.session.commit()
-
 def add_challenge(user_id, challenge_name, user_started=True):
     # Validate challenge_name: must be a non-empty string and within length limits.
     if not isinstance(challenge_name, str) or not challenge_name.strip():
@@ -351,18 +328,6 @@ def add_challenge(user_id, challenge_name, user_started=True):
 
         # Add associated content message and AI message
         add_content_message(user_id, challenge_name, challenge_id=challenge.id)
-        add_ai_message(
-            user_id, 
-            f"Share your progress 📈, ask for a plan 📆, or some just guidance 🧭.\n\nI'm here to help you complete the challenge:\n{challenge_name}", 
-            "challenge", 
-            challenge.id
-        )
-
-        # Update user content accordingly
-        if user_started:
-            set_user_content(user_id, f"started challenge {challenge_name}")
-        else:
-            set_user_content(user_id, f"was given (by you) challenge {challenge_name}")
 
         return True, challenge.id
 
@@ -372,13 +337,6 @@ def add_challenge(user_id, challenge_name, user_started=True):
     except Exception as e:
         db.session.rollback()
         return False, f"An unexpected error occurred: {str(e)}"
-
-
-def update_challenge(user_id, challenge_id):
-    challenge = Challenge.query.filter_by(user_id=user_id, id=challenge_id).first()
-    if challenge:
-        set_user_content(user_id, f"completed challenge {challenge.challenge_name}")
-        challenge.completion_date = datetime.now()
 
 def is_challenge_complete(challenge_id):
     challenge = Challenge.query.filter_by(id=challenge_id).first()
@@ -410,12 +368,6 @@ def add_lesson(user_id, lesson_name, user_started=True):
         # Add associated content message.
         add_content_message(user_id, lesson_name, lesson_id=lesson.id)
 
-        # Update the user's current content.
-        if user_started:
-            set_user_content(user_id, f"started lesson {lesson_name}")
-        else:
-            set_user_content(user_id, f"was given (by you) lesson {lesson_name}")
-
         return True, lesson.id
 
     except SQLAlchemyError as e:
@@ -424,22 +376,6 @@ def add_lesson(user_id, lesson_name, user_started=True):
     except Exception as e:
         db.session.rollback()
         return False, f"An unexpected error occurred: {str(e)}"
-
-
-def update_lesson(user_id, lesson_id, completion_date=None, system_role=None):
-    lesson = Lesson.query.filter_by(user_id=user_id, id=lesson_id).first()
-    if lesson:
-        if completion_date:
-            set_user_content(user_id, f"completed lesson {lesson.lesson_name}")
-            lesson.completion_date = completion_date
-        elif system_role:
-            if system_role == "LessonCreate":
-                set_user_content(user_id, f"started lesson {lesson.lesson_name}")
-            else:
-                set_user_content(user_id, f"worked on but not completed lesson {lesson.lesson_name}")
-            lesson.system_role = system_role
-    
-    db.session.commit()
 
 def is_lesson_complete(lesson_id):
     lesson = Lesson.query.filter_by(id=lesson_id).first()
@@ -615,10 +551,6 @@ def user_knowledge_net_info(user_id):
 
 ### CLEAR ###
 
-def clear_user_chat_history(user_id):
-    ChatHistory.query.filter_by(user_id=user_id).delete()
-    db.session.commit()
-
 def clear_user_challenges(user_id):
     Challenge.query.filter_by(user_id=user_id).delete()
     db.session.commit()
@@ -655,7 +587,6 @@ def clear_user_library_completions(user_id):
     db.session.commit()
 
 def reset_user_profile(user_id):
-    clear_user_chat_history(user_id)
     clear_all_user_actions(user_id)
     clear_user_achievements(user_id)
     clear_user_challenges(user_id)
