@@ -1,6 +1,5 @@
-from database.models import db, User, ChatHistory, Challenge, Lesson, UserAction, Achievement, UserAchievement, Feedback,LibraryRoomState,LibraryCompletion
+from database.models import db, User, Challenge, Lesson, UserAction, Achievement, UserAchievement, Feedback,LibraryRoomState,LibraryCompletion
 from utils import extract_single_emoji
-from datetime import datetime
 from sqlalchemy.exc import SQLAlchemyError
 import pytz
 
@@ -8,144 +7,11 @@ history_limit = 16
 MAX_LESSON_NAME_LENGTH = 200
 MAX_CHALLENGE_NAME_LENGTH = 200
 
-def add_user_message(user_id, message_content, challenge_id=None, lesson_id=None):
-    message = ChatHistory(
-        user_id=user_id,
-        message=message_content,
-        role="user",
-        system_role="User",
-        challenge_id=challenge_id,
-        lesson_id=lesson_id
-    )
-    db.session.add(message)
-    db.session.commit()
-
-def add_content_message(user_id, content_name, challenge_id=None, lesson_id=None):
-    system_role = None
-    if challenge_id:
-        system_role = f"challenge/{challenge_id}"
-    elif lesson_id:
-        system_role = f"lesson/{lesson_id}"
-    else:
-        print("Content ID not passed error.")
-
-    message = ChatHistory(
-        user_id=user_id, 
-        message=content_name, 
-        role=system_role, 
-        system_role=system_role,
-        challenge_id=None,
-        lesson_id=None
-    )
-    db.session.add(message)
-    db.session.commit()
-
-def edit_content_message_to_completed(user_id, challenge_id=None, lesson_id=None):
-    if challenge_id:
-        message = ChatHistory.query.filter_by(user_id=user_id, system_role=f"challenge/{challenge_id}").first()
-    elif lesson_id:
-        message = ChatHistory.query.filter_by(user_id=user_id, system_role=f"lesson/{lesson_id}").first()
-    if not message:
-        return
-
-    message.role += "?completed"
-    message.system_role += "?completed"
-    db.session.commit()
-
-def add_completion_message(user_id, challenge_id=None, lesson_id=None):
-    edit_content_message_to_completed(user_id, challenge_id, lesson_id)
-    completion_message = ChatHistory(
-        user_id=user_id,
-        message="Completed!",
-        role="complete",
-        system_role="complete",
-        challenge_id=challenge_id,
-        lesson_id=lesson_id
-    )
-    
-    db.session.add(completion_message)
-    db.session.commit()
-
 def award_lesson_experience(user_id):
     user = User.query.get(user_id)
     if user:
         user.experience_points += 100
         db.session.commit()    
-
-def get_recent_messages(user_id, lesson_id=None, challenge_id=None, limit=history_limit):
-    # Validate input parameters
-    if not isinstance(user_id, int) or user_id <= 0:
-        return {"error": "Invalid user_id. It must be a positive integer.", "messages": []}, 400
-    if lesson_id is not None and (not isinstance(lesson_id, int) or lesson_id <= 0):
-        return {"error": "Invalid lesson_id. It must be a positive integer or None.", "messages": []}, 400
-    if challenge_id is not None and (not isinstance(challenge_id, int) or challenge_id <= 0):
-        return {"error": "Invalid challenge_id. It must be a positive integer or None.", "messages": []}, 400
-    if not isinstance(limit, int) or limit <= 0:
-        return {"error": "Invalid limit. It must be a positive integer.", "messages": []}, 400
-
-    try:
-        # Construct query dynamically based on provided parameters
-        query = ChatHistory.query.filter_by(user_id=user_id)
-        if lesson_id is not None:
-            query = query.filter_by(lesson_id=lesson_id)
-        if challenge_id is not None:
-            query = query.filter_by(challenge_id=challenge_id)
-
-        # Retrieve messages, handling ordering and limit
-        recent_messages = query.order_by(ChatHistory.id.desc()).limit(limit).all()
-
-        # Reverse order to maintain chronological order
-        messages = [
-            {"role": msg.role, "content": msg.message, "type": msg.message_type}
-            for msg in reversed(recent_messages)
-        ]
-
-        return {"messages": messages}, 200
-
-    except SQLAlchemyError as e:
-        return {"error": f"Database error: {str(e)}", "messages": []}, 500
-    except Exception as e:
-        return {"error": f"An unexpected error occurred: {str(e)}", "messages": []}, 500
-
-
-def get_content_messages(lesson_id, challenge_id, limit=history_limit):
-    query = ChatHistory.query.filter_by(lesson_id=lesson_id, challenge_id=challenge_id)
-    recent_messages = query.order_by(ChatHistory.id.desc()).limit(limit).all()
-    recent_messages = recent_messages[::-1]
-    return [{"role": msg.role, "content": msg.message, "type": msg.message_type} for msg in recent_messages]
-
-def get_api_messages(user_id, lesson_id=None, challenge_id=None, limit=history_limit):
-    # Validate input parameters
-    if not isinstance(user_id, int) or user_id <= 0:
-        return {"error": "Invalid user_id. It must be a positive integer.", "messages": []}, 400
-    if lesson_id is not None and (not isinstance(lesson_id, int) or lesson_id <= 0):
-        return {"error": "Invalid lesson_id. It must be a positive integer or None.", "messages": []}, 400
-    if challenge_id is not None and (not isinstance(challenge_id, int) or challenge_id <= 0):
-        return {"error": "Invalid challenge_id. It must be a positive integer or None.", "messages": []}, 400
-    if not isinstance(limit, int) or limit <= 0:
-        return {"error": "Invalid limit. It must be a positive integer.", "messages": []}, 400
-
-    try:
-        # Construct the base query based on provided parameters.
-        query = ChatHistory.query.filter_by(user_id=user_id, lesson_id=lesson_id, challenge_id=challenge_id)
-        valid_roles = ['system', 'assistant', 'user', 'function']
-        query = query.filter(ChatHistory.role.in_(valid_roles))
-
-        # Retrieve messages ordered by id descending and then reverse the list to maintain chronological order.
-        recent_messages = query.order_by(ChatHistory.id.desc()).limit(limit).all()
-        recent_messages = list(reversed(recent_messages))
-
-        messages = [{"role": msg.role, "content": msg.message} for msg in recent_messages]
-        return {"messages": messages}, 200
-
-    except SQLAlchemyError as e:
-        # Roll back the session if necessary and return an empty list with an error message.
-        return {"error": f"Database error: {str(e)}", "messages": []}, 500
-
-    except Exception as e:
-        # Catch-all for any other unexpected exceptions.
-        return {"error": f"An unexpected error occurred: {str(e)}", "messages": []}, 500
-
 
 def set_system_role(user_id, role):
     user = User.query.get(user_id)
@@ -169,51 +35,6 @@ def set_mentor_name(user_id, name):
 def get_mentor_name(user_id):
     user = User.query.get(user_id)
     return user.mentor_name if user and user.mentor_name else "Azalea"
-
-def remove_latest_system_message(user_id, lesson_id=None):
-    latest_system_message = ChatHistory.query.filter_by(user_id=user_id, lesson_id=lesson_id, role='system').order_by(ChatHistory.id.desc()).first()
-    if latest_system_message:
-        db.session.delete(latest_system_message)
-        db.session.commit()
-
-def add_system_message(user_id, content, lesson_id=None):
-    new_message = ChatHistory(
-        user_id=user_id,
-        role="system",
-        message=content,
-        system_role="system",
-        challenge_id=None,
-        lesson_id=lesson_id
-    )
-    db.session.add(new_message)
-    db.session.commit()
-
-def get_system_messages(user_id, lesson_id=None):
-    system_chats = ChatHistory.query.filter_by(user_id=user_id, lesson_id=lesson_id, role='system').all()
-    return [{"role": chat.role, "content": chat.message} for chat in system_chats]
-
-def remove_latest_message_by_role(user_id, role):
-    latest_message = ChatHistory.query.filter_by(user_id=user_id, role=role).order_by(ChatHistory.id.desc()).first()
-    if latest_message:
-        db.session.delete(latest_message)
-        db.session.commit()
-        
-def get_latest_message_by_role(user_id, role):
-    latest_message = ChatHistory.query.filter_by(user_id=user_id, role=role).order_by(ChatHistory.id.desc()).first()
-    return latest_message.message if latest_message else None
-
-def remove_score_from_answer(user_id, message):
-    latest_message = ChatHistory.query.filter_by(user_id=user_id, role="user").order_by(ChatHistory.id.desc()).first()
-    latest_message.message = message
-    db.session.commit()
-
-def contains_quiz_message(lesson_id):
-    return bool(ChatHistory.query.filter_by(lesson_id=lesson_id, message_type="quiz").order_by(ChatHistory.id.desc()).first())
-
-def complete_quiz_message(user_id, lesson_id, score):
-    latest_quiz = ChatHistory.query.filter_by(user_id=user_id, lesson_id=lesson_id, message_type="quiz").order_by(ChatHistory.id.desc()).first()
-    latest_quiz.message = score + latest_quiz.message
-    db.session.commit()
 
 def add_action(user_id, action_name, lesson_id=None):
     existing_action = UserAction.query.filter_by(user_id=user_id, action=action_name, lesson_id=lesson_id).first()

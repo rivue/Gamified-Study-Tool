@@ -160,6 +160,11 @@ const routes = [
             }
         }
     },
+    {
+        path: '/lessons/:id/quizzes',
+        name: 'QuizManager',
+        component: () => import('@/views/QuizManager.vue')
+    },
 
     // Simple routes
     { path: '/courses', component: defineAsyncComponent(() => import('./components/Game/Creation/LibraryBrowser.vue')), meta: { title: 'Rivue.ai | My Courses' } },
@@ -208,6 +213,7 @@ const routes = [
     // { path: '/plan/:pathMatch(.*)*', redirect: '/plan' },
     { path: '/login/:pathMatch(.*)*', redirect: '/login' },
     { path: '/profile/:pathMatch(.*)*', redirect: '/profile' },
+    { path: '/lessons/:id/quizzes/:pathMatch(.*)*', redirect: '/lessons/:id/quizzes' },
     // { path: '/admin/:pathMatch(.*)*', redirect: '/admin' },
 
     // Catch-all route - must be last!

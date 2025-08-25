@@ -77,19 +77,6 @@ def system_message(user_id, role_name = None ):
 
     return system_message
 
-    if not system_messages:
-        initialize_messages(user_id)
-        system_messages = db.get_system_messages(user_id)
-
-    if limit:
-        limited_messages = db.get_api_messages(user_id, lesson_id=lesson_id, challenge_id=challenge_id, limit=limit)
-    else:
-        limited_messages = db.get_api_messages(user_id, lesson_id=lesson_id, challenge_id=challenge_id)
-    has_system_message = any(msg['role'] == 'system' for msg in limited_messages)
-
-    messages = system_messages + limited_messages if not has_system_message else limited_messages
-    return messages
-
 def quiz_to_message(quiz):
     response = {}
     response["choices"] = [{}]

@@ -1,8 +1,8 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
-from sqlalchemy import JSON, update
+from sqlalchemy import JSON
 from sqlalchemy.ext.mutable import MutableList
-from sqlalchemy.exc import IntegrityError, SQLAlchemyError
+from sqlalchemy.exc import  SQLAlchemyError
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 import secrets, string
@@ -39,7 +39,6 @@ class User(db.Model, UserMixin):
 
     actions = db.relationship('UserAction', backref='user', cascade="all, delete-orphan") # TODO: not using
 
-    chats = db.relationship('ChatHistory', backref='user', cascade="all, delete-orphan") # TODO: not using
     lessons = db.relationship('Lesson', backref='user', cascade="all, delete-orphan") # TODO: not using
 
     tier = db.Column(db.String(50), default='free')  # 'free', 'paid', 'pro'
@@ -144,21 +143,6 @@ class UserAction(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     lesson_id = db.Column(db.Integer, db.ForeignKey('lesson.id'), nullable=True)
     action = db.Column(db.String(100), nullable=False)
-
-class ChatHistory(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    message = db.Column(db.Text, nullable=False)
-    role = db.Column(db.String(50), nullable=False)
-    system_role = db.Column(db.String(100), nullable=False)
-    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
-
-    challenge_id = db.Column(db.Integer, db.ForeignKey('challenge.id'), nullable=True)
-    lesson_id = db.Column(db.Integer, db.ForeignKey('lesson.id'), nullable=True)
-    message_type = db.Column(db.String(50), default='message')
-    
-    def as_dict(self):
-        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
     
 class Feedback(db.Model):
     id = db.Column(db.Integer, primary_key=True)

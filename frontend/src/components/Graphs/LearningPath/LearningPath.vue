@@ -16,7 +16,11 @@
                 </button>
             </div>
             <div class="right-controls">
-
+                <button @click="goToQuizManager"
+                    class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg p-4 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200"
+                    style="color: var(--highlight-color);">
+                    <ClipboardDocumentListIcon class="w-6 h-6" />
+                </button>
 
                 <button @click="goToExperiments"
                     class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg p-4 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200"
@@ -348,6 +352,7 @@ import {
     PencilIcon,
     PlusIcon,
     ArrowLeftIcon,
+    ClipboardDocumentListIcon,
 } from '@heroicons/vue/24/solid';
 import { Trophy } from 'lucide-vue-next';
 import { useGameStore } from '@/store/gameStore'
@@ -528,6 +533,10 @@ function goToCourseList() {
 
 function handleLeaveCourseClick() {
     showLeaveCourseModal.value = true;
+}
+
+function goToQuizManager() {
+    router.push(`/lessons/${props.libraryId}/quizzes`)
 }
 
 // Get color for a unit based on its index
