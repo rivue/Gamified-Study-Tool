@@ -13,7 +13,7 @@
                 <input type="text" id="username" v-model="editableProfile.username" class="profile-input" />
             </div>
             <div class="settings-buttons">
-                <MenuButton label="Save Username" @click="saveUsername" customClass="action-button" />
+                <MenuButton label="Save Username" @click="saveUsername" class="action-button" />
             </div>
         </div>
 
@@ -56,13 +56,13 @@
                 <input type="password" id="confirmNewPassword" v-model="confirmNewPassword" class="profile-input" />
             </div>
             <div class="settings-buttons">
-                <MenuButton label="Change Password" @click="changePassword" customClass="action-button" />
+                <MenuButton label="Change Password" @click="changePassword" class="action-button" />
             </div>
         </div>
 
         <div class="settings-buttons half-n-half">
-            <MenuButton label="Save Profile" @click="saveUserProfile" customClass="action-button" />
-            <MenuButton label="Logout" @click="logout" customClass="danger-button" />
+            <MenuButton label="Save Profile" @click="saveUserProfile" class="action-button" />
+            <MenuButton label="Logout" @click="logout" class="danger-button" />
         </div>
 
         <div class="profile-section" style="text-align: center;">
@@ -409,22 +409,20 @@ const changePassword = async () => {
     flex-direction: row;
 }
 
-.red {
-    background-color: red;
+.action-button {
+  background-color: var(--background-color-1t);
 }
 
-.action-button {
-    /* Custom styles for general action buttons if needed */
-    /* Example: flex-grow: 1; to make buttons take equal space */
+.action-button:hover {
+  background-color: var(--element-color-1);
 }
 
 .danger-button {
-    background-color: var(red) !important;
+    background-color: #860000;
     /* Ensure high specificity */
-    color: red !important;
 }
 
 .danger-button:hover {
-    background-color: var(red) !important;
+    background-color: #6B0000;
 }
 </style>
