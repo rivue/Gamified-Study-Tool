@@ -8,7 +8,6 @@
                     <LoginForm v-if="activeForm === 'login'" @loginSuccess="handleLoginSuccess" :toggleForms="toggleForms" />
                     <SignupForm v-else-if="activeForm === 'signup'" @signupSuccess="handleSignupSuccess"/>
                     <SendPasswordResetEmail v-else-if="activeForm === 'passwordReset'" />
-                    <div ref="googleButton" class="google-button-container"></div>
 
                     <!-- Buttons under each form -->
                     <div class="form-actions">
