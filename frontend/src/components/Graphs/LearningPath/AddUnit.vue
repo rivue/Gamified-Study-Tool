@@ -151,7 +151,7 @@ const addNewUnit = async () => {
             location.reload();
         }
     } catch (error) {
-        unitNameError.value = error.response?.data?.message || 'Failed to add unit. Please try again.'
+        unitNameError.value = 'Failed to add unit. Please try again.'
     } finally {
         isAddingUnit.value = false
     }

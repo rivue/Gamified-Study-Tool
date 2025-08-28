@@ -67,7 +67,6 @@ def init_chat_routes(app):
         
         actions = []
         if not challenge_id and current_user.is_authenticated:
-            actions = dbh.get_actions(current_user.id, lesson_id)
         else:
             actions = ["Leave challenge."]
 
@@ -92,7 +91,6 @@ def init_chat_routes(app):
         subheading, progress = get_subheading_and_progress(current_user, lesson_id, None)
         return jsonify(
             messages=dbh.get_recent_messages(current_user.id),
-            actions=dbh.get_actions(current_user.id, lesson_id),
             redirect=lesson_id,
             subheading=subheading,
             progress=progress
@@ -103,7 +101,6 @@ def init_chat_routes(app):
         subheading, progress = get_subheading_and_progress(current_user, lesson_id, None)
         return jsonify(
             messages=dbh.get_recent_messages(current_user.id, lesson_id),
-            actions=dbh.get_actions(current_user.id, lesson_id),
             redirect=lesson_id,
             subheading=subheading,
             progress=progress

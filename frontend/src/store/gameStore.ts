@@ -158,7 +158,7 @@ export const useGameStore = defineStore("gameStore", {
                     if (response.data.data === null && response.data.room_data === null) {
                         // if for some reason roomNameThing is null
                         this.libraryError = true;
-                        console.error("Failed to fetch library details", response);
+                        console.error("Failed to fetch library details");
                         return;
                     }
                     const data = response.data.data;

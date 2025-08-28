@@ -3,7 +3,6 @@ from flask_login import login_required, current_user
 
 from stats import get_line_graph_data, get_stats
 from knowledge_net.graph_calc import get_graph_data
-from knowledge_net.explore import suggest_lessons
 
 def init_graph_routes(app):
 
@@ -60,6 +59,4 @@ def init_graph_routes(app):
     @app.route('/api/explore', methods=['GET'])
     @login_required
     def explore():
-        node_name = request.args.get('name', '')
         suggestions = suggest_lessons(current_user.id, node_name)
-        return jsonify({"suggestions": suggestions})

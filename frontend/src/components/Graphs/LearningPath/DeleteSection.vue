@@ -156,14 +156,14 @@ async function handleDeleteSection() {
             closeModal();
         } else {
             // Handle cases where status is not 200/204 but not an exception (e.g., custom error response)
-            const errorMessage = response.data?.message || 'An unexpected error occurred while deleting the section.';
+            const errorMessage = 'An unexpected error occurred while deleting the section.';
             apiError.value = errorMessage;
             toast.error(errorMessage, { id: toastId });
             emit('delete-error', { sectionId: props.sectionId, message: errorMessage });
         }
     } catch (error: any) {
         console.error('Error deleting section:', error);
-        const errorMessage = error.response?.data?.message || error.message || 'Failed to delete section. Please try again.';
+        const errorMessage = 'Failed to delete section. Please try again.';
         apiError.value = errorMessage;
         toast.error(errorMessage, { id: toastId });
         emit('delete-error', { sectionId: props.sectionId, message: errorMessage });

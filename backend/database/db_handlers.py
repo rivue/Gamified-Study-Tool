@@ -36,22 +36,6 @@ def get_mentor_name(user_id):
     user = User.query.get(user_id)
     return user.mentor_name if user and user.mentor_name else "Azalea"
 
-def add_action(user_id, action_name, lesson_id=None):
-    existing_action = UserAction.query.filter_by(user_id=user_id, action=action_name, lesson_id=lesson_id).first()
-    if not existing_action:
-        action = UserAction(user_id=user_id, action=action_name, lesson_id=lesson_id)
-        db.session.add(action)
-        db.session.commit()
-
-
-def get_actions(user_id, lesson_id=None):
-    actions = UserAction.query.filter_by(user_id=user_id, lesson_id=lesson_id).all()
-    return [action.action for action in actions]
-
-def remove_user_action(user_id, action_name, lesson_id=None):
-    action = UserAction.query.filter_by(user_id=user_id, action=action_name, lesson_id=lesson_id)
-    action.delete()
-
 def add_achievement(achievement_name, description=None):
     achievement = Achievement(name=achievement_name, description=description)
     db.session.add(achievement)

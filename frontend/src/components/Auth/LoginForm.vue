@@ -146,11 +146,11 @@ const handleGoogleSignIn = async (response: any) => {
             const redirectPath = route.query.redirect?.toString() || '/';
             router.push(redirectPath);
         } else {
-            popupStore.showPopup(data.message || 'Google Sign-In failed. Please try again.');
+            popupStore.showPopup('Google Sign-In failed. Please try again.');
         }
     } catch (error: any) {
         const popupStore = usePopupStore();
-        const errorMessage = error.response?.data?.message || 'An error occurred during Google Sign-In. Please try again.';
+        const errorMessage = 'An error occurred during Google Sign-In. Please try again.';
         popupStore.showPopup(errorMessage);
     }
 };

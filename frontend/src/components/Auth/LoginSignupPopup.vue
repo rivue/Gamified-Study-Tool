@@ -77,11 +77,11 @@ const handleGoogleSignIn = async (response: any) => {
             router.push("/courses");
         } else {
             const popupStore = usePopupStore();
-            popupStore.showPopup(data.message || 'Google Sign-In failed. Please try again.');
+            popupStore.showPopup('Google Sign-In failed. Please try again.');
         }
     } catch (error) {
         const popupStore = usePopupStore();
-        const errorMessage = error.response?.data?.message || 'An error occurred during Google Sign-In. Please try again.' + error;
+        const errorMessage = 'An error occurred during Google Sign-In. Please try again.';
         popupStore.showPopup(errorMessage);
     } finally {
         loggingIn.value = false;

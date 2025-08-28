@@ -45,7 +45,7 @@
       lessons.value = response.data.lessons;
       loaded.value = true;
     } catch (error) {
-      console.error("Error fetching public content:", error);
+      console.error("Error fetching public content:");
       popupStore.showPopup("Failed to load public content.");
     }
   };

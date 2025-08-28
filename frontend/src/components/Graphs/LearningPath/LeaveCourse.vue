@@ -159,13 +159,13 @@ async function handleLeaveCourse() {
                 router.push('/courses'); 
             }
         } else {
-            const errorMessage = response.data?.message || 'An unexpected error occurred.';
+            const errorMessage = 'An unexpected error occurred.';
             apiError.value = errorMessage;
             toast.error(errorMessage, { id: toastId });
         }
     } catch (error: any) {
         console.error('Error leaving course:', error);
-        const errorMessage = error.response?.data?.message || error.message || 'Failed to leave course. Please try again.';
+        const errorMessage = 'Failed to leave course. Please try again.';
         apiError.value = errorMessage;
         toast.error(errorMessage, { id: toastId });
        

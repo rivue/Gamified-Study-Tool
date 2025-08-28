@@ -199,10 +199,10 @@ const saveUserProfile = async () => {
             // Re-fetch profile to get any backend-side updates or confirmations
             fetchProfile();
         } else {
-            popupStore.showPopup(response.data.message || "Failed to update profile.");
+            popupStore.showPopup("Failed to update profile.");
         }
     } catch (error: any) {
-        popupStore.showPopup(error.response?.data?.message || "Error updating profile.");
+        popupStore.showPopup("Error updating profile.");
     }
 };
 
@@ -223,10 +223,10 @@ const saveUsername = async () => {
                 authStore.user.username = editableProfile.value.username;
             }
         } else {
-            popupStore.showPopup(response.data.message || "Failed to update username.");
+            popupStore.showPopup("Failed to update username.");
         }
     } catch (error: any) {
-        popupStore.showPopup(error.response?.data?.message || "Error updating username.");
+        popupStore.showPopup("Error updating username.");
     }
 };
 
@@ -302,11 +302,11 @@ const changePassword = async () => {
             newPassword.value = "";
             confirmNewPassword.value = "";
         } else {
-            popupStore.showPopup(response.data.message || "Failed to change password.");
+            popupStore.showPopup("Failed to change password.");
         }
     } catch (error: any) {
         if (error.response && error.response.data && error.response.data.message) {
-            popupStore.showPopup(error.response.data.message);
+            // popupStore.showPopup(error.response.data.message);
         } else {
             popupStore.showPopup("An unexpected error occurred while changing password.");
         }
