@@ -95,6 +95,7 @@ const togglePasswordVisibility = () => {
 };
 
 const handleSubmit = () => {
+    
     if (!email.value || !password.value) {
         const popupStore = usePopupStore();
         popupStore.showPopup("Email and password are required.");

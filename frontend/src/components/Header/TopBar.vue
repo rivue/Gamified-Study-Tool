@@ -54,9 +54,8 @@ const pageTitle = computed(() => {
 });
 
 const navigateToLogin = () => {
-    if (router.currentRoute.value.path === '/login*') {
-        // Clean the URL by removing query parameters
-        router.replace('/login');
+    if (router.currentRoute.value.path === '/login') {
+        location.reload();
     } else {
         router.push('/login');
     }
