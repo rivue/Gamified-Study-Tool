@@ -1,13 +1,13 @@
 <!-- LoginSignupPopup.vue -->
 <template>
-    <div v-if="!loggedIn" class="popup-overlay">
+    <div v-if="!loggedIn" class="login-signup-overlay">
         <div v-if="loggingIn" id="loadingCloud" class="cloud-animation">☁️</div>
         <div v-else class="popup-content">
             <transition name="fade" mode="out-in">
                 <div :key="activeForm" class="form-container">
                     <LoginForm v-if="activeForm === 'login'" @loginSuccess="handleLoginSuccess" :toggleForms="toggleForms" />
                     <SignupForm v-else-if="activeForm === 'signup'" @signupSuccess="handleSignupSuccess"/>
-                    <SendPasswordResetEmail v-else-if="activeForm === 'passwordReset'" @resetSuccess="handleResetSuccess" />
+                    <SendPasswordResetEmail v-else-if="activeForm === 'passwordReset'" />
                     <div ref="googleButton" class="google-button-container"></div>
 
                     <!-- Buttons under each form -->
@@ -36,7 +36,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, nextTick, watch } from 'vue';
+import { ref, computed, onMounted, nextTick, watch, onUnmounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import LoginForm from "./LoginForm.vue";
 import SignupForm from "./SignupForm.vue";
@@ -52,6 +52,7 @@ const googleButton = ref<HTMLDivElement | null>(null); // Ref for the Google but
 const activeForm = ref('login');
 const loggingIn = ref(false);
 const authStore = useAuthStore();
+const googleInitialized = ref(false); // Track initialization state
 
 // Ensure this is declared to be accessible in the global scope for the callback
 declare global {
@@ -88,6 +89,40 @@ const handleGoogleSignIn = async (response: any) => {
     }
 };
 
+// Add cleanup function
+const clearGoogleButton = () => {
+    if (googleButton.value) {
+        googleButton.value.innerHTML = '';
+    }
+};
+
+// Initialize Google only once
+const initializeGoogle = () => {
+    if (!googleInitialized.value && typeof google !== 'undefined' && google.accounts && google.accounts.id) {
+        google.accounts.id.initialize({
+            client_id: process.env.VUE_APP_GOOGLE_CLIENT_ID,
+            callback: window.handleGoogleSignIn,
+        });
+        googleInitialized.value = true;
+    }
+};
+
+// Add render function with cleanup
+const renderGoogleButton = async () => {
+    await nextTick();
+    
+    if (googleButton.value && googleInitialized.value) {
+        // Clear existing button first
+        clearGoogleButton();
+        
+        google.accounts.id.renderButton(
+            googleButton.value,
+            { theme: "outline", size: "large", width: "300" } 
+        );
+    } else if (!googleInitialized.value) {
+        console.error('Google Identity Services not initialized.');
+    }
+};
 
 onMounted(async () => {
     if (loggedIn.value) {
@@ -102,33 +137,26 @@ onMounted(async () => {
     // Make handleGoogleSignIn globally accessible
     window.handleGoogleSignIn = handleGoogleSignIn;
 
-    // Wait for the next DOM update cycle to ensure googleButton.value is available
-    await nextTick();
+    // Initialize Google only once
+    initializeGoogle();
 
-    if (googleButton.value && typeof google !== 'undefined' && google.accounts && google.accounts.id) {
-        google.accounts.id.initialize({
-            client_id: process.env.VUE_APP_GOOGLE_CLIENT_ID, // Ensure this is set in your .env file
-            callback: window.handleGoogleSignIn,
-        });
-        google.accounts.id.renderButton(
-            googleButton.value,
-            { theme: "outline", size: "large", width: "300" } 
-        );
-    } else {
-        console.error('Google Identity Services library not loaded or googleButton ref not found.');
+    // Render Google button with cleanup
+    // await renderGoogleButton();
+});
+
+// Add cleanup on unmount
+onUnmounted(() => {
+    clearGoogleButton();
+    googleInitialized.value = false; // Reset initialization state
+    // Clean up global reference
+    if (window.handleGoogleSignIn) {
+        delete window.handleGoogleSignIn;
     }
 });
 
 watch(activeForm, async (newForm) => {
   if (newForm === 'signup' || newForm === 'login') {
-    await nextTick();
-
-    if (googleButton.value && typeof google !== 'undefined' && google.accounts && google.accounts.id) {
-      google.accounts.id.renderButton(
-        googleButton.value,
-        { theme: 'outline', size: 'large', width: '300' }
-      );
-    }
+    await renderGoogleButton();
   }
 });
 
@@ -151,14 +179,10 @@ const handleSignupSuccess = (userEmail: string) => {
     showSignupToast(userEmail);
 };
 
-const handleResetSuccess = () => {
-    // This function was not implemented in the original code
-    // Added here to satisfy the template usage
-};
 </script>
 
 <style scoped>
-.popup-overlay {
+.login-signup-overlay {
     position: fixed;
     left: 0;
     width: 100%;
@@ -167,7 +191,6 @@ const handleResetSuccess = () => {
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 95;
     padding: 20px;
     box-sizing: border-box;
     overflow-y: auto;

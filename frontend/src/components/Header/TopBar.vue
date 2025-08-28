@@ -19,11 +19,9 @@
                 </div>
             </div>
 
-            <router-link v-if="!loggedIn" to="/login" custom v-slot="{ navigate }">
-                <button class="login-button" @click="navigate">
-                    Log in
-                </button>
-            </router-link>
+            <button class="login-button" v-if=!loggedIn @click="navigateToLogin">
+                Log in
+            </button>
 
             <button class="menu-btn icon-btn" @click="toggleSideMenu" aria-label="side menu">
                 <span class="menu-line"></span>
@@ -40,9 +38,11 @@ import { useUserStatsStore } from "@/store/userStatsStore";
 import { useMenuStore } from "@/store/menuStore";
 import { useAuthStore } from "@/store/authStore";
 import { computed, onMounted } from "vue";
+import { useRouter } from 'vue-router';
 
 const authStore = useAuthStore();
 const loggedIn = computed(() => authStore.loggedIn);
+const router = useRouter();
 
 const userStats = useUserStatsStore();
 const { currentStreak, bestStreak } = storeToRefs(userStats);
@@ -52,6 +52,15 @@ const menuStore = useMenuStore();
 const pageTitle = computed(() => {
     return "rivue.ai";
 });
+
+const navigateToLogin = () => {
+    if (router.currentRoute.value.path === '/login*') {
+        // Clean the URL by removing query parameters
+        router.replace('/login');
+    } else {
+        router.push('/login');
+    }
+};
 
 const toggleSideMenu = (): void => {
     menuStore.toggleSideMenu();

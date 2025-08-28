@@ -144,7 +144,7 @@ const routes = [
             }
         }
     },
-    {
+    { 
         name: 'Leaderboard',
         path: '/lessons/:libraryId/leaderboard',
         component: defineAsyncComponent(() => import('./components/Graphs/LearningPath/Leaderboard.vue')),
@@ -303,15 +303,7 @@ router.beforeEach(async (to, from, next) => {
             path: '/login',
             query: { redirect: from.fullPath },
         });
-    } else if (to.path === '/login' && !to.query.redirect) {
-        
-        // Ensure the redirect query is included when navigating to the login page from any route
-        next({
-            path: '/login',
-            query: { redirect: from.fullPath },
-        });
     } else {
-
         next();
     }
 

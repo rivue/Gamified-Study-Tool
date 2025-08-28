@@ -1,4 +1,3 @@
-<!-- TODO: fix weird vue warn messages that come up when someone types -->
 <template>
     <h1>Password Reset</h1>
  
