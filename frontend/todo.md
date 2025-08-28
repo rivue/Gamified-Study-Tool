@@ -1,0 +1,1 @@
+- make page refresh when you click "Log in" when you on the /login route
