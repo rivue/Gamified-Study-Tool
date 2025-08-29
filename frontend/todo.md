@@ -1,1 +1,1 @@
-- make page refresh when you click "Log in" when you on the /login route
+Please create an ability for users to create empty courses instead of having to specify course material / file uploads, or a course structure (topic names) - basically they can specify name and private / public status and leave everything else out. Please ONLY CREATE THE FRONTEND for this. All of the changes should be in the "/create" route with the following component: frontend/src/components/Game/Creation/LibraryCreator.vue
