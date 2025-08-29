@@ -10,7 +10,6 @@
                         </h2>
                         <div class="quiz-stats">
                             <span class="stat">{{ questions.length }} Questions</span>
-                            <span class="stat">{{ timeRemaining }} min left</span>
                             <span class="stat">Score: {{ score }}/{{ answeredQuestions }}</span>
                         </div>
                     </div>
@@ -154,7 +153,7 @@
                 </main>
 
                 <footer class="modal-footer">
-                    <button v-if="!showResults" @click="submitAnswer" :disabled="!selectedAnswer" class="button-primary">
+                    <button v-if="!showResults" @click="submitAnswer" :disabled="!selectedAnswer" class="button-secondary">
                         <span v-if="!showAnswer">Submit Answer</span>
                         <span v-else-if="currentQuestionIndex < questions.length - 1">Next Question</span>
                         <span v-else>View Results</span>
@@ -164,7 +163,7 @@
                             <ArrowPathIcon class="w-5 h-5" />
                             <span>Retake Quiz</span>
                         </button>
-                        <button @click="close" class="button-primary">
+                        <button @click="close" class="button-secondary">
                             <span>Close</span>
                         </button>
                     </div>
@@ -192,7 +191,6 @@ const showAnswer = ref(false);
 const showResults = ref(false);
 const userAnswers = ref([]);
 const score = ref(0);
-const timeRemaining = ref(15);
 
 // Mock quiz data
 const questions = ref([
@@ -288,20 +286,10 @@ const retakeQuiz = () => {
     showResults.value = false;
     userAnswers.value = [];
     score.value = 0;
-    timeRemaining.value = 15;
 };
 
 onMounted(() => {
     requestAnimationFrame(() => container.value?.focus());
-    
-    // Timer simulation
-    const timer = setInterval(() => {
-        if (timeRemaining.value > 0 && !showResults.value) {
-            timeRemaining.value--;
-        } else {
-            clearInterval(timer);
-        }
-    }, 60000); // 1 minute intervals
 });
 </script>
 
@@ -427,12 +415,26 @@ onMounted(() => {
     display: grid;
     place-items: center;
     transition: all .25s ease;
+    position: relative;
 }
-
+.close-button:before {
+    content:"";
+    position:absolute;
+    inset:0;
+    border-radius: inherit;
+    background: radial-gradient(circle at 30% 30%, rgba(13,148,136,.4), transparent 65%);
+    opacity: 0;
+    transition: opacity .35s ease;
+}
 .close-button:hover {
     color: #ffffff;
     transform: translateY(-2px);
     box-shadow: 0 6px 18px -6px rgba(0,0,0,.65), 0 0 0 1px rgba(13,148,136,.4);
+}
+.close-button:hover:before { opacity: 1; }
+.close-button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px -2px rgba(0,0,0,.7);
 }
 
 /* Progress */
@@ -784,11 +786,9 @@ onMounted(() => {
     gap: .75rem;
 }
 
-.button-primary, .button-secondary {
+.button-secondary {
     position: relative;
     border: 1px solid rgba(13,148,136,.45);
-    background: linear-gradient(120deg, var(--highlight-color), var(--highlight-color-alt));
-    color: #042f2e;
     font-weight: 600;
     letter-spacing: .4px;
     padding: .85rem 1.55rem;
@@ -798,12 +798,12 @@ onMounted(() => {
     display: inline-flex;
     align-items: center;
     gap: .5rem;
-    transition: transform .25s ease, box-shadow .35s ease;
-}
-
-.button-primary:disabled {
-    opacity: .5;
-    cursor: not-allowed;
+    box-shadow:
+        0 10px 24px -10px rgba(0,0,0,.75),
+        0 4px 18px -6px rgba(13,148,136,.55),
+        0 0 0 1px rgba(13,148,136,.4),
+        inset 0 0 0 1px rgba(255,255,255,.15);
+    transition: transform .25s cubic-bezier(.22,.99,.45,1), box-shadow .35s ease, filter .4s ease;
 }
 
 .button-secondary {
@@ -811,9 +811,37 @@ onMounted(() => {
     color: #f8fafc;
 }
 
-.button-primary:hover:not(:disabled), .button-secondary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(0,0,0,.2);
+.button-secondary:before {
+    content:"";
+    position:absolute;
+    inset:0;
+    border-radius: inherit;
+    background: radial-gradient(circle at 30% 30%, rgba(13,148,136,.4), transparent 65%);
+    mix-blend-mode: overlay;
+    opacity: 0;
+    transition: opacity .5s ease;
+}
+
+.button-secondary:hover {
+    transform: translateY(-4px);
+    box-shadow:
+        0 18px 40px -18px rgba(0,0,0,.85),
+        0 6px 26px -10px rgba(13,148,136,.65),
+        0 0 0 1px rgba(13,148,136,.55);
+}
+
+.button-secondary:hover:before { 
+    opacity: 1; 
+}
+
+.button-secondary:active {
+    transform: translateY(-1px);
+    transition: transform .15s ease;
+}
+
+.button-secondary:focus-visible {
+    outline: 3px solid var(--highlight-color);
+    outline-offset: 3px;
 }
 
 /* Responsive */
@@ -838,5 +866,15 @@ onMounted(() => {
         flex-direction: column;
         width: 100%;
     }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+    .modal-fade-enter-active,
+    .modal-fade-leave-active { transition: none; }
+    .button-secondary,
+    .close-button,
+    .option-button,
+    .tf-button { transition: none; }
 }
 </style>

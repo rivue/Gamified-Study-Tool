@@ -86,11 +86,11 @@
       :summary="selectedMaterial.summary"
       @close="closeSummaryModal"
     />
-    <!-- <QuizModal
+    <QuizModal
       v-if="quizIsShowing"
       :material-name="selectedMaterial.name"
       @close="closeQuizModal"
-    /> -->
+    />
   </div>
 </template>
 
@@ -108,12 +108,12 @@ import {
   ClipboardDocumentIcon // for docx
 } from '@heroicons/vue/24/outline'; // Using outline for a lighter feel
 import SummaryModal from '@/components/Graphs/Materials/SummaryModal.vue';
-// import QuizModal from '@/components/QuizModal.vue';
+import QuizModal from '@/components/Graphs/Materials/QuizModal.vue';
 
 const router = useRouter();
 const fileInput = ref<HTMLInputElement | null>(null);
 const summaryIsShowing = ref(false);
-// const quizIsShowing = ref(false);
+const quizIsShowing = ref(false);
 const selectedMaterial = ref(null as Material | null);
 
 // Mock data
@@ -242,6 +242,15 @@ const materials = ref<Material[]>([
     },
     {
         id: 2,
+        name: 'Course_Syllabus.docx',
+        type: 'docx',
+        size: 450560,
+        uploadedDate: 'Aug 26, 2025',
+        status: 'Ready',
+        summary: summary
+    },
+    {
+        id: 3,
         name: 'Neural Networks Deep Dive.pptx',
         type: 'pptx',
         size: 8388608,
@@ -249,15 +258,7 @@ const materials = ref<Material[]>([
         status: 'Summarizing',
         summary: summary
     },
-    {
-        id: 3,
-        name: 'Course_Syllabus.docx',
-        type: 'docx',
-        size: 450560,
-        uploadedDate: 'Aug 26, 2025',
-        status: 'Error',
-        summary: summary
-    },
+    
 ]);
 
 const goBack = () => {
@@ -315,15 +316,15 @@ function closeSummaryModal() {
     selectedMaterial.value = null;
 }
 
-// function showQuiz(file: Material) {
-//     quizIsShowing.value = true;
-//     selectedMaterial.value = file;
-// }
+function showQuiz(file: Material) {
+    quizIsShowing.value = true;
+    selectedMaterial.value = file;
+}
 
-// function closeQuizModal() {
-//     quizIsShowing.value = false;
-//     selectedMaterial.value = null;
-// }
+function closeQuizModal() {
+    quizIsShowing.value = false;
+    selectedMaterial.value = null;
+}
 
 // Simulate upload progress for mock
 setInterval(() => {
