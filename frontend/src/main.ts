@@ -165,6 +165,12 @@ const routes = [
         name: 'QuizManager',
         component: () => import('@/views/QuizManager.vue')
     },
+    {
+        path: '/lessons/:id/materials',
+        name: 'CourseMaterials',
+        component: () => import('@/components/Graphs/Materials/CourseMaterials.vue'),
+        meta: { requiresAuth: true }
+    },
 
     // Simple routes
     { path: '/courses', component: defineAsyncComponent(() => import('./components/Game/Creation/LibraryBrowser.vue')), meta: { title: 'Rivue.ai | My Courses' } },

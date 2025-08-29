@@ -545,6 +545,10 @@ function goToQuizManager() {
     router.push(`/lessons/${props.libraryId}/quizzes`)
 }
 
+function goToMaterials() {
+    router.push(`/lessons/${props.libraryId}/materials`)
+}
+
 // Get color for a unit based on its index
 const getUnitColor = (unitIndex) => {
     const colorIndex = unitIndex % unitColors.length
