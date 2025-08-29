@@ -96,9 +96,29 @@
                             <div class="section-card">
                                 <div class="card-header">
                                     <h2 class="section-title">Course Information</h2>
-                                    <p class="section-description text-lg">Give your course a name and upload your source
-                                        material
-                                    </p>
+                                    <p class="section-description text-lg">Choose your creation method and give your course a name.</p>
+                                </div>
+
+                                <div class="form-group">
+                                     <label class="form-label">Creation Mode</label>
+                                    <div class="visibility-toggle creation-mode-toggle">
+                                        <button type="button"
+                                            :class="['visibility-option', { 'active': courseMode === 'guided' }]"
+                                            @click="courseMode = 'guided'">
+                                            <div class="option-content">
+                                                <div class="option-title">Guided</div>
+                                                <div class="option-desc">Generate a course from a PDF and topic structure.</div>
+                                            </div>
+                                        </button>
+                                        <button type="button"
+                                            :class="['visibility-option', 'recommended', { 'active': courseMode === 'empty' }]"
+                                            @click="courseMode = 'empty'">
+                                            <div class="option-content">
+                                                <div class="option-title">Empty</div>
+                                                <div class="option-desc">Create an empty course with just a name.</div>
+                                            </div>
+                                        </button>
+                                    </div>
                                 </div>
 
                                 <div class="form-group">
@@ -113,7 +133,7 @@
                                     </div>
                                 </div>
 
-                                <div class="form-group">
+                                <div v-if="courseMode === 'guided'" class="form-group">
                                     <label class="form-label">Course Material</label>
                                     <div class="file-upload-area" :class="{ 'has-file': selectedFile }">
                                         <input type="file" id="fileInput" ref="fileInput" @change="handleFileUpload"
@@ -148,7 +168,7 @@
                         </div>
 
                         <!-- Step 2: Course Structure -->
-                        <div v-if="currentTab === 'structure'" class="step-content">
+                        <div v-if="currentTab === 'structure' && courseMode === 'guided'" class="step-content">
                             <div class="section-card">
                                 <div class="card-header">
                                     <h2 class="section-title">Course Structure</h2>
@@ -326,6 +346,8 @@ interface Group {
     editingName?: string;
 }
 
+const courseMode = ref<'guided' | 'empty'>('guided');
+
 const groupSchema = z.object({
     name: z.string()
         .min(4, "Topic names must be at least 4 characters")
@@ -368,16 +390,16 @@ const groupSchema = z.object({
         })
 });
 
-const formSchema = z.object({
+const guidedFormSchema = z.object({
     topic: z.string()
         .min(4, "Course name must be at least 4 characters")
         .max(25, "Course name must be at most 25 characters")
         .refine(val => !val.startsWith(" ") && !val.endsWith(" "),
             "Course name must not start or end with a space"),
     visibility: z.boolean(),
-    selectedFile: z.instanceof(File, { message: "Must have at least one file - we wouldn't know what to generate!" }),
+    selectedFile: z.instanceof(File, { message: "A file is required for guided course creation." }),
     groups: z.array(groupSchema)
-        .min(1, "Must have at least one Topic (and topic names can't be empty)")
+        .min(1, "At least one topic is required for guided course creation.")
         .refine(
             groups => {
                 const names = groups.map(g => g.name.toLowerCase());
@@ -386,6 +408,22 @@ const formSchema = z.object({
             "Duplicate topic names are not allowed"
         )
 });
+
+const emptyFormSchema = z.object({
+    topic: z.string()
+        .min(4, "Course name must be at least 4 characters")
+        .max(25, "Course name must be at most 25 characters")
+        .refine(val => !val.startsWith(" ") && !val.endsWith(" "),
+            "Course name must not start or end with a space"),
+    visibility: z.boolean(),
+    selectedFile: z.instanceof(File).optional().nullable(),
+    groups: z.array(groupSchema).optional()
+});
+
+const formSchema = computed(() => {
+    return courseMode.value === 'guided' ? guidedFormSchema : emptyFormSchema;
+});
+
 
 // Keep all existing state...
 const router = useRouter();
@@ -441,11 +479,20 @@ const loadingMessages = ref([
 ]);
 
 // Updated steps with descriptions
-const steps = computed(() => [
-    { value: 'basics', label: 'Course Basics' },
-    { value: 'structure', label: 'Course Structure' },
-    { value: 'settings', label: 'Settings' }
-]);
+const steps = computed(() => {
+    if (courseMode.value === 'empty') {
+        return [
+            { value: 'basics', label: 'Course Basics' },
+            { value: 'settings', label: 'Settings' }
+        ];
+    }
+    return [
+        { value: 'basics', label: 'Course Basics' },
+        { value: 'structure', label: 'Course Structure' },
+        { value: 'settings', label: 'Settings' }
+    ];
+});
+
 
 const disableExtras = computed(() => {
     return !authStore.loggedIn;
@@ -458,6 +505,10 @@ const getStepIndex = (step: string) => {
 
 const goToNextStep = () => {
     const currentIndex = getStepIndex(currentTab.value);
+    if (courseMode.value === 'empty' && currentTab.value === 'basics') {
+        currentTab.value = 'settings';
+        return;
+    }
     if (currentIndex < steps.value.length - 1) {
         currentTab.value = steps.value[currentIndex + 1].value as 'basics' | 'structure' | 'settings';
     }
@@ -465,6 +516,10 @@ const goToNextStep = () => {
 
 const goToPreviousStep = () => {
     const currentIndex = getStepIndex(currentTab.value);
+     if (courseMode.value === 'empty' && currentTab.value === 'settings') {
+        currentTab.value = 'basics';
+        return;
+    }
     if (currentIndex > 0) {
         currentTab.value = steps.value[currentIndex - 1].value as 'basics' | 'structure' | 'settings';
     }
@@ -566,14 +621,14 @@ const hasStepErrors = (step: 'basics' | 'structure' | 'settings') => {
         topic: topic.value,
         visibility: isPublic.value,
         selectedFile: selectedFile.value,
-        groups: groups.value.map(g => ({
+        groups: courseMode.value === 'guided' ? groups.value.map(g => ({
             name: g.name,
             sections: g.sections.filter(s => s.trim() !== "")
-        })).filter(g => g.name.trim() !== "")
+        })).filter(g => g.name.trim() !== "") : undefined
     }
 
     try {
-        formSchema.parse(payload)
+        formSchema.value.parse(payload)
         return false
     } catch (e) {
         if (e instanceof z.ZodError) {
@@ -583,6 +638,7 @@ const hasStepErrors = (step: 'basics' | 'structure' | 'settings') => {
                 case 'basics':
                     return !!(errors.topic?._errors?.length || errors.selectedFile?._errors?.length)
                 case 'structure':
+                     if (courseMode.value === 'empty') return false;
                     return !!(errors.groups?._errors?.length ||
                         (errors.groups && typeof errors.groups === 'object' &&
                             Object.keys(errors.groups).some(key => key !== '_errors')))
@@ -610,14 +666,14 @@ const getStepErrorSummary = (step: 'basics' | 'structure') => {
         topic: topic.value,
         visibility: isPublic.value,
         selectedFile: selectedFile.value,
-        groups: groups.value.map(g => ({
+        groups: courseMode.value === 'guided' ? groups.value.map(g => ({
             name: g.name,
             sections: g.sections.filter(s => s.trim() !== "")
-        })).filter(g => g.name.trim() !== "")
+        })).filter(g => g.name.trim() !== "") : undefined
     }
 
     try {
-        formSchema.parse(payload)
+        formSchema.value.parse(payload)
         return ''
     } catch (e) {
         if (e instanceof z.ZodError) {
@@ -630,6 +686,7 @@ const getStepErrorSummary = (step: 'basics' | 'structure') => {
                     if (errors.selectedFile?._errors?.length) basicErrors.push('Course material')
                     return basicErrors.join(', ')
                 case 'structure':
+                    if (courseMode.value === 'empty') return '';
                     const structureErrors = []
                     if (errors.groups?._errors?.length) structureErrors.push('Topics required')
                     if (errors.groups && typeof errors.groups === 'object') {
@@ -662,7 +719,7 @@ function validateForm(data: unknown) {
     resetErrors()
     validationAttempted.value = true;
     try {
-        formSchema.parse(data)
+        formSchema.value.parse(data)
         return true
     } catch (e) {
         if (e instanceof z.ZodError) {
@@ -678,11 +735,11 @@ async function handleSubmit() {
     const payload = {
         topic: topic.value,
         visibility: isPublic.value,
-        selectedFile: selectedFile.value,
-        groups: groups.value.map(g => ({
+        selectedFile: courseMode.value === 'guided' ? selectedFile.value : null,
+        groups: courseMode.value === 'guided' ? groups.value.map(g => ({
             name: g.name,
             sections: g.sections.filter(s => s.trim() !== "")
-        })).filter(g => g.name.trim() !== "")
+        })).filter(g => g.name.trim() !== "") : []
     }
 
     if (!validateForm(payload)) {
@@ -694,16 +751,19 @@ async function handleSubmit() {
 
     const formData = new FormData();
 
-    if (selectedFile.value) {
-        formData.append("selectedFile", selectedFile.value);
+    if (payload.selectedFile) {
+        formData.append("selectedFile", payload.selectedFile);
     }
 
-    payload.groups.forEach((group, index) => {
-        formData.append(`groupNames[${index}]`, group.name);
-        group.sections.forEach(section => {
-            formData.append(`groupSections[${index}][]`, section);
+    if (payload.groups) {
+        payload.groups.forEach((group, index) => {
+            formData.append(`groupNames[${index}]`, group.name);
+            group.sections.forEach(section => {
+                formData.append(`groupSections[${index}][]`, section);
+            });
         });
-    });
+    }
+
 
     formData.append("topic", topic.value);
     formData.append("language", "English");
@@ -712,13 +772,11 @@ async function handleSubmit() {
     formData.append("libraryDifficulty", libraryDifficulty.value);
     formData.append("guide", "Azalea");
     formData.append("visibility", isPublic.value.toString());
-
-    if (selectedFile.value) {
-        formData.append("selectedFile", selectedFile.value);
-    }
+    
+    const url = courseMode.value === 'guided' ? "/api/library/generate" : "/api/library/create-empty";
 
     axios
-        .post("/api/library/generate", formData, {
+        .post(url, formData, {
             headers: {
                 "Content-Type": "multipart/form-data",
             },
@@ -1316,6 +1374,7 @@ onUnmounted(() => {
     background: rgba(26, 139, 127, 0.05);
     cursor: pointer;
     transition: all 0.2s;
+    position: relative;
 }
 
 .visibility-option:hover {
@@ -1326,6 +1385,19 @@ onUnmounted(() => {
 .visibility-option.active {
     border-color: var(--color-primary);
     background: rgba(26, 139, 127, 0.2);
+}
+
+.visibility-option.recommended::before {
+    content: "Recommended";
+    position: absolute;
+    top: -10px;
+    right: 10px;
+    background-color: var(--color-primary);
+    color: white;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 0.7rem;
+    font-weight: bold;
 }
 
 .option-icon {
