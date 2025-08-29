@@ -350,7 +350,6 @@ onMounted(() => {
 .button-primary {
     position: relative;
     border: 1px solid rgba(13,148,136,.45);
-    /* background: linear-gradient(120deg, var(--btn-bg1), var(--btn-bg2)); */
     font-weight: 600;
     letter-spacing: .4px;
     padding: .85rem 1.55rem;
@@ -368,11 +367,10 @@ onMounted(() => {
     transition: transform .25s cubic-bezier(.22,.99,.45,1), box-shadow .35s ease, filter .4s ease;
 }
 .button-primary:before {
-    content:"";
     position:absolute;
     inset:0;
     border-radius: inherit;
-    mix-blend-mode: overlay; */
+    mix-blend-mode: overlay;
     opacity: 0;
     transition: opacity .5s ease;
 }
