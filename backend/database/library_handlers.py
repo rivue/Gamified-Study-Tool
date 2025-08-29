@@ -667,10 +667,8 @@ def join_library(user_id: int, library_id: int, join_code: str = None):
         raise UserAlreadyMemberError("user already in this library")
 
     try:
-        print("test")
         membership = LibraryMembership(user_id=user.id, library_id=library.id, joined_at=datetime.now())
         db.session.add(membership)
-        print("test1")
         # bulk-insert room states
 
         # Note: redundant when generating library for first time - maybe move to after save_library_room_contents
@@ -684,7 +682,6 @@ def join_library(user_id: int, library_id: int, join_code: str = None):
             for unit in library.units for section in unit.sections
         ]
         db.session.bulk_save_objects(states)
-        print("test2")
 
         db.session.add(LibraryFavorites(user_id=user.id,
                                             library_id=library.id,
@@ -695,7 +692,6 @@ def join_library(user_id: int, library_id: int, join_code: str = None):
         return jsonify({"message": "User added to library successfully"}), 201
     
     except IntegrityError as e:
-        print("integrity error join_library")
         db.session.rollback()
         print(f"{e}")
         raise UserAlreadyMemberError  # your custom error

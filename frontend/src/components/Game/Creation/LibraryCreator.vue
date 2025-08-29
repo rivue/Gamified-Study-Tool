@@ -9,7 +9,7 @@
 
                 <!-- Stepper Navigation -->
                 <div class="stepper-nav">
-                    <div class="stepper-container">
+                    <div class="stepper-container" :class="{ 'two-steps': steps.length === 2 }">
                         <div v-for="(step, index) in steps" :key="step.value" class="stepper-item">
                             <!-- Step Circle -->
                             <div :class="['step-circle', {
@@ -103,6 +103,14 @@
                                      <label class="form-label">Creation Mode</label>
                                     <div class="visibility-toggle creation-mode-toggle">
                                         <button type="button"
+                                            :class="['visibility-option', 'recommended', { 'active': courseMode === 'empty' }]"
+                                            @click="courseMode = 'empty'">
+                                            <div class="option-content">
+                                                <div class="option-title">Empty</div>
+                                                <div class="option-desc">Start from scratch in seconds. Add chapters as you go.</div>
+                                            </div>
+                                        </button>
+                                        <button type="button"
                                             :class="['visibility-option', { 'active': courseMode === 'guided' }]"
                                             @click="courseMode = 'guided'">
                                             <div class="option-content">
@@ -110,14 +118,7 @@
                                                 <div class="option-desc">Generate a course from a PDF and topic structure.</div>
                                             </div>
                                         </button>
-                                        <button type="button"
-                                            :class="['visibility-option', 'recommended', { 'active': courseMode === 'empty' }]"
-                                            @click="courseMode = 'empty'">
-                                            <div class="option-content">
-                                                <div class="option-title">Empty</div>
-                                                <div class="option-desc">Create an empty course with just a name.</div>
-                                            </div>
-                                        </button>
+                                        
                                     </div>
                                 </div>
 
@@ -346,7 +347,7 @@ interface Group {
     editingName?: string;
 }
 
-const courseMode = ref<'guided' | 'empty'>('guided');
+const courseMode = ref<'guided' | 'empty'>('empty');
 
 const groupSchema = z.object({
     name: z.string()
@@ -847,9 +848,13 @@ onUnmounted(() => {
     align-items: flex-start;
     justify-content: space-between;
     position: relative;
-    width: 600px;
-    /* Changed from max-width to fixed width */
+    max-width: 600px;
     margin: 0 auto;
+}
+
+.stepper-container.two-steps {
+    justify-content: space-around;
+    max-width: 400px;
 }
 
 .stepper-item {
@@ -1388,7 +1393,7 @@ onUnmounted(() => {
 }
 
 .visibility-option.recommended::before {
-    content: "Recommended";
+    content: "Recommended for beginners";
     position: absolute;
     top: -10px;
     right: 10px;
@@ -1398,6 +1403,11 @@ onUnmounted(() => {
     border-radius: 10px;
     font-size: 0.7rem;
     font-weight: bold;
+}
+
+.visibility-option.active.recommended {
+    border-width: 3px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
 }
 
 .option-icon {

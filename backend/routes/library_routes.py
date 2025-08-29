@@ -24,7 +24,7 @@ def init_library_routes(app):
     executor = Executor(app)
 
     @app.route("/api/library/generate", methods=["POST"])
-    def generate_library():
+    def generate_guided_library():
         
         # User checks
         user_id = current_user.id if not isinstance(current_user, AnonymousUserMixin) else None
@@ -132,7 +132,7 @@ def init_library_routes(app):
 
             
             _, library_favorites_status_code = lbh.join_library(user_id, library_id, join_code)
-            print("after library generate")
+            
             if library_favorites_status_code == 201:
                 process_document(selected_file, library_id) # extract embeddings + and upload to pinecone
             else:
@@ -207,6 +207,69 @@ def init_library_routes(app):
 
         except Exception as e:
             return jsonify(status="error", message=f"Failed to generate room content: {str(e)}"), 500
+        
+    @app.route("/api/library/create-empty", methods=["POST"])
+    def generate_empty_library():
+        
+        # User checks
+        user_id = current_user.id if not isinstance(current_user, AnonymousUserMixin) else None
+        if not user_id:
+            return jsonify(status="error", message="Must be logged in to generate libraries."), 403
+        
+        # Topic checks
+        topic = request.form.get("topic")
+        if not topic:
+            return jsonify(status="error", message="No topic provided"), 400
+        
+        topic = clean(topic)
+
+        if len(topic) > 70:
+            return jsonify({"error": "Topic is too long. Maximum 200 characters allowed."}), 400
+        if len(topic) < 4:
+            return jsonify({"error": "Topic must be at least 4 characters."}), 400
+
+
+        is_public = request.form.get("visibility", "false").lower() == "true"
+
+        groups = parse_group_structure()
+        if groups:
+            print("Parsed Groups:", groups)
+        else:
+            print("No groups provided.")
+
+        # Start moderation task
+        moderation_future = executor.submit(moderate, topic)
+
+        # Wait for moderation result
+        violation, message = moderation_future.result()
+        if violation:
+            if user_id:
+                increment_violations(user_id)
+            return jsonify({"error": f"Message breaks our usage policy. Please check our guidelines.\n{message}"}), 400
+
+        # Creates library database object
+        library_response, library_response_status_code = lbh.create_library(user_id, topic, "library_difficulty_delete_later", "language_delete_later", "language_difficulty_delete_later", "guide_delete_later", is_public)
+        if library_response_status_code == 201:
+            
+            library_id = library_response.get_json().get("library_id")
+            
+
+            join_code = None
+            if not is_public:
+                # fetches join code if new library is private
+                lib = Library.query.filter_by(id=library_id).first()
+                join_code = lib.join_code 
+
+            try:
+                lbh.join_library(user_id, library_id, join_code)
+            except Exception as e:
+                return jsonify(status="error", message="Failed to join library"), 500
+            
+            library = lbh.get_library(library_id, user_id, False)
+            return jsonify(status="success", library_data=library.get_json())
+
+        else:
+            return jsonify(status="error", message="Failed to create library"), 500
 
     @app.route("/api/library/<int:library_id>", methods=["GET"])
     def get_library(library_id):
@@ -239,7 +302,6 @@ def init_library_routes(app):
                 # _ is unit_id
                 _, section_id = library_data.get('section_to_unit_map').get(library_topic)
                 room_data = lbh.retrieve_library_room_contents(library_id, section_id, user_id)
-                print("check")
                 if not room_data:
                     return jsonify(status="error", message="Room not found"), 404
             else:

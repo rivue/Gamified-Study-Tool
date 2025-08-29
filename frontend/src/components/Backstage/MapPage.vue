@@ -1,6 +1,6 @@
 <template>
     <div class="page-main-container">
-        <div v-if="!loading && library && isDataValid">
+        <div v-if="!loading && library">
             <h1 class="text-3xl -mt-4">{{ library.data.library_topic }}</h1>
             <LearningPath :libraryId="Number(library.data.id)" :room-names="library.data.room_names"
                 :room-data="library.room_data" :library-is-public="library.data.is_public"
@@ -10,9 +10,6 @@
         </div>
         <div v-else-if="loading">
             <p>Loading...</p>
-        </div>
-        <div v-else>
-            <p>Failed to load data.</p>
         </div>
     </div>
 </template>

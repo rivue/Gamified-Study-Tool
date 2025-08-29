@@ -66,7 +66,9 @@
                         @unit-added="handleUnitAdded" />
 
                     <!-- Unit Headers -->
-                    <template v-for="([unit], unitName, unitIndex) in rawUnitData" :key="unitIndex">
+
+                    <template v-if="rawUnitData.length > 0" v-for="([unit], unitName, unitIndex) in rawUnitData"
+                        :key="unitIndex">
                         <div class="relative -mx-12 my-12 px-16 pt-40 pb-36 border-t-2 border-b-2 flex-shrink-0"
                             :class="['unit-box', { 'unit--first': unitIndex === 0, 'unit--last': unitIndex === Object.keys(rawUnitData).length - 1 }]"
                             :style="{
@@ -280,6 +282,9 @@
                             @unit-added="handleUnitAdded" />
 
                     </template>
+                    <template v-else>
+                        <EmptyCourse :is-owner="isOwner" :color="getUnitColor(0)" />
+                    </template>
 
                     <!-- Added right padding to ensure last nodes have space -->
                     <div class="p-16"></div>
@@ -363,6 +368,7 @@ import AddUnit from "./AddUnit.vue";
 import AddSection from "./AddSection.vue"
 import DeleteSection from "./DeleteSection.vue"
 import LeaveCourse from './LeaveCourse.vue'; // Import the new modal
+import EmptyCourse from './EmptyCourse.vue';
 
 const props = defineProps({
     libraryId: {
@@ -876,11 +882,15 @@ const handleScroll = () => {
 .nav-group.right {
     align-items: center;
 }
+
 .nav-group.right {
     display: flex;
-    gap: 0.75rem; /* Space between buttons */
-    justify-content: flex-end; /* Aligns buttons to the right */
+    gap: 0.75rem;
+    /* Space between buttons */
+    justify-content: flex-end;
+    /* Aligns buttons to the right */
 }
+
 @media (max-width: 600px) {
     .scrollContainer {
         position: static !important;
@@ -947,27 +957,34 @@ const handleScroll = () => {
 @media (min-width: 601px) {
 
     .map-footer {
-    display: flex;
-    justify-content: space-between; /* Ensures left and right groups are on opposite sides */
-    align-items: center; /* Vertically aligns the buttons */
-    position: static; /* Keeps the footer in its normal flow */
-    margin-top: 2rem;
-    padding: 20px;
-    margin-bottom: 8rem;
-    background: transparent;
-}
+        display: flex;
+        justify-content: space-between;
+        /* Ensures left and right groups are on opposite sides */
+        align-items: center;
+        /* Vertically aligns the buttons */
+        position: static;
+        /* Keeps the footer in its normal flow */
+        margin-top: 2rem;
+        padding: 20px;
+        margin-bottom: 8rem;
+        background: transparent;
+    }
 
-.nav-group.left {
-    display: flex;
-    gap: 0.75rem; /* Space between buttons */
-    justify-content: flex-start; /* Aligns buttons to the left */
-}
+    .nav-group.left {
+        display: flex;
+        gap: 0.75rem;
+        /* Space between buttons */
+        justify-content: flex-start;
+        /* Aligns buttons to the left */
+    }
 
-.nav-group.right {
-    display: flex;
-    gap: 0.75rem; /* Space between buttons */
-    justify-content: flex-end; /* Aligns buttons to the right */
-}
+    .nav-group.right {
+        display: flex;
+        gap: 0.75rem;
+        /* Space between buttons */
+        justify-content: flex-end;
+        /* Aligns buttons to the right */
+    }
 
 }
 
