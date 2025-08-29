@@ -16,7 +16,7 @@
                 </button>
             </div>
             <div class="right-controls">
-                <button @click="goToQuizManager"
+                <button @click="goToMaterials"
                     class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg p-4 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200"
                     style="color: var(--highlight-color);">
                     <ClipboardDocumentListIcon class="w-6 h-6" />
@@ -539,10 +539,6 @@ function goToCourseList() {
 
 function handleLeaveCourseClick() {
     showLeaveCourseModal.value = true;
-}
-
-function goToQuizManager() {
-    router.push(`/lessons/${props.libraryId}/quizzes`)
 }
 
 function goToMaterials() {
