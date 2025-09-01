@@ -1,7 +1,9 @@
 import os
+import json
 from supabase import create_client, Client
 from .models import db, Material
 from werkzeug.datastructures import FileStorage
+from io import BytesIO
 
 # This is a placeholder for your actual Supabase client.
 # Ideally, you should initialize this once in your main app factory
@@ -26,42 +28,57 @@ def create_and_upload_material(course_id: int, file: FileStorage):
     if not file or not file.filename:
         raise ValueError("Invalid file provided.")
 
-    # 1. Create an initial Material record to get an ID
-    # We set a temporary storage_path because the column is not nullable.
+    # --- Safer File Reading with Chunking ---
+    # Enforce a maximum file size to protect the server (e.g., 25MB)
+    MAX_FILE_SIZE = 25 * 1024 * 1024
+    CHUNK_SIZE = 4 * 1024 * 1024  # Read in 4MB chunks
+
+    parts = []
+    total_bytes_read = 0
+    while True:
+        chunk = file.stream.read(CHUNK_SIZE)
+        if not chunk:
+            break  # End of file
+        
+        total_bytes_read += len(chunk)
+        if total_bytes_read > MAX_FILE_SIZE:
+            raise ValueError(f"File exceeds the maximum allowed size of {int(MAX_FILE_SIZE / 1024 / 1024)}MB.")
+            
+        parts.append(chunk)
+
+    file_bytes = b''.join(parts)
+    # --- End of Safer File Reading ---
+
     new_material = Material(
-        library_id=course_id, # Assuming course_id maps to library_id
+        library_id=course_id,
         name=file.filename,
         type=file.filename.split('.')[-1].lower(),
-        size=file.content_length or 0,
+        size=total_bytes_read, # Use the actual bytes read for size
         status='processing',
-        storage_path='_temp' 
+        storage_path='_temp'
     )
     db.session.add(new_material)
-    db.session.flush() # Use flush to get the auto-generated ID from the DB sequence
+    db.session.flush()
 
     material_id = new_material.id
     storage_path = f"{course_id}/{material_id}_{file.filename}"
     
     try:
-        # 2. Upload the file to Supabase Storage
-        file.stream.seek(0)
-        file_bytes = file.read()
-        
-        supabase.storage.from_("course_materials").upload(
-            path=storage_path,
-            file=file_bytes,
-            file_options={"content-type": file.mimetype or 'application/octet-stream'}
-        )
+        try:
+            supabase.storage.from_("course_materials").upload(
+                path=storage_path,
+                file=file_bytes,
+                file_options={"content-type": file.mimetype or "application/octet-stream"}
+            )
+        except json.JSONDecodeError:
+            raise Exception("Failed to parse Supabase response. Check your SUPABASE_URL and ensure you are using the SERVICE_ROLE_KEY.")
 
-        # 3. Update the material record with the final storage_path
         new_material.storage_path = storage_path
         db.session.commit()
 
         return new_material
 
     except Exception as e:
-        # If anything fails, roll back the entire transaction
         db.session.rollback()
         print(f"Error during material upload: {e}")
-        # You might want to add logic here to delete the file from storage if it was already uploaded
         raise

@@ -4,7 +4,7 @@ from database.material_handlers import create_and_upload_material
 
 def init_material_routes(app):
 
-    @app.route("/api/upload", methods=["POST"])
+    @app.route("/api/materials/upload", methods=["POST"])
     @login_required # Protect this endpoint
     def upload_material():
         """
