@@ -186,6 +186,7 @@ from routes.graph_routes import init_graph_routes
 from routes.feedback_routes import init_feedback_routes
 from routes.admin_routes import init_admin_routes
 from routes.library_routes import init_library_routes
+from routes.material_routes import init_material_routes
 
 init_auth_routes(app)
 init_profile_routes(app)
@@ -194,6 +195,7 @@ init_graph_routes(app)
 init_feedback_routes(app)
 init_admin_routes(app)
 init_library_routes(app)
+init_material_routes(app)
 
 if app.config['FLASK_ENV'] not in ['migration', 'production']:
     with app.app_context():

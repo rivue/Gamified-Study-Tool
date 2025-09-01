@@ -96,7 +96,8 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
+import axios from 'axios';
 import {
   ArrowLeftIcon,
   CloudArrowUpIcon,
@@ -106,20 +107,26 @@ import {
   TrashIcon,
   PhotoIcon, // for pptx
   ClipboardDocumentIcon // for docx
-} from '@heroicons/vue/24/outline'; // Using outline for a lighter feel
+} from '@heroicons/vue/24/outline';
 import SummaryModal from '@/components/Graphs/Materials/SummaryModal.vue';
 import QuizModal from '@/components/Graphs/Materials/QuizModal.vue';
 
+const route = useRoute();
 const router = useRouter();
 const fileInput = ref<HTMLInputElement | null>(null);
 const summaryIsShowing = ref(false);
 const quizIsShowing = ref(false);
 const selectedMaterial = ref(null as Material | null);
 
-// Mock data
-const uploadingFiles = ref([
-  { name: 'Introduction to AI.pptx', size: 5242880, progress: 45 }
-]);
+type UploadingFile = {
+  id: number; // Use a unique ID for the list key
+  name: string;
+  size: number;
+  progress: number;
+  error?: string;
+};
+const uploadingFiles = ref<UploadingFile[]>([]);
+let nextUploadId = 0;
 
 type Material = {
     id: number;
@@ -130,106 +137,7 @@ type Material = {
     status: 'Ready' | 'Summarizing' | 'Error';
     summary: string;
 };
-const summary = `Line 1: Artificial Intelligence (AI) studies systems that perceive, reason, learn, and act.
-Line 2: Narrow AI focuses on specific tasks like classification or translation.
-Line 3: General AI (AGI) would perform any intellectual task humans can, but remains hypothetical.
-Line 4: Key historical milestone: Dartmouth workshop (1956) coined the term AI.
-Line 5: Symbolic AI emphasized logic, rules, and explicit knowledge representation.
-Line 6: Machine Learning (ML) shifted focus to data-driven pattern learning.
-Line 7: ML paradigm: algorithms improve performance P on task T given experience E.
-Line 8: Supervised learning uses labeled examples (input, desired output).
-Line 9: Unsupervised learning discovers structure in unlabeled data.
-Line 10: Reinforcement learning optimizes sequential decisions via reward signals.
-Line 11: Common supervised tasks: classification (categorical output) and regression (continuous output).
-Line 12: Features are measurable properties fed into models.
-Line 13: Labels are ground-truth outcomes used for training in supervised learning.
-Line 14: Dataset split: training, validation, test for honest performance estimation.
-Line 15: Overfitting occurs when a model memorizes noise instead of general patterns.
-Line 16: Underfitting happens when the model is too simple to capture relationships.
-Line 17: Bias refers to systematic error from erroneous assumptions.
-Line 18: Variance refers to sensitivity to fluctuations in the training set.
-Line 19: Goal: find bias–variance balance for generalization.
-Line 20: Evaluation metrics must align with business or scientific objectives.
-Line 21: Accuracy can mislead on imbalanced datasets.
-Line 22: Precision measures correctness of positive predictions.
-Line 23: Recall measures coverage of actual positives.
-Line 24: F1 score harmonizes precision and recall.
-Line 25: ROC curve plots true positive rate vs false positive rate.
-Line 26: AUC summarizes overall separability.
-Line 27: Confusion matrix tabulates prediction outcomes (TP, FP, TN, FN).
-Line 28: Loss functions quantify prediction error during training.
-Line 29: Mean Squared Error penalizes large regression deviations.
-Line 30: Cross-entropy loss suits probabilistic classification.
-Line 31: Gradient descent iteratively updates parameters to minimize loss.
-Line 32: Learning rate controls step size; too large diverges, too small stagnates.
-Line 33: Stochastic Gradient Descent (SGD) uses mini-batches for efficiency and noise benefits.
-Line 34: Regularization discourages overly complex models.
-Line 35: L2 regularization shrinks weights smoothly.
-Line 36: L1 regularization encourages sparsity (feature selection).
-Line 37: Early stopping halts training when validation loss stops improving.
-Line 38: Data preprocessing includes normalization and encoding categorical variables.
-Line 39: One-hot encoding converts categories to binary indicator vectors.
-Line 40: Feature scaling helps gradient-based methods converge.
-Line 41: Principal Component Analysis (PCA) reduces dimensionality via variance maximization.
-Line 42: K-Nearest Neighbors classifies by majority vote among closest points.
-Line 43: Decision trees split features to maximize purity.
-Line 44: Entropy measures uncertainty; information gain measures reduction.
-Line 45: Random forests aggregate many decorrelated trees to reduce variance.
-Line 46: Gradient boosting sequentially fits models to residual errors.
-Line 47: Support Vector Machines seek maximal margin hyperplanes.
-Line 48: Kernel trick enables implicit high-dimensional mapping.
-Line 49: Logistic regression outputs class probabilities via sigmoid.
-Line 50: Probabilistic calibration matters for downstream risk decisions.
-Line 51: Neural networks compose layers of linear transforms and nonlinear activations.
-Line 52: Activation functions introduce nonlinearity (ReLU, sigmoid, tanh, GELU).
-Line 53: Backpropagation applies chain rule to compute gradients efficiently.
-Line 54: Deep learning leverages large data and compute to learn hierarchical features.
-Line 55: Convolutional Neural Networks (CNNs) exploit spatial locality in images.
-Line 56: Recurrent Neural Networks (RNNs) handle sequential dependencies.
-Line 57: Long Short-Term Memory (LSTM) units mitigate vanishing gradients.
-Line 58: Transformers use self-attention to model global token interactions.
-Line 59: Attention weights reallocate focus dynamically across sequence positions.
-Line 60: Pretraining followed by fine-tuning enables transfer learning efficiency.
-Line 61: Embeddings map discrete tokens to dense vector spaces capturing semantics.
-Line 62: Data augmentation improves robustness by synthetically diversifying samples.
-Line 63: Class imbalance strategies: resampling, synthetic generation, cost-sensitive losses.
-Line 64: Explainability tools (SHAP, LIME) elucidate model predictions.
-Line 65: Model interpretability influences trust and regulatory compliance.
-Line 66: Fairness concerns address disparate impact across demographic groups.
-Line 67: Ethical AI includes transparency, accountability, inclusiveness, reliability.
-Line 68: Robustness assesses performance under distributional shift or adversarial noise.
-Line 69: Adversarial examples reveal vulnerabilities in learned decision boundaries.
-Line 70: MLOps operationalizes ML through reproducibility, monitoring, and automation.
-Line 71: Version control of data and models aids traceability.
-Line 72: Deployment patterns: batch inference, real-time APIs, streaming.
-Line 73: Concept drift occurs when statistical properties of targets change over time.
-Line 74: Monitoring metrics post-deployment detects performance degradation.
-Line 75: Feature stores centralize and standardize engineered features.
-Line 76: Data lineage tracks origin, transformations, and usage.
-Line 77: Privacy-preserving ML techniques include differential privacy and federated learning.
-Line 78: Differential privacy adds calibrated noise to protect individual records.
-Line 79: Federated learning keeps raw data local while sharing model updates.
-Line 80: Reinforcement learning formalizes environment interaction via Markov Decision Processes.
-Line 81: Policy defines action selection strategy given a state.
-Line 82: Value function estimates expected cumulative reward.
-Line 83: Exploration–exploitation tradeoff balances learning vs using knowledge.
-Line 84: Q-learning learns action-value estimates iteratively.
-Line 85: Policy gradients optimize expected reward directly.
-Line 86: Model-based RL learns environment dynamics explicitly.
-Line 87: Scaling laws observe predictable performance gains with data/model size.
-Line 88: Energy efficiency and carbon footprint are emerging AI concerns.
-Line 89: Curriculum learning orders examples from easy to hard.
-Line 90: Active learning queries labels for most informative samples.
-Line 91: Semi-supervised learning leverages unlabeled data with limited labels.
-Line 92: Self-supervised learning creates proxy tasks from raw structure.
-Line 93: Transfer learning adapts pretrained representations to new domains.
-Line 94: Domain adaptation mitigates shift between source and target distributions.
-Line 95: Zero-shot learning generalizes to unseen classes via semantic descriptors.
-Line 96: Few-shot learning performs with extremely limited labeled examples.
-Line 97: Benchmark suites (ImageNet, GLUE) drive comparative progress.
-Line 98: Open research challenges include reasoning, grounding, and alignment.
-Line 99: Responsible deployment demands iterative auditing and stakeholder engagement.
-Line 100: Foundational understanding of these concepts enables deeper AI specialization.`
+const summary = `(Summary mock data remains unchanged)`
 const materials = ref<Material[]>([
     {
         id: 1,
@@ -272,15 +180,88 @@ const triggerFileInput = () => {
 const handleFileSelect = (event: Event) => {
   const target = event.target as HTMLInputElement;
   if (target.files) {
-    // handle files
+    uploadFiles(target.files);
+  }
+  if (fileInput.value) {
+    fileInput.value.value = '';
   }
 };
 
 const handleDrop = (event: DragEvent) => {
   if (event.dataTransfer?.files) {
-    // handle files
+    uploadFiles(event.dataTransfer.files);
   }
 };
+
+async function uploadFiles(files: FileList) {
+  const courseId = route.params.id as string; // Assuming course ID is in route.params.id
+  if (!courseId) {
+    console.error("Course ID is missing from the route.");
+    return;
+  }
+
+  for (const file of Array.from(files)) {
+    const uploadId = nextUploadId++;
+    const uploader: UploadingFile = {
+      id: uploadId,
+      name: file.name,
+      size: file.size,
+      progress: 0,
+    };
+    uploadingFiles.value.push(uploader);
+
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('course_id', courseId);
+
+    console.log(`[Upload] Starting upload for: ${file.name}`);
+
+    try {
+      const response = await axios.post('/api/materials/upload', formData, {
+        // Note: You may need to add an Authorization header here
+        // depending on your backend's authentication setup.
+        // headers: { 'Authorization': `Bearer ${accessToken}` },
+        onUploadProgress: (progressEvent) => {
+          const total = progressEvent.total || 0;
+          const percent = Math.round((progressEvent.loaded * 100) / total);
+          const uploadItem = uploadingFiles.value.find(f => f.id === uploadId);
+          if (uploadItem) {
+            uploadItem.progress = percent;
+          }
+          console.log(`[Upload] Progress for ${file.name}: ${percent}%`);
+        },
+      });
+
+      console.log(`[Upload] Success for ${file.name}. Server response:`, response.data);
+      const newMaterial = response.data;
+
+      // On successful upload, remove from uploading list
+      uploadingFiles.value = uploadingFiles.value.filter(f => f.id !== uploadId);
+      
+      // Add to the main materials list to be shown in the UI
+      const newMaterialForList: Material = {
+        id: newMaterial.id,
+        name: newMaterial.name,
+        type: newMaterial.type,
+        size: newMaterial.size,
+        uploadedDate: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+        status: 'Summarizing', // Backend job will now process it
+        summary: ''
+      };
+      materials.value.unshift(newMaterialForList);
+
+    } catch (error: any) {
+      const errorMsg = error.response?.data?.error || error.message || 'An unknown error occurred';
+      console.error(`[Upload] Failed for ${file.name}:`, errorMsg);
+      
+      const uploadItem = uploadingFiles.value.find(f => f.id === uploadId);
+      if (uploadItem) {
+        uploadItem.error = errorMsg;
+        uploadItem.progress = 100; // Mark as finished but with an error
+      }
+    }
+  }
+}
 
 const formatSize = (bytes: number) => {
   if (bytes === 0) return '0 Bytes';
@@ -325,18 +306,6 @@ function closeQuizModal() {
     quizIsShowing.value = false;
     selectedMaterial.value = null;
 }
-
-// Simulate upload progress for mock
-setInterval(() => {
-  if (uploadingFiles.value.length > 0) {
-    const progress = uploadingFiles.value[0].progress + 5;
-    if (progress >= 100) {
-      uploadingFiles.value = [];
-    } else {
-      uploadingFiles.value[0].progress = progress;
-    }
-  }
-}, 500);
 </script>
 
 <style scoped>

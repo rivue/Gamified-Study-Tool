@@ -67,95 +67,96 @@
 
                     <!-- Unit Headers -->
 
-                    <template v-if="rawUnitData.length > 0" v-for="([unit], unitName, unitIndex) in rawUnitData"
-                        :key="unitIndex">
-                        <div class="relative -mx-12 my-12 px-16 pt-40 pb-36 border-t-2 border-b-2 flex-shrink-0"
-                            :class="['unit-box', { 'unit--first': unitIndex === 0, 'unit--last': unitIndex === Object.keys(rawUnitData).length - 1 }]"
-                            :style="{
-                                borderColor: getUnitColor(unitIndex),
-                                backgroundColor: 'var(--background-color-1t)',
-                            }">
+                    <template v-if="Object.keys(rawUnitData || {}).length > 0">
+                        <template v-for="(unitSections, unitName, unitIndex) in rawUnitData">
+                            <div class="relative -mx-12 my-12 px-16 pt-40 pb-36 border-t-2 border-b-2 flex-shrink-0"
+                                :class="['unit-box', { 'unit--first': unitIndex === 0, 'unit--last': unitIndex === Object.keys(rawUnitData).length - 1 }]"
+                                :style="{
+                                    borderColor: getUnitColor(unitIndex),
+                                    backgroundColor: 'var(--background-color-1t)',
+                                }">
 
 
-                            <!-- Unit name header -->
-                            <div class="absolute -top-5 left-1/2 transform -translate-x-1/2 px-6 py-2 rounded-lg font-bold text-xl whitespace-nowrap shadow-md"
-                                :style="{ backgroundColor: getUnitColor(unitIndex), color: 'var(--light-text)' }">
-                                {{ unitName }}
-                            </div>
+                                <!-- Unit name header -->
+                                <div class="absolute -top-5 left-1/2 transform -translate-x-1/2 px-6 py-2 rounded-lg font-bold text-xl whitespace-nowrap shadow-md"
+                                    :style="{ backgroundColor: getUnitColor(unitIndex), color: 'var(--light-text)' }">
+                                    {{ unitName }}
+                                </div>
 
-                            <!-- Sections container -->
-                            <div class="flex items-center">
-                                <template v-if="rawUnitData[unitName].length > 0"
-                                    v-for="([sectionId, sectionName], sectionIndex) in rawUnitData[unitName]"
-                                    :key="sectionIndex">
+                                <!-- Sections container -->
+                                <div class="flex items-center">
+                                    <template v-if="rawUnitData[unitName].length > 0"
+                                        v-for="([sectionId, sectionName], sectionIndex) in rawUnitData[unitName]"
+                                        :key="sectionIndex">
 
-                                    <AddSection v-if="editModeEnabled && isOwner" class="-mx-8" :library-id="libraryId"
-                                        :unit-id="getUnitIdByName(unitName)" :position="sectionIndex"
-                                        :offset="getNodeOffset(getGlobalSectionIndex(unitIndex, sectionIndex) - .6)"
-                                        :unit-color="getUnitColor(unitIndex)" @nodes-added="onSectionAdd" />
+                                        <AddSection v-if="editModeEnabled && isOwner" class="-mx-8"
+                                            :library-id="libraryId" :unit-id="getUnitIdByName(unitName)"
+                                            :position="sectionIndex"
+                                            :offset="getNodeOffset(getGlobalSectionIndex(unitIndex, sectionIndex) - .6)"
+                                            :unit-color="getUnitColor(unitIndex)" @nodes-added="onSectionAdd" />
 
-                                    <div class="relative flex-shrink-0 mx-12" :style="{
-                                        transform: `translateY(${getNodeOffset(getGlobalSectionIndex(unitIndex, sectionIndex))}px)`,
-                                    }" @mouseenter="!editModeEnabled && handleNodeHover(sectionId)"
-                                        @mouseleave="!editModeEnabled && handleNodeLeave()"
-                                        @click="editModeEnabled ? handleEditNodeClick() : undefined">
+                                        <div class="relative flex-shrink-0 mx-12" :style="{
+                                            transform: `translateY(${getNodeOffset(getGlobalSectionIndex(unitIndex, sectionIndex))}px)`,
+                                        }" @mouseenter="!editModeEnabled && handleNodeHover(sectionId)"
+                                            @mouseleave="!editModeEnabled && handleNodeLeave()"
+                                            @click="editModeEnabled ? handleEditNodeClick() : undefined">
 
-                                        <DeleteSection v-if="editModeEnabled && isOwner" :section-id="sectionId"
-                                            :section-name="sectionName" />
+                                            <DeleteSection v-if="editModeEnabled && isOwner" :section-id="sectionId"
+                                                :section-name="sectionName" />
 
-                                        <!-- Tooltip -->
-                                        <div v-if="selectedRoomId && selectedRoomId === sectionId"
-                                            class="absolute -top-32 left-1/2 -translate-x-1/2 w-64 z-50"
-                                            @mouseenter.stop @mouseover.stop>
-                                            <div class="relative" style="pointer-events: auto;">
-                                                <!-- Red close button in top-right -->
-                                                <div @click.stop="selectedRoomId = null"
-                                                    class="absolute -top-3 -right-3 w-8 h-8 rounded-full flex items-center justify-center cursor-pointer"
-                                                    style="background-color: red;">
-                                                    <XMarkIcon class="w-4 h-4" style="color: var(--light-text);" />
-                                                </div>
-                                                <!-- Main tooltip content -->
-                                                <div class="rounded-2xl p-4 shadow-lg"
-                                                    style="background-color: var(--element-color-1); color: var(--light-text);">
-                                                    <div class="font-medium mb-3">{{ sectionName }}
-                                                        <br>
-                                                        <span
-                                                            v-if="getRoomData(sectionId) && getRoomData(sectionId).lesson_state <= getRoomData(sectionId).num_lessons">
-                                                            lesson {{ getRoomData(sectionId).lesson_state }} / {{
-                                                                getRoomData(sectionId).num_lessons }}
-                                                        </span>
+                                            <!-- Tooltip -->
+                                            <div v-if="selectedRoomId && selectedRoomId === sectionId"
+                                                class="absolute -top-32 left-1/2 -translate-x-1/2 w-64 z-50"
+                                                @mouseenter.stop @mouseover.stop>
+                                                <div class="relative" style="pointer-events: auto;">
+                                                    <!-- Red close button in top-right -->
+                                                    <div @click.stop="selectedRoomId = null"
+                                                        class="absolute -top-3 -right-3 w-8 h-8 rounded-full flex items-center justify-center cursor-pointer"
+                                                        style="background-color: red;">
+                                                        <XMarkIcon class="w-4 h-4" style="color: var(--light-text);" />
                                                     </div>
-                                                    <div class="relative">
-                                                        <!-- Shadow element (bottom layer) -->
-                                                        <div class="absolute inset-0 rounded-xl"
-                                                            style="background-color: rgba(0,0,0,0.2); transform: translateY(4px);">
-                                                        </div>
-
-                                                        <!-- Button element (top layer) -->
-                                                        <button @click.stop="startLesson(sectionName, sectionId)"
-                                                            class="relative w-full rounded-xl py-2 px-4 font-medium flex items-center justify-center gap-2 transition-transform duration-200 hover:translate-y-1"
-                                                            style="background-color: var(--light-text); color: var(--element-color-1);">
+                                                    <!-- Main tooltip content -->
+                                                    <div class="rounded-2xl p-4 shadow-lg"
+                                                        style="background-color: var(--element-color-1); color: var(--light-text);">
+                                                        <div class="font-medium mb-3">{{ sectionName }}
+                                                            <br>
                                                             <span
                                                                 v-if="getRoomData(sectionId) && getRoomData(sectionId).lesson_state <= getRoomData(sectionId).num_lessons">
-                                                                PLAY
+                                                                lesson {{ getRoomData(sectionId).lesson_state }} / {{
+                                                                    getRoomData(sectionId).num_lessons }}
                                                             </span>
-                                                            <span v-else>
-                                                                REVIEW
-                                                            </span>
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                                <!-- Triangle pointer -->
-                                                <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 transform rotate-45"
-                                                    style="background-color: var(--element-color-1);" />
-                                            </div>
-                                        </div>
+                                                        </div>
+                                                        <div class="relative">
+                                                            <!-- Shadow element (bottom layer) -->
+                                                            <div class="absolute inset-0 rounded-xl"
+                                                                style="background-color: rgba(0,0,0,0.2); transform: translateY(4px);">
+                                                            </div>
 
-                                        <!-- Icon button with hover group -->
-                                        <div class="group perspective-1000"
-                                            :style="{ filter: editModeEnabled ? 'grayscale(1) brightness(0.9)' : 'none' }">
-                                            <!-- Main button container with enhanced 3D transforms -->
-                                            <div class="
+                                                            <!-- Button element (top layer) -->
+                                                            <button @click.stop="startLesson(sectionName, sectionId)"
+                                                                class="relative w-full rounded-xl py-2 px-4 font-medium flex items-center justify-center gap-2 transition-transform duration-200 hover:translate-y-1"
+                                                                style="background-color: var(--light-text); color: var(--element-color-1);">
+                                                                <span
+                                                                    v-if="getRoomData(sectionId) && getRoomData(sectionId).lesson_state <= getRoomData(sectionId).num_lessons">
+                                                                    PLAY
+                                                                </span>
+                                                                <span v-else>
+                                                                    REVIEW
+                                                                </span>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                    <!-- Triangle pointer -->
+                                                    <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 transform rotate-45"
+                                                        style="background-color: var(--element-color-1);" />
+                                                </div>
+                                            </div>
+
+                                            <!-- Icon button with hover group -->
+                                            <div class="group perspective-1000"
+                                                :style="{ filter: editModeEnabled ? 'grayscale(1) brightness(0.9)' : 'none' }">
+                                                <!-- Main button container with enhanced 3D transforms -->
+                                                <div class="
                                             relative 
                                             transform-gpu 
                                             transition-all 
@@ -166,8 +167,8 @@
                                             group-active:scale-95
                                             group-active:translate-y-1
                                         ">
-                                                <!-- Enhanced shadow with depth -->
-                                                <div class="
+                                                    <!-- Enhanced shadow with depth -->
+                                                    <div class="
                                                     absolute 
                                                     inset-0 
                                                     rounded-full 
@@ -186,12 +187,12 @@
                                                     backgroundColor: getUnitColor(unitIndex),
                                                     transform: 'translateY(10px) scale(0.85)'
                                                 }">
-                                                </div>
+                                                    </div>
 
-                                                <!-- Base and background elements -->
-                                                <div class="relative w-48 h-48">
-                                                    <!-- Bottom layer for 3D effect (shadow/base) -->
-                                                    <div class="
+                                                    <!-- Base and background elements -->
+                                                    <div class="relative w-48 h-48">
+                                                        <!-- Bottom layer for 3D effect (shadow/base) -->
+                                                        <div class="
                                                 absolute 
                                                 inset-0 
                                                 rounded-full 
@@ -202,10 +203,10 @@
                                                 group-hover:translate-y-4
                                                 group-active:translate-y-1
                                                 " :style="{ backgroundColor: getUnitColor(unitIndex) }">
-                                                    </div>
+                                                        </div>
 
-                                                    <!-- Main button background with subtle gradient -->
-                                                    <div class="
+                                                        <!-- Main button background with subtle gradient -->
+                                                        <div class="
                                                         absolute 
                                                         inset-0 
                                                         rounded-full 
@@ -223,64 +224,65 @@
                                                             background: getUnitGradient(unitIndex)
                                                         }">
 
-                                                        <!-- Icon with enhanced transitions -->
-                                                        <component
-                                                            :is="getIconForIndex(getGlobalSectionIndex(unitIndex, sectionIndex))"
-                                                            class="
+                                                            <!-- Icon with enhanced transitions -->
+                                                            <component
+                                                                :is="getIconForIndex(getGlobalSectionIndex(unitIndex, sectionIndex))"
+                                                                class="
                                                             relative
                                                             w-24 
                                                             h-24 
                                                             duration-300 
                                                             drop-shadow-lg
                                                         " style="color: var(--light-text);" />
-                                                    </div>
+                                                        </div>
 
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <AddSection
-                                        v-if="editModeEnabled && isOwner && sectionIndex === rawUnitData[unitName].length - 1"
-                                        class="-mx-8" :library-id="libraryId"
-                                        :unit-id="props.unitPositionMap[unitName][1]" :position="sectionIndex + 1"
-                                        :offset="getNodeOffset(getGlobalSectionIndex(unitIndex, sectionIndex) + .5)"
-                                        :unit-color="getUnitColor(unitIndex)" @nodes-added="onSectionAdd" />
-                                </template>
-
-                                <template v-else>
-                                    <div class="flex flex-col pt-10 pb-10 items-center justify-center p-6 min-w-64">
-
-                                        <div class="text-center mb-4 mt-2" style="color: var(--light-text);">
-                                            <p class="text-lg">No stepping stones yet</p>
-                                            <p class="text-sm opacity-75">Add stepping stones to get started</p>
-                                        </div>
-
-                                        <!-- owner sees the AddSection bubble -->
-                                        <AddSection v-if="isOwner" :library-id="libraryId"
-                                            :unit-id="props.unitPositionMap[unitName][1]" :position="0"
-                                            :empty-unit="true"
-                                            :offset="getNodeOffset(getGlobalSectionIndex(unitIndex, 20))"
+                                        <AddSection
+                                            v-if="editModeEnabled && isOwner && sectionIndex === rawUnitData[unitName].length - 1"
+                                            class="-mx-8" :library-id="libraryId"
+                                            :unit-id="props.unitPositionMap[unitName][1]" :position="sectionIndex + 1"
+                                            :offset="getNodeOffset(getGlobalSectionIndex(unitIndex, sectionIndex) + .5)"
                                             :unit-color="getUnitColor(unitIndex)" @nodes-added="onSectionAdd" />
+                                    </template>
 
-                                        <div v-if="!isOwner" class="flex items-center gap-2 px-4 py-2 rounded-lg transition-all 
+                                    <template v-else>
+                                        <div class="flex flex-col pt-10 pb-10 items-center justify-center p-6 min-w-64">
+
+                                            <div class="text-center mb-4 mt-2" style="color: var(--light-text);">
+                                                <p class="text-lg">No stepping stones yet</p>
+                                                <p class="text-sm opacity-75">Add stepping stones to get started</p>
+                                            </div>
+
+                                            <!-- owner sees the AddSection bubble -->
+                                            <AddSection v-if="isOwner" :library-id="libraryId"
+                                                :unit-id="props.unitPositionMap[unitName][1]" :position="0"
+                                                :empty-unit="true"
+                                                :offset="getNodeOffset(getGlobalSectionIndex(unitIndex, 20))"
+                                                :unit-color="getUnitColor(unitIndex)" @nodes-added="onSectionAdd" />
+
+                                            <div v-if="!isOwner" class="flex items-center gap-2 px-4 py-2 rounded-lg transition-all 
                                             duration-200 hover:scale-105 active:scale-95" :style="{
                                                 background: getUnitColor(unitIndex),
                                                 color: 'var(--light-text)',
 
                                             }">
-                                            <PlusIcon class="w-0 h-5 opacity-0" />
-                                            <span>Only Course owner can add stepping stones!</span>
-                                            <PlusIcon class="w-0 h-5 opacity-0" />
+                                                <PlusIcon class="w-0 h-5 opacity-0" />
+                                                <span>Only Course owner can add stepping stones!</span>
+                                                <PlusIcon class="w-0 h-5 opacity-0" />
+                                            </div>
                                         </div>
-                                    </div>
-                                </template>
+                                    </template>
+                                </div>
                             </div>
-                        </div>
 
-                        <AddUnit v-if="editModeEnabled" :library-id="libraryId" :position="unitIndex + 1"
-                            :existing-units="Object.keys(rawUnitData)" :can-add-unit="isOwner"
-                            @unit-added="handleUnitAdded" />
+                            <AddUnit v-if="editModeEnabled" :library-id="libraryId" :position="unitIndex + 1"
+                                :existing-units="Object.keys(rawUnitData)" :can-add-unit="isOwner"
+                                @unit-added="handleUnitAdded" />
 
+                        </template>
                     </template>
                     <template v-else>
                         <EmptyCourse :is-owner="isOwner" :color="getUnitColor(0)" />
@@ -424,7 +426,7 @@ const getUnitIdByName = (unitName: string) => {
     return null;
 };
 
-const rawUnitData = ref();
+const rawUnitData = ref<Record<string, any[][]>>({});
 
 watch(() => props.unitSectionMap, async (newVal) => {
     rawUnitData.value = newVal;

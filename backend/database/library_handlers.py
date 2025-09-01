@@ -686,9 +686,7 @@ def join_library(user_id: int, library_id: int, join_code: str = None):
         db.session.add(LibraryFavorites(user_id=user.id,
                                             library_id=library.id,
                                             is_favorited=False))
-        print("test3")
         db.session.commit()
-        print("after commit")
         return jsonify({"message": "User added to library successfully"}), 201
     
     except IntegrityError as e:
