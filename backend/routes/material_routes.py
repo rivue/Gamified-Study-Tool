@@ -1,8 +1,18 @@
 from flask import request, jsonify
 from flask_login import login_required
 from database.material_handlers import create_and_upload_material
+from database.models import Material
 
 def init_material_routes(app):
+
+    @app.route("/api/materials/course/<int:course_id>", methods=["GET"])
+    @login_required
+    def get_materials_for_course(course_id):
+        """
+        Fetches all materials for a given course ID.
+        """
+        materials = Material.query.filter_by(library_id=course_id).order_by(Material.id.desc()).all()
+        return jsonify([material.as_dict() for material in materials]), 200
 
     @app.route("/api/materials/upload", methods=["POST"])
     @login_required # Protect this endpoint

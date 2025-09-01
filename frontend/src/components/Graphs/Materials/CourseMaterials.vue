@@ -95,7 +95,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import axios from 'axios';
 import {
@@ -137,37 +137,46 @@ type Material = {
     status: 'Ready' | 'Summarizing' | 'Error';
     summary: string;
 };
-const summary = `(Summary mock data remains unchanged)`
-const materials = ref<Material[]>([
-    {
-        id: 1,
-        name: 'Machine Learning Basics.pdf',
-        type: 'pdf',
-        size: 1258291,
-        uploadedDate: 'Aug 28, 2025',
-        status: 'Ready',
-        summary: summary
-    },
-    {
-        id: 2,
-        name: 'Course_Syllabus.docx',
-        type: 'docx',
-        size: 450560,
-        uploadedDate: 'Aug 26, 2025',
-        status: 'Ready',
-        summary: summary
-    },
-    {
-        id: 3,
-        name: 'Neural Networks Deep Dive.pptx',
-        type: 'pptx',
-        size: 8388608,
-        uploadedDate: 'Aug 27, 2025',
-        status: 'Summarizing',
-        summary: summary
-    },
-    
-]);
+const materials = ref<Material[]>([]);
+
+const fetchMaterials = async () => {
+  const courseId = route.params.id as string;
+  if (!courseId) {
+    console.error("Course ID is missing, cannot fetch materials.");
+    return;
+  }
+  try {
+    const response = await axios.get(`/api/materials/course/${courseId}`);
+
+    if (!Array.isArray(response.data)) {
+      console.error("Data received from backend is not an array as expected.");
+      materials.value = [];
+      return;
+    }
+
+    const statusMap: { [key: string]: 'Ready' | 'Summarizing' | 'Error' } = {
+      processing: 'Summarizing',
+      ready: 'Ready',
+      error: 'Error',
+    };
+
+    materials.value = response.data.map((material: any) => ({
+      id: material.id,
+      name: material.name,
+      type: material.type,
+      size: material.size,
+      uploadedDate: new Date(material.uploaded_at || new Date()).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+      status: statusMap[material.status] || 'Error',
+      summary: material.summary || ''
+    }));
+  } catch (error) {
+    console.error("Failed to fetch materials:", error);
+  }
+};
+
+onMounted(() => {
+  fetchMaterials();
+});
 
 const goBack = () => {
   router.back();
@@ -214,13 +223,8 @@ async function uploadFiles(files: FileList) {
     formData.append('file', file);
     formData.append('course_id', courseId);
 
-    console.log(`[Upload] Starting upload for: ${file.name}`);
-
     try {
       const response = await axios.post('/api/materials/upload', formData, {
-        // Note: You may need to add an Authorization header here
-        // depending on your backend's authentication setup.
-        // headers: { 'Authorization': `Bearer ${accessToken}` },
         onUploadProgress: (progressEvent) => {
           const total = progressEvent.total || 0;
           const percent = Math.round((progressEvent.loaded * 100) / total);
@@ -228,11 +232,9 @@ async function uploadFiles(files: FileList) {
           if (uploadItem) {
             uploadItem.progress = percent;
           }
-          console.log(`[Upload] Progress for ${file.name}: ${percent}%`);
         },
       });
 
-      console.log(`[Upload] Success for ${file.name}. Server response:`, response.data);
       const newMaterial = response.data;
 
       // On successful upload, remove from uploading list

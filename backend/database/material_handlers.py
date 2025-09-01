@@ -13,8 +13,8 @@ try:
     from ..app import supabase
 except (ImportError, ModuleNotFoundError):
     print("Warning: Could not import Supabase client from backend.app. Using a fallback initialization.")
-    SUPABASE_URL = os.environ.get("SUPABASE_URL", "http://localhost:54323")
-    SUPABASE_KEY = os.environ.get("SUPABASE_KEY") # Your anon key
+    SUPABASE_URL = os.environ.get("SUPABASE_URL", "http://127.0.0.1:54321")
+    SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
     if not SUPABASE_KEY:
         raise ValueError("Supabase key is not set in environment variables.")
     supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
@@ -65,7 +65,7 @@ def create_and_upload_material(course_id: int, file: FileStorage):
     
     try:
         try:
-            supabase.storage.from_("course_materials").upload(
+            supabase.storage.from_("course-materials").upload(
                 path=storage_path,
                 file=file_bytes,
                 file_options={"content-type": file.mimetype or "application/octet-stream"}
