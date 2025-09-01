@@ -1,6 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
-from sqlalchemy import JSON
+from sqlalchemy import JSON, Enum
 from sqlalchemy.ext.mutable import MutableList
 from sqlalchemy.exc import  SQLAlchemyError
 from datetime import datetime, timedelta
@@ -215,6 +215,7 @@ class Library(db.Model):
                             order_by="LibraryUnit.position")
 
     factoids = db.relationship('LibraryFactoid', backref='library', cascade="all, delete-orphan")
+    materials = db.relationship('Material', back_populates='library', cascade="all, delete-orphan", lazy=True)
     
     @classmethod
     def _generate_unique_code(cls):
@@ -403,6 +404,47 @@ class LibrarySection(db.Model):
         db.UniqueConstraint('unit_id', 'position',
                             name='uq_unit_section_position'),
     )
+
+class Material(db.Model):
+    __tablename__ = 'materials'
+
+    id = db.Column(db.Integer, primary_key=True)
+    
+    # Assuming 'course' corresponds to a 'Library' in this application's domain
+    library_id = db.Column(db.Integer, db.ForeignKey('library.id', ondelete='CASCADE'), nullable=False)
+    
+    name = db.Column(db.Text, nullable=False)
+    type = db.Column(db.Text, nullable=False) # e.g., 'pdf', 'pptx', 'docx'
+    size = db.Column(db.Integer, nullable=False) # size in bytes
+    
+    storage_path = db.Column(db.Text, nullable=False, unique=True)
+    
+    status = db.Column(
+        Enum('processing', 'ready', 'error', name='material_status_enum'),
+        nullable=False,
+        default='processing',
+        server_default='processing'
+    )
+    
+    summary = db.Column(db.Text, nullable=True)
+    
+    created_at = db.Column(db.DateTime(timezone=True), nullable=False, server_default=db.func.now())
+
+    # Relationship back to Library
+    library = db.relationship('Library', back_populates='materials')
+
+    def as_dict(self):
+        return {
+            'id': self.id,
+            'library_id': self.library_id,
+            'name': self.name,
+            'type': self.type,
+            'size': self.size,
+            'storage_path': self.storage_path,
+            'status': self.status,
+            'summary': self.summary,
+            'created_at': self.created_at.isoformat() if self.created_at else None
+        }
 
 class LibraryRoomState(db.Model): # maps users to states of rooms they are in
     id = db.Column(db.Integer, primary_key=True)

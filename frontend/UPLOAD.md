@@ -7,25 +7,12 @@ table (table defined below) that acts as the central point of truth of the docum
 GET /api/materials --> gets the list of materials for a course, including their current status. the frontend can poll this endpoint to see when a material becomes 'Ready'
 - GET /api/materials/<material_id>/summary --> Fetches the generated summary for a specific material.
 
-`materials` table:
-   * id (PK)
-   * course_id (FK)
-   * name (TEXT)
-   * type (TEXT)
-   * size (INT)
-   * storage_path (TEXT) - Path in Supabase Storage bucket
-   * status (ENUM: 'processing', 'ready', 'error')
-   * summary (TEXT) - You can store the summary directly here if it's a 1-to-1 relationship.
-   * created_at (TIMESTAMPTZ)
-
 1) Storage bucket:  In your Supabase project dashboard, go to the "Storage" section.
        * Create a new bucket and name it exactly course_materials.
        * Security Policies: You will need to establish security rules (policies) for this bucket. For example,
          you'll likely want a policy that only allows authenticated users to upload files into a path that
 
-2) add db table + local / prod migration
-
-3) background trigger:
+2) background trigger:
     - do it with supabase functions in supabase/functions directory
-
-4) add the system prompt, maybe create MaterialSummary.txt
+    - make sure you add the system prompt, maybe create MaterialSummary.txt
+    - add add env's to local + prod
