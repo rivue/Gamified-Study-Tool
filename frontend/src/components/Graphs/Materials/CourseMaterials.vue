@@ -10,7 +10,7 @@
 
     <main class="content-area">
       <!-- Upload Section -->
-      <div class="upload-section">
+      <div v-if="isOwner" class="upload-section">
         <div class="upload-box" @dragover.prevent @drop.prevent="handleDrop">
           <input type="file" ref="fileInput" @change="handleFileSelect" multiple class="hidden-input" />
           <div class="upload-content">
@@ -117,6 +117,7 @@ const fileInput = ref<HTMLInputElement | null>(null);
 const summaryIsShowing = ref(false);
 const quizIsShowing = ref(false);
 const selectedMaterial = ref(null as Material | null);
+const isOwner = ref(false);
 
 type UploadingFile = {
   id: number; // Use a unique ID for the list key
@@ -138,6 +139,19 @@ type Material = {
     summary: string;
 };
 const materials = ref<Material[]>([]);
+
+const checkOwnership = async () => {
+  const courseId = route.params.id as string;
+  if (!courseId) return;
+  try {
+    const response = await axios.get(`/api/courses/${courseId}/is-owner`);
+    isOwner.value = response.data.is_owner;
+    console.log(isOwner.value ? "User is the owner of the course." : "User is NOT the owner of the course.");
+  } catch (error) {
+    console.error("Failed to check course ownership:", error);
+    isOwner.value = false;
+  }
+};
 
 const fetchMaterials = async () => {
   const courseId = route.params.id as string;
@@ -176,6 +190,7 @@ const fetchMaterials = async () => {
 
 onMounted(() => {
   fetchMaterials();
+  checkOwnership();
 });
 
 const goBack = () => {
@@ -203,6 +218,12 @@ const handleDrop = (event: DragEvent) => {
 };
 
 async function uploadFiles(files: FileList) {
+  if (!isOwner.value) {
+    console.error("You are not the owner of this course and cannot upload materials.");
+    // Optionally, show a user-facing error message here.
+    return;
+  }
+
   const courseId = route.params.id as string; // Assuming course ID is in route.params.id
   if (!courseId) {
     console.error("Course ID is missing from the route.");

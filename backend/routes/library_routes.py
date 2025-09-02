@@ -733,6 +733,16 @@ def init_library_routes(app):
         except Exception as e:
             return jsonify(status="error", message=f"Failed to update library visibility status: {str(e)}"), 500
         
+    @app.route("/api/courses/<int:library_id>/is-owner", methods=["GET"])
+    @login_required
+    def is_course_owner(library_id):
+        """
+        Checks if the current user is the owner of the course.
+        """
+        library = Library.query.get_or_404(library_id)
+        is_owner = library.owner_id == current_user.id
+        return jsonify({"is_owner": is_owner})
+    
     @app.route("/api/libraries", methods=["GET"])
     def get_libraries():
         browse = request.args.get("browse", type=bool)
