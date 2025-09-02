@@ -420,10 +420,10 @@ class Material(db.Model):
     storage_path = db.Column(db.Text, nullable=False, unique=True)
     
     status = db.Column(
-        Enum('processing', 'ready', 'error', name='material_status_enum'),
+        Enum('pending', 'processing', 'ready', 'error', name='material_status_enum'),
         nullable=False,
-        default='processing',
-        server_default='processing'
+        default='pending',
+        server_default='pending'
     )
     
     summary = db.Column(db.Text, nullable=True)

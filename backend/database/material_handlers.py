@@ -54,7 +54,7 @@ def create_and_upload_material(course_id: int, file: FileStorage):
         name=file.filename,
         type=file.filename.split('.')[-1].lower(),
         size=total_bytes_read, # Use the actual bytes read for size
-        status='processing',
+        status='pending',
         storage_path='_temp'
     )
     db.session.add(new_material)

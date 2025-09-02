@@ -135,7 +135,7 @@ type Material = {
     type: 'pdf' | 'pptx' | 'docx';
     size: number;
     uploadedDate: string;
-    status: 'Ready' | 'Summarizing' | 'Error';
+    status: 'Pending' | 'Ready' | 'Summarizing' | 'Error';
     summary: string;
 };
 const materials = ref<Material[]>([]);
@@ -168,7 +168,8 @@ const fetchMaterials = async () => {
       return;
     }
 
-    const statusMap: { [key: string]: 'Ready' | 'Summarizing' | 'Error' } = {
+    const statusMap: { [key: string]: 'Pending'| 'Ready' | 'Summarizing' | 'Error' } = {
+      pending: 'Pending',
       processing: 'Summarizing',
       ready: 'Ready',
       error: 'Error',
