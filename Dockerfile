@@ -22,7 +22,7 @@ RUN cd frontend && npm install && npm run build
 
 # Copy backend files
 COPY backend/ ./backend/
-COPY requirements.txt ./
+COPY backend/requirements.txt ./
 
 # Install Python dependencies
 # Explicitly uninstall pinecone-client to avoid conflicts (pinecone-client is out of date, install pinecone instead)
