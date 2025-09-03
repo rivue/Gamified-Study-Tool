@@ -27,7 +27,7 @@ COPY requirements.txt ./
 # Install Python dependencies
 # Explicitly uninstall pinecone-client to avoid conflicts (pinecone-client is out of date, install pinecone instead)
 RUN pip3 uninstall -y pinecone-client || true
-RUN pip3 install --no-cache-dir -r requirements.txt
+RUN pip3 install --no-cache-dir -r backend/requirements.txt
 RUN pip3 install gunicorn
 
 # Copy the built frontend files to a location the backend can serve
