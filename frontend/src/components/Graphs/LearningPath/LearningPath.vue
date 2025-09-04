@@ -3,48 +3,98 @@
     <div class="page-wrapper">
         <header class="map-header">
             <div class="right-controls">
-                <button @click="goToCourseList"
-                    class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg px-6 py-4 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200 font-medium"
-                    style="color: var(--highlight-color);">
-                    <ArrowLeftIcon class="w-6 h-6" />
-                </button>
 
-                <button v-if="!isOwner" @click="handleLeaveCourseClick"
-                    class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg p-4 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200"
-                    style="color: var(--highlight-color);">
-                    <span class="text-lg">Remove Course</span>
-                </button>
+                <Tooltip>
+                    <TooltipTrigger>
+                        <button @click="goToCourseList"
+                            class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg px-6 py-4 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200 font-medium"
+                            style="color: var(--highlight-color);">
+                            <ArrowLeftIcon class="w-6 h-6" />
+                        </button>
+                    </TooltipTrigger>
+                    <TooltipContent variant="shad" side="bottom" :offset="4">
+                        Back to Course list
+                    </TooltipContent>
+                </Tooltip>
+
+                <Tooltip v-if="!isOwner">
+                    <TooltipTrigger>
+                        <button @click="handleLeaveCourseClick"
+                            class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg p-4 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200"
+                            style="color: var(--highlight-color);">
+                            <span class="text-lg">Remove Course</span>
+                        </button>
+                    </TooltipTrigger>
+                    <TooltipContent variant="shad" side="bottom" :offset="4">
+                        Leave this course
+                    </TooltipContent>
+                </Tooltip>
             </div>
             <div class="right-controls">
-                <button @click="goToMaterials"
-                    class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg p-4 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200"
-                    style="color: var(--highlight-color);">
-                    <ClipboardDocumentListIcon class="w-6 h-6" />
-                </button>
+                <Tooltip>
+                    <TooltipTrigger>
+                        <button @click="goToMaterials"
+                            class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg p-4 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200"
+                            style="color: var(--highlight-color);">
+                            <ClipboardDocumentListIcon class="w-6 h-6" />
+                        </button>
+                    </TooltipTrigger>
+                    <TooltipContent variant="shad" side="bottom" :offset="4">
+                        Study Materials
+                    </TooltipContent>
+                </Tooltip>
 
-                <button @click="goToExperiments"
-                    class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg p-4 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200"
-                    style="color: var(--highlight-color);">
-                    Brain Dump (experimental)
-                </button>
+                <Tooltip>
+                    <TooltipTrigger>
+                        <button @click="goToExperiments"
+                            class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg p-4 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200"
+                            style="color: var(--highlight-color);">
+                            Brain Dump (experimental)
+                        </button>
+                    </TooltipTrigger>
+                    <TooltipContent variant="shad" side="bottom" :offset="4">
+                        Experimental feature
+                    </TooltipContent>
+                </Tooltip>
 
-                <button v-if="isOwner" @click="toggleEditMode"
-                    class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg p-4 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200"
-                    style="color: var(--highlight-color);">
-                    <PencilIcon class="w-6 h-6" />
-                </button>
+                <Tooltip v-if="isOwner">
+                    <TooltipTrigger>
+                        <button @click="toggleEditMode"
+                            class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg p-4 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200"
+                            style="color: var(--highlight-color);">
+                            <PencilIcon class="w-6 h-6" />
+                        </button>
+                    </TooltipTrigger>
+                    <TooltipContent variant="shad" side="bottom" :offset="4">
+                        {{ editModeEnabled ? 'Disable' : 'Enable' }} edit mode
+                    </TooltipContent>
+                </Tooltip>
 
-                <button @click="goToLeaderboard"
-                    class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg p-4 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200"
-                    style="color: var(--highlight-color);">
-                    <Trophy class="w-6 h-6" />
-                </button>
+                <Tooltip>
+                    <TooltipTrigger>
+                        <button @click="goToLeaderboard"
+                            class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg p-4 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200"
+                            style="color: var(--highlight-color);">
+                            <Trophy class="w-6 h-6" />
+                        </button>
+                    </TooltipTrigger>
+                    <TooltipContent variant="shad" side="bottom" :offset="4">
+                        Course Leaderboard
+                    </TooltipContent>
+                </Tooltip>
 
-                <button v-if="isOwner" @click="toggleSettings"
-                    class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg p-4 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200"
-                    style="color: var(--highlight-color);">
-                    <CogIcon class="w-6 h-6" />
-                </button>
+                <Tooltip v-if="isOwner">
+                    <TooltipTrigger>
+                        <button @click="toggleSettings"
+                            class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg p-4 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200"
+                            style="color: var(--highlight-color);">
+                            <CogIcon class="w-6 h-6" />
+                        </button>
+                    </TooltipTrigger>
+                    <TooltipContent variant="shad" side="bottom" :offset="4">
+                        Course Settings
+                    </TooltipContent>
+                </Tooltip>
             </div>
 
         </header>
@@ -298,32 +348,60 @@
 
                 <!-- left side -->
                 <div class="nav-group left">
-                    <button @click="scrollToStart(); $nextTick(handleScroll)"
-                        class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg p-4 flex items-center gap-2 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200"
-                        style="color: var(--highlight-color);">
-                        <ChevronDoubleLeftIcon class="w-6 h-6" />
-                        <span>To Start</span>
-                    </button>
-                    <button @click="scroll('left'); $nextTick(handleScroll)"
-                        class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg p-4 flex items-center gap-2 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200"
-                        style="color: var(--highlight-color);">
-                        <ChevronLeftIcon class="w-6 h-6" />
-                    </button>
+                    <Tooltip>
+                        <TooltipTrigger>
+                            <button @click="scrollToStart(); $nextTick(handleScroll)"
+                                class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg p-4 flex items-center gap-2 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200"
+                                style="color: var(--highlight-color);">
+                                <ChevronDoubleLeftIcon class="w-6 h-6" />
+                                <span>To Start</span>
+                            </button>
+                        </TooltipTrigger>
+                        <TooltipContent variant="shad" side="bottom" :offset="4">
+                            Scroll to beginning
+                        </TooltipContent>
+                    </Tooltip>
+                    <Tooltip>
+                        <TooltipTrigger>
+                            <button @click="scroll('left'); $nextTick(handleScroll)"
+                                class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg p-4 flex items-center gap-2 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200"
+                                style="color: var(--highlight-color);">
+                                <ChevronLeftIcon class="w-6 h-6" />
+                            </button>
+                        </TooltipTrigger>
+                        <TooltipContent variant="shad" side="bottom" :offset="4">
+                            Scroll left
+                        </TooltipContent>
+                    </Tooltip>
                 </div>
 
                 <!-- right side -->
                 <div class="nav-group right">
-                    <button @click="scroll('right'); $nextTick(handleScroll)"
-                        class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg p-4 flex items-center gap-2 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200"
-                        style="color: var(--highlight-color);">
-                        <ChevronRightIcon class="w-6 h-6" />
-                    </button>
-                    <button @click="scrollToEnd(); $nextTick(handleScroll)"
-                        class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg p-4 flex items-center gap-2 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200"
-                        style="color: var(--highlight-color);">
-                        <span>To End</span>
-                        <ChevronDoubleRightIcon class="w-6 h-6" />
-                    </button>
+                    <Tooltip>
+                        <TooltipTrigger>
+                            <button @click="scroll('right'); $nextTick(handleScroll)"
+                                class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg p-4 flex items-center gap-2 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200"
+                                style="color: var(--highlight-color);">
+                                <ChevronRightIcon class="w-6 h-6" />
+                            </button>
+                        </TooltipTrigger>
+                        <TooltipContent variant="shad" side="bottom" :offset="4">
+                            Scroll right
+                        </TooltipContent>
+                    </Tooltip>
+                    <Tooltip>
+                        <TooltipTrigger>
+                            <button @click="scrollToEnd(); $nextTick(handleScroll)"
+                                class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg p-4 flex items-center gap-2 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200"
+                                style="color: var(--highlight-color);">
+                                <span>To End</span>
+                                <ChevronDoubleRightIcon class="w-6 h-6" />
+                            </button>
+                        </TooltipTrigger>
+                        <TooltipContent variant="shad" side="bottom" :offset="4">
+                            Scroll to end
+                        </TooltipContent>
+                    </Tooltip>
                 </div>
 
             </footer>
@@ -371,6 +449,10 @@ import AddSection from "./AddSection.vue"
 import DeleteSection from "./DeleteSection.vue"
 import LeaveCourse from './LeaveCourse.vue'; // Import the new modal
 import EmptyCourse from './EmptyCourse.vue';
+import TooltipTrigger from '@/components/ui/tooltip/TooltipTrigger.vue';
+import TooltipContent from '@/components/ui/tooltip/TooltipContent.vue';
+import Tooltip from '@/components/ui/tooltip/Tooltip.vue';
+import { Tooltip as UITooltip, TooltipTrigger as UITooltipTrigger, TooltipContent as UITooltipContent } from "@/components/ui/tooltip";
 
 const props = defineProps({
     libraryId: {

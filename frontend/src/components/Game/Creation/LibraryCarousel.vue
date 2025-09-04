@@ -7,13 +7,13 @@
             </div>
             <div class="join-course-container">
                 <div class="actions-form">
-                <div class="join-form">
-                    <Input class="join-input" type="text" v-model="joinCode" placeholder="Enter course code..."
-                        @keydown.enter="joinCourse" />
-                    <Button class="join-button" @click="joinCourse" :disabled="joinLoading">
-                        <LoaderCircle v-if="joinLoading" class="mr-2 h-4 w-4 animate-spin" />
-                        Join
-                    </Button>
+                    <div class="join-form">
+                        <Input class="join-input" type="text" v-model="joinCode" placeholder="Enter course code..."
+                            @keydown.enter="joinCourse" />
+                        <Button class="join-button" @click="joinCourse" :disabled="joinLoading">
+                            <LoaderCircle v-if="joinLoading" class="mr-2 h-4 w-4 animate-spin" />
+                            Join
+                        </Button>
                     </div>
                     <Button class="create-button" @click="goToCreateLibrary">
                         Create Course
@@ -33,24 +33,16 @@
                 <Input class="search-input" type="text" v-model="searchQuery" @input="filterLibraries"
                     @keydown="handleSearchKeydown" placeholder="Search courses you've joined..." />
             </div>
-            
+
             <div class="filter-buttons">
-                <button 
-                    @click="setOwnerFilter('all')" 
-                    :class="['filter-btn', { 'active': ownerFilter === 'all' }]"
-                >
+                <button @click="setOwnerFilter('all')" :class="['filter-btn', { 'active': ownerFilter === 'all' }]">
                     All Courses
                 </button>
-                <button 
-                    @click="setOwnerFilter('owned')" 
-                    :class="['filter-btn', { 'active': ownerFilter === 'owned' }]"
-                >
+                <button @click="setOwnerFilter('owned')" :class="['filter-btn', { 'active': ownerFilter === 'owned' }]">
                     My Courses
                 </button>
-                <button 
-                    @click="setOwnerFilter('joined')" 
-                    :class="['filter-btn', { 'active': ownerFilter === 'joined' }]"
-                >
+                <button @click="setOwnerFilter('joined')"
+                    :class="['filter-btn', { 'active': ownerFilter === 'joined' }]">
                     Joined Courses
                 </button>
             </div>
@@ -69,12 +61,19 @@
                     <div class="card-content">
                         <div class="card-header">
                             <h3 class="course-title">{{ library.library_topic }}</h3>
-                            <button @click.stop="updateFavoritedStatus(library.id, libraryFavoritesMap[library.id])"
-                                class="star-button p-4">
-                                <StarIcon
-                                    :class="['star-icon', 'h-6', 'w-6', libraryFavoritesMap[library.id] ? 'favorited' : '']"
-                                />
-                            </button>
+                            <Tooltip>
+                                <TooltipTrigger>
+                                    <button
+                                        @click.stop="updateFavoritedStatus(library.id, libraryFavoritesMap[library.id])"
+                                        class="star-button p-4">
+                                        <StarIcon
+                                            :class="['star-icon', 'h-6', 'w-6', libraryFavoritesMap[library.id] ? 'favorited' : '']" />
+                                    </button>
+                                </TooltipTrigger>
+                                <TooltipContent side="top" variant="shad" :offset="32">
+                                    {{ libraryFavoritesMap[library.id] ? 'Unfavorite' : 'Favorite' }} this course
+                                </TooltipContent>
+                            </Tooltip>
                         </div>
                         <div class="card-stats">
                             <div class="stat">
@@ -97,7 +96,8 @@
             <BookOpen class="empty-icon" />
             <h3 class="empty-title">No Courses Yet?</h3>
             <p class="empty-description">
-                You haven't created or joined any courses yet. Create your own course or use the form above to join an existing one.
+                You haven't created or joined any courses yet. Create your own course or use the form above to join an
+                existing one.
             </p>
         </div>
 
@@ -132,6 +132,7 @@ import { StarIcon } from "@heroicons/vue/24/solid";
 import { Button } from "@/components/ui/button";
 import { LoaderCircle, Search, BookOpen } from "lucide-vue-next";
 import { useAuthStore } from "@/store/authStore";
+import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import axios from "axios";
 
 // Props
@@ -194,13 +195,13 @@ async function filterLibraries() {
 // Set owner filter with loading delay
 async function setOwnerFilter(filter: 'all' | 'owned' | 'joined') {
     if (ownerFilter.value === filter) return; // Don't reload if same filter
-    
+
     filterLoading.value = true;
     ownerFilter.value = filter;
-    
+
     // Simulate loading delay for better UX
     await new Promise(resolve => setTimeout(resolve, 300));
-    
+
     await filterLibraries();
     filterLoading.value = false;
 }
@@ -360,7 +361,6 @@ function goToPage(page: number) {
 </script>
 
 <style scoped>
-
 .loading-state {
     display: flex;
     flex-direction: column;
@@ -483,18 +483,22 @@ function goToPage(page: number) {
 .subtitle {
     font-size: 1rem;
     color: var(--text-color-secondary);
-    text-align: center; /*  the text */
+    text-align: center;
+    /*  the text */
 }
 
 .join-course-container {
     width: 100%;
-    max-width: 400px; /* Adjusted to fit both buttons if necessary, or rely on flex-wrap */
+    max-width: 400px;
+    /* Adjusted to fit both buttons if necessary, or rely on flex-wrap */
 }
 
 .actions-form {
     display: flex;
-    flex-direction: column; /* Stack join and create vertically */
-    gap: 0.75rem; /* Add some space between join form and create button */
+    flex-direction: column;
+    /* Stack join and create vertically */
+    gap: 0.75rem;
+    /* Add some space between join form and create button */
 }
 
 .join-form {
@@ -503,16 +507,19 @@ function goToPage(page: number) {
 }
 
 
-.create-button { /* Style like join-button */
+.create-button {
+    /* Style like join-button */
     height: 44px;
     border-radius: 8px;
-    background: var(--button-gradient); /* Or a different style if preferred */
+    background: var(--button-gradient);
+    /* Or a different style if preferred */
     color: var(--text-color);
     font-weight: 600;
     padding: 0 1.25rem;
     transition: all 0.2s;
     border: none;
-    width: 100%; /* Make create button full width of its container */
+    width: 100%;
+    /* Make create button full width of its container */
 }
 
 .create-button:hover:not(:disabled) {
@@ -522,19 +529,25 @@ function goToPage(page: number) {
 }
 
 
-@media (min-width: 768px) { /* Adjust for larger screens */
+@media (min-width: 768px) {
+
+    /* Adjust for larger screens */
     .actions-form {
-        flex-direction: row; /* Place join and create side-by-side */
+        flex-direction: row;
+        /* Place join and create side-by-side */
         align-items: center;
     }
 
     .join-form {
-        flex: 1; /* Allow join form to take available space */
+        flex: 1;
+        /* Allow join form to take available space */
     }
 
     .create-button {
-        width: auto; /* Adjust width for side-by-side layout */
-        margin-left: 0.5rem; /* Add space between join and create buttons */
+        width: auto;
+        /* Adjust width for side-by-side layout */
+        margin-left: 0.5rem;
+        /* Add space between join and create buttons */
     }
 }
 

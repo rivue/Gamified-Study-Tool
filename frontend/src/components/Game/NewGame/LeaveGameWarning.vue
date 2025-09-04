@@ -1,5 +1,16 @@
 <template>
-    <div class="close-button" @click="showLeavePopup">x</div>
+    <div class="close-button" @click="showLeavePopup">
+        <Tooltip>
+            <TooltipTrigger>
+                x
+                <TooltipContent variant="shad" side="bottom" :offset="4">
+                    Leave Lesson
+                </TooltipContent>
+            </TooltipTrigger>
+        </Tooltip>
+
+    </div>
+
     <Transition name="modal">
         <div v-if="showPopup" class="fixed inset-0 flex items-center justify-center z-50 p-4"
             style="background-color: var(--background-haze); pointer-events: auto;">
@@ -13,7 +24,8 @@
                 </div>
                 <div class="space-y-4">
                     <p>
-                        Are you sure you want to leave? Your progress will be lost and you will not receive any points for this session.
+                        Are you sure you want to leave? Your progress will be lost and you will not receive any points
+                        for this session.
                     </p>
                     <div class="flex justify-end gap-3 mt-6">
                         <button @click="hideLeavePopup" class="px-4 py-2 border rounded-lg"
@@ -36,6 +48,9 @@
 
 import { XMarkIcon } from '@heroicons/vue/24/solid';
 import { useRoute, useRouter } from 'vue-router';
+import Tooltip from '@/components/ui/tooltip/Tooltip.vue';
+import TooltipTrigger from '@/components/ui/tooltip/TooltipTrigger.vue';
+import TooltipContent from '@/components/ui/tooltip/TooltipContent.vue';
 import { ref } from 'vue';
 
 const showPopup = ref(false);
@@ -82,8 +97,10 @@ function handleLeave() {
 }
 
 .close-button {
-    position: fixed; /* Change from absolute to fixed */
-    width: 40px; /* Slightly larger for better touch targets */
+    position: fixed;
+    /* Change from absolute to fixed */
+    width: 40px;
+    /* Slightly larger for better touch targets */
     height: 40px;
     background: rgba(255, 0, 0, 0.8);
     color: white;
@@ -94,8 +111,10 @@ function handleLeave() {
     font-weight: bold;
     cursor: pointer;
     transition: background-color 0.2s;
-    top: 80px; /* Position from top of viewport */
-    left: 20px; /* Position from left of viewport */
+    top: 80px;
+    /* Position from top of viewport */
+    left: 20px;
+    /* Position from left of viewport */
     z-index: 10;
     display: flex;
     align-items: center;

@@ -1,23 +1,25 @@
 <!-- App.vue -->
 <template>
     <Toaster />
-    <div class="app-container" :class="themeClass">
-        <div v-if="!hideHeaderFooter">
-        <TopBar />
-        <SideMenu />
-        <MentorSelection />
-    </div>
-    
-    <div class="main-content">
-        <div class="another" @scroll="onScroll">
-                <!-- Routes -->
-                <router-view v-if="shouldShowRouterView"></router-view>
-                <!-- <home-page v-else /> -->
-                <InfoPopup />
-                <AdPopup />
+    <TooltipProvider :openDelay="180" :closeDelay="80">
+        <div class="app-container" :class="themeClass">
+            <div v-if="!hideHeaderFooter">
+                <TopBar />
+                <SideMenu />
+                <MentorSelection />
+            </div>
+            
+            <div class="main-content">
+                <div class="another" @scroll="onScroll">
+                    <!-- Routes -->
+                    <router-view v-if="shouldShowRouterView"></router-view>
+                    <!-- <home-page v-else /> -->
+                    <InfoPopup />
+                    <AdPopup />
+                </div>
             </div>
         </div>
-    </div>
+    </TooltipProvider>
 </template>
 
 <script setup lang="ts">
@@ -37,6 +39,7 @@ import { useMentorStore } from "@/store/mentorStore";
 import { useLoadingStore } from "@/store/loadingStore";
 import { useUserStatsStore } from "@/store/userStatsStore";
 import { Toaster } from '@/components/ui/sonner'
+import { TooltipProvider } from '@/components/ui/tooltip'
 import 'vue-sonner/style.css' // vue-sonner v2 requires this import
 
 const router = useRouter();
