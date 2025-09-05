@@ -28,7 +28,7 @@
                     <div v-for="(user, index) in topThree" :key="user.username" :class="['rank-card', 'rank-' + (index + 1)]">
                         <div class="rank-badge">{{ index + 1 }}</div>
                         <img :src="user.avatarUrl || defaultAvatar" alt="avatar" class="rank-avatar">
-                        <p class="rank-name">{{ user.name || user.username }}</p>
+                        <p class="rank-name">{{ getDisplayName(user) }}</p>
                         <p class="rank-points">{{ user.points || 0 }} pts</p>
                     </div>
                 </div>
@@ -39,7 +39,7 @@
                         <div class="user-rank">{{ index + 4 }}</div>
                         <img :src="user.avatarUrl || defaultAvatar" alt="avatar" class="user-avatar">
                         <div class="user-info">
-                            <p class="user-name">{{ user.name || user.username }}</p>
+                            <p class="user-name">{{ getDisplayName(user) }}</p>
                             <span v-if="user.username === currentUsername" class="user-tag">You</span>
                         </div>
                         <div class="user-points">{{ user.points || 0 }} pts</div>
@@ -80,6 +80,14 @@ const defaultAvatar = 'https://i.pravatar.cc/150?u=a042581f4e29026704d';
 // Computed properties for top 3 and other users
 const topThree = computed(() => leaderboardData.value.members.slice(0, 3));
 const otherUsers = computed(() => leaderboardData.value.members.slice(3));
+
+// Helper to display a concise username without exposing full email addresses
+const getDisplayName = (user: any) => {
+    if (user?.name && user.name.trim() !== '') {
+        return user.name;
+    }
+    return user?.username?.split('@')[0] || user?.username;
+};
 
 // Fetch leaderboard data
 const fetchLeaderboard = async () => {
@@ -223,6 +231,9 @@ onMounted(() => {
 .rank-name {
     font-weight: bold;
     font-size: 1.1rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .rank-points {
@@ -269,10 +280,14 @@ onMounted(() => {
 
 .user-info {
     flex-grow: 1;
+    min-width: 0;
 }
 
 .user-name {
     font-weight: bold;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .user-tag {
