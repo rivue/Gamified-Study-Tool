@@ -1,20 +1,27 @@
 <template>
-    <div class="relative flex-shrink-0">
-        <div v-if="emptyUnit" class="flex items-center gap-2 px-4 py-2 rounded-lg transition-all 
-                                            duration-200 hover:scale-105 active:scale-95 cursor-pointer" @click="showModal = true"
-            :style="{
-                background: unitColor,
-                color: 'var(--light-text)'
-            }">
-            <PlusIcon class="w-5 h-5" />
-            <span>Add Stepping Stone</span>
-        </div>
+    <div class="relative flex-shrink-0" :style="!emptyUnit && typeof offset === 'number' ? { transform: `translateY(${offset}px)` } : {}">
+        <Tooltip>
+            <TooltipTrigger>
+                <div v-if="emptyUnit" class="flex items-center gap-2 px-4 py-2 rounded-lg transition-all 
+                                                duration-200 hover:scale-105 active:scale-95 cursor-pointer" @click="showModal = true"
+                    :style="{
+                        background: unitColor,
+                        color: 'var(--light-text)'
+                    }">
+                    <PlusIcon class="w-5 h-5" />
+                    <span>Add Stepping Stone</span>
+                </div>
 
-        <div v-else
-            class="w-16 h-16 rounded-full flex items-center justify-center cursor-pointer transition-all duration-300 hover:scale-110 hover:shadow-lg active:scale-95"
-            :style="{ backgroundColor: unitColor, transform: `translateY(${offset}px)` }" @click="showModal = true">
-            <PlusIcon class="w-8 h-8" style="color: var(--light-text)" />
-        </div>
+                <div v-else
+                    class="w-16 h-16 rounded-full flex items-center justify-center cursor-pointer transition-all duration-300 hover:scale-110 hover:shadow-lg active:scale-95"
+                    :style="{ backgroundColor: unitColor }" @click="showModal = true">
+                    <PlusIcon class="w-8 h-8" style="color: var(--light-text)" />
+                </div>
+            </TooltipTrigger>
+            <TooltipContent variant="shad" side="top" :offset="3">
+                {{ emptyUnit ? 'Add the first stepping stone' : 'Add a new stepping stone' }}
+            </TooltipContent>
+        </Tooltip>
 
         <!-- the modal itself -->
         <teleport to="body">
@@ -119,7 +126,7 @@
                         </div> -->
                         <div class="flex justify-end gap-3 mt-6">
                             <button @click="closeModal" class="px-4 py-2 border rounded-lg"
-                                style="border-color: var(--color-primary); color: var(--highlight-color);"
+                                style="border-color: var (--color-primary); color: var(--highlight-color);"
                                 :disabled="isAddingNode"
                                 :class="{ 'opacity-50 cursor-not-allowed': isAddingNode }">
                                 Cancel
@@ -155,6 +162,7 @@ import {
 } from '@heroicons/vue/24/solid'
 import { toast } from 'vue-sonner';
 import axios from 'axios';
+import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 
 const props = defineProps({
     libraryId: {

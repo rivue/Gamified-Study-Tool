@@ -11,6 +11,7 @@ const props = withDefaults(defineProps<{
 
 const globalCfg = inject<any>('tooltipGlobalConfig', { openDelay: 0, closeDelay: 0, disabled: false })
 const isOpen = ref(false)
+const triggerEl = ref<HTMLElement | null>(null)
 let timer: number | undefined
 
 function show() {
@@ -52,7 +53,8 @@ provide('tooltipCtx', {
   isOpen,
   show,
   hide,
-  id: tooltipId
+  id: tooltipId,
+  triggerEl
 })
 </script>
 
@@ -63,5 +65,7 @@ provide('tooltipCtx', {
 </template>
 
 <style scoped>
-.tt-root { display: inline-block; position: relative; }
+/* Use inline flow and avoid creating a new containing block so absolute elements
+   inside triggers are not re-anchored (prevents Y shifting). */
+.tt-root { display: inline; position: static; }
 </style>
