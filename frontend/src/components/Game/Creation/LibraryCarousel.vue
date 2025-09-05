@@ -74,7 +74,7 @@
                                             :class="['star-icon', 'h-6', 'w-6', libraryFavoritesMap[library.id] ? 'favorited' : '']" />
                                     </button>
                                 </TooltipTrigger>
-                                <TooltipContent side="top" variant="shad" :offset="32">
+                                <TooltipContent side="top" variant="shad" :offset="-2">
                                     {{ libraryFavoritesMap[library.id] ? 'Unfavorite' : 'Favorite' }} this course
                                 </TooltipContent>
                             </Tooltip>
@@ -86,17 +86,22 @@
                         </div>
                     </div>
 
-                    <div class="card-footer">
-                        <Button v-if="ownerFilter !== 'archived'" @click="updateArchivedStatus(library.id, true)" class="archive-button">
-                            Archive
-                        </Button>
-                        <Button v-else @click="updateArchivedStatus(library.id, false)" class="archive-button">
-                            Unarchive
-                        </Button>
-                        <Button @click="goToLibrary(library.id)" class="go-to-course-button">
-                            Go to Course
-                        </Button>
-                    </div>
+                    <div class="card-actions">
+                            <Tooltip>
+                                <TooltipTrigger>
+                                    <button @click.stop="updateArchivedStatus(library.id, ownerFilter !== 'archived')" class="action-button">
+                                        <ArchiveX v-if="ownerFilter === 'archived'" class="h-5 w-5" />
+                                        <Archive v-else class="h-5 w-5" />
+                                    </button>
+                                </TooltipTrigger>
+                                <TooltipContent side="top" variant="shad" :offset="-2">
+                                    {{ ownerFilter === 'archived' ? 'Unarchive' : 'Archive' }} course
+                                </TooltipContent>
+                            </Tooltip>
+                            <Button @click="goToLibrary(library.id)" class="go-to-course-button">
+                                Go to Course
+                            </Button>
+                        </div>
                 </div>
             </div>
         </div>
@@ -140,7 +145,7 @@ import { useRouter } from "vue-router";
 import { Input } from "@/components/ui/input";
 import { StarIcon } from "@heroicons/vue/24/solid";
 import { Button } from "@/components/ui/button";
-import { LoaderCircle, Search, BookOpen } from "lucide-vue-next";
+import { LoaderCircle, Search, BookOpen, Archive, ArchiveX } from "lucide-vue-next";
 import { useAuthStore } from "@/store/authStore";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import axios from "axios";
@@ -362,18 +367,21 @@ function updateFavoritedStatus(libraryId: number, oldStatus: boolean) {
 }
 
 function updateArchivedStatus(libraryId: number, archive: boolean) {
-    axios
-        .put(`/api/library/${libraryId}/archive`, {
-            archive: archive,
-        })
-        .then((response) => {
-            if (response.status === 200) {
-                emit('archive-status-changed');
-            }
-        })
-        .catch((error) => {
-            console.error('Error updating archive status:', error);
-        });
+    const action = archive ? 'archive' : 'unarchive';
+    if (confirm(`Are you sure you want to ${action} this course?`)) {
+        axios
+            .put(`/api/library/${libraryId}/archive`, {
+                archive: archive,
+            })
+            .then((response) => {
+                if (response.status === 200) {
+                    emit('archive-status-changed');
+                }
+            })
+            .catch((error) => {
+                console.error('Error updating archive status:', error);
+            });
+    }
 }
 
 function handleSearchKeydown(event: KeyboardEvent) {
@@ -797,8 +805,33 @@ function goToPage(page: number) {
     align-items: center;
 }
 
+.card-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 1.5rem;
+    background: rgba(26, 139, 127, 0.1);
+    border-top: 1px solid rgba(26, 139, 127, 0.2);
+    gap: 0.5rem;
+}
+
+.action-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 50%;
+    transition: background-color 0.2s ease;
+    color: var(--text-color-secondary);
+}
+
+.action-button:hover {
+    background-color: rgba(26, 139, 127, 0.1);
+    color: var(--color-primary);
+}
+
 .go-to-course-button {
-    width: 100%;
+    flex-grow: 1;
     background: var(--button-gradient);
     color: var(--text-color);
     font-weight: 600;

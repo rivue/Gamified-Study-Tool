@@ -125,7 +125,8 @@ onBeforeUnmount(() => {
   line-height: 1.25;
   padding: 6px 8px;
   border-radius: 6px;
-  z-index: 9999; /* much higher z-index */
+  /* Raise above any app element, menus, modals, etc. */
+  z-index: 2147483647;
   max-width: 260px;
   box-shadow: 0 4px 16px rgba(0,0,0,.25);
   pointer-events: none;
@@ -146,6 +147,6 @@ onBeforeUnmount(() => {
     0 0 0 1px hsl(240 3.7% 15.9%);
   backdrop-filter: blur(8px);
   letter-spacing: .2px;
-  z-index: 9999; /* ensure shadcn variant also has high z-index */
+  z-index: 2147483647; /* ensure shadcn variant also has high z-index */
 }
 </style>
