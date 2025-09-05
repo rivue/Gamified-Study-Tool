@@ -380,6 +380,17 @@ def init_library_routes(app):
             db.session.rollback()
             app.logger.error(f"Error leaving library: {e}")
             return jsonify(status="error", message="An internal error occurred. Please try again."), 500
+
+    @app.route('/api/library/<int:library_id>/archive', methods=['PUT'])
+    @login_required
+    def archive_library(library_id):
+        try:
+            archive = request.json.get('archive', True)
+            return lbh.set_library_archived(current_user.id, library_id, archive)
+        except Exception as e:
+            db.session.rollback()
+            app.logger.error(f"Error updating archive status: {e}")
+            return jsonify(status="error", message="An internal error occurred. Please try again."), 500
         
     @app.route('/api/library/unit', methods=['POST'])
     def generate_unit():
