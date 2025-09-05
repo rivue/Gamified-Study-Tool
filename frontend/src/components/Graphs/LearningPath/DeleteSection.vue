@@ -9,7 +9,7 @@
                     <TrashIcon class="w-8 h-8" />
                 </button>
             </TooltipTrigger>
-            <TooltipContent variant="shad" side="top" :offset="65">
+            <TooltipContent variant="shad" side="top" :offset="5">
                 Delete this section
             </TooltipContent>
         </Tooltip>

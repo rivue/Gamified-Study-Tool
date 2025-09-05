@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { inject, computed } from 'vue'
+import { inject, computed, ref, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
 const ctx = inject<any>('tooltipCtx')
 if (!ctx) console.warn('TooltipContent used outside Tooltip root')
 const props = withDefaults(defineProps<{
@@ -14,36 +14,101 @@ const props = withDefaults(defineProps<{
 })
 const classes = computed(() => [
   'tt-content',
-  `side-${props.side}`,
   props.variant === 'shad' ? 'tt-shadcn' : '',
   props.class
 ].filter(Boolean).join(' '))
 
-const offsetStyles = computed(() => {
-  const offset = props.offset
+const el = ref<HTMLElement | null>(null)
+const styleObj = ref<Record<string, string>>({})
+
+function computePosition() {
+  if (!ctx?.triggerEl?.value || !el.value) return
+  const t = ctx.triggerEl.value as HTMLElement
+  const c = el.value as HTMLElement
+  const tr = t.getBoundingClientRect()
+  const cr = c.getBoundingClientRect() // dimensions only; top/left will be recalculated
+  const gap = props.offset ?? 12
+  let top = 0
+  let left = 0
   switch (props.side) {
-    case 'top': return { transform: `translate(-50%, -${offset}px)` }
-    case 'bottom': return { transform: `translate(-50%, ${offset}px)` }
-    case 'left': return { transform: `translate(-${offset}px, -50%)` }
-    case 'right': return { transform: `translate(${offset}px, -50%)` }
-    default: return { transform: `translate(-50%, -${offset}px)` }
+    case 'bottom':
+      top = tr.bottom + gap
+      left = tr.left + tr.width / 2 - cr.width / 2
+      break
+    case 'left':
+      top = tr.top + tr.height / 2 - cr.height / 2
+      left = tr.left - gap - cr.width
+      break
+    case 'right':
+      top = tr.top + tr.height / 2 - cr.height / 2
+      left = tr.right + gap
+      break
+    case 'top':
+    default:
+      top = tr.top - gap - cr.height
+      left = tr.left + tr.width / 2 - cr.width / 2
+      break
   }
+
+  // Keep within viewport bounds (basic clamping)
+  const vw = window.innerWidth
+  const vh = window.innerHeight
+  const padding = 4
+  left = Math.max(padding, Math.min(left, vw - cr.width - padding))
+  top = Math.max(padding, Math.min(top, vh - cr.height - padding))
+
+  styleObj.value = {
+    position: 'fixed',
+    top: `${Math.round(top)}px`,
+    left: `${Math.round(left)}px`
+  }
+}
+
+function scheduleCompute() {
+  // Run after DOM shows the tooltip
+  nextTick(() => {
+    requestAnimationFrame(() => computePosition())
+  })
+}
+
+watch(() => ctx?.isOpen.value, (open) => {
+  if (open) scheduleCompute()
+})
+
+watch(() => [props.side, props.offset], () => {
+  if (ctx?.isOpen.value) scheduleCompute()
+})
+
+function onWinChange() {
+  if (ctx?.isOpen.value) computePosition()
+}
+
+onMounted(() => {
+  window.addEventListener('resize', onWinChange)
+  window.addEventListener('scroll', onWinChange, true)
+})
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', onWinChange)
+  window.removeEventListener('scroll', onWinChange, true)
 })
 </script>
 
 <template>
-  <transition name="tt-fade">
-    <div
-      v-show="ctx?.isOpen.value"
-      :id="ctx?.id"
-      role="tooltip"
-      :class="classes"
-      :style="offsetStyles"
-      v-if="ctx"
-    >
-      <slot />
-    </div>
-  </transition>
+  <teleport to="body">
+    <transition name="tt-fade">
+      <div
+        v-show="ctx?.isOpen.value"
+        :id="ctx?.id"
+        role="tooltip"
+        :class="classes"
+        :style="styleObj"
+        v-if="ctx"
+        ref="el"
+      >
+        <slot />
+      </div>
+    </transition>
+  </teleport>
 </template>
 
 <style scoped>
@@ -53,10 +118,7 @@ const offsetStyles = computed(() => {
 .tt-fade-leave-to { opacity: 0; }
 
 .tt-content {
-  position: absolute;
-  top: 0;
-  left: 50%;
-  /* removed transform - now handled by computed style */
+  position: fixed; /* positioned via JS relative to viewport */
   background: #111;
   color: #fff;
   font-size: 12px;
@@ -69,10 +131,6 @@ const offsetStyles = computed(() => {
   pointer-events: none;
   font-weight: 500;
 }
-
-.tt-content.side-bottom { top: 100%; }
-.tt-content.side-left { left: 0; top: 50%; }
-.tt-content.side-right { left: 100%; top: 50%; }
 
 .tt-shadcn {
   background: hsl(240 10% 3.9%);

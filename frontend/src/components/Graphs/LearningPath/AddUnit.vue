@@ -6,10 +6,17 @@
             backgroundColor: 'var(--background-color-1t)',
             borderRight: 'none',
         }">
-        <div class="absolute hover:opacity-80 cursor-pointer bottom-52 left-1/2 transform -translate-x-1/2 px-2 py-7 rounded-lg whitespace-nowrap shadow-md z-10"
-            @click="openAddUnitModal" :style="{ backgroundColor: 'var(--background-color-1t)' }">
-            <PlusIcon class="w-8 h-8" style="color: var(--highlight-color);" />
-        </div>
+        <Tooltip>
+            <TooltipTrigger>
+                <div class="absolute hover:opacity-80 cursor-pointer bottom-52 left-1/2 transform -translate-x-1/2 px-2 py-7 rounded-lg whitespace-nowrap shadow-md z-10"
+                    @click="openAddUnitModal" :style="{ backgroundColor: 'var(--background-color-1t)' }">
+                    <PlusIcon class="w-8 h-8" style="color: var(--highlight-color);" />
+                </div>
+            </TooltipTrigger>
+            <TooltipContent variant="shad" side="top" :offset="8">
+                {{ position === 0 ? 'Add the first course unit' : 'Add a new course unit' }}
+            </TooltipContent>
+        </Tooltip>
     </div>
 
     <!-- Add Unit Modal -->
@@ -60,6 +67,7 @@
 import { ref, nextTick, onMounted, toRefs } from 'vue'
 import { PlusIcon, XMarkIcon } from '@heroicons/vue/24/solid'
 import axios from 'axios'
+import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 
 const props = defineProps({
     libraryId: {

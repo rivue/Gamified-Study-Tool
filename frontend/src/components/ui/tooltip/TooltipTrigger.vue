@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { inject } from 'vue'
+import { inject, onMounted, onBeforeUnmount, ref } from 'vue'
 
 const ctx = inject<any>('tooltipCtx', null)
 
@@ -13,6 +13,19 @@ const props = withDefaults(defineProps<{
 })
 
 const Tag = props.as as any
+const el = ref<HTMLElement | null>(null)
+
+onMounted(() => {
+  if (ctx && 'triggerEl' in ctx) {
+    ctx.triggerEl.value = el.value
+  }
+})
+
+onBeforeUnmount(() => {
+  if (ctx && 'triggerEl' in ctx) {
+    ctx.triggerEl.value = null
+  }
+})
 
 </script>
 
@@ -20,6 +33,7 @@ const Tag = props.as as any
   <Tag
     :class="['tt-trigger', props.class]"
     :tabindex="-1"
+    ref="el"
     :aria-describedby="ctx?.id"
     :aria-disabled="props.disabled || undefined"
     @mouseenter="!props.disabled && ctx?.show()"
