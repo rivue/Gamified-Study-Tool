@@ -74,9 +74,7 @@
                     <div class="card-footer">
                         <div class="creator">
                             <UserCircle class="creator-icon" />
-                            <span>{{ library.owner_username === null ? "Creator not found" :
-                                library.owner_username.length > 12 && !library.is_public ?
-                                    library.owner_username.slice(0, 9) + "..." : library.owner_username }}</span>
+                            <span class="creator-name">{{ library.owner_username === null ? "Creator not found" : library.owner_username }}</span>
                         </div>
 
                         <Input v-if="!library.is_public && !joinedCourses.has(library.id)"
@@ -648,6 +646,8 @@ function handleSearchKeydown(event: KeyboardEvent) {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
 }
 
 .creator {
@@ -656,12 +656,20 @@ function handleSearchKeydown(event: KeyboardEvent) {
     gap: 0.5rem;
     color: var(--text-color-secondary);
     font-size: 0.875rem;
+    flex: 1;
+    min-width: 0;
 }
 
 .creator-icon {
     width: 1rem;
     height: 1rem;
     color: var(--color-primary-light);
+}
+
+.creator-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .loading-indicator {
@@ -785,12 +793,17 @@ function handleSearchKeydown(event: KeyboardEvent) {
     transition: all 0.2s;
     cursor: pointer;
     border: none;
+    flex-shrink: 0;
 }
 
 .joined-card-button:hover {
     background: linear-gradient(135deg, #059669, #047857);
     transform: translateY(-1px);
     box-shadow: 0 4px 8px rgba(16, 185, 129, 0.3);
+}
+
+.leave-card-button {
+    flex-shrink: 0;
 }
 
 .join-container {
