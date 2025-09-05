@@ -726,6 +726,18 @@ def leave_library(user_id: int, library_id: int):
             db.session.rollback()
             raise
 
+def set_library_archived(user_id: int, library_id: int, archive: bool):
+
+    try:
+        with db_transaction():
+            membership = LibraryMembership.query.filter_by(user_id=user_id, library_id=library_id).first()
+            if not membership:
+                return jsonify(status="error", message="You are not a member of this course."), 403
+            membership.archived = archive
+            return jsonify(status="success", archived=archive), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify(status="error", message=str(e)), 500
 def add_section_user_state(user_id, library_id, section_id, num_lessons, initial_lesson_state=1):
 
     # Check if a record already exists for this user, library, and room
@@ -1127,15 +1139,24 @@ def get_libraries_info(user_id=None, browse=False):
 
         if user_id:
             
-            my_libraries = (Library.query.filter_by(owner_id=user_id).order_by(Library.id.desc()).all())
+            my_libraries = (
+                db.session.query(Library)
+                .join(LibraryMembership, (Library.id == LibraryMembership.library_id))
+                .filter(Library.owner_id == user_id, LibraryMembership.user_id == user_id,
+                        LibraryMembership.archived.is_(False))
+                .order_by(Library.id.desc())
+                .all()
+            )
             response["mine"] = [model_to_dict(library, exclude=['room_names', 'factoids']) for library in my_libraries]
 
             joined_q = (
                 db.session.query(Library)
-                .join(LibraryMembership, 
-                    Library.id == LibraryMembership.library_id)
-                    .filter(LibraryMembership.user_id == user_id,
-                            Library.owner_id != user_id)
+                .join(LibraryMembership, Library.id == LibraryMembership.library_id)
+                .filter(
+                    LibraryMembership.user_id == user_id,
+                    Library.owner_id != user_id,
+                    LibraryMembership.archived.is_(False)
+                )
             )
             joined_public  = joined_q.filter(Library.is_public.is_(True)).all()
 
@@ -1145,6 +1166,14 @@ def get_libraries_info(user_id=None, browse=False):
                                         for l in joined_public]
             response["joined_private"] = [model_to_dict(l, exclude=["room_names", "factoids"])
                                         for l in joined_private]
+
+            archived = (
+                db.session.query(Library)
+                .join(LibraryMembership, Library.id == LibraryMembership.library_id)
+                .filter(LibraryMembership.user_id == user_id, LibraryMembership.archived.is_(True))
+                .all()
+            )
+            response["archived"] = [model_to_dict(l, exclude=["room_names", "factoids"]) for l in archived]
             
             favorited_map = {fav.library_id: fav.is_favorited for fav in LibraryFavorites.query.filter_by(user_id=user_id).all()}
             response["favorites_map"] = favorited_map

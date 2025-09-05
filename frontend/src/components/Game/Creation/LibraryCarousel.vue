@@ -45,6 +45,10 @@
                     :class="['filter-btn', { 'active': ownerFilter === 'joined' }]">
                     Joined Courses
                 </button>
+                <button @click="setOwnerFilter('archived')"
+                    :class="['filter-btn', { 'active': ownerFilter === 'archived' }]">
+                    Archived
+                </button>
             </div>
         </div>
 
@@ -83,6 +87,12 @@
                     </div>
 
                     <div class="card-footer">
+                        <Button v-if="ownerFilter !== 'archived'" @click="updateArchivedStatus(library.id, true)" class="archive-button">
+                            Archive
+                        </Button>
+                        <Button v-else @click="updateArchivedStatus(library.id, false)" class="archive-button">
+                            Unarchive
+                        </Button>
                         <Button @click="goToLibrary(library.id)" class="go-to-course-button">
                             Go to Course
                         </Button>
@@ -139,6 +149,7 @@ import axios from "axios";
 const props = defineProps<{
     libraries: Array<{ clicks: number; context: any; difficulty: string; guide: string; id: number; image_url: string, language: string; language_difficulty: string; likes: number; library_topic: string; owner_id: number }>;
     libraryFavoritesMap: Record<number, boolean>;
+    archivedLibraries: Array<any>;
 }>();
 
 // State
@@ -154,19 +165,23 @@ const joinMessageType = ref("");
 const joinLoading = ref(false);
 const filterLoading = ref(false);
 const authStore = useAuthStore();
-const ownerFilter = ref<'all' | 'owned' | 'joined'>('all');
+const ownerFilter = ref<'all' | 'owned' | 'joined' | 'archived'>('all');
 
 // so parent can refresh list
-const emit = defineEmits(['libraryJoined']);
+const emit = defineEmits(['libraryJoined', 'archive-status-changed']);
 
 // Filtering function
 async function filterLibraries() {
-    let libraries = [...props.libraries];
-
-    if (ownerFilter.value === 'owned') {
-        libraries = libraries.filter(library => library.owner_id === parseInt(authStore.user.id));
-    } else if (ownerFilter.value === 'joined') {
-        libraries = libraries.filter(library => library.owner_id !== parseInt(authStore.user.id));
+    let libraries;
+    if (ownerFilter.value === 'archived') {
+        libraries = [...props.archivedLibraries];
+    } else {
+        libraries = [...props.libraries];
+        if (ownerFilter.value === 'owned') {
+            libraries = libraries.filter(library => library.owner_id === parseInt(authStore.user.id));
+        } else if (ownerFilter.value === 'joined') {
+            libraries = libraries.filter(library => library.owner_id !== parseInt(authStore.user.id));
+        }
     }
 
     // First, sort libraries so favorited ones appear first
@@ -193,7 +208,7 @@ async function filterLibraries() {
 }
 
 // Set owner filter with loading delay
-async function setOwnerFilter(filter: 'all' | 'owned' | 'joined') {
+async function setOwnerFilter(filter: 'all' | 'owned' | 'joined' | 'archived') {
     if (ownerFilter.value === filter) return; // Don't reload if same filter
 
     filterLoading.value = true;
@@ -217,6 +232,12 @@ watch(() => props.libraries, () => {
 // Watch for changes to the favorites map to re-sort when favorites change
 watch(() => props.libraryFavoritesMap, () => {
     // Re-sort libraries when favorites change
+    if (!filterLoading.value) {
+        filterLibraries();
+    }
+}, { deep: true });
+
+watch(() => props.archivedLibraries, () => {
     if (!filterLoading.value) {
         filterLibraries();
     }
@@ -337,6 +358,21 @@ function updateFavoritedStatus(libraryId: number, oldStatus: boolean) {
         .catch((error) => {
             console.log(error);
             console.error("Error updating favorite status:", error);
+        });
+}
+
+function updateArchivedStatus(libraryId: number, archive: boolean) {
+    axios
+        .put(`/api/library/${libraryId}/archive`, {
+            archive: archive,
+        })
+        .then((response) => {
+            if (response.status === 200) {
+                emit('archive-status-changed');
+            }
+        })
+        .catch((error) => {
+            console.error('Error updating archive status:', error);
         });
 }
 
