@@ -59,7 +59,7 @@
         </div>
 
         <!-- Conditional rendering based on library count -->
-        <div v-else-if="libraries.length > 0" class="courses-container">
+        <div v-else-if="libraries.length > 0 || archivedLibraries.length > 0" class="courses-container">
             <div class="courses-grid">
                 <div v-for="library in paginatedLibraries" :key="library.id" class="course-card">
                     <div class="card-content">
@@ -176,7 +176,7 @@ async function filterLibraries() {
     if (ownerFilter.value === 'archived') {
         libraries = [...props.archivedLibraries];
     } else {
-        libraries = [...props.libraries];
+        libraries = [...props.libraries].filter(lib => !props.archivedLibraries.some(archived => archived.id === lib.id));
         if (ownerFilter.value === 'owned') {
             libraries = libraries.filter(library => library.owner_id === parseInt(authStore.user.id));
         } else if (ownerFilter.value === 'joined') {
