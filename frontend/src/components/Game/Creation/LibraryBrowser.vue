@@ -6,7 +6,7 @@
         </div>
 
         <template v-else>
-            <LibraryCarousel v-if="loggedIn" :libraries="myLibraries" :library-favorites-map="favoritesMap"/>
+            <LibraryCarousel v-if="loggedIn" :libraries="myLibraries" :archived-libraries="archivedLibraries" :library-favorites-map="favoritesMap" @libraryJoined="fetchLibraries" @archive-status-changed="fetchLibraries"/>
         </template>
     </div>
 </template>
@@ -21,6 +21,7 @@ import LibraryCarousel from "@/components/Game/Creation/LibraryCarousel.vue";
 const authStore = useAuthStore();
 const isLoading = ref(true);
 const myLibraries = ref([]);
+const archivedLibraries = ref([] as any[]);
 const favoritesMap = ref({});
 
 onMounted(() => {
@@ -32,13 +33,14 @@ function fetchLibraries() {
         .get("/api/libraries")
         .then((response) => {
             if (authStore.loggedIn) {
+                archivedLibraries.value = response.data.archived || [];
                 const combinedLibraries = [
                     ...response.data.mine,
                     ...response.data.joined_public,
                     ...response.data.joined_private
-                ];
-                
-                myLibraries.value = combinedLibraries.sort((a, b) => 
+                ].filter(lib => !archivedLibraries.value.some((a: any) => a.id === lib.id));
+
+                myLibraries.value = combinedLibraries.sort((a, b) =>
                     a.library_topic.localeCompare(b.library_topic)
                 );
 
