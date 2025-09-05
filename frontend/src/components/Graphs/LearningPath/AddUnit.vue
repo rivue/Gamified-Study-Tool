@@ -13,7 +13,7 @@
                     <PlusIcon class="w-8 h-8" style="color: var(--highlight-color);" />
                 </div>
             </TooltipTrigger>
-            <TooltipContent variant="shad" side="top" :offset="8">
+            <TooltipContent variant="shad" side="top" :offset="56">
                 {{ position === 0 ? 'Add the first course unit' : 'Add a new course unit' }}
             </TooltipContent>
         </Tooltip>
