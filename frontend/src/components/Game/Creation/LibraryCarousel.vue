@@ -255,6 +255,12 @@ watch(searchQuery, () => {
     }
 });
 
+watch(() => props.archivedLibraries, () => {
+    if (!filterLoading.value) {
+        filterLibraries();
+    }
+}, { deep: true });
+
 // Initialize on component mount
 onMounted(() => {
     filterLibraries(); // Use the filterLibraries function which already sorts favorited items first

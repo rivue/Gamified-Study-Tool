@@ -7,6 +7,7 @@
 
         <template v-else>
             <LibraryCarousel v-if="loggedIn" :libraries="myLibraries" :archived-libraries="archivedLibraries" :library-favorites-map="favoritesMap" @libraryJoined="fetchLibraries" @archive-status-changed="fetchLibraries"/>
+            <LibraryCarousel v-if="loggedIn" :libraries="myLibraries" :archived-libraries="archivedLibraries" :library-favorites-map="favoritesMap" @libraryJoined="fetchLibraries" @archive-status-changed="fetchLibraries"/>
         </template>
     </div>
 </template>
@@ -22,6 +23,7 @@ const authStore = useAuthStore();
 const isLoading = ref(true);
 const myLibraries = ref([]);
 const archivedLibraries = ref([] as any[]);
+const archivedLibraries = ref([] as any[]);
 const favoritesMap = ref({});
 
 onMounted(() => {
@@ -34,11 +36,12 @@ function fetchLibraries() {
         .then((response) => {
             if (authStore.loggedIn) {
                 archivedLibraries.value = response.data.archived || [];
+                archivedLibraries.value = response.data.archived || [];
                 const combinedLibraries = [
                     ...response.data.mine,
                     ...response.data.joined_public,
                     ...response.data.joined_private
-                ];
+                ].filter(lib => !archivedLibraries.value.some((a: any) => a.id === lib.id));
 
                 myLibraries.value = combinedLibraries.sort((a, b) =>
                     a.library_topic.localeCompare(b.library_topic)
