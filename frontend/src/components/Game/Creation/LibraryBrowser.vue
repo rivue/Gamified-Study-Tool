@@ -38,7 +38,7 @@ function fetchLibraries() {
                     ...response.data.mine,
                     ...response.data.joined_public,
                     ...response.data.joined_private
-                ].filter(lib => !archivedLibraries.value.some((a: any) => a.id === lib.id));
+                ];
 
                 myLibraries.value = combinedLibraries.sort((a, b) =>
                     a.library_topic.localeCompare(b.library_topic)
