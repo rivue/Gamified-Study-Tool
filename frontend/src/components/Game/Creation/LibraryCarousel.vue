@@ -219,9 +219,6 @@ async function setOwnerFilter(filter: 'all' | 'owned' | 'joined' | 'archived') {
     filterLoading.value = true;
     ownerFilter.value = filter;
 
-    // Simulate loading delay for better UX
-    await new Promise(resolve => setTimeout(resolve, 300));
-
     await filterLibraries();
     filterLoading.value = false;
 }
