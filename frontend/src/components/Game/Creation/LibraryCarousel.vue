@@ -30,7 +30,7 @@
         <div class="filters-container">
             <div class="search-container">
                 <Search class="search-icon" />
-                <Input class="search-input" type="text" v-model="searchQuery" @input="filterLibraries"
+                <Input class="search-input" type="text" v-model="searchQuery"
                     @keydown="handleSearchKeydown" placeholder="Search courses you've joined..." />
             </div>
 
@@ -247,6 +247,13 @@ watch(() => props.archivedLibraries, () => {
         filterLibraries();
     }
 }, { deep: true });
+
+// Watch search query to update the filtered list after it changes
+watch(searchQuery, () => {
+    if (!filterLoading.value) {
+        filterLibraries();
+    }
+});
 
 // Initialize on component mount
 onMounted(() => {
