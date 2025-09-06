@@ -261,6 +261,13 @@ watch(() => props.archivedLibraries, () => {
     }
 }, { deep: true });
 
+// Watch search query to update the filtered list after it changes
+watch(searchQuery, () => {
+    if (!filterLoading.value) {
+        filterLibraries();
+    }
+});
+
 // Initialize on component mount
 onMounted(() => {
     filterLibraries(); // Use the filterLibraries function which already sorts favorited items first
