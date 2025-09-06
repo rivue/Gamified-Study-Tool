@@ -248,23 +248,21 @@ function loadMoreItems() {
     isLoading.value = true;
 
     // Simulate loading delay for better UX
-    setTimeout(() => {
-        const start = currentLoadIndex.value;
-        const end = start + itemsPerLoad;
-        const newItems = filteredLibraries.value.slice(start, end);
+    const start = currentLoadIndex.value;
+    const end = start + itemsPerLoad;
+    const newItems = filteredLibraries.value.slice(start, end);
 
-        if (newItems.length > 0) {
-            displayedLibraries.value = [...displayedLibraries.value, ...newItems];
-            currentLoadIndex.value = end;
+    if (newItems.length > 0) {
+        displayedLibraries.value = [...displayedLibraries.value, ...newItems];
+        currentLoadIndex.value = end;
 
-            // Check if we've loaded all items
-            hasMoreToLoad.value = currentLoadIndex.value < filteredLibraries.value.length;
-        } else {
-            hasMoreToLoad.value = false;
-        }
+        // Check if we've loaded all items
+        hasMoreToLoad.value = currentLoadIndex.value < filteredLibraries.value.length;
+    } else {
+        hasMoreToLoad.value = false;
+    }
 
-        isLoading.value = false;
-    }, 320);
+    isLoading.value = false;
 }
 
 // Infinite scroll handler
