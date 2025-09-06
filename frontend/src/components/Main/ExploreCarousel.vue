@@ -26,7 +26,7 @@
         <div class="filters-container">
             <div class="search-container">
                 <Search class="search-icon" />
-                <Input v-model="searchQuery" @input="filterLibraries" @keydown="handleSearchKeydown"
+                <Input v-model="searchQuery" @keydown="handleSearchKeydown"
                     placeholder="Search courses..." class="search-input" />
             </div>
             
@@ -285,6 +285,11 @@ watch(() => props.libraries, (newLibraries) => {
     // Update filtered libraries when props change
     filterLibraries();
 }, { deep: true });
+
+// Watch search query to update filters after the value changes
+watch(searchQuery, () => {
+    filterLibraries();
+});
 
 // Method to check if a course is new
 function isNewCourse(library: any) {
