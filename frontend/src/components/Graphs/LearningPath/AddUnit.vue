@@ -1,6 +1,6 @@
 <template>
-    <div v-if="canAddUnit" class="relative -mx-12 my-12 flex-shrink-0 w-0 flex items-center justify-center" :class="[
-        (position === 0 || position === existingUnits.length) ? 'pt-72 pb-52' : 'pt-72 pb-52 border-dashed border-2'
+    <div v-if="canAddUnit" class="relative -mx-12 my-12 flex-shrink-0 w-0 h-0 overflow-visible flex items-center justify-center" :class="[
+        (position === 0 || position === existingUnits.length) ? '' : 'border-dashed border-2'
          ]" :style="{
             borderColor: 'var(--background-color-1t)',
             backgroundColor: 'var(--background-color-1t)',
@@ -8,7 +8,7 @@
         }">
         <Tooltip>
             <TooltipTrigger>
-                <div class="absolute hover:opacity-80 cursor-pointer bottom-52 left-1/2 transform -translate-x-1/2 px-2 py-7 rounded-lg whitespace-nowrap shadow-md z-10"
+                <div class="absolute hover:opacity-80 cursor-pointer -top-4 left-1/2 transform -translate-x-1/2 px-2 py-7 rounded-lg whitespace-nowrap shadow-md z-10"
                     @click="openAddUnitModal" :style="{ backgroundColor: 'var(--background-color-1t)' }">
                     <PlusIcon class="w-8 h-8" style="color: var(--highlight-color);" />
                 </div>

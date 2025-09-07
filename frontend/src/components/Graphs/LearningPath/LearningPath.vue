@@ -110,15 +110,13 @@
                     <!-- Left padding so first node is visible -->
                     <div class="w-24 flex-shrink-0"></div>
 
-                    <!-- Add Unit at the beginning -->
-                    <AddUnit v-if="editModeEnabled" :library-id="libraryId" :position="0"
-                        :existing-units="Object.keys(rawUnitData)" :can-add-unit="isOwner"
-                        @unit-added="handleUnitAdded" />
-
+                    
                     <!-- Unit Headers -->
-
                     <template v-if="Object.keys(rawUnitData || {}).length > 0">
                         <template v-for="(unitSections, unitName, unitIndex) in rawUnitData">
+                            <AddUnit v-if="editModeEnabled" :library-id="libraryId" :position="0"
+                        :existing-units="Object.keys(rawUnitData)" :can-add-unit="isOwner"
+                        @unit-added="handleUnitAdded" />
                             <div class="relative -mx-12 my-12 px-16 pt-40 pb-36 border-t-2 border-b-2 flex-shrink-0"
                                 :class="['unit-box', { 'unit--first': unitIndex === 0, 'unit--last': unitIndex === Object.keys(rawUnitData).length - 1 }]"
                                 :style="{
@@ -335,7 +333,7 @@
                         </template>
                     </template>
                     <template v-else>
-                        <EmptyCourse :is-owner="isOwner" :color="getUnitColor(0)" />
+                        <EmptyCourse :is-owner="isOwner" :color="getUnitColor(0)" :library-id="libraryId" />
                     </template>
 
                     <!-- Added right padding to ensure last nodes have space -->

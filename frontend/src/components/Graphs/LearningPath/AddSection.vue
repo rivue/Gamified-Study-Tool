@@ -1,5 +1,13 @@
 <template>
-    <div class="relative flex-shrink-0" :style="!emptyUnit && typeof offset === 'number' ? { transform: `translateY(${offset}px)` } : {}">
+    <div
+        class="relative flex-shrink-0"
+        :style="!emptyUnit
+            ? {
+                ...(typeof offset === 'number' ? { transform: `translateY(${offset}px)` } : {}),
+                height: '0px',
+                overflow: 'visible'
+              }
+            : {}">
         <Tooltip>
             <TooltipTrigger>
                 <div v-if="emptyUnit" class="flex items-center gap-2 px-4 py-2 rounded-lg transition-all 
@@ -152,7 +160,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import {
     XMarkIcon,
     DocumentPlusIcon,
@@ -188,6 +196,11 @@ const props = defineProps({
     },
     offset: {
         type: Number,
+    },
+    // If true, opens the modal automatically when mounted
+    autoOpen: {
+        type: Boolean,
+        default: false
     }
 });
 
@@ -202,6 +215,12 @@ const fileError = ref('');
 const apiError = ref('');
 const isAddingNode = ref(false);
 const fileInput = ref(null);
+
+onMounted(() => {
+    if (props.autoOpen) {
+        showModal.value = true;
+    }
+});
 
 function closeModal() {
     if (isAddingNode.value) {

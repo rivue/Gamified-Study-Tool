@@ -248,7 +248,7 @@ def init_library_routes(app):
             return jsonify({"error": f"Message breaks our usage policy. Please check our guidelines.\n{message}"}), 400
 
         # Creates library database object
-        library_response, library_response_status_code = lbh.create_library(user_id, topic, "library_difficulty_delete_later", "language_delete_later", "language_difficulty_delete_later", "guide_delete_later", is_public)
+        library_response, library_response_status_code = lbh.create_library(user_id, topic, "library_difficulty_delete_later", "language_delete_later", "language_difficulty_delete_later", "Azelea", is_public)
         if library_response_status_code == 201:
             
             library_id = library_response.get_json().get("library_id")
