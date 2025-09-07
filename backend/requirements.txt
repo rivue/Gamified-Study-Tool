@@ -180,3 +180,5 @@ wrapt==1.15.0
 yarg==0.1.9
 yarl==1.9.2
 zipp==3.21.0
+celery==5.3.6
+redis==5.0.8
