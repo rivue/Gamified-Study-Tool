@@ -1,12 +1,26 @@
 <template>
     <transition name="modal-fade">
         <div class="modal-backdrop" @click.self="close" role="dialog" aria-modal="true" :aria-label="`Summary of ${materialName}`">
-            <div class="modal-container" ref="container">
+            <div class="modal-container" :class="{ fullscreen: isFullscreen }" ref="container">
                 <header class="modal-header">
                     <h2 class="modal-title">
                         <span class="title-accent"></span>
                         Summary of {{ materialName }}
                     </h2>
+                    <button @click.stop="toggleFullscreen" class="fullscreen-button" :aria-label="isFullscreen ? 'Exit full screen' : 'Enter full screen'">
+                        <svg v-if="!isFullscreen" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M4 9V4h5"/>
+                            <path d="M20 9V4h-5"/>
+                            <path d="M4 15v5h5"/>
+                            <path d="M20 15v5h-5"/>
+                        </svg>
+                        <svg v-else xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 3H3v6"/>
+                            <path d="M15 3h6v6"/>
+                            <path d="M3 15v6h6"/>
+                            <path d="M21 15v6h-6"/>
+                        </svg>
+                    </button>
                     <button @click="close" class="close-button" aria-label="Close dialog">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M18 6L6 18M6 6l12 12"/>
@@ -37,6 +51,11 @@ const props = defineProps({
 
 const emit = defineEmits(['close']);
 const close = () => emit('close');
+
+const isFullscreen = ref(false);
+const toggleFullscreen = () => {
+    isFullscreen.value = !isFullscreen.value;
+};
 
 const container = ref(null);
 onMounted(() => {
@@ -188,7 +207,6 @@ const renderedSummary = computed(() => {
 
 /* ============ Close Button ============ */
 .close-button {
-    margin-left: auto;
     background: linear-gradient(135deg, rgba(13,148,136,.12), rgba(13,148,136,.05));
     border: 1px solid rgba(13,148,136,.35);
     color: #f8fafc;
@@ -199,6 +217,54 @@ const renderedSummary = computed(() => {
     place-items: center;
     transition: all .25s ease;
     position: relative;
+}
+.fullscreen-button {
+    background: linear-gradient(135deg, rgba(13,148,136,.12), rgba(13,148,136,.05));
+    border: 1px solid rgba(13,148,136,.35);
+    color: #f8fafc;
+    padding: .55rem;
+    border-radius: .85rem;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    transition: all .25s ease;
+    position: relative;
+    margin-left: auto;
+}
+.fullscreen-button:before {
+    content:"";
+    position:absolute;
+    inset:0;
+    border-radius: inherit;
+    background: radial-gradient(circle at 30% 30%, rgba(13,148,136,.4), transparent 65%);
+    opacity: 0;
+    transition: opacity .35s ease;
+}
+.fullscreen-button:hover {
+    color: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px -6px rgba(0,0,0,.65), 0 0 0 1px rgba(13,148,136,.4);
+}
+.fullscreen-button:hover:before { opacity: 1; }
+.fullscreen-button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px -2px rgba(0,0,0,.7);
+}
+.modal-container.fullscreen {
+    position: fixed;
+    inset: 0;
+    margin: 0;
+    width: 100vw;
+    height: 100vh;
+    max-height: none;
+    border-radius: 0;
+    z-index: 1001;
+}
+.modal-container.fullscreen .prose {
+    font-size: 1.15rem;
+}
+.modal-container.fullscreen .modal-title {
+    font-size: clamp(1.5rem, 1.6rem + .5vw, 2rem);
 }
 .close-button:before {
     content:"";
@@ -224,6 +290,7 @@ const renderedSummary = computed(() => {
 .modal-body {
     padding: 0 1.75rem 1.75rem;
     overflow-y: auto;
+    flex: 1;
     scrollbar-width: thin;
     scrollbar-color: var(--highlight-color) transparent;
 }
