@@ -21,6 +21,7 @@ def process_material(self, material_id: int) -> dict:
     This demonstrates the pattern described in BACKGROUND_PROCESSING_STRATEGY.md:
     queue the job quickly and execute the heavy work in a Celery worker.
     """
+    print("processing material")
     material: Optional[Material] = db.session.get(Material, material_id)
     if not material:
         # Mark task as failure explicitly with a clear message
@@ -39,7 +40,7 @@ def process_material(self, material_id: int) -> dict:
         # - Update DB rows as needed
 
         # For now, record a stub summary and mark ready
-        material.summary = material.summary or "Processed asynchronously by worker."
+        material.summary = "Processed asynchrounously" #material.summary or "Processed asynchronously by worker."
         material.status = "ready"
         db.session.add(material)
         db.session.commit()
