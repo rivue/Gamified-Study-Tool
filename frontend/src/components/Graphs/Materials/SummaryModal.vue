@@ -14,7 +14,7 @@
                     </button>
                 </header>
                 <main class="modal-body">
-                    <div class="summary-content prose" v-html="summary"></div>
+                    <div class="summary-content prose" v-html="renderedSummary"></div>
                 </main>
                 <footer class="modal-footer">
                     <button @click="close" class="button-primary">
@@ -26,10 +26,11 @@
     </transition>
 </template>
 
-<script setup>
-import { defineProps, defineEmits, onMounted, ref } from 'vue';
+<script setup lang="ts">
+import { defineProps, defineEmits, onMounted, ref, computed } from 'vue';
+import { marked } from 'marked';
 
-defineProps({
+const props = defineProps({
     materialName: { type: String, required: true },
     summary: { type: String, default: '<p>No summary available.</p>' }
 });
@@ -40,6 +41,34 @@ const close = () => emit('close');
 const container = ref(null);
 onMounted(() => {
     requestAnimationFrame(() => container.value?.focus());
+});
+
+// Normalize single-line markdown by inserting line breaks before headings, lists, and numbers
+function normalizeMarkdown(md: string): string {
+    if (!md) return '';
+    const hasNewlines = /\n/.test(md);
+    if (hasNewlines) return md;
+
+    let s = md.trim();
+    // Newline before headings that appear mid-text
+    s = s.replace(/(?<!^)\s+(#{1,6})\s+/g, '\n$1 ');
+    // Newline before unordered list items like " - "
+    s = s.replace(/(?<!^)\s-\s/g, '\n- ');
+    // Newline before ordered list items like " 1. "
+    s = s.replace(/(?<!^)\s(\d+\.)\s/g, '\n$1 ');
+    // Add an extra newline after headings to improve spacing
+    s = s.replace(/^(#{1,6} .*)$/gm, '$1\n');
+    return s;
+}
+
+// Render the summary as Markdown if it is not already HTML
+const renderedSummary = computed(() => {
+    const text = props.summary || '';
+    const looksLikeHtml = /<\/?[a-z][\s\S]*>/i.test(text);
+    if (looksLikeHtml) return text;
+
+    // const normalized = normalizeMarkdown(text);
+    return marked.parse(text, { gfm: true, breaks: true });
 });
 </script>
 
@@ -236,9 +265,20 @@ onMounted(() => {
 
 .summary-content :deep(ul),
 .summary-content :deep(ol) {
+    list-style: decimal;
+    list-style-position: outside;
+    padding-left: 1.6rem; /* adjust as needed */
     margin: 0 0 1.25rem 0;
-    padding: 0;
-    list-style: none;
+}
+
+/* Nested ordered lists */
+.summary-content :deep(ol ol) {
+    padding-left: 1.6rem;
+}
+
+/* Optional: small spacing between items */
+.summary-content :deep(ol li) {
+    margin-bottom: .55rem;
 }
 
 .summary-content :deep(ul li) {
