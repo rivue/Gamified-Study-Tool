@@ -9,10 +9,12 @@ from flask import Flask, jsonify, make_response, send_from_directory, request
 from flask_login import LoginManager
 from flask_migrate import Migrate
 from flask_cors import CORS
+
+# Load .env as early as possible so imports can read env vars
+load_dotenv()
+from database.supabase import supabase
 from database.models import db, User
 from database.upgrade_db import run_upgrades
-
-load_dotenv()
 app = Flask(__name__, static_folder='../frontend/dist')
 app.secret_key = os.getenv('FLASK_SECRET_KEY')
 app.config['FLASK_ENV'] = os.getenv('FLASK_ENV', 'development')
@@ -187,6 +189,7 @@ from routes.feedback_routes import init_feedback_routes
 from routes.admin_routes import init_admin_routes
 from routes.library_routes import init_library_routes
 from routes.material_routes import init_material_routes
+from routes.task_routes import init_task_routes
 
 init_auth_routes(app)
 init_profile_routes(app)
@@ -196,6 +199,7 @@ init_feedback_routes(app)
 init_admin_routes(app)
 init_library_routes(app)
 init_material_routes(app)
+init_task_routes(app)
 
 if app.config['FLASK_ENV'] not in ['migration', 'production']:
     with app.app_context():
@@ -218,4 +222,5 @@ def unauthorized():
     return make_response(jsonify({"error": "User not authenticated"}), 401)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    debug_mode = app.config['FLASK_ENV'] == 'development'
+    app.run(host='0.0.0.0', port=5000, debug=debug_mode)

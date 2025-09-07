@@ -1,24 +1,7 @@
-import os
 import json
-from supabase import create_client, Client
 from .models import db, Material
 from werkzeug.datastructures import FileStorage
-from io import BytesIO
-
-# This is a placeholder for your actual Supabase client.
-# Ideally, you should initialize this once in your main app factory
-# and import it here to avoid creating multiple clients.
-try:
-    # Attempt to import from a central location
-    from ..app import supabase
-except (ImportError, ModuleNotFoundError):
-    print("Warning: Could not import Supabase client from backend.app. Using a fallback initialization.")
-    SUPABASE_URL = os.environ.get("SUPABASE_URL", "http://127.0.0.1:54321")
-    SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
-    if not SUPABASE_KEY:
-        raise ValueError("Supabase key is not set in environment variables.")
-    supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
-
+from database.supabase import supabase
 
 def create_and_upload_material(course_id: int, file: FileStorage):
     """

@@ -1,12 +1,26 @@
 <template>
     <transition name="modal-fade">
         <div class="modal-backdrop" @click.self="close" role="dialog" aria-modal="true" :aria-label="`Summary of ${materialName}`">
-            <div class="modal-container" ref="container">
+            <div class="modal-container" :class="{ fullscreen: isFullscreen }" ref="container">
                 <header class="modal-header">
                     <h2 class="modal-title">
                         <span class="title-accent"></span>
                         Summary of {{ materialName }}
                     </h2>
+                    <button @click.stop="toggleFullscreen" class="fullscreen-button" :aria-label="isFullscreen ? 'Exit full screen' : 'Enter full screen'">
+                        <svg v-if="!isFullscreen" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M4 9V4h5"/>
+                            <path d="M20 9V4h-5"/>
+                            <path d="M4 15v5h5"/>
+                            <path d="M20 15v5h-5"/>
+                        </svg>
+                        <svg v-else xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 3H3v6"/>
+                            <path d="M15 3h6v6"/>
+                            <path d="M3 15v6h6"/>
+                            <path d="M21 15v6h-6"/>
+                        </svg>
+                    </button>
                     <button @click="close" class="close-button" aria-label="Close dialog">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M18 6L6 18M6 6l12 12"/>
@@ -14,7 +28,7 @@
                     </button>
                 </header>
                 <main class="modal-body">
-                    <div class="summary-content prose" v-html="summary"></div>
+                    <div class="summary-content prose" v-html="renderedSummary"></div>
                 </main>
                 <footer class="modal-footer">
                     <button @click="close" class="button-primary">
@@ -26,10 +40,11 @@
     </transition>
 </template>
 
-<script setup>
-import { defineProps, defineEmits, onMounted, ref } from 'vue';
+<script setup lang="ts">
+import { defineProps, defineEmits, onMounted, ref, computed } from 'vue';
+import { marked } from 'marked';
 
-defineProps({
+const props = defineProps({
     materialName: { type: String, required: true },
     summary: { type: String, default: '<p>No summary available.</p>' }
 });
@@ -37,9 +52,42 @@ defineProps({
 const emit = defineEmits(['close']);
 const close = () => emit('close');
 
+const isFullscreen = ref(false);
+const toggleFullscreen = () => {
+    isFullscreen.value = !isFullscreen.value;
+};
+
 const container = ref(null);
 onMounted(() => {
     requestAnimationFrame(() => container.value?.focus());
+});
+
+// Normalize single-line markdown by inserting line breaks before headings, lists, and numbers
+function normalizeMarkdown(md: string): string {
+    if (!md) return '';
+    const hasNewlines = /\n/.test(md);
+    if (hasNewlines) return md;
+
+    let s = md.trim();
+    // Newline before headings that appear mid-text
+    s = s.replace(/(?<!^)\s+(#{1,6})\s+/g, '\n$1 ');
+    // Newline before unordered list items like " - "
+    s = s.replace(/(?<!^)\s-\s/g, '\n- ');
+    // Newline before ordered list items like " 1. "
+    s = s.replace(/(?<!^)\s(\d+\.)\s/g, '\n$1 ');
+    // Add an extra newline after headings to improve spacing
+    s = s.replace(/^(#{1,6} .*)$/gm, '$1\n');
+    return s;
+}
+
+// Render the summary as Markdown if it is not already HTML
+const renderedSummary = computed(() => {
+    const text = props.summary || '';
+    const looksLikeHtml = /<\/?[a-z][\s\S]*>/i.test(text);
+    if (looksLikeHtml) return text;
+
+    // const normalized = normalizeMarkdown(text);
+    return marked.parse(text, { gfm: true, breaks: true });
 });
 </script>
 
@@ -159,7 +207,6 @@ onMounted(() => {
 
 /* ============ Close Button ============ */
 .close-button {
-    margin-left: auto;
     background: linear-gradient(135deg, rgba(13,148,136,.12), rgba(13,148,136,.05));
     border: 1px solid rgba(13,148,136,.35);
     color: #f8fafc;
@@ -170,6 +217,54 @@ onMounted(() => {
     place-items: center;
     transition: all .25s ease;
     position: relative;
+}
+.fullscreen-button {
+    background: linear-gradient(135deg, rgba(13,148,136,.12), rgba(13,148,136,.05));
+    border: 1px solid rgba(13,148,136,.35);
+    color: #f8fafc;
+    padding: .55rem;
+    border-radius: .85rem;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    transition: all .25s ease;
+    position: relative;
+    margin-left: auto;
+}
+.fullscreen-button:before {
+    content:"";
+    position:absolute;
+    inset:0;
+    border-radius: inherit;
+    background: radial-gradient(circle at 30% 30%, rgba(13,148,136,.4), transparent 65%);
+    opacity: 0;
+    transition: opacity .35s ease;
+}
+.fullscreen-button:hover {
+    color: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px -6px rgba(0,0,0,.65), 0 0 0 1px rgba(13,148,136,.4);
+}
+.fullscreen-button:hover:before { opacity: 1; }
+.fullscreen-button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px -2px rgba(0,0,0,.7);
+}
+.modal-container.fullscreen {
+    position: fixed;
+    inset: 0;
+    margin: 0;
+    width: 100vw;
+    height: 100vh;
+    max-height: none;
+    border-radius: 0;
+    z-index: 1001;
+}
+.modal-container.fullscreen .prose {
+    font-size: 1.15rem;
+}
+.modal-container.fullscreen .modal-title {
+    font-size: clamp(1.5rem, 1.6rem + .5vw, 2rem);
 }
 .close-button:before {
     content:"";
@@ -195,6 +290,7 @@ onMounted(() => {
 .modal-body {
     padding: 0 1.75rem 1.75rem;
     overflow-y: auto;
+    flex: 1;
     scrollbar-width: thin;
     scrollbar-color: var(--highlight-color) transparent;
 }
@@ -236,9 +332,20 @@ onMounted(() => {
 
 .summary-content :deep(ul),
 .summary-content :deep(ol) {
+    list-style: decimal;
+    list-style-position: outside;
+    padding-left: 1.6rem; /* adjust as needed */
     margin: 0 0 1.25rem 0;
-    padding: 0;
-    list-style: none;
+}
+
+/* Nested ordered lists */
+.summary-content :deep(ol ol) {
+    padding-left: 1.6rem;
+}
+
+/* Optional: small spacing between items */
+.summary-content :deep(ol li) {
+    margin-bottom: .55rem;
 }
 
 .summary-content :deep(ul li) {

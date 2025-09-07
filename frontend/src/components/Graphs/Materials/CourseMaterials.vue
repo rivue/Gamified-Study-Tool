@@ -297,6 +297,7 @@ const formatSize = (bytes: number) => {
 
 const getStatusClass = (status: string) => {
   switch (status) {
+    case 'Pending': return 'status-pending';
     case 'Ready': return 'status-ready';
     case 'Summarizing': return 'status-summarizing';
     case 'Error': return 'status-error';
@@ -527,6 +528,7 @@ function closeQuizModal() {
   text-transform: uppercase;
   white-space: nowrap;
 }
+.status-pending { background-color: #7b18f4; color: white; }
 .status-ready { background-color: #2ecc71; color: white; }
 .status-summarizing { background-color: #3498db; color: white; }
 .status-error { background-color: #e74c3c; color: white; }

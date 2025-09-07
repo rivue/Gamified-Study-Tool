@@ -3,47 +3,80 @@ import fitz
 from vector_processing.file_processing import clean_text, split_into_sentences, create_sections
 from vector_processing.embedding_service import insert_sections_to_pinecone_parallel
 
-def process_document(selected_files, library_id=None):
-    # Validate file type and size here if needed (e.g., check if it's a PDF and not too large)
+def extract_text(selected_files, ocr_callback=None, dpi=150, assume_scanned=None):
+    """
+    Central text extraction logic.
+    - selected_files: PDF bytes
+    - ocr_callback: optional callable(bytes) -> str used for OCR per page if scanned
+    - dpi: rasterization DPI for OCR workflow
+    - assume_scanned: override auto-detection if True/False
+    """
+    doc = None
     try:
-        doc = fitz.open(stream=selected_files, filetype="pdf")
-    except Exception as e:
-        print(f"Failed to open PDF: {e}")
-        raise IOError("Failed to open PDF file. The file might be corrupted or in an unsupported format.")
+        try:
+            doc = fitz.open(stream=selected_files, filetype="pdf")
+        except Exception as e:
+            raise IOError(f"Failed to open PDF file: {e}")
 
-    try:
-        # Determine if the PDF is scanned or digital
-        is_scanned = not any(page.get_text("text").strip() for page in doc)
+        # Determine if scanned
+        if assume_scanned is None:
+            is_scanned = not any(page.get_text("text").strip() for page in doc)
+        else:
+            is_scanned = bool(assume_scanned)
+
         extracted_text = ""
+
         if is_scanned:
-            print("Detected Scanned PDF - performing OCR...")
+            if ocr_callback is None:
+                raise ValueError("Scanned PDF detected but no OCR callback was provided.")
             for page in doc:
                 try:
-                    pix = page.get_pixmap(dpi=100) 
+                    pix = page.get_pixmap(dpi=dpi, alpha=False)
                     img_bytes = pix.tobytes("png")
-                    # Assuming you have an OCR client (e.g., Google Vision); wrap its call in try/except.
-                    image = vision.Image(content=img_bytes)
-                    response = client.text_detection(image=image)
-                    text = response.text_annotations[0].description if response.text_annotations else ""
+                    text = ocr_callback(img_bytes) or ""
                     extracted_text += f"{clean_text(text)}\n"
-                except Exception as page_err:
-                    print(f"OCR error on page: {page_err}")
-                    continue  # Skip problematic pages
+                except Exception:
+                    # Skip problematic pages during OCR
+                    continue
         else:
-            print("Detected Digital PDF - extracting text directly...")
-            extracted_text = "\n".join([clean_text(page.get_text("text")) for page in doc])
-        
+            extracted_text = "\n".join(clean_text(page.get_text("text")) for page in doc)
+
         if not extracted_text.strip():
-            print("No text extracted from the document.")
             raise ValueError("No text extracted from the document.")
-        
-        sentences = split_into_sentences(extracted_text)
-        sections = create_sections(sentences)
-        print(f"sections: {sections}")
-        insert_sections_to_pinecone_parallel(sections, library_id)
-    except Exception as e:
-        print(f"Error processing document: {e}")
-        raise
+
+        return extracted_text
     finally:
         if doc is not None:
             doc.close()
+
+def process_document(selected_files, library_id=None, ocr_callback=None, dpi=150, assume_scanned=None):
+    """
+    Extracts text, splits into sentences, creates sections, and uploads to Pinecone.
+    """
+    try:
+        extracted_text = extract_text(
+            selected_files,
+            ocr_callback=ocr_callback,
+            dpi=dpi,
+            assume_scanned=assume_scanned,
+        )
+        sentences = split_into_sentences(extracted_text)
+        sections = create_sections(sentences)
+        insert_sections_to_pinecone_parallel(sections, library_id)
+        return sections
+    except Exception:
+        raise
+
+def process_document_no_pinecone(selected_files, ocr_callback=None, dpi=150, assume_scanned=None):
+    """
+    Extracts text only (no split, no sections, no upload).
+    """
+    try:
+        return extract_text(
+            selected_files,
+            ocr_callback=ocr_callback,
+            dpi=dpi,
+            assume_scanned=assume_scanned,
+        )
+    except Exception:
+        raise
