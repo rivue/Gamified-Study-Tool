@@ -18,11 +18,18 @@ def make_celery(app: "flask.Flask") -> Celery:
 
     # Reasonable defaults; adjust as needed
     celery.conf.update(
-        timezone="UTC",
         task_track_started=True,
+        timezone="UTC",
         task_serializer="json",
         accept_content=["json"],
         result_serializer="json",
+        task_acks_late=True,
+        worker_prefetch_multiplier=1,
+        task_time_limit=300,       # hard timeout
+        task_soft_time_limit=270,  # soft timeout
+        enable_utc=True,
+        # For long jobs on Redis broker:
+        broker_transport_options={"visibility_timeout": 3600}
     )
 
     class ContextTask(celery.Task):
