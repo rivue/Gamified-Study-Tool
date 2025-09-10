@@ -427,6 +427,8 @@ class Material(db.Model):
     )
     
     summary = db.Column(db.Text, nullable=True)
+    # Stores generated quiz content as JSON, e.g. {"questions": [...]} or a plain list
+    quiz = db.Column(db.JSON, nullable=True)
     
     created_at = db.Column(db.DateTime(timezone=True), nullable=False, server_default=db.func.now())
 
@@ -443,6 +445,7 @@ class Material(db.Model):
             'storage_path': self.storage_path,
             'status': self.status,
             'summary': self.summary,
+            'quiz': self.quiz,
             'created_at': self.created_at.isoformat() if self.created_at else None
         }
 

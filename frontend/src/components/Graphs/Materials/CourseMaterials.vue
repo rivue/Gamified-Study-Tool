@@ -65,9 +65,9 @@
                 <DocumentTextIcon class="w-5 h-5" />
                 <span>View Summary</span>
               </button>
-              <button @click="showQuiz(material)" class="action-button" :disabled="material.status !== 'Ready'">
+              <button @click="showQuiz(material)" class="action-button" :disabled="material.status !== 'Ready' || !material.quiz || (material.quiz.questions || []).length === 0">
                 <QuestionMarkCircleIcon class="w-5 h-5" />
-                <span>Generate Quiz</span>
+                <span>Take Quiz</span>
               </button>
               <button class="action-button delete-button">
                 <TrashIcon class="w-5 h-5" />
@@ -89,6 +89,7 @@
     <QuizModal
       v-if="quizIsShowing"
       :material-name="selectedMaterial.name"
+      :questions="(selectedMaterial.quiz && selectedMaterial.quiz.questions) ? selectedMaterial.quiz.questions : []"
       @close="closeQuizModal"
     />
   </div>
@@ -137,6 +138,7 @@ type Material = {
     uploadedDate: string;
     status: 'Pending' | 'Ready' | 'Summarizing' | 'Error';
     summary: string;
+    quiz?: { questions: any[] } | null;
 };
 const materials = ref<Material[]>([]);
 
@@ -182,7 +184,8 @@ const fetchMaterials = async () => {
       size: material.size,
       uploadedDate: new Date(material.uploaded_at || new Date()).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
       status: statusMap[material.status] || 'Error',
-      summary: material.summary || ''
+      summary: material.summary || '',
+      quiz: material.quiz || null,
     }));
   } catch (error) {
     console.error("Failed to fetch materials:", error);

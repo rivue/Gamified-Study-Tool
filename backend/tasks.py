@@ -2,6 +2,8 @@ from __future__ import annotations
 from app import supabase
 
 from typing import Optional
+import json
+import re
 from celery import states
 
 from celery_app import celery
@@ -82,6 +84,60 @@ def process_material(self, material_id: int) -> dict:
 
         # - Update DB rows as needed
         material.summary = summary or "No summary generated."
+
+        # - Generate a JSON quiz based strictly on the extracted text
+        quiz_prompt = (
+            "Create a concise quiz strictly based on the source content.\n"
+            "Return ONLY valid minified JSON with this schema: \n"
+            "{\n  \"questions\": [\n    {\n      \"type\": \"Multiple Choice\"|\"True/False\"|\"Short Answer\",\n      \"question\": string,\n      \"options\": array<string> (omit for True/False and Short Answer),\n      \"correct\": string,\n      \"explanation\": string\n    }\n  ]\n}\n"
+            "Guidelines:\n"
+            "- 6-8 questions total with a mix of types.\n"
+            "- Options should be clear and non-ambiguous.\n"
+            "- Keep answers grounded in the source; do not invent facts.\n\n"
+            "SOURCE CONTENT START\n"
+            f"{extracted_text}\n"
+            "SOURCE CONTENT END"
+        )
+        quiz_json = {"questions": []}
+        print("after quiz_json")
+        try:
+            chat = getattr(client, "chat", None)
+            if not chat or not hasattr(chat, "completions"):
+                raise AttributeError("OpenAI client lacks chat.completions API")
+            print("after chat")
+            resp = chat.completions.create(
+                model="gpt-4o-mini",
+                messages=[{"role": "user", "content": quiz_prompt}],
+                temperature=0.2,
+                max_tokens=1200,
+            )
+            print("before choices")
+            choices = getattr(resp, "choices", []) or []
+            if choices and getattr(choices[0], "message", None):
+                content = getattr(choices[0].message, "content", "")
+            else:
+                content = (choices[0]["message"]["content"] if choices else "")
+            print("before text")
+            text = (content or "").strip()
+            # Extract JSON if wrapped in code fences
+            fence_match = re.search(r"```(?:json)?\n(.*?)\n```", text, re.DOTALL | re.IGNORECASE)
+            json_str = fence_match.group(1).strip() if fence_match else text
+            print("after jsonstr")
+            parsed = json.loads(json_str)
+            # normalize to {"questions": [...]} shape
+            if isinstance(parsed, list):
+                quiz_json = {"questions": parsed}
+            elif isinstance(parsed, dict) and "questions" in parsed:
+                quiz_json = {"questions": parsed.get("questions", [])}
+            else:
+                # fallback if unexpected structure
+                quiz_json = {"questions": []}
+            print("after else chain")
+        except Exception:
+            # If quiz generation fails, continue without blocking summary
+            quiz_json = {"questions": []}
+
+        material.quiz = quiz_json
 
         # Mark ready
         material.status = "ready"

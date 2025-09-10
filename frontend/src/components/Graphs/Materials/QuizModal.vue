@@ -177,8 +177,10 @@
 import { defineProps, defineEmits, onMounted, ref, computed } from 'vue';
 import { CheckIcon, XMarkIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
 
-defineProps({
-    materialName: { type: String, required: true }
+const props = defineProps({
+    materialName: { type: String, required: true },
+    // Optional: pass in pre-generated questions; falls back to defaults if empty
+    questions: { type: Array, required: false, default: () => [] }
 });
 
 const emit = defineEmits(['close']);
@@ -192,8 +194,8 @@ const showResults = ref(false);
 const userAnswers = ref([]);
 const score = ref(0);
 
-// Mock quiz data
-const questions = ref([
+// Use passed-in questions if provided; otherwise fallback to a default mock set
+const questions = ref(props.questions && props.questions.length ? props.questions : [
     {
         type: 'Multiple Choice',
         question: 'What is the primary goal of supervised learning?',
