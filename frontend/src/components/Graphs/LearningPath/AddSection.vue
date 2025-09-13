@@ -114,18 +114,40 @@
                                 <p v-if="fileError" class="mt-2 text-sm text-red-400">{{ fileError }}</p>
                             </div>
                         </div>
+                        
                         <div>
                             <label class="block text-sm font-medium mb-1" style="color: var(--highlight-color);">
                                 Select Existing Materials (optional)
                             </label>
-                            <div v-if="materials.length" class="border rounded-lg p-2 max-h-40 overflow-y-auto"
+                            <div v-if="materials.length" class="border rounded-lg p-2"
                                 style="background-color: var(--background-color-1t); border-color: var(--color-primary-light);">
-                                <div v-for="mat in materials" :key="mat.id" class="flex items-center gap-2 mb-1">
-                                    <input type="checkbox" :value="mat.id" v-model="selectedMaterialIds" :id="`mat-${mat.id}`" />
-                                    <label :for="`mat-${mat.id}`" class="flex-1 text-sm" style="color: var(--highlight-color);">
-                                        {{ mat.name }} ({{ formatFileSize(mat.size) }})
-                                    </label>
+                                <Input v-model="materialSearch" placeholder="Search materials..." class="mb-2" />
+                                <div v-if="filteredMaterials.length" class="max-h-40 overflow-y-auto">
+                                    <Table>
+                                        <TableHeader>
+                                            <TableRow>
+                                                <TableHead class="w-8"></TableHead>
+                                                <TableHead>Name</TableHead>
+                                                <TableHead class="text-right">Size</TableHead>
+                                            </TableRow>
+                                        </TableHeader>
+                                        <TableBody>
+                                            <TableRow v-for="mat in filteredMaterials" :key="mat.id" @click="toggleMaterial(mat.id)"
+                                                class="cursor-pointer">
+                                                <TableCell>
+                                                    <input type="checkbox" :value="mat.id" v-model="selectedMaterialIds" @click.stop />
+                                                </TableCell>
+                                                <TableCell class="text-sm" style="color: var(--highlight-color);">
+                                                    {{ mat.name }}
+                                                </TableCell>
+                                                <TableCell class="text-right text-sm" style="color: var(--highlight-color);">
+                                                    {{ formatFileSize(mat.size) }}
+                                                </TableCell>
+                                            </TableRow>
+                                        </TableBody>
+                                    </Table>
                                 </div>
+                                <p v-else class="text-sm opacity-70">No materials match.</p>
                             </div>
                             <p v-else class="text-sm opacity-70">No materials available.</p>
                         </div>
@@ -175,7 +197,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, watch, computed } from 'vue';
 import {
     XMarkIcon,
     DocumentPlusIcon,
@@ -186,6 +208,8 @@ import {
 import { toast } from 'vue-sonner';
 import axios from 'axios';
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
+import { Input } from '@/components/ui/input';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 const props = defineProps({
     libraryId: {
@@ -227,6 +251,7 @@ const newNodeNames = ref(['']);
 const selectedFile = ref(null);
 const materials = ref<any[]>([]);
 const selectedMaterialIds = ref<number[]>([]);
+const materialSearch = ref('');
 const nodeNameErrors = ref([]);
 const fileError = ref('');
 const apiError = ref('');
@@ -247,6 +272,13 @@ const fetchMaterials = async () => {
         console.error('Failed to fetch materials:', error);
     }
 };
+
+const filteredMaterials = computed(() =>
+    materials.value.filter((m: any) =>
+        m.name.toLowerCase().includes(materialSearch.value.toLowerCase())
+    )
+);
+
 
 watch(showModal, (val) => {
     if (val) {

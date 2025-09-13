@@ -10,8 +10,20 @@ def init_material_routes(app):
     def get_materials_for_course(course_id):
         """
         Fetches all materials for a given course ID.
+        Optional query parameter 'state' can filter by specific states (comma-separated).
         """
-        materials = Material.query.filter_by(library_id=course_id).order_by(Material.id.desc()).all()
+        query = Material.query.filter_by(library_id=course_id)
+        
+        # Check for optional state filter COMMA SEPERATED VALUES - NOT A LIST OBJECT!!
+        states_param = request.args.get('states')
+
+        if states_param:
+            print("alkjsdf;lkajsdf;lkajs")
+            # Split comma-separated states and filter 
+            states = [state.strip() for state in states_param.split(',')]
+            query = query.filter(Material.status.in_(states))
+        
+        materials = query.order_by(Material.id.desc()).all()
         return jsonify([material.as_dict() for material in materials]), 200
 
     @app.route("/api/materials/upload", methods=["POST"])
