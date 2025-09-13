@@ -447,6 +447,7 @@ class Material(db.Model):
             'status': self.status,
             'summary': self.summary,
             'quiz': self.quiz,
+            'added_to_course_path': self.added_to_course_path,
             'created_at': self.created_at.isoformat() if self.created_at else None
         }
 

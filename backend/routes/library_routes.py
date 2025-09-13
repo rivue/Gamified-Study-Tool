@@ -539,9 +539,11 @@ def init_library_routes(app):
                 try:
                     material_file = supabase.storage.from_("course-materials").download(material.storage_path)
                     process_document(material_file, library_id_int)
+                    material.added_to_course_path = True
+                    db.session.commit()
                 except Exception:
                     return jsonify(status="error", message=f"Failed to process material '{material.name}'"), 500
-
+                
             futures_dict = {}
             for subtopic in section_names:
 
@@ -573,7 +575,7 @@ def init_library_routes(app):
                     relative_position = section_position + int(position)
                     
                     lbh.save_section_contents(library_id_int, section, section_contents, unit_id, relative_position)
-
+                    
                     results.append({"subtopic": section, "status": "success", "data": section_contents})
                     completed_subtopics[section] = True
 
