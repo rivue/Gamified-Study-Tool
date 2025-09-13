@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from flask import jsonify, request
-from flask_login import login_required
+from flask_login import login_required, current_user
 from database.models import Test, Library, db
 
 
@@ -102,7 +102,12 @@ def init_task_routes(app):
         if not course_id or not material_ids:
             return jsonify({"error": "course_id and material_ids required"}), 400
 
-        if course_id != Library.query.get(course_id).owner_id:
+        library = Library.query.get(course_id)
+        
+        if not library:
+            return jsonify({"error": "Library does not exist???"}), 400
+            
+        if current_user != library.owner_id:
             return jsonify({"error": "You are not the course owner!"}), 400
 
         test = Test(
