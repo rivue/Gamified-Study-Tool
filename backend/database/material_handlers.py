@@ -65,3 +65,16 @@ def create_and_upload_material(course_id: int, file: FileStorage):
         db.session.rollback()
         print(f"Error during material upload: {e}")
         raise
+
+
+def delete_material(material: Material):
+    """Delete a material record and remove the file from storage."""
+
+    try:
+        supabase.storage.from_("course-materials").remove([material.storage_path])
+    except Exception as e:
+        # Log the error but continue with database deletion
+        print(f"Error deleting material from storage: {e}")
+
+    db.session.delete(material)
+    db.session.commit()

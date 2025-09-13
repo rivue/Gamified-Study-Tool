@@ -100,9 +100,13 @@
                                     <QuestionMarkCircleIcon class="w-5 h-5" />
                                     <span>Take Quiz</span>
                                 </button>
-                                <button class="action-button delete-button">
-                                    <TrashIcon class="w-5 h-5" />
-                                </button>
+                                <DeleteMaterial
+                                    v-if="isOwner"
+                                    :material-id="material.id"
+                                    :material-name="material.name"
+                                    @material-deleted="onMaterialDeleted"
+                                />
+                                
                             </div>
                         </li>
                     </ul>
@@ -159,13 +163,13 @@ import {
     DocumentIcon,
     DocumentTextIcon,
     QuestionMarkCircleIcon,
-    TrashIcon,
     PhotoIcon, // for pptx
     ClipboardDocumentIcon // for docx
 } from '@heroicons/vue/24/outline';
 import SummaryModal from '@/components/Graphs/Materials/SummaryModal.vue';
 import QuizModal from '@/components/Graphs/Materials/QuizModal.vue';
 import TestModal from '@/components/Graphs/Materials/TestModal.vue';
+import DeleteMaterial from '@/components/Graphs/Materials/DeleteMaterial.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -450,6 +454,11 @@ function closeQuizModal() {
     quizIsShowing.value = false;
     selectedMaterial.value = null;
 }
+
+function onMaterialDeleted(materialId: number) {
+  materials.value = materials.value.filter(m => m.id !== materialId);
+}
+
 </script>
 
 <style scoped>
