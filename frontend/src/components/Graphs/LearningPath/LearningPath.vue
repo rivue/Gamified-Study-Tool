@@ -450,7 +450,6 @@ import EmptyCourse from './EmptyCourse.vue';
 import TooltipTrigger from '@/components/ui/tooltip/TooltipTrigger.vue';
 import TooltipContent from '@/components/ui/tooltip/TooltipContent.vue';
 import Tooltip from '@/components/ui/tooltip/Tooltip.vue';
-import { Tooltip as UITooltip, TooltipTrigger as UITooltipTrigger, TooltipContent as UITooltipContent } from "@/components/ui/tooltip";
 
 const props = defineProps({
     libraryId: {

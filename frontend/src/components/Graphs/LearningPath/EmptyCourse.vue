@@ -1,42 +1,70 @@
 <template>
-    <div class="relative -mx-12 my-12 px-16 pt-40 pb-36 border-t-2 border-b-2 flex-shrink-0 unit-box unit--first unit--last"
-        :style="{
-            borderColor: color,
-            backgroundColor: 'var(--background-color-1t)',
+
+
+    <div class="relative -mx-12 my-12 px-16 pt-40 pb-36 border-t-2 border-b-2 flex-shrink-0"
+        :class="['unit-box', 'unit--first', 'unit--last']" :style="{
+            borderColor: '#2ecc71', // green
+            backgroundColor: 'var(--background-color-1t)'
         }">
+
 
         <!-- Unit name header -->
         <div class="absolute -top-5 left-1/2 transform -translate-x-1/2 px-6 py-2 rounded-lg font-bold text-xl whitespace-nowrap shadow-md"
-            :style="{ backgroundColor: color, color: 'var(--light-text)' }">
-            Nothing to see here!
+            :style="{ backgroundColor: '#2ecc71', color: 'var(--light-text)' }">
+            Nothing here yet!
         </div>
 
-        <div class="flex flex-col pt-10 pb-10 items-center justify-center p-6 min-w-64">
-            <div class="text-center mb-6 mt-2" style="color: var(--light-text);">
-                <p class="text-2xl font-bold">This course is completely empty!</p>
-                <p v-if="isOwner" class="text-lg opacity-75 mt-4">Create your first section to get started.</p>
-                <p v-else class="text-lg opacity-75 mt-4">Check back later to see when content has been added!</p>
+        <!-- Sections container -->
+        <div class="flex items-center">
+            <div>
+                <div class="flex flex-col pt-10 pb-10 items-center justify-center p-6 min-w-64">
+                    <div class="text-center mb-4 mt-2" style="color: var(--light-text);">
+                        <p class="text-lg">No units yet</p>
+                        <p class="text-sm opacity-75">Add a unit to get started</p>
+                    </div>
+
+                    <!-- Inline Add Unit button (styled like AddSection) -->
+                    <AddUnit
+                        v-if="isOwner"
+                        :library-id="libraryId"
+                        :position="0"
+                        :can-add-unit="isOwner"
+                        :inline-button="true"
+                        :button-color="green"
+                    />
+
+                    <div v-else class="flex items-center gap-2 px-4 py-2 rounded-lg" :style="{
+                        background: '#2ecc71',
+                        color: 'var(--light-text)'
+                    }">
+                        <PlusIcon class="w-0 h-5 opacity-0" />
+                        <span>Only the course owner can add units.</span>
+                        <PlusIcon class="w-0 h-5 opacity-0" />
+                    </div>
+                </div>
             </div>
-
         </div>
+    </div>
 
-        <!-- After unit is created, mount AddSection with auto-open to let user add the section -->
-        <AddSection v-if="createdUnitId"
+    <!-- <AddUnit v-if="editModeEnabled" :library-id="libraryId" :position="unitIndex + 1"
+            :existing-units="Object.keys(rawUnitData)" :can-add-unit="isOwner" @unit-added="handleUnitAdded" /> -->
+
+    <!-- remove this because we should need after we refresh the page -->
+    <!-- <AddSection v-if="createdUnitId"
             :library-id="libraryId"
             :unit-id="createdUnitId"
             :position="0"
             :empty-unit="true"
             :unit-color="color"
             :auto-open="true"
-            @nodes-added="handleNodesAdded" />
+            @nodes-added="handleNodesAdded" /> -->
 
-    </div>
 </template>
 
 <script setup lang="ts">
-import { defineProps, ref } from 'vue';
-import axios from 'axios';
-import AddSection from './AddSection.vue';
+import { defineProps } from 'vue';
+import { PlusIcon } from '@heroicons/vue/24/solid'
+import AddUnit from './AddUnit.vue';
 
 const props = defineProps({
     isOwner: {
@@ -53,36 +81,7 @@ const props = defineProps({
     }
 });
 
-const creatingUnit = ref(false);
-const createdUnitId = ref<number | null>(null);
-const errorMessage = ref('');
-
-async function createUnitAndOpenSection() {
-    if (creatingUnit.value) return;
-    errorMessage.value = '';
-    creatingUnit.value = true;
-    try {
-        const response = await axios.post('/api/library/unit', {
-            libraryId: props.libraryId,
-            unitName: 'Unit 1',
-            position: 0,
-        });
-        if (response.data?.status === 'success' && response.data.unit_id) {
-            createdUnitId.value = response.data.unit_id;
-        } else {
-            errorMessage.value = response.data?.message || 'Failed to create unit';
-        }
-    } catch (e: any) {
-        errorMessage.value = e?.response?.data?.message || e?.message || 'Failed to create unit';
-    } finally {
-        creatingUnit.value = false;
-    }
-}
-
-function handleNodesAdded() {
-    // Refresh to reflect new sections
-    window.location.reload();
-}
+const green = '#2ecc71'; // green color
 </script>
 
 <style scoped>

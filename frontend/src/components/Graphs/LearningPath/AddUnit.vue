@@ -1,5 +1,23 @@
 <template>
-    <div v-if="canAddUnit" class="relative -mx-12 my-12 flex-shrink-0 w-0 h-0 overflow-visible flex items-center justify-center" :class="[
+    <!-- Inline button trigger (matches AddSection emptyUnit style) -->
+    <div v-if="canAddUnit && inlineButton" class="relative flex-shrink-0">
+        <Tooltip>
+            <TooltipTrigger>
+                <div class="flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 hover:scale-105 active:scale-95 cursor-pointer"
+                    @click="openAddUnitModal"
+                    :style="{ background: buttonColorComputed, color: 'var(--light-text)' }">
+                    <PlusIcon class="w-5 h-5" />
+                    <span>Add Unit</span>
+                </div>
+            </TooltipTrigger>
+            <TooltipContent variant="shad" side="top" :offset="3">
+                {{ position === 0 ? 'Add the first unit' : 'Add a new unit' }}
+            </TooltipContent>
+        </Tooltip>
+    </div>
+
+    <!-- Default edge trigger (vertical plus icon) -->
+    <div v-else-if="canAddUnit" class="relative -mx-12 my-12 flex-shrink-0 w-0 h-0 overflow-visible flex items-center justify-center" :class="[
         (position === 0 || position === existingUnits.length) ? '' : 'border-dashed border-2'
          ]" :style="{
             borderColor: 'var(--background-color-1t)',
@@ -64,7 +82,7 @@
 </template>
 
 <script setup>
-import { ref, nextTick, onMounted, toRefs } from 'vue'
+import { ref, nextTick, onMounted, toRefs, computed } from 'vue'
 import { PlusIcon, XMarkIcon } from '@heroicons/vue/24/solid'
 import axios from 'axios'
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
@@ -85,6 +103,16 @@ const props = defineProps({
     canAddUnit: {
         type: Boolean,
         default: false
+    },
+    // If true, render an inline button trigger (like AddSection emptyUnit UI)
+    inlineButton: {
+        type: Boolean,
+        default: false
+    },
+    // Optional color for the inline button background
+    buttonColor: {
+        type: String,
+        default: ''
     }
 })
 
@@ -95,6 +123,8 @@ const newUnitName = ref('')
 const unitNameError = ref('')
 const isAddingUnit = ref(false)
 const { canAddUnit } = toRefs(props)
+
+const buttonColorComputed = computed(() => props.buttonColor || 'var(--button-gradient)')
 
 onMounted(() => {
     if (!canAddUnit.value) {
