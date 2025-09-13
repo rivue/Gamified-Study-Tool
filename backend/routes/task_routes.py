@@ -106,8 +106,7 @@ def init_task_routes(app):
         
         if not library:
             return jsonify({"error": "Library does not exist???"}), 400
-            
-        if current_user != library.owner_id:
+        if current_user.id != library.owner_id:
             return jsonify({"error": "You are not the course owner!"}), 400
 
         test = Test(
