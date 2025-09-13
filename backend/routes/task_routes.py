@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 from flask import jsonify, request
+from flask_login import login_required
+from database.models import Test, Library, db
 
 
 def init_task_routes(app):
@@ -82,17 +84,35 @@ def init_task_routes(app):
             except Exception:
                 payload["result"] = None
         return jsonify(payload), 200
+    
+    @app.route("/api/tests/course/<int:course_id>", methods=["GET"])
+    @login_required
+    def get_tests(course_id):
+        tests = Test.query.filter_by(library_id=course_id).order_by(Test.id.desc()).all()
+        return jsonify([t.as_dict() for t in tests]), 200
 
-#### current edge function vvv
-# begin
-#   if TG_OP = 'INSERT' and new.bucket_id = 'course-materials' then
-#       perform net.http_post(
-#           url:='http://host.docker.internal:5000/api/tasks/process-material',
-#           headers:='{"Content-Type": "application/json"}'::jsonb,
-#           body:=jsonb_build_object(
-#               'material_id', (new.metadata->>'material_id')::int
-#           )
-#       );
-#     end if;
-#     return new;
-# end;
+    @app.route("/api/tests/generate", methods=["POST"])
+    @login_required
+    def generate_test():
+        data = request.get_json(silent=True) or {}
+        course_id = data.get("course_id")
+        material_ids = data.get("material_ids", [])
+        name = data.get("name", "Test")
+
+        if not course_id or not material_ids:
+            return jsonify({"error": "course_id and material_ids required"}), 400
+
+        if course_id != Library.query.get(course_id).owner_id:
+            return jsonify({"error": "You are not the course owner!"}), 400
+
+        test = Test(
+            library_id=course_id,
+            name=name,
+            material_ids=material_ids,
+            status="pending",
+        )
+        db.session.add(test)
+        db.session.commit()
+        from tasks import process_test
+        async_result = process_test.delay(test.id)
+        return jsonify({**test.as_dict(), "task_id": async_result.id}), 202

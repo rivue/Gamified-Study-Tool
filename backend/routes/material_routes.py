@@ -1,6 +1,6 @@
 from flask import request, jsonify
 from flask_login import login_required, current_user
-from database.material_handlers import create_and_upload_material
+from database.material_handlers import create_and_upload_material, delete_material
 from database.models import Material, Library
 
 def init_material_routes(app):
@@ -75,3 +75,23 @@ def init_material_routes(app):
             "material_id": material.id,
             "summary": material.summary
         }), 200
+        
+    @app.route("/api/materials/<int:material_id>", methods=["DELETE"])
+    @login_required
+    def delete_material_route(material_id):
+        """Delete a material if the current user owns the course."""
+
+        material = Material.query.get(material_id)
+        if not material:
+            return jsonify({"error": "Material not found"}), 404
+
+        library = Library.query.get(material.library_id)
+        if library.owner_id != current_user.id:
+            return jsonify({"error": "You need to be the owner to do that!"}), 403
+
+        try:
+            delete_material(material)
+            return jsonify({"message": "Material deleted"}), 200
+        except Exception as e:
+            print(f"[ERROR] in delete_material_route: {e}")
+            return jsonify({"error": "Failed to delete material"}), 500

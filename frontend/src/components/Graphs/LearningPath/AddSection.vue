@@ -37,35 +37,34 @@
         <Transition name="modal">
             <div v-if="showModal" class="fixed inset-0 flex items-center justify-center z-50 p-4"
                 style="background-color: var(--background-haze); pointer-events: auto;">
-                <div class="rounded-2xl p-6 w-full max-w-md shadow-xl border pointer-events-auto"
+                <div class="rounded-2xl p-6 w-full max-w-2xl shadow-xl border pointer-events-auto"
                     style="background-color: var(--background-color); color: var(--light-text); border-color: var(--color-primary-dark);">
-                    <div class="flex justify-between items-center mb-4">
-                        <h2 class="text-xl font-semibold">Add New Stepping Stones</h2>
-                        <!-- <button @click="closeModal" style="color: var(--highlight-color);"> -->
-                                  <button @click="closeModal" style="color: var(--highlight-color);"
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-semibold">Add New Stepping Stones</h2>
+                        <button @click="closeModal" style="color: var(--highlight-color);"
                                 :disabled="isAddingNode"
                                 :class="{ 'opacity-50 cursor-not-allowed': isAddingNode }">
                             <XMarkIcon class="w-6 h-6" />
                         </button>
                     </div>
-                    <div class="space-y-4">
+                    <div class="space-y-6">
                         <!-- Dynamic list of node names -->
                         <div>
-                            <label class="block text-sm font-medium mb-1">
+                            <label class="block text-sm font-medium mb-2">
                                 Stepping Stone Names
                             </label>
                             <div v-for="(node, index) in newNodeNames" :key="index"
                                 class="flex items-center gap-2 mb-2">
-                                <input v-model="newNodeNames[index]" type="text" class="w-full p-2 border rounded-lg font-medium"
-                                    style="background-color: var(--background-color-1t); color: var(--light-text); border-color: var(--color-primary-dark);"
+                                <input v-model="newNodeNames[index]" type="text" class="w-full p-3 border rounded-lg font-medium transition-all duration-200 focus:ring-2 focus:ring-opacity-50"
+                                    style="background-color: var(--background-color-1t); color: var(--light-text); border-color: var(--color-primary-dark); focus:border-color: var(--highlight-color);"
                                     placeholder="Enter Stepping Stone name" maxlength="25" />
                                 <button v-if="newNodeNames.length > 1" @click="removeNodeName(index)"
-                                    class="text-red-400 hover:text-red-300">
+                                    class="text-red-400 hover:text-red-300 transition-colors">
                                     <XCircleIcon class="w-6 h-6" />
                                 </button>
                             </div>
                             <button v-if="emptyUnit" @click="addNodeNameField"
-                                class="mt-2 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 flex items-center gap-1"
+                                class="mt-2 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 flex items-center gap-1 transition-all duration-200 hover:shadow-md"
                                 style="background: var(--button-gradient); color: var(--light-text);">
                                 <PlusIcon class="w-4 h-4" />
                                 Add Another Node
@@ -74,13 +73,15 @@
                                 <span v-for="(error, index) in nodeNameErrors" :key="index">{{ error }}<br v-if="index < nodeNameErrors.length - 1"></span>
                             </p>
                         </div>
+
+                        <!-- Upload Resource Section -->
                         <div>
-                            <label class="block text-sm font-medium mb-1" style="color: var(--highlight-color);">
+                            <label class="block text-sm font-medium mb-2" style="color: var(--highlight-color);">
                                 Upload Resource (optional)<br>
-                                <span class="opacity-65">Note: Stepping stone content is based on this resource and all
+                                <span class="opacity-65 text-xs">Note: Stepping stone content is based on this resource and all
                                     previously uploaded resources in this library</span>
                             </label>
-                            <div class="border border-dashed rounded-lg p-4 text-center"
+                            <div class="border border-dashed rounded-lg p-4 text-center transition-all duration-200 hover:border-opacity-80"
                                 style="background-color: var(--background-color-1t); border-color: var(--color-primary-light);">
                                 <input type="file" ref="fileInput" @change="handleFileSelection" class="hidden"
                                     accept=".pdf,.doc,.docx,.txt" />
@@ -115,41 +116,113 @@
                             </div>
                         </div>
                         
+                        <!-- Modern Materials Selection Section -->
                         <div>
-                            <label class="block text-sm font-medium mb-1" style="color: var(--highlight-color);">
+                            <label class="block text-sm font-medium mb-2" style="color: var(--highlight-color);">
                                 Select Existing Materials (optional)
                             </label>
-                            <div v-if="materials.length" class="border rounded-lg p-2"
+                            <div v-if="materials.length" class="border rounded-xl overflow-hidden shadow-sm"
                                 style="background-color: var(--background-color-1t); border-color: var(--color-primary-light);">
-                                <Input v-model="materialSearch" placeholder="Search materials..." class="mb-2" />
-                                <div v-if="filteredMaterials.length" class="max-h-40 overflow-y-auto">
-                                    <Table>
-                                        <TableHeader>
-                                            <TableRow>
-                                                <TableHead class="w-8"></TableHead>
-                                                <TableHead>Name</TableHead>
-                                                <TableHead class="text-right">Size</TableHead>
-                                            </TableRow>
-                                        </TableHeader>
-                                        <TableBody>
-                                            <TableRow v-for="mat in filteredMaterials" :key="mat.id" @click="toggleMaterial(mat.id)"
-                                                class="cursor-pointer">
-                                                <TableCell>
-                                                    <input type="checkbox" :value="mat.id" v-model="selectedMaterialIds" @click.stop />
-                                                </TableCell>
-                                                <TableCell class="text-sm" style="color: var(--highlight-color);">
-                                                    {{ mat.name }}
-                                                </TableCell>
-                                                <TableCell class="text-right text-sm" style="color: var(--highlight-color);">
-                                                    {{ formatFileSize(mat.size) }}
-                                                </TableCell>
-                                            </TableRow>
-                                        </TableBody>
-                                    </Table>
+                                
+                                <!-- Search Header -->
+                                <div class="p-4 border-b" style="border-color: var(--color-primary-light); background-color: var(--background-color);">
+                                    <div class="relative">
+                                        <Input 
+                                            v-model="materialSearch" 
+                                            placeholder="Search materials..." 
+                                            class="pl-10 pr-4 py-2 w-full rounded-lg border transition-all duration-200 focus:ring-2 focus:ring-opacity-50" 
+                                            style="background-color: var(--background-color-1t); color: var(--light-text); border-color: var(--color-primary-dark);"
+                                        />
+                                        <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4" style="color: var(--color-primary-light);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                        </svg>
+                                    </div>
+                                    <div v-if="selectedMaterialIds.length > 0" class="mt-2 flex items-center gap-2 text-sm" style="color: var(--highlight-color);">
+                                        <span>{{ selectedMaterialIds.length }} material{{ selectedMaterialIds.length !== 1 ? 's' : '' }} selected</span>
+                                        <button @click="selectedMaterialIds = []" class="text-xs px-2 py-1 rounded-md transition-colors hover:opacity-80" style="background-color: var(--color-primary-dark); color: var(--light-text);">
+                                            Clear all
+                                        </button>
+                                    </div>
                                 </div>
-                                <p v-else class="text-sm opacity-70">No materials match.</p>
+                                
+                                <!-- Materials List -->
+                                <div v-if="filteredMaterials.length" class="max-h-64 overflow-y-auto">
+                                    <div class="divide-y" style="divide-color: var(--color-primary-light);">
+                                        <div 
+                                            v-for="mat in filteredMaterials" 
+                                            :key="mat.id" 
+                                            @click="toggleMaterial(mat.id)"
+                                            class="flex items-center p-4 cursor-pointer transition-all duration-200 hover:shadow-sm"
+                                            :class="{ 'selected-material': selectedMaterialIds.includes(mat.id) }"
+                                            :style="selectedMaterialIds.includes(mat.id) 
+                                                ? { 'background-color': 'var(--color-primary-dark)', 'background-opacity': '0.3' } 
+                                                : { 'background-color': 'transparent' }"
+                                        >
+                                            <!-- Custom Checkbox -->
+                                            <div class="flex-shrink-0 mr-4">
+                                                <div class="relative">
+                                                    <input 
+                                                        type="checkbox" 
+                                                        :value="mat.id" 
+                                                        v-model="selectedMaterialIds" 
+                                                        @click.stop 
+                                                        class="sr-only"
+                                                    />
+                                                    <div 
+                                                        class="w-5 h-5 rounded border-2 flex items-center justify-center transition-all duration-200"
+                                                        :style="selectedMaterialIds.includes(mat.id) 
+                                                            ? { 'background-color': 'var(--highlight-color)', 'border-color': 'var(--highlight-color)' }
+                                                            : { 'background-color': 'transparent', 'border-color': 'var(--color-primary-light)' }"
+                                                    >
+                                                        <svg v-if="selectedMaterialIds.includes(mat.id)" class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                                        </svg>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- File Icon -->
+                                            <div class="flex-shrink-0 mr-3">
+                                                <DocumentIcon class="w-8 h-8" style="color: var(--color-primary-light);" />
+                                            </div>
+                                            
+                                            <!-- Material Info -->
+                                            <div class="flex-grow min-w-0">
+                                                <div class="flex items-center gap-2">
+                                                    <p class="text-sm font-medium truncate" style="color: var(--highlight-color);">
+                                                        {{ mat.name }}
+                                                    </p>
+                                                    <span v-if="mat.added_to_course_path" class="text-xs text-red-400 flex-shrink-0">(already added)</span>
+                                                </div>
+                                                <p class="text-xs mt-1" style="color: var(--color-primary-light);">
+                                                    {{ formatFileSize(mat.size) }}
+                                                </p>
+                                            </div>
+                                            
+                                            <!-- Selection Indicator -->
+                                            <div v-if="selectedMaterialIds.includes(mat.id)" class="flex-shrink-0 ml-2">
+                                                <div class="w-2 h-2 rounded-full" style="background-color: var(--highlight-color);"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- No Results -->
+                                <div v-else class="p-8 text-center">
+                                    <svg class="w-12 h-12 mx-auto mb-2" style="color: var(--color-primary-light);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                    </svg>
+                                    <p class="text-sm" style="color: var(--color-primary-light);">No materials match your search</p>
+                                </div>
                             </div>
-                            <p v-else class="text-sm opacity-70">No materials available.</p>
+                            
+                            <!-- No Materials Available -->
+                            <div v-else class="border border-dashed rounded-xl p-8 text-center" style="border-color: var(--color-primary-light);">
+                                <svg class="w-12 h-12 mx-auto mb-2" style="color: var(--color-primary-light);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                </svg>
+                                <p class="text-sm" style="color: var(--color-primary-light);">No materials available in this library</p>
+                            </div>
                         </div>
 
                         <!-- API call error message -->
@@ -157,26 +230,14 @@
                             {{ apiError }}
                         </p>
 
-                        <!-- <div class="flex justify-end gap-3 mt-6">
-                            <button @click="closeModal" class="px-4 py-2 border rounded-lg"
-                                style="border-color: var(--color-primary); color: var(--highlight-color);">
-                                Cancel
-                            </button>
-                            <button @click="addNewNodes" class="px-4 py-2 rounded-lg focus:outline-none focus:ring-2"
-                                style="background: var(--button-gradient); color: var(--light-text);"
-                                :disabled="isAddingNode">
-                                <span v-if="isAddingNode">Adding...</span>
-                                <span v-else>Add Stepping Stone</span>
-                            </button>
-                        </div> -->
-                        <div class="flex justify-end gap-3 mt-6">
-                            <button @click="closeModal" class="px-4 py-2 border rounded-lg"
-                                style="border-color: var (--color-primary); color: var(--highlight-color);"
+                        <div class="flex justify-end gap-3 mt-8">
+                            <button @click="closeModal" class="px-6 py-2 border rounded-lg transition-all duration-200 hover:shadow-md"
+                                style="border-color: var(--color-primary); color: var(--highlight-color);"
                                 :disabled="isAddingNode"
                                 :class="{ 'opacity-50 cursor-not-allowed': isAddingNode }">
                                 Cancel
                             </button>
-                            <button @click="addNewNodes" class="px-4 py-2 rounded-lg focus:outline-none focus:ring-2 flex items-center justify-center"
+                            <button @click="addNewNodes" class="px-6 py-2 rounded-lg focus:outline-none focus:ring-2 flex items-center justify-center gap-2 transition-all duration-200 hover:shadow-md"
                                 style="background: var(--button-gradient); color: var(--light-text);"
                                 :disabled="isAddingNode">
                                 <span v-if="isAddingNode">
@@ -209,7 +270,6 @@ import { toast } from 'vue-sonner';
 import axios from 'axios';
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { Input } from '@/components/ui/input';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 const props = defineProps({
     libraryId: {
@@ -279,6 +339,28 @@ const filteredMaterials = computed(() =>
     )
 );
 
+const onMaterialCheckboxChange = (mat: any) => {
+    const index = selectedMaterialIds.value.indexOf(mat.id);
+    const isSelected = index !== -1;
+    if (isSelected) {
+        selectedMaterialIds.value.splice(index, 1);
+        return;
+    }
+    if (mat.added_to_course_path) {
+        const confirmAdd = window.confirm('This material is already added to the course. Are you sure you want to add it again?');
+        if (!confirmAdd) {
+            return;
+        }
+    }
+    selectedMaterialIds.value.push(mat.id);
+};
+
+const toggleMaterial = (materialId: number) => {
+    const mat = materials.value.find((m: any) => m.id === materialId);
+    if (mat) {
+        onMaterialCheckboxChange(mat);
+    }
+};
 
 watch(showModal, (val) => {
     if (val) {
@@ -428,3 +510,10 @@ const resetForm = () => {
     apiError.value = '';
 }
 </script>
+
+<style scoped>
+.selected-material {
+    background-color: var(--color-primary-dark);
+    background-opacity: 0.2;
+}
+</style>
