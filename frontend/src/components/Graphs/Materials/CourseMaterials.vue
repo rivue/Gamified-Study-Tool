@@ -48,8 +48,14 @@
       <!-- Processed Files Section -->
       <div class="materials-list-section">
         <h2 class="section-title">Uploaded Materials</h2>
+        <div class="generate-test">
+          <button @click="generateMockTest" class="action-button" :disabled="selectedMaterialIds.length === 0">
+            Generate Mock Test
+          </button>
+        </div>
         <ul v-if="materials.length > 0" class="materials-list">
           <li v-for="material in materials" :key="material.id" class="material-item">
+            <input type="checkbox" v-model="selectedMaterialIds" :value="material.id" class="material-checkbox" />
             <div class="file-info">
               <component :is="getIconForFileType(material.type)" class="file-icon" />
               <div class="file-details">
@@ -79,6 +85,33 @@
           <p>No materials uploaded yet. Start by dropping a file above.</p>
         </div>
       </div>
+      <div class="materials-list-section">
+        <details class="mock-tests-dropdown">
+          <summary class="section-title">Mock Tests</summary>
+          <ul v-if="mockTests.length > 0" class="materials-list">
+            <li v-for="test in mockTests" :key="test.id" class="material-item">
+              <div class="file-info">
+                <DocumentTextIcon class="file-icon" />
+                <div class="file-details">
+                  <span class="file-name">{{ test.name }}</span>
+                </div>
+              </div>
+              <div class="file-status">
+                <span :class="['status-badge', getStatusClass(test.status)]">{{ test.status }}</span>
+              </div>
+              <div class="file-actions">
+                <button @click="showTest(test)" class="action-button" :disabled="test.status !== 'Ready' || test.questions.length === 0">
+                  <QuestionMarkCircleIcon class="w-5 h-5" />
+                  <span>Take Test</span>
+                </button>
+              </div>
+            </li>
+          </ul>
+          <div v-else class="empty-state">
+            <p>No mock tests generated yet.</p>
+          </div>
+        </details>
+      </div>
     </main>
     <SummaryModal
       v-if="summaryIsShowing"
@@ -91,6 +124,12 @@
       :material-name="selectedMaterial.name"
       :questions="(selectedMaterial.quiz && selectedMaterial.quiz.questions) ? selectedMaterial.quiz.questions : []"
       @close="closeQuizModal"
+    />
+    <MockTestModal
+      v-if="testIsShowing && selectedTest"
+      :test-name="selectedTest.name"
+      :questions="selectedTest.questions || []"
+      @close="closeTestModal"
     />
   </div>
 </template>
@@ -111,6 +150,7 @@ import {
 } from '@heroicons/vue/24/outline';
 import SummaryModal from '@/components/Graphs/Materials/SummaryModal.vue';
 import QuizModal from '@/components/Graphs/Materials/QuizModal.vue';
+import MockTestModal from '@/components/Graphs/Materials/MockTestModal.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -141,6 +181,16 @@ type Material = {
     quiz?: { questions: any[] } | null;
 };
 const materials = ref<Material[]>([]);
+const selectedMaterialIds = ref<number[]>([]);
+type MockTest = {
+  id: number;
+  name: string;
+  status: 'Pending' | 'Ready' | 'Summarizing' | 'Error';
+  questions: any[];
+};
+const mockTests = ref<MockTest[]>([]);
+const testIsShowing = ref(false);
+const selectedTest = ref<MockTest | null>(null);
 
 const checkOwnership = async () => {
   const courseId = route.params.id as string;
@@ -192,8 +242,31 @@ const fetchMaterials = async () => {
   }
 };
 
+const fetchMockTests = async () => {
+  const courseId = route.params.id as string;
+  if (!courseId) return;
+  try {
+    const response = await axios.get(`/api/mock-tests/course/${courseId}`);
+    const statusMap: { [key: string]: 'Pending'| 'Ready' | 'Summarizing' | 'Error' } = {
+      pending: 'Pending',
+      processing: 'Summarizing',
+      ready: 'Ready',
+      error: 'Error',
+    };
+    mockTests.value = response.data.map((test: any) => ({
+      id: test.id,
+      name: test.name,
+      status: statusMap[test.status] || 'Error',
+      questions: test.questions || [],
+    }));
+  } catch (error) {
+    console.error('Failed to fetch mock tests:', error);
+  }
+};
+
 onMounted(() => {
   fetchMaterials();
+  fetchMockTests();
   checkOwnership();
 });
 
@@ -203,6 +276,32 @@ const goBack = () => {
 
 const triggerFileInput = () => {
   fileInput.value?.click();
+};
+
+const generateMockTest = async () => {
+  const courseId = route.params.id as string;
+  if (!courseId || selectedMaterialIds.value.length === 0) return;
+  try {
+    await axios.post('/api/mock-tests/generate', {
+      course_id: Number(courseId),
+      material_ids: selectedMaterialIds.value,
+      name: `Mock Test ${new Date().toLocaleDateString()}`,
+    });
+    selectedMaterialIds.value = [];
+    await fetchMockTests();
+  } catch (error) {
+    console.error('Failed to generate mock test:', error);
+  }
+};
+
+const showTest = (test: MockTest) => {
+  selectedTest.value = test;
+  testIsShowing.value = true;
+};
+
+const closeTestModal = () => {
+  testIsShowing.value = false;
+  selectedTest.value = null;
 };
 
 const handleFileSelect = (event: Event) => {
@@ -471,7 +570,7 @@ function closeQuizModal() {
 
 .material-item {
   display: grid;
-  grid-template-columns: 2fr 1fr 2fr;
+  grid-template-columns: auto 2fr 1fr 2fr;
   align-items: center;
   gap: 1.5rem;
   padding: 1rem 1.5rem;
@@ -554,6 +653,15 @@ function closeQuizModal() {
   color: var(--light-text);
   transition: all 0.2s ease;
   cursor: pointer;
+}
+.generate-test {
+  margin-bottom: 1rem;
+}
+.material-checkbox {
+  margin-right: 1rem;
+}
+.mock-tests-dropdown {
+  width: 100%;
 }
 .action-button:hover:not(:disabled) {
   background-color: var(--element-color-2);
