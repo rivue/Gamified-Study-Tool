@@ -149,7 +149,7 @@
                                             @mouseleave="!editModeEnabled && handleNodeLeave()"
                                             @click="editModeEnabled ? handleEditNodeClick() : undefined">
 
-                                            <DeleteSection v-if="editModeEnabled && isOwner" :section-id="sectionId"
+                                            <DeleteSection v-if="editModeEnabled && isOwner && !isMockSection(sectionId)" :section-id="sectionId"
                                                 :section-name="sectionName" />
 
                                             <!-- Tooltip -->
@@ -508,7 +508,18 @@ const getUnitIdByName = (unitName: string) => {
 const rawUnitData = ref<Record<string, any[][]>>({});
 
 watch(() => props.unitSectionMap, async (newVal) => {
-    rawUnitData.value = newVal;
+    rawUnitData.value = { ...(newVal || {}) };
+    // Inject a mock unit/section to launch the terminal lesson (no backend)
+    const MOCK_UNIT = 'Sandbox';
+    const MOCK_SECTION: [number, string] = [-1, 'Terminal (Mock)'];
+    if (!rawUnitData.value[MOCK_UNIT]) {
+        rawUnitData.value[MOCK_UNIT] = [] as any[];
+    }
+    // Avoid duplicates
+    const exists = (rawUnitData.value[MOCK_UNIT] as any[]).some(([id, name]) => id === MOCK_SECTION[0] && name === MOCK_SECTION[1]);
+    if (!exists) {
+        (rawUnitData.value[MOCK_UNIT] as any[]).push(MOCK_SECTION);
+    }
     recalcMaxLeft()
 }, { deep: true, immediate: true })
 
@@ -844,12 +855,14 @@ const getNodeOffset = (index) => {
     // Add a slight phase shift for more natural movement
     return Math.sin(index * 0.6) * amplitude;
 }
+const isMockSection = (sectionId: number) => sectionId === -1;
 const startLesson = (sectionName, sectionId) => {
     gameStore.setSectionId(sectionId);
-    router.push({
-        name: 'GamePage',
-        params: { id: props.libraryId, roomName: sectionName },
-    })
+    if (isMockSection(sectionId)) {
+        router.push({ name: 'MockTerminalLesson', params: { id: props.libraryId } });
+        return;
+    }
+    router.push({ name: 'GamePage', params: { id: props.libraryId, roomName: sectionName } });
 }
 const scroll = (direction) => {
     if (!scrollContainer.value) return
