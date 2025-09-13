@@ -216,6 +216,7 @@ class Library(db.Model):
 
     factoids = db.relationship('LibraryFactoid', backref='library', cascade="all, delete-orphan")
     materials = db.relationship('Material', back_populates='library', cascade="all, delete-orphan", lazy=True)
+    mock_tests = db.relationship('MockTest', back_populates='library', cascade="all, delete-orphan", lazy=True)
     
     @classmethod
     def _generate_unique_code(cls):
@@ -446,6 +447,36 @@ class Material(db.Model):
             'status': self.status,
             'summary': self.summary,
             'quiz': self.quiz,
+            'created_at': self.created_at.isoformat() if self.created_at else None
+        }
+
+
+class MockTest(db.Model):
+    __tablename__ = 'mock_tests'
+
+    id = db.Column(db.Integer, primary_key=True)
+    library_id = db.Column(db.Integer, db.ForeignKey('library.id', ondelete='CASCADE'), nullable=False)
+    name = db.Column(db.Text, nullable=False)
+    material_ids = db.Column(db.JSON, nullable=False)
+    status = db.Column(
+        Enum('pending', 'processing', 'ready', 'error', name='mock_test_status_enum'),
+        nullable=False,
+        default='pending',
+        server_default='pending'
+    )
+    questions = db.Column(db.JSON, nullable=True)
+    created_at = db.Column(db.DateTime(timezone=True), nullable=False, server_default=db.func.now())
+
+    library = db.relationship('Library', back_populates='mock_tests')
+
+    def as_dict(self):
+        return {
+            'id': self.id,
+            'library_id': self.library_id,
+            'name': self.name,
+            'material_ids': self.material_ids,
+            'status': self.status,
+            'questions': self.questions,
             'created_at': self.created_at.isoformat() if self.created_at else None
         }
 

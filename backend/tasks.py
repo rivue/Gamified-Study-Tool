@@ -7,7 +7,7 @@ import re
 from celery import states
 
 from celery_app import celery
-from database.models import db, Material
+from database.models import db, Material, MockTest
 from vector_processing.file_handler import process_document_no_pinecone
 from openai import OpenAI
 
@@ -156,4 +156,90 @@ def process_material(self, material_id: int) -> dict:
             except Exception:
                 db.session.rollback()
         # Let Celery handle retry/backoff; include context in meta
+        raise self.retry(exc=exc)
+
+
+@celery.task(
+    bind=True,
+    name="tasks.process_mock_test",
+    autoretry_for=(Exception,),
+    retry_backoff=True,
+    retry_jitter=True,
+    max_retries=5,
+)
+def process_mock_test(self, test_id: int) -> dict:
+    """Generate a mock test from multiple materials."""
+    mock_test: Optional[MockTest] = db.session.get(MockTest, test_id)
+    if not mock_test:
+        self.update_state(state=states.FAILURE, meta={"error": "mock_test_not_found", "test_id": test_id})
+        return {"status": "error", "error": "mock_test_not_found", "test_id": test_id}
+    try:
+        mock_test.status = "processing"
+        db.session.add(mock_test)
+        db.session.commit()
+
+        combined_text = ""
+        for mid in mock_test.material_ids:
+            material = db.session.get(Material, mid)
+            if not material:
+                continue
+            material_file = supabase.storage.from_("course-materials").download(material.storage_path)
+            combined_text += process_document_no_pinecone(material_file) + "\n"
+
+        client = OpenAI()
+        prompt = (
+            "Create a comprehensive mock test based strictly on the source content.\n"
+            "Return ONLY valid minified JSON with this schema: \n"
+            "{\n  \"questions\": [\n    {\n      \"type\": \"Multiple Choice\"|\"True/False\"|\"Short Answer\",\n      \"question\": string,\n      \"options\": array<string> (omit for True/False and Short Answer),\n      \"correct\": string,\n      \"explanation\": string\n    }\n  ]\n}\n"
+            "Guidelines:\n"
+            "- 20-30 questions total with a mix of types.\n"
+            "- Options should be clear and non-ambiguous.\n"
+            "- Keep answers grounded in the source; do not invent facts.\n\n"
+            "SOURCE CONTENT START\n"
+            f"{combined_text}\n"
+            "SOURCE CONTENT END"
+        )
+
+        quiz_json = {"questions": []}
+        try:
+            chat = getattr(client, "chat", None)
+            if not chat or not hasattr(chat, "completions"):
+                raise AttributeError("OpenAI client lacks chat.completions API")
+            resp = chat.completions.create(
+                model="gpt-4o-mini",
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.2,
+                max_tokens=2000,
+            )
+            choices = getattr(resp, "choices", []) or []
+            if choices and getattr(choices[0], "message", None):
+                content = getattr(choices[0].message, "content", "")
+            else:
+                content = (choices[0]["message"]["content"] if choices else "")
+            text = (content or "").strip()
+            fence_match = re.search(r"```(?:json)?\n(.*?)\n```", text, re.DOTALL | re.IGNORECASE)
+            json_str = fence_match.group(1).strip() if fence_match else text
+            parsed = json.loads(json_str)
+            if isinstance(parsed, list):
+                quiz_json = {"questions": parsed}
+            elif isinstance(parsed, dict) and "questions" in parsed:
+                quiz_json = {"questions": parsed.get("questions", [])}
+        except Exception:
+            quiz_json = {"questions": []}
+
+        mock_test.questions = quiz_json.get("questions", [])
+        mock_test.status = "ready"
+        db.session.add(mock_test)
+        db.session.commit()
+
+        return {"status": "ok", "test_id": test_id}
+    except Exception as exc:
+        db.session.rollback()
+        if mock_test:
+            try:
+                mock_test.status = "error"
+                db.session.add(mock_test)
+                db.session.commit()
+            except Exception:
+                db.session.rollback()
         raise self.retry(exc=exc)
