@@ -15,6 +15,7 @@
                     <div class="streak-info text-md text-[var(--highlight-color)] rounded-2xl">
                         <p class="pr-8 pl-4 pt-4 pb-4 rounded-xl">Current Streak: {{ currentStreak }}</p>
                         <p class="pr-8 pl-4 pt-4 pb-4 rounded-xl">Best Streak: {{ bestStreak }}</p>
+                        <p class="pr-8 pl-4 pt-4 pb-4 rounded-xl streak-desc">Complete a lesson each day to keep your streak. Missing a day resets it.</p>
                     </div>
                 </div>
             </div>
@@ -255,6 +256,11 @@ onMounted(() => {
     background-color: var(--background-color-2t);
     border: 1px solid var(--color-primary-dark);
     margin-bottom: 8px;
+}
+
+.streak-info p.streak-desc {
+    white-space: normal;
+    display: block;
 }
 
 .streak-dropdown::before {
