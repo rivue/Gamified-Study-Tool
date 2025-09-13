@@ -112,6 +112,8 @@
                                     </div>
                                 </div>
                                 <p v-if="fileError" class="mt-2 text-sm text-red-400">{{ fileError }}</p>
+                                <div>
+                           </div>
                             </div>
                         </div>
                         
@@ -135,10 +137,14 @@
                                             <TableRow v-for="mat in filteredMaterials" :key="mat.id" @click="toggleMaterial(mat.id)"
                                                 class="cursor-pointer">
                                                 <TableCell>
-                                                    <input type="checkbox" :value="mat.id" v-model="selectedMaterialIds" @click.stop />
+                                                    <input type="checkbox"
+                                                        :checked="selectedMaterialIds.includes(mat.id)"
+                                                        @change="onMaterialCheckboxChange(mat)"
+                                                        @click.stop />
                                                 </TableCell>
                                                 <TableCell class="text-sm" style="color: var(--highlight-color);">
                                                     {{ mat.name }}
+                                                    <span v-if="mat.added_to_course_path" class="ml-2 text-xs text-red-400">(already added)</span>
                                                 </TableCell>
                                                 <TableCell class="text-right text-sm" style="color: var(--highlight-color);">
                                                     {{ formatFileSize(mat.size) }}
@@ -279,12 +285,35 @@ const filteredMaterials = computed(() =>
     )
 );
 
+const onMaterialCheckboxChange = (mat: any) => {
+    const index = selectedMaterialIds.value.indexOf(mat.id);
+    const isSelected = index !== -1;
+    if (isSelected) {
+        selectedMaterialIds.value.splice(index, 1);
+        return;
+    }
+    if (mat.added_to_course_path) {
+        const confirmAdd = window.confirm('This is already added, are you sure you want to add it again?');
+        if (!confirmAdd) {
+            return;
+        }
+    }
+    selectedMaterialIds.value.push(mat.id);
+};
+
+const toggleMaterial = (id: number) => {
+    const mat = materials.value.find((m: any) => m.id === id);
+    if (mat) {
+        onMaterialCheckboxChange(mat);
+    }
+};
 
 watch(showModal, (val) => {
     if (val) {
         fetchMaterials();
     }
 });
+
 
 function closeModal() {
     if (isAddingNode.value) {
