@@ -2,7 +2,7 @@
   <QuizModal
     :material-name="testName"
     :questions="questions"
-    title="Mock Test"
+    title="Test"
     @close="$emit('close')"
   />
 </template>

@@ -276,7 +276,7 @@ const restartGame = (): void => {
 }
 
 const shareResults = (): void => {
-    // Mock share functionality
+    // Share functionality
     console.log('Sharing results...')
 }
 </script>

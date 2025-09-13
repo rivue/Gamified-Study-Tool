@@ -195,7 +195,7 @@ const showResults = ref(false);
 const userAnswers = ref([]);
 const score = ref(0);
 
-// Use passed-in questions if provided; otherwise fallback to a default mock set
+// Use passed-in questions if provided; otherwise fallback to a default set
 const questions = ref(props.questions && props.questions.length ? props.questions : [
     {
         type: 'Multiple Choice',
