@@ -429,6 +429,7 @@ class Material(db.Model):
     summary = db.Column(db.Text, nullable=True)
     # Stores generated quiz content as JSON, e.g. {"questions": [...]} or a plain list
     quiz = db.Column(db.JSON, nullable=True)
+    added_to_course_path = db.Column(db.Boolean, default=False, nullable=False)
     
     created_at = db.Column(db.DateTime(timezone=True), nullable=False, server_default=db.func.now())
 
