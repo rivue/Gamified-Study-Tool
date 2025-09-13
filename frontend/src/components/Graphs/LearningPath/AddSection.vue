@@ -114,6 +114,21 @@
                                 <p v-if="fileError" class="mt-2 text-sm text-red-400">{{ fileError }}</p>
                             </div>
                         </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1" style="color: var(--highlight-color);">
+                                Select Existing Materials (optional)
+                            </label>
+                            <div v-if="materials.length" class="border rounded-lg p-2 max-h-40 overflow-y-auto"
+                                style="background-color: var(--background-color-1t); border-color: var(--color-primary-light);">
+                                <div v-for="mat in materials" :key="mat.id" class="flex items-center gap-2 mb-1">
+                                    <input type="checkbox" :value="mat.id" v-model="selectedMaterialIds" :id="`mat-${mat.id}`" />
+                                    <label :for="`mat-${mat.id}`" class="flex-1 text-sm" style="color: var(--highlight-color);">
+                                        {{ mat.name }} ({{ formatFileSize(mat.size) }})
+                                    </label>
+                                </div>
+                            </div>
+                            <p v-else class="text-sm opacity-70">No materials available.</p>
+                        </div>
 
                         <!-- API call error message -->
                         <p v-if="apiError" class="mt-2 text-sm" style="color: var(--error-color);">
@@ -160,7 +175,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import {
     XMarkIcon,
     DocumentPlusIcon,
@@ -210,6 +225,8 @@ const showModal = ref(false);
 // State for adding new nodes
 const newNodeNames = ref(['']);
 const selectedFile = ref(null);
+const materials = ref<any[]>([]);
+const selectedMaterialIds = ref<number[]>([]);
 const nodeNameErrors = ref([]);
 const fileError = ref('');
 const apiError = ref('');
@@ -219,6 +236,21 @@ const fileInput = ref(null);
 onMounted(() => {
     if (props.autoOpen) {
         showModal.value = true;
+    }
+});
+
+const fetchMaterials = async () => {
+    try {
+        const response = await axios.get(`/api/materials/course/${props.libraryId}`);
+        materials.value = response.data.filter((m: any) => m.size <= 5 * 1024 * 1024);
+    } catch (error) {
+        console.error('Failed to fetch materials:', error);
+    }
+};
+
+watch(showModal, (val) => {
+    if (val) {
+        fetchMaterials();
     }
 });
 
@@ -323,6 +355,8 @@ const addNewNodes = async () => {
         if (selectedFile.value) {
             formData.append('file', selectedFile.value);
         }
+        // Include selected existing materials
+        selectedMaterialIds.value.forEach(id => formData.append('materialIds', id.toString()));
         const response = await axios.post('/api/library/section', formData, {
             signal: currentAbortController.signal,
             headers: {
@@ -357,6 +391,7 @@ const addNewNodes = async () => {
 const resetForm = () => {
     newNodeNames.value = [''];
     removeFile();
+    selectedMaterialIds.value = [];
     nodeNameErrors.value = [];
     apiError.value = '';
 }

@@ -14,9 +14,10 @@ import database.library_handlers as lbh
 import knowledge_net.library_generator as lgn
 from images.library_imager import generate_images_task
 from database.user_handler import increment_violations
-from database.models import Library, LibrarySection, LibraryUnit, db
+from database.models import Library, LibrarySection, LibraryUnit, Material, db
 from vector_processing.file_handler import process_document
 from vector_processing.retrieval import query_and_respond_pinecone
+from database.supabase import supabase
 import time
 
 def init_library_routes(app):
@@ -443,6 +444,7 @@ def init_library_routes(app):
         library_id = request.form.get("libraryId")
         unit_id = request.form.get("unitId")
         position = request.form.get("position")
+        material_ids = request.form.getlist("materialIds")
 
         # Validate inputs
         if not section_names:
@@ -459,6 +461,7 @@ def init_library_routes(app):
             return jsonify(status="error", message="No section names provided"), 400
 
         try:
+            library_id_int = int(library_id)
             # Check if "file" is in request.files
             selected_file = None
             if "file" in request.files:
@@ -509,7 +512,7 @@ def init_library_routes(app):
             if not units_library:
                 raise ValueError(f"Library not found for unit {unit_id}.")
             
-            library_response = get_library(library_id)
+            library_response = get_library(library_id_int)
             if not library_response or library_response.status_code == "error":
                 return jsonify(status="error", message="Can only generate library rooms for valid libraries"), 400
 
@@ -517,7 +520,27 @@ def init_library_routes(app):
             results = []
             rag_context = None
             if selected_file:
-                process_document(selected_file, library_id)
+                process_document(selected_file, library_id_int)
+
+            # Process any selected existing materials
+            MAX_MATERIAL_SIZE = 5 * 1024 * 1024  # 5MB
+            for mid in material_ids:
+                try:
+                    mid_int = int(mid)
+                except (TypeError, ValueError):
+                    return jsonify(status="error", message="Invalid material ID"), 400
+
+                material = Material.query.get(mid_int)
+                if not material or material.library_id != library_id_int:
+                    return jsonify(status="error", message=f"Material {mid_int} not found in this library"), 400
+                if material.size > MAX_MATERIAL_SIZE:
+                    return jsonify(status="error", message=f"Material '{material.name}' exceeds 5MB limit"), 400
+
+                try:
+                    material_file = supabase.storage.from_("course-materials").download(material.storage_path)
+                    process_document(material_file, library_id_int)
+                except Exception:
+                    return jsonify(status="error", message=f"Failed to process material '{material.name}'"), 500
 
             futures_dict = {}
             for subtopic in section_names:
@@ -525,12 +548,12 @@ def init_library_routes(app):
                 # Generate new content for this subtopic
                 last_section = None
                 try:
-                    print(f"subtopic: {subtopic}, library_id: {library_id}")
-                    rag_context = query_and_respond_pinecone(subtopic, library_id)
+                    print(f"subtopic: {subtopic}, library_id: {library_id_int}")
+                    rag_context = query_and_respond_pinecone(subtopic, library_id_int)
 
                     print(f"rag context: {rag_context}")
-                    
-                    future = executor.submit(lgn.generate_libroom_content, user_id, subtopic, library_id, rag_context)
+
+                    future = executor.submit(lgn.generate_libroom_content, user_id, subtopic, library_id_int, rag_context)
 
                     futures_dict[future] = subtopic
                     last_section = time.time()
@@ -549,7 +572,7 @@ def init_library_routes(app):
                     print(position)
                     relative_position = section_position + int(position)
                     
-                    lbh.save_section_contents(library_id, section, section_contents, unit_id, relative_position)
+                    lbh.save_section_contents(library_id_int, section, section_contents, unit_id, relative_position)
 
                     results.append({"subtopic": section, "status": "success", "data": section_contents})
                     completed_subtopics[section] = True
