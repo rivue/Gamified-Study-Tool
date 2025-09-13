@@ -127,7 +127,9 @@
                                     <input type="text" v-model="topic" ref="topicInput"
                                         :class="['form-input', { 'error': formattedErrors.topic?._errors?.length }]"
                                         placeholder="e.g., Introduction to Biology, Advanced Calculus..."
-                                        maxlength="100" @focus="selectInputText" @paste="handlePaste" />
+                                        maxlength="25" @focus="selectInputText"
+                                        @keydown="handleMaxLengthKeydown($event, 25, 'Course name')"
+                                        @paste="handleMaxLengthPaste($event, 25, 'Course name')" />
                                     <div class="input-hint text-md">Must be 4-25 characters long</div>
                                     <div v-if="formattedErrors.topic?._errors?.length" class="error-text">
                                         {{ formattedErrors.topic._errors[0] }}
@@ -144,7 +146,7 @@
                                             <div class="upload-icon">📄</div>
                                             <div class="upload-text">
                                                 <span class="upload-main">Click to upload PDF</span>
-                                                <span class="upload-sub">Maximum size: 500KB</span>
+                                                <span class="upload-sub">Maximum size: 5 MB</span>
                                             </div>
                                         </div>
                                         <div v-else class="selected-file-display">
@@ -194,7 +196,9 @@
                                     <div v-for="(group, groupIndex) in groups" :key="groupIndex" class="topic-card">
                                         <div class="topic-header">
                                             <input type="text" v-model="group.name" placeholder="Enter topic name..."
-                                                maxlength="40"
+                                                maxlength="25"
+                                                @keydown="handleMaxLengthKeydown($event, 25, 'Topic name')"
+                                                @paste="handleMaxLengthPaste($event, 25, 'Topic name')"
                                                 :class="['topic-input', { 'error': formattedErrors.groups?.[groupIndex]?.name?._errors?.length }]" />
                                             <button class="remove-topic-btn" @click="removeGroup(groupIndex)"
                                                 type="button">✕</button>
@@ -209,7 +213,9 @@
                                                 <div v-for="(section, sectionIndex) in group.sections"
                                                     :key="sectionIndex" class="subtopic-item">
                                                     <input type="text" v-model="group.sections[sectionIndex]"
-                                                        placeholder="Enter subtopic name..." maxlength="40"
+                                                        placeholder="Enter subtopic name..." maxlength="25"
+                                                        @keydown="handleMaxLengthKeydown($event, 25, 'Subtopic name')"
+                                                        @paste="handleMaxLengthPaste($event, 25, 'Subtopic name')"
                                                         class="subtopic-input" />
                                                     <button class="remove-subtopic-btn"
                                                         @click="removeSection(groupIndex, sectionIndex)"
@@ -585,15 +591,46 @@ const removeSection = (groupIndex: number, sectionIndex: number) => {
     }
 };
 
-const handlePaste = (event: ClipboardEvent) => {
-    if (!event.clipboardData) return;
-    const pastedText = event.clipboardData.getData("text");
-    if (pastedText.length > 80) {
-        popupStore.showPopup(
-            "Briefly describe the topic you wish to learn about in up to 80 characters.</br>Add other info into the <b>Extra</b> field."
-        );
+// Enforce max length with immediate feedback (typing/paste)
+const handleMaxLengthKeydown = (event: KeyboardEvent, max: number, label: string) => {
+    const input = event.target as HTMLInputElement;
+    if (!input) return;
+    // Allow control/navigation keys
+    const allowedKeys = [
+        'Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown',
+        'Home', 'End', 'Tab', 'Escape', 'Enter'
+    ];
+    if (allowedKeys.includes(event.key) || event.ctrlKey || event.metaKey || event.altKey) return;
+
+    const selectionStart = input.selectionStart ?? input.value.length;
+    const selectionEnd = input.selectionEnd ?? input.value.length;
+    const selectionLength = Math.max(0, selectionEnd - selectionStart);
+
+    // Prospective length after this keypress (assume single char insert)
+    const prospectiveLength = input.value.length - selectionLength + (event.key.length === 1 ? 1 : 0);
+    if (prospectiveLength > max) {
+        event.preventDefault();
+        popupStore.showPopup(`${label} must be at most ${max} characters.`);
     }
 };
+
+const handleMaxLengthPaste = (event: ClipboardEvent, max: number, label: string) => {
+    const input = event.target as HTMLInputElement;
+    if (!input || !event.clipboardData) return;
+    const pastedText = event.clipboardData.getData('text') ?? '';
+
+    const selectionStart = input.selectionStart ?? input.value.length;
+    const selectionEnd = input.selectionEnd ?? input.value.length;
+    const selectionLength = Math.max(0, selectionEnd - selectionStart);
+    const prospectiveLength = input.value.length - selectionLength + pastedText.length;
+
+    if (prospectiveLength > max) {
+        // Let maxlength attribute cap the content, just show feedback
+        popupStore.showPopup(`${label} must be at most ${max} characters.`);
+    }
+};
+
+// Legacy paste handler no longer used; replaced by handleMaxLengthPaste for immediate limit feedback
 
 const selectInputText = (event: FocusEvent) => {
     if (event.target instanceof HTMLInputElement) {
@@ -605,8 +642,8 @@ const handleFileUpload = (event: Event) => {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
         const file = input.files[0];
-        if (file.size > 15 * 1024 * 1024) {
-            popupStore.showPopup("File size must be less than 15MB");
+        if (file.size > 5 * 1024 * 1024) {
+            popupStore.showPopup("File size must be less than 5MB");
             if (fileInput.value) fileInput.value.value = '';
             return;
         }
