@@ -6,7 +6,7 @@
                     <div class="quiz-info">
                         <h2 class="modal-title">
                             <span class="title-accent"></span>
-                            Quiz: {{ materialName }}
+                            {{ title }}: {{ materialName }}
                         </h2>
                         <div class="quiz-stats">
                             <span class="stat">{{ questions.length }} Questions</span>
@@ -180,7 +180,8 @@ import { CheckIcon, XMarkIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
 const props = defineProps({
     materialName: { type: String, required: true },
     // Optional: pass in pre-generated questions; falls back to defaults if empty
-    questions: { type: Array, required: false, default: () => [] }
+    questions: { type: Array, required: false, default: () => [] },
+    title: { type: String, default: 'Quiz' }
 });
 
 const emit = defineEmits(['close']);
