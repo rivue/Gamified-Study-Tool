@@ -18,6 +18,7 @@
                     <AdPopup />
                 </div>
             </div>
+            <KatelynBirthdaySurprise v-if="showKatelynSurprise" @close="handleBirthdayClose" />
         </div>
     </TooltipProvider>
 </template>
@@ -41,6 +42,7 @@ import { useUserStatsStore } from "@/store/userStatsStore";
 import { Toaster } from '@/components/ui/sonner'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import 'vue-sonner/style.css' // vue-sonner v2 requires this import
+import KatelynBirthdaySurprise from '@/components/Celebration/KatelynBirthdaySurprise.vue'
 
 const router = useRouter();
 const route = useRoute();
@@ -69,6 +71,95 @@ const shouldShowChat = computed(() => {
 });
 
 const shouldShowRouterView = computed(() => route.path !== "/");
+
+const showKatelynSurprise = ref(false);
+const katelynDismissed = ref(false);
+const isKatelynTesting = ref(false);
+const BIRTHDAY_EMAIL = 'brownkt27@gmail.com';
+const BIRTHDAY_SESSION_KEY = 'katelyn-birthday-surprise';
+const BIRTHDAY_TEST_FLAG = 'katelyn-birthday-test-flag';
+
+const getSessionStore = () => {
+    if (typeof window === 'undefined') {
+        return null;
+    }
+    return window.sessionStorage;
+};
+
+const getLocalStore = () => {
+    if (typeof window === 'undefined') {
+        return null;
+    }
+    return window.localStorage;
+};
+
+const clearKatelynDismissal = () => {
+    const sessionStore = getSessionStore();
+    sessionStore?.removeItem(`${BIRTHDAY_SESSION_KEY}-dismissed`);
+    katelynDismissed.value = false;
+};
+
+const maybeShowKatelynSurprise = () => {
+    if (katelynDismissed.value && !isKatelynTesting.value) {
+        return;
+    }
+
+    if (!authStore.loggedIn && !isKatelynTesting.value) {
+        showKatelynSurprise.value = false;
+        return;
+    }
+
+    const username = authStore.user.username?.toLowerCase();
+    const isBirthdayMatch = username === BIRTHDAY_EMAIL;
+    if (isKatelynTesting.value || isBirthdayMatch) {
+        const sessionStore = getSessionStore();
+        if (isBirthdayMatch && sessionStore && !sessionStore.getItem(BIRTHDAY_SESSION_KEY)) {
+            sessionStore.setItem(BIRTHDAY_SESSION_KEY, new Date().toISOString());
+        }
+        showKatelynSurprise.value = true;
+    } else {
+        showKatelynSurprise.value = false;
+    }
+};
+
+const handleBirthdayClose = () => {
+    katelynDismissed.value = true;
+    showKatelynSurprise.value = false;
+    const sessionStore = getSessionStore();
+    sessionStore?.setItem(`${BIRTHDAY_SESSION_KEY}-dismissed`, 'true');
+};
+
+const hydrateDismissState = () => {
+    const sessionStore = getSessionStore();
+    if (sessionStore?.getItem(`${BIRTHDAY_SESSION_KEY}-dismissed`)) {
+        katelynDismissed.value = true;
+    }
+};
+
+const applyTestingFlagFromQuery = () => {
+    if (typeof window === 'undefined') {
+        return;
+    }
+    const localStore = getLocalStore();
+    const params = new URLSearchParams(window.location.search);
+    if (params.has('katelynTest')) {
+        const value = params.get('katelynTest');
+        if (value === '1') {
+            localStore?.setItem(BIRTHDAY_TEST_FLAG, 'true');
+            isKatelynTesting.value = true;
+            clearKatelynDismissal();
+        } else if (value === '0') {
+            localStore?.removeItem(BIRTHDAY_TEST_FLAG);
+            isKatelynTesting.value = false;
+        }
+    } else {
+        const storedValue = localStore?.getItem(BIRTHDAY_TEST_FLAG);
+        if (storedValue === 'true') {
+            isKatelynTesting.value = true;
+            clearKatelynDismissal();
+        }
+    }
+};
 
 
 // Methods
@@ -99,6 +190,10 @@ onMounted(() => {
         userStatsStore.fetchStreak();
     }
 
+    applyTestingFlagFromQuery();
+    hydrateDismissState();
+    maybeShowKatelynSurprise();
+
     if (window.location.search === "?awake") {
         router.push("/");
     }
@@ -118,11 +213,32 @@ watch(loggedIn, (newValue) => {
     if (!newValue) {
         console.debug("login from app");
         router.push("/login");
+        if (!isKatelynTesting.value) {
+            showKatelynSurprise.value = false;
+        }
     }
     if (newValue && shouldShowChat.value) {
         // console.log("login fetch");
         messageStore.fetchRecentMessages(route.path);
     }
+    if (newValue) {
+        const sessionStore = getSessionStore();
+        katelynDismissed.value = sessionStore?.getItem(`${BIRTHDAY_SESSION_KEY}-dismissed`) === 'true';
+        maybeShowKatelynSurprise();
+    }
+});
+
+watch(() => authStore.user.username, () => {
+    if (authStore.loggedIn) {
+        maybeShowKatelynSurprise();
+    }
+});
+
+watch(isKatelynTesting, () => {
+    if (isKatelynTesting.value) {
+        clearKatelynDismissal();
+    }
+    maybeShowKatelynSurprise();
 });
 
 watch(() => route.path, () => {
