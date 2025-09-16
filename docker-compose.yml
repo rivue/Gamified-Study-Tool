@@ -1,0 +1,126 @@
+version: '3.9'
+
+# Docker Compose for Gamefied-Study-Tool
+# - Provides dev and prod profiles
+# - Postgres database
+# - Backend Flask app (serves built frontend in prod)
+# - Frontend dev server (optional in dev profile)
+# - Frontend build job that outputs to a shared volume mounted by backend
+
+name: gamefied-study-tool
+
+volumes:
+  postgres_data:
+  frontend_dist:
+
+networks:
+  appnet:
+    driver: bridge
+
+services:
+  db:
+    image: postgres:15
+    container_name: gst_db
+    restart: unless-stopped
+    environment:
+      # Override via .env if desired
+      POSTGRES_DB: ${POSTGRES_DB:-app}
+      POSTGRES_USER: ${POSTGRES_USER:-app}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-app}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    networks:
+      - appnet
+
+  # Build frontend into a shared volume that backend serves from
+  frontend-build:
+    image: node:18
+    container_name: gst_frontend_build
+    working_dir: /app/frontend
+    command: sh -c "npm ci && npm run build"
+    volumes:
+      - ./frontend:/app/frontend
+      - frontend_dist:/app/frontend/dist
+    networks:
+      - appnet
+    profiles: ["prod", "dev"]
+
+  # Backend in production: runs Gunicorn and serves built frontend/dist
+  backend:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    container_name: gst_backend
+    restart: unless-stopped
+    env_file:
+      - ./.env
+    environment:
+      # Ensure backend can reach Postgres in compose
+      DB_HOST: ${DB_HOST:-db}
+      DB_PORT: ${DB_PORT:-5432}
+      # Common Flask/production toggles
+      FLASK_ENV: ${FLASK_ENV:-production}
+      # If your app uses DATABASE_URL instead of DB_*
+      # DATABASE_URL: ${DATABASE_URL:-postgresql://${POSTGRES_USER:-app}:${POSTGRES_PASSWORD:-app}@db:5432/${POSTGRES_DB:-app}}
+    command: sh -c "flask --app backend/app db upgrade && gunicorn --chdir backend -b 0.0.0.0:5000 -w 2 app:app"
+    depends_on:
+      db:
+        condition: service_healthy
+      frontend-build:
+        condition: service_completed_successfully
+    ports:
+      - "5000:5000"
+    volumes:
+      # Mount built frontend into the path expected by the backend
+      - frontend_dist:/app/frontend/dist:ro
+    networks:
+      - appnet
+    profiles: ["prod"]
+
+  # Backend in development: hot-reload and relies on locally built/dist or dev frontend
+  backend-dev:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    container_name: gst_backend_dev
+    restart: unless-stopped
+    env_file:
+      - ./.env
+    environment:
+      DB_HOST: ${DB_HOST:-db}
+      DB_PORT: ${DB_PORT:-5432}
+      FLASK_ENV: development
+    command: sh -c "flask --app backend/app db upgrade || true; python backend/app.py"
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./:/app
+      - frontend_dist:/app/frontend/dist
+    networks:
+      - appnet
+    profiles: ["dev"]
+
+  # Frontend dev server (optional): Vue CLI on :8080
+  frontend-dev:
+    image: node:18
+    container_name: gst_frontend_dev
+    working_dir: /app/frontend
+    command: sh -c "npm install && npm run serve -- --host 0.0.0.0"
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./frontend:/app/frontend
+    networks:
+      - appnet
+    profiles: ["dev"]
+

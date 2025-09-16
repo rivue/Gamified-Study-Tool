@@ -1,6 +1,7 @@
 # library_routes.py
 
 import random
+import os
 from flask import request, jsonify
 from flask_login import current_user, login_required, AnonymousUserMixin
 from bleach import clean
@@ -19,6 +20,8 @@ from vector_processing.file_handler import process_document
 from vector_processing.retrieval import query_and_respond_pinecone
 from database.supabase import supabase
 import time
+
+MAX_FILE_SIZE = 2_000 * 1024  # 2 MB limit
 
 def init_library_routes(app):
 
@@ -96,13 +99,22 @@ def init_library_routes(app):
             print("No groups provided.")
 
         try:
-            selected_file = request.files.get("selectedFile").read()
-            if not selected_file:
+            file = request.files.get("selectedFile")
+            if not file:
                 return jsonify({"error": "No file provided (request.json)"}), 400
 
             if "selectedFile" not in request.files:
                 print(request.files)
                 return jsonify({"error": "No file provided (not in request.files)"}), 400
+            file.seek(0, os.SEEK_END)
+            file_size = file.tell()
+            file.seek(0)
+            if file_size > MAX_FILE_SIZE:
+                return jsonify({"error": "File too large. Maximum size is 5MB."}), 400
+
+            selected_file = file.read()
+            if not selected_file:
+                return jsonify({"error": "No file provided (request.json)"}), 400
         except Exception as e:
             return jsonify({"error": f"Error reading file: {str(e)}"}), 400
 

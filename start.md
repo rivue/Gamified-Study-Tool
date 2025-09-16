@@ -1,4 +1,5 @@
 backend:
+- supabase start (if supabase isn't running)
 - flask run
 
 frontend:
@@ -9,4 +10,4 @@ redis:
 
 celery (in backend/):
 - celery -A tasks worker --loglevel INFO 
-Note: for MacOS, add -P solo --concurrency=1
+Note: for MacOS if u want to connect to prod redis, add -P solo --concurrency=1

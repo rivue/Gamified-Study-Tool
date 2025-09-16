@@ -161,6 +161,7 @@
                                             <button class="remove-file" @click="removeFile" type="button">✕</button>
                                         </div>
                                     </div>
+                                    <div v-if="fileSizeError" class="error-text" role="alert">{{ fileSizeError }}</div>
                                     <div v-if="formattedErrors.selectedFile?._errors?.length" class="error-text">
                                         {{ formattedErrors.selectedFile._errors[0] }}
                                     </div>
@@ -454,6 +455,8 @@ const buttonDisabled = ref({
     isSubmitting: false,
 });
 const selectedFile = ref<File | null>(null);
+const fileSizeError = ref('');
+const MAX_GUIDED_FILE_SIZE = 5 * 1024 * 1024;
 const topicInput = ref<HTMLInputElement | null>(null);
 const fileInput = ref<HTMLInputElement | null>(null);
 const visibilityTab = ref<'public' | 'private'>('public');
@@ -640,14 +643,18 @@ const selectInputText = (event: FocusEvent) => {
 
 const handleFileUpload = (event: Event) => {
     const input = event.target as HTMLInputElement;
+    fileSizeError.value = '';
     if (input.files && input.files.length > 0) {
         const file = input.files[0];
-        if (file.size > 5 * 1024 * 1024) {
-            popupStore.showPopup("File size must be less than 5MB");
+        if (file.size > MAX_GUIDED_FILE_SIZE) {
+            fileSizeError.value = "File size must be 5MB or smaller.";
+            selectedFile.value = null;
             if (fileInput.value) fileInput.value.value = '';
             return;
         }
         selectedFile.value = file;
+    } else {
+        selectedFile.value = null;
     }
 };
 
@@ -742,6 +749,7 @@ const getStepErrorSummary = (step: 'basics' | 'structure') => {
 
 const removeFile = () => {
     selectedFile.value = null;
+    fileSizeError.value = '';
     if (fileInput.value) fileInput.value.value = '';
 };
 

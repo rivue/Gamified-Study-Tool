@@ -25,7 +25,6 @@ def process_material(self, material_id: int) -> dict:
     This demonstrates the pattern described in BACKGROUND_PROCESSING_STRATEGY.md:
     queue the job quickly and execute the heavy work in a Celery worker.
     """
-    print("processing material")
     material: Optional[Material] = db.session.get(Material, material_id)
     if not material:
         # Mark task as failure explicitly with a clear message
@@ -39,11 +38,9 @@ def process_material(self, material_id: int) -> dict:
 
         # - Download the file from Supabase by material.storage_path
         material_file = supabase.storage.from_("course-materials").download(material.storage_path)
-        print("successfully downloaded the file")
         
         # - Extract text
         extracted_text = process_document_no_pinecone(material_file)
-        print("successfully extracted text")
 
         # - Generate a detailed extracted summary with creative examples/metaphors/acronyms
         client = OpenAI()
@@ -99,30 +96,25 @@ def process_material(self, material_id: int) -> dict:
             "SOURCE CONTENT END"
         )
         quiz_json = {"questions": []}
-        print("after quiz_json")
         try:
             chat = getattr(client, "chat", None)
             if not chat or not hasattr(chat, "completions"):
                 raise AttributeError("OpenAI client lacks chat.completions API")
-            print("after chat")
             resp = chat.completions.create(
                 model="gpt-4o-mini",
                 messages=[{"role": "user", "content": quiz_prompt}],
                 temperature=0.2,
                 max_tokens=1200,
             )
-            print("before choices")
             choices = getattr(resp, "choices", []) or []
             if choices and getattr(choices[0], "message", None):
                 content = getattr(choices[0].message, "content", "")
             else:
                 content = (choices[0]["message"]["content"] if choices else "")
-            print("before text")
             text = (content or "").strip()
             # Extract JSON if wrapped in code fences
             fence_match = re.search(r"```(?:json)?\n(.*?)\n```", text, re.DOTALL | re.IGNORECASE)
             json_str = fence_match.group(1).strip() if fence_match else text
-            print("after jsonstr")
             parsed = json.loads(json_str)
             # normalize to {"questions": [...]} shape
             if isinstance(parsed, list):
@@ -132,7 +124,6 @@ def process_material(self, material_id: int) -> dict:
             else:
                 # fallback if unexpected structure
                 quiz_json = {"questions": []}
-            print("after else chain")
         except Exception:
             # If quiz generation fails, continue without blocking summary
             quiz_json = {"questions": []}

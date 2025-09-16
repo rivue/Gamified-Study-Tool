@@ -1,7 +1,10 @@
+import os
 from flask import request, jsonify
 from flask_login import login_required, current_user
 from database.material_handlers import create_and_upload_material, delete_material
 from database.models import Material, Library
+
+MAX_FILE_SIZE = 2_000 * 1024  # 2 MB limit
 
 def init_material_routes(app):
 
@@ -45,6 +48,12 @@ def init_material_routes(app):
         if not file or file.filename == '':
             return jsonify({"error": "No selected file"}), 400
             
+        file.seek(0, os.SEEK_END)
+        file_size = file.tell()
+        file.seek(0)
+        if file_size > MAX_FILE_SIZE:
+            return jsonify({"error": "File too large. Maximum size is 5MB."}), 400
+
         if not course_id:
             return jsonify({"error": "Course ID is required"}), 400
 

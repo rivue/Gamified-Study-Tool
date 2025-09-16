@@ -18,9 +18,10 @@
                         <p class="upload-text">Drag & drop your lecture slides here</p>
                         <p class="upload-subtext">or</p>
                         <button @click="triggerFileInput" class="browse-button">Browse Files</button>
-                        <p class="supported-files">Supported: PDF, PPTX, DOCX (max 25MB)</p>
+                        <p class="supported-files">Supported: PDF, PPTX, DOCX (max 5MB)</p>
                     </div>
                 </div>
+                <p v-if="uploadErrorMessage" class="upload-error-message" role="alert">{{ uploadErrorMessage }}</p>
             </div>
 
             <!-- Uploading Files Section -->
@@ -36,10 +37,15 @@
                             </div>
                         </div>
                         <div class="file-status">
-                            <div class="progress-bar">
-                                <div class="progress" :style="{ width: file.progress + '%' }"></div>
-                            </div>
-                            <span class="status-text">{{ file.progress }}%</span>
+                            <template v-if="!file.error">
+                                <div class="progress-bar">
+                                    <div class="progress" :style="{ width: file.progress + '%' }"></div>
+                                </div>
+                                <span class="status-text">{{ file.progress }}%</span>
+                            </template>
+                            <template v-else>
+                                <span class="status-text status-text-error">{{ file.error }}</span>
+                            </template>
                         </div>
                     </li>
                 </ul>
@@ -190,6 +196,8 @@ type UploadingFile = {
 };
 const uploadingFiles = ref<UploadingFile[]>([]);
 let nextUploadId = 0;
+const uploadErrorMessage = ref('');
+const MAX_MATERIAL_FILE_SIZE = 5 * 1024 * 1024;
 
 type Material = {
     id: number;
@@ -354,7 +362,13 @@ async function uploadFiles(files: FileList) {
         return;
     }
 
+    uploadErrorMessage.value = '';
+
     for (const file of Array.from(files)) {
+        if (file.size > MAX_MATERIAL_FILE_SIZE) {
+            uploadErrorMessage.value = `"${file.name}" is too large. Files must be 5MB or smaller.`;
+            continue;
+        }
         const uploadId = nextUploadId++;
         const uploader: UploadingFile = {
             id: uploadId,
@@ -405,6 +419,10 @@ async function uploadFiles(files: FileList) {
             if (uploadItem) {
                 uploadItem.error = errorMsg;
                 uploadItem.progress = 100; // Mark as finished but with an error
+            }
+
+            if (error.response?.status === 400 && /file too large/i.test(errorMsg)) {
+                uploadErrorMessage.value = `"${file.name}" is too large. Files must be 5MB or smaller.`;
             }
         }
     }
@@ -571,6 +589,12 @@ function onMaterialDeleted(materialId: number) {
     margin-top: 1rem;
     font-size: 0.875rem;
     color: var(--text-color-secondary);
+}
+
+.upload-error-message {
+    margin-top: 1rem;
+    font-size: 0.875rem;
+    color: var(--error-color);
 }
 
 .hidden-input {
@@ -800,6 +824,12 @@ function onMaterialDeleted(materialId: number) {
     font-size: 0.875rem;
     margin-left: 1rem;
     white-space: nowrap;
+}
+
+.status-text-error {
+    margin-left: 0;
+    color: var(--error-color);
+    font-weight: 600;
 }
 
 /* Empty State */
