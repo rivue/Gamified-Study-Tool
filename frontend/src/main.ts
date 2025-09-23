@@ -151,7 +151,7 @@ const routes = [
             }
         }
     },
-    { 
+    {
         name: 'Leaderboard',
         path: '/lessons/:libraryId/leaderboard',
         component: defineAsyncComponent(() => import('./components/Graphs/LearningPath/Leaderboard.vue')),
@@ -160,6 +160,21 @@ const routes = [
             try {
                 console.log(to.params.libraryId)
                 const response = await axios.get(`/api/library/${to.params.libraryId}/scores`);
+                response.data?.status === "success" ? next() : next('/create');
+            } catch (error) {
+                console.error("Failed to validate library:", error);
+                next('/create');
+            }
+        }
+    },
+    {
+        name: 'StudySlots',
+        path: '/lessons/:libraryId/study-slots',
+        component: defineAsyncComponent(() => import('./components/Graphs/LearningPath/StudySlots.vue')),
+        meta: { title: 'Rivue.ai | Study Slots', requiresCreator: true },
+        beforeEnter: async (to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext) => {
+            try {
+                const response = await axios.get(`/api/library/${to.params.libraryId}`);
                 response.data?.status === "success" ? next() : next('/create');
             } catch (error) {
                 console.error("Failed to validate library:", error);

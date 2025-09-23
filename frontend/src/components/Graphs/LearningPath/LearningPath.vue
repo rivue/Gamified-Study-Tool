@@ -57,6 +57,19 @@
                     </TooltipContent>
                 </Tooltip>
 
+                <Tooltip>
+                    <TooltipTrigger>
+                        <button @click="goToStudySlots"
+                            class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg p-4 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200"
+                            style="color: var(--highlight-color);">
+                            <SparklesIcon class="w-6 h-6" />
+                        </button>
+                    </TooltipTrigger>
+                    <TooltipContent variant="shad" side="bottom" :offset="4">
+                        Study Slots
+                    </TooltipContent>
+                </Tooltip>
+
                 <Tooltip v-if="isOwner">
                     <TooltipTrigger>
                         <button @click="toggleEditMode"
@@ -618,6 +631,10 @@ function toggleEditMode() {
 
 function goToLeaderboard() {
     router.push(`/lessons/${props.libraryId}/leaderboard`)
+}
+
+function goToStudySlots() {
+    router.push(`/lessons/${props.libraryId}/study-slots`)
 }
 
 function goToExperiments() {
