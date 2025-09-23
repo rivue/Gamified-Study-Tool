@@ -195,7 +195,13 @@ const routes = [
     },
 
     // Simple routes
-    { path: '/courses', component: defineAsyncComponent(() => import('./components/Game/Creation/LibraryBrowser.vue')), meta: { title: 'Rivue.ai | My Courses' } },
+    {
+        name: 'Home',
+        path: '/home',
+        alias: ['/courses'],
+        component: defineAsyncComponent(() => import('./components/Game/Creation/LibraryBrowser.vue')),
+        meta: { title: 'Rivue.ai | Home' }
+    },
     { path: '/create', component: defineAsyncComponent(() => import('./components/Game/Creation/LibraryCreator.vue')), meta: { title: 'Rivue.ai | Create Course' } },
     // { path: '/progress', component: defineAsyncComponent(() => import('./components/Backstage/ProgressPage.vue')), meta: { title: 'Rivue.ai | Progress' } },
     { path: '/contact', component: defineAsyncComponent(() => import('./components/Footer/ContactPage.vue')), meta: { title: 'Rivue.ai | Contact Us' } },
@@ -231,7 +237,8 @@ const routes = [
     },
     // { path: '/lessons/:pathMatch(.*)*', redirect: '/' },
     { path: '/explore/:pathMatch(.*)*', redirect: '/explore' },
-    { path: '/courses/:pathMatch(.*)*', redirect: '/courses' },
+    { path: '/courses/:pathMatch(.*)*', redirect: '/home' },
+    { path: '/home/:pathMatch(.*)*', redirect: '/home' },
     { path: '/create/:pathMatch(.*)*', redirect: '/create' },
     // { path: '/progress/:pathMatch(.*)*', redirect: '/progress' },
     { path: '/contact/:pathMatch(.*)*', redirect: '/contact' },

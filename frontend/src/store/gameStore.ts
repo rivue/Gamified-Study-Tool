@@ -137,7 +137,7 @@ export const useGameStore = defineStore("gameStore", {
         },
         async fetchLibraryDetails(libraryId: string, roomNameThing: string) {
 
-            let sectionid = DEFAULT_SECTIONID_VALUE;
+            const sectionid = DEFAULT_SECTIONID_VALUE;
 
             if (this.sectionId) {
                 const sectionid = this.sectionId
@@ -273,7 +273,7 @@ export const useGameStore = defineStore("gameStore", {
             const totalQuestions = this.currentQuestion;
             const questionsRightOnFirstTry = totalQuestions - this.incorrectQuestionAnswers.length - this.skippedQuestions.length;
 
-            let data = {
+            const data = {
                 libraryId: this.libraryId,
                 sectionId: this.sectionId,
                 questionsRightOnFirstTry: questionsRightOnFirstTry,

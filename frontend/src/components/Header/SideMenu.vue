@@ -17,9 +17,9 @@
 
                     <SideMenuButton
                         v-if="loggedIn"
-                        label="My Courses"
-                        :isSelected="isRouteActive('/courses')"
-                        @click="openRoute('/courses')"
+                        label="Home"
+                        :isSelected="isRouteActive('/home', '^/courses')"
+                        @click="openRoute('/home')"
                         class="menu-button"
                     />
 

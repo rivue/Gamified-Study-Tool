@@ -62,7 +62,7 @@
                         <button @click="goToStudySlots"
                             class="menu-button bg-background-color-1t backdrop-blur-sm shadow-md rounded-lg p-4 hover:bg-element-color-1 hover:transform hover:translate-y-[-2px] border border-color-primary-dark transition-all duration-200"
                             style="color: var(--highlight-color);">
-                            <SparklesIcon class="w-6 h-6" />
+                            <Dices class="w-6 h-6" />
                         </button>
                     </TooltipTrigger>
                     <TooltipContent variant="shad" side="bottom" :offset="4">
@@ -440,7 +440,6 @@ import {
     ChevronRightIcon,
     PuzzlePieceIcon,
     RocketLaunchIcon,
-    SparklesIcon,
     CogIcon,
     XMarkIcon,
     ChevronDoubleLeftIcon,
@@ -450,7 +449,7 @@ import {
     ArrowLeftIcon,
     ClipboardDocumentListIcon,
 } from '@heroicons/vue/24/solid';
-import { Trophy } from 'lucide-vue-next';
+import { Trophy, Dices } from 'lucide-vue-next';
 import { useGameStore } from '@/store/gameStore'
 import { useRouter } from 'vue-router';
 import { toast } from 'vue-sonner'
@@ -643,7 +642,7 @@ function goToExperiments() {
 }
 
 function goToCourseList() {
-    router.push("/courses");
+    router.push("/home");
 }
 
 function handleLeaveCourseClick() {
@@ -732,7 +731,7 @@ const icons = [
     TrophyIcon,
     AcademicCapIcon,
     BeakerIcon,
-    SparklesIcon,
+    Dices,
     RocketLaunchIcon
 ]
 

@@ -1,0 +1,5 @@
+Currently I have a StudySlots component which users can use to study for certain classes, but the study slots component is within individual courses. Could you please add it so that it is at the "user level" as well? Here is what I mean below:
+
+1) Make the study slots component appear in the users "my courses" page - change the name "my courses" to "home" and redesign the UI to make it so that study slots is there and is obvious to users.
+2) inside of the course, change the icon which directs to study slots to be something more in tune with gambling / betting / slot machining 
+3) in study slots, let users choose whether they want to use their courses in the slots, or make a short list of courses. For their courses, give them a list of courses they have joined and let them select which ones to pick to be ran in the slots and for making a short list of courses let them type in a list similar to how they type in a list for adding a sub-topic for creating a new course

@@ -67,7 +67,7 @@ def init_auth_routes(app):
                     db.session.commit()
 
                 login_user(user, remember=True)
-                user.update_daily_streak(True) # --> THIS NEEDS TO BE CHANGED!!!
+                user.update_daily_streak(login=True)
                 db.session.commit()
                 
                 print(f" streak: {user.streak_count}, highest_streak: {user.highest_streak}")
@@ -387,6 +387,8 @@ def init_auth_routes(app):
             user.confirmed = True
             db.session.commit()
             login_user(user)
+            user.update_daily_streak(login=True)
+            db.session.commit()
             user_data = {
                 'id': user.id,
                 'username': user.username,
@@ -414,6 +416,8 @@ def init_auth_routes(app):
             db.session.add(user)
             db.session.commit()
             login_user(user)
+            user.update_daily_streak(login=True)
+            db.session.commit()
             user_data = {
                 'id': user.id,
                 'username': user.username,

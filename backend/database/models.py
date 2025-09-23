@@ -83,33 +83,40 @@ class User(db.Model, UserMixin):
         return [membership.library for membership in self.library_memberships]
     
     def update_daily_streak(self, login: bool = False):
-        """
-            login is a flag to indicate if the user is just doing regular activity and has not just ended a course (most of the time thats loging in or resetting the page).
-            If True, we don't want certain things updating, like an increase in streak
-            but we still want to do things like resetting the streak
-            maybe it would make more sense to rename it to just_completed_game or not and flip the logic around now that I say it like that
+        """Update a user's streak based on recent activity.
+
+        When ``login`` is ``True`` the method only evaluates whether the
+        streak should reset.  No incrementing or date updates occur so that a
+        streak increases **only** when a course is completed.  If the user has
+        not completed a course in the last 24 hours the streak is reset to
+        ``0``.
+
+        When ``login`` is ``False`` it indicates a course has been completed
+        and the streak should be incremented when appropriate.
         """
         tz = ZoneInfo(self.timezone or 'UTC')
         today_local = datetime.now(tz).date()
         yesterday_local = today_local - timedelta(days=1)
             
-        if self.last_streak_date is None and not login:
+        last = self.last_streak_date
+        
+        if login:
+            if last is None:
+                self.streak_count = 0
+            elif last not in (today_local, yesterday_local):
+                self.streak_count = 0
+            return self.streak_count
+
+        if last is None:
             self.streak_count = 1
 
         else:
-            last = self.last_streak_date
-            # last request was today, no change
-            if last == today_local:
-                return self.streak_count
-            # last request was yesterday, increment streak
-            if last == yesterday_local and not login:
+            if last == yesterday_local:
                 self.streak_count += 1
-            # broke streak, reset
             else:
                 self.streak_count = 1
-
-        if not login:
-            self.last_streak_date = today_local
+                
+        self.last_streak_date = today_local
         
         if self.streak_count > self.highest_streak:
             self.highest_streak = self.streak_count

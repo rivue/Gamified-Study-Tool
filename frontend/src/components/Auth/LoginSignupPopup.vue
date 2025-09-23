@@ -74,7 +74,7 @@ const handleGoogleSignIn = async (response: any) => {
 
         if (data.status === 'success') {
             authStore.login(data.user); // Assuming data.user contains the user info
-            router.push("/courses");
+            router.push("/home");
         } else {
             const popupStore = usePopupStore();
             popupStore.showPopup('Google Sign-In failed. Please try again.');
@@ -129,7 +129,7 @@ onMounted(async () => {
         popupStore.showPopup(
             "You are already signed in. Visit settings to log out."
         );
-        router.push("/courses");
+        router.push("/home");
         return; // Exit if already logged in
     }
 
@@ -166,7 +166,7 @@ const toggleForms = (form: string) => {
 const handleLoginSuccess = async (user: UserData) => {
     authStore.login(user);
     // const redirectPath = route.query.redirect?.toString() || "/";
-    router.push("/courses");
+    router.push("/home");
 };
 
 const toEmailVerificationScreen = () => {

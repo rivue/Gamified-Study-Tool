@@ -2,10 +2,15 @@
     <div class="study-slots-page" :class="pageStateClass">
         <div class="slots-container">
             <header class="slots-header">
-                <router-link :to="`/lessons/${libraryIdParam}`" class="back-link">
-                    <ArrowLeftCircle class="icon" />
-                    <span>Back to learning path</span>
-                </router-link>
+                <div class="header-anchor">
+                    <router-link v-if="isLibraryMode" :to="`/lessons/${libraryIdParam}`" class="back-link">
+                        <ArrowLeftCircle class="icon" />
+                        <span>Back to learning path</span>
+                    </router-link>
+                    <div v-else class="home-chip">
+                        Home
+                    </div>
+                </div>
                 <button class="music-toggle" @click="toggleMusic" :aria-pressed="!musicEnabled" aria-label="Toggle study music">
                     <component :is="musicEnabled ? Volume2 : VolumeX" class="icon" />
                     <span>{{ musicEnabled ? 'Music on' : 'Music muted' }}</span>
@@ -15,6 +20,91 @@
             <div class="slots-intro">
                 <h1>Study Slots</h1>
                 <p>Spin the reels to let chance decide your next deep-focus session and break reward.</p>
+            </div>
+
+            <div v-if="isGlobalMode" class="selection-panel">
+                <div class="source-toggle" role="tablist" aria-label="Study slots source">
+                    <button
+                        type="button"
+                        :class="['toggle-button', { active: selectionSource === 'courses' }]"
+                        @click="chooseSelectionSource('courses')"
+                        :disabled="libraryOptions.length === 0"
+                    >
+                        Use my courses
+                    </button>
+                    <button
+                        type="button"
+                        :class="['toggle-button', { active: selectionSource === 'custom' }]"
+                        @click="chooseSelectionSource('custom')"
+                    >
+                        Custom list
+                    </button>
+                </div>
+
+                <div v-if="selectionSource === 'courses'" class="course-selection">
+                    <p v-if="libraryOptions.length === 0" class="selection-help">
+                        Join or create a course to spin with it, or switch to a custom list.
+                    </p>
+                    <div v-else class="course-chips">
+                        <button
+                            v-for="option in libraryOptions"
+                            :key="option.id"
+                            type="button"
+                            class="course-chip"
+                            :class="{ active: selectedLibraryIds.includes(option.id) }"
+                            @click="toggleCourse(option.id)"
+                        >
+                            {{ option.name }}
+                        </button>
+                    </div>
+                    <div v-if="libraryOptions.length > 0" class="course-actions">
+                        <button type="button" class="mini-button" @click="selectAllCourses" :disabled="selectedLibraryIds.length === libraryOptions.length">
+                            Select all
+                        </button>
+                        <button type="button" class="mini-button" @click="clearCourses" :disabled="selectedLibraryIds.length === 0">
+                            Clear
+                        </button>
+                    </div>
+                    <p v-if="libraryOptions.length > 0 && selectedLibraryIds.length === 0" class="selection-help">
+                        Pick at least one course to fill the reels.
+                    </p>
+                </div>
+
+                <div v-else class="custom-list">
+                    <p class="selection-help">
+                        Add any focus areas or topics you want to include in the spin.
+                    </p>
+                    <div v-for="(entry, index) in customCourses" :key="`custom-${index}`" class="custom-item">
+                        <input
+                            type="text"
+                            v-model="customCourses[index]"
+                            placeholder="e.g. Organic chemistry review"
+                            maxlength="50"
+                            @input="handleCustomCourseChange()"
+                            @keydown.enter.prevent="handleCustomCourseEnter(index)"
+                        />
+                        <button
+                            type="button"
+                            class="remove-custom"
+                            @click="removeCustomCourse(index)"
+                            :disabled="customCourses.length === 1"
+                            aria-label="Remove item"
+                        >
+                            &times;
+                        </button>
+                    </div>
+                    <button
+                        type="button"
+                        class="add-custom"
+                        @click="addCustomCourse"
+                        :disabled="customCourses.length >= maxCustomCourses"
+                    >
+                        + Add another
+                    </button>
+                    <p v-if="classes.length === 0" class="selection-help">
+                        Add at least one item to spin the reels.
+                    </p>
+                </div>
             </div>
 
             <section class="machine-shell" :class="machineStateClass">
@@ -51,7 +141,7 @@
             <p v-if="errorMessage" class="error-text">{{ errorMessage }}</p>
             <p v-if="loading" class="status-text">Loading classes...</p>
             <div v-else-if="noClassesAvailable" class="empty-state">
-                <p>Add lessons to this course to unlock Study Slots.</p>
+                <p>{{ emptyStateMessage }}</p>
             </div>
 
             <section v-if="lastOutcome" class="outcome-card">
@@ -93,11 +183,11 @@
             <section class="rules-card">
                 <h2>How it works</h2>
                 <ul>
-                    <li><span>🎰</span> Tap <strong>Spin</strong> to shuffle three reels filled with your classes.</li>
+                    <li><span>🎰</span> Tap <strong>Spin</strong> to shuffle three reels filled with your selected courses or custom list.</li>
                     <li><span>🏆</span> <strong>3 of a kind</strong> → 60-minute focus session + 60-minute break.</li>
                     <li><span>🔥</span> <strong>2 of a kind</strong> → 45-minute focus session + 15-minute break.</li>
                     <li><span>✨</span> <strong>All different</strong> → 20-minute focus session + 5-minute break.</li>
-                    <li><span>��</span> Keep the study music on for an immersive session, then enjoy the timed break.</li>
+                    <li><span>🎵</span> Keep the study music on for an immersive session, then enjoy the timed break.</li>
                 </ul>
             </section>
         </div>
@@ -105,13 +195,31 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
+import { computed, onMounted, onUnmounted, ref, watch, withDefaults } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import axios from 'axios';
 import { ArrowLeftCircle, Play, RotateCcw, Volume2, VolumeX } from 'lucide-vue-next';
+
+type LibrarySummary = {
+    id: number;
+    name?: string;
+    library_topic?: string;
+};
+
+const props = withDefaults(defineProps<{
+    mode: 'library' | 'global';
+    availableLibraries: LibrarySummary[];
+    defaultLibraryIds: number[];
+}>(), {
+    mode: 'library',
+    availableLibraries: () => [],
+    defaultLibraryIds: () => [],
+});
 
 const route = useRoute();
 const router = useRouter();
+
+const isGlobalMode = computed(() => props.mode === 'global');
+const isLibraryMode = computed(() => props.mode === 'library');
 
 const classes = ref<string[]>([]);
 const displayedReels = ref<string[]>(['—', '—', '—']);
@@ -128,9 +236,22 @@ const timerMode = ref<'idle' | 'ready' | 'session' | 'break' | 'complete'>('idle
 const remainingTime = ref(0);
 const musicEnabled = ref(true);
 
-const lights = computed(() => Array.from({ length: 18 }));
 const libraryIdParam = computed(() => route.params.libraryId ?? route.params.id);
 
+const libraryOptions = computed(() => props.availableLibraries.map((library) => {
+    const label = (library.name ?? library.library_topic ?? '').toString().trim();
+    return {
+        id: Number(library.id),
+        name: label.length > 0 ? label : 'Untitled course'
+    };
+}));
+
+const selectionSource = ref<'courses' | 'custom'>(isGlobalMode.value && props.availableLibraries.length === 0 ? 'custom' : 'courses');
+const selectedLibraryIds = ref<number[]>([]);
+const customCourses = ref<string[]>(['', '', '']);
+const maxCustomCourses = 12;
+
+const lights = computed(() => Array.from({ length: 18 }));
 const noClassesAvailable = computed(() => !loading.value && classes.value.length === 0);
 const canSpin = computed(() => !isSpinning.value && classes.value.length > 0 && timerMode.value !== 'session' && timerMode.value !== 'break');
 const isReadyToStart = computed(() => lastOutcome.value !== null && (timerMode.value === 'ready' || timerMode.value === 'complete'));
@@ -173,11 +294,155 @@ const machineStateClass = computed(() => ({
 const bulbClass = computed(() => ({
     active: matchType.value !== null
 }));
+const emptyStateMessage = computed(() => {
+    if (isGlobalMode.value) {
+        if (selectionSource.value === 'courses') {
+            if (libraryOptions.value.length === 0) {
+                return 'Join or create a course to include it in the slots, or switch to a custom list.';
+            }
+            return 'Select at least one course to spin the reels.';
+        }
+        return 'Add at least one custom item to spin the reels.';
+    }
+    return 'Add lessons to this course to unlock Study Slots.';
+});
 
 let reelIntervals: Array<ReturnType<typeof setInterval> | null> = [null, null, null];
 let reelTimeouts: ReturnType<typeof setTimeout>[] = [];
 let timerInterval: ReturnType<typeof setInterval> | null = null;
 let studyMusic: HTMLAudioElement | null = null;
+
+const dedupeCaseInsensitive = (values: string[]) => {
+    const seen = new Set<string>();
+    const unique: string[] = [];
+    values.forEach((value) => {
+        const key = value.toLowerCase();
+        if (!seen.has(key)) {
+            seen.add(key);
+            unique.push(value);
+        }
+    });
+    return unique;
+};
+
+const ensureCourseSelection = () => {
+    if (!isGlobalMode.value || selectionSource.value !== 'courses') {
+        return;
+    }
+    const availableIds = libraryOptions.value.map((option) => option.id);
+    if (availableIds.length === 0) {
+        selectedLibraryIds.value = [];
+        return;
+    }
+    if (selectedLibraryIds.value.length === 0) {
+        const defaults = props.defaultLibraryIds.filter((id) => availableIds.includes(id));
+        selectedLibraryIds.value = defaults.length > 0
+            ? defaults
+            : libraryOptions.value.slice(0, Math.min(libraryOptions.value.length, 3)).map((option) => option.id);
+    }
+};
+
+function updateClassesFromSelection(reset = false) {
+    if (!isGlobalMode.value) {
+        return;
+    }
+
+    const values = selectionSource.value === 'courses'
+        ? libraryOptions.value
+            .filter((option) => selectedLibraryIds.value.includes(option.id))
+            .map((option) => option.name.trim())
+        : customCourses.value.map((entry) => entry.trim());
+
+    const filtered = values.filter((value) => value.length > 1);
+    const unique = dedupeCaseInsensitive(filtered);
+
+    classes.value = unique;
+    loading.value = false;
+
+    if (reset) {
+        resetGame();
+    } else if (!hasSpun.value) {
+        setInitialReels();
+    }
+}
+
+const chooseSelectionSource = (source: 'courses' | 'custom') => {
+    if (!isGlobalMode.value) {
+        return;
+    }
+    if (source === 'courses' && libraryOptions.value.length === 0) {
+        selectionSource.value = 'custom';
+        return;
+    }
+    selectionSource.value = source;
+};
+
+const toggleCourse = (id: number) => {
+    if (!isGlobalMode.value) {
+        return;
+    }
+    if (selectedLibraryIds.value.includes(id)) {
+        selectedLibraryIds.value = selectedLibraryIds.value.filter((item) => item !== id);
+    } else {
+        selectedLibraryIds.value = [...selectedLibraryIds.value, id];
+    }
+    updateClassesFromSelection(hasSpun.value);
+};
+
+const selectAllCourses = () => {
+    if (!isGlobalMode.value) {
+        return;
+    }
+    selectedLibraryIds.value = libraryOptions.value.map((option) => option.id);
+    updateClassesFromSelection(hasSpun.value);
+};
+
+const clearCourses = () => {
+    if (!isGlobalMode.value) {
+        return;
+    }
+    selectedLibraryIds.value = [];
+    updateClassesFromSelection(true);
+};
+
+const addCustomCourse = () => {
+    if (!isGlobalMode.value) {
+        return;
+    }
+    if (customCourses.value.length >= maxCustomCourses) {
+        return;
+    }
+    customCourses.value.push('');
+};
+
+const removeCustomCourse = (index: number) => {
+    if (!isGlobalMode.value) {
+        return;
+    }
+    if (customCourses.value.length === 1) {
+        customCourses.value[0] = '';
+    } else {
+        customCourses.value.splice(index, 1);
+    }
+    handleCustomCourseChange();
+};
+
+const handleCustomCourseEnter = (index: number) => {
+    if (!isGlobalMode.value || selectionSource.value !== 'custom') {
+        return;
+    }
+    if (customCourses.value[index].trim().length > 1 && customCourses.value.length < maxCustomCourses) {
+        customCourses.value.push('');
+    }
+    handleCustomCourseChange();
+};
+
+const handleCustomCourseChange = () => {
+    if (!isGlobalMode.value || selectionSource.value !== 'custom') {
+        return;
+    }
+    updateClassesFromSelection(hasSpun.value);
+};
 
 const formatTime = (totalSeconds: number) => {
     const clamped = Math.max(totalSeconds, 0);
@@ -187,29 +452,41 @@ const formatTime = (totalSeconds: number) => {
 };
 
 const fetchClasses = async () => {
-    loading.value = true;
     errorMessage.value = '';
+    if (isGlobalMode.value) {
+        loading.value = false;
+        ensureCourseSelection();
+        updateClassesFromSelection(false);
+        return;
+    }
+
+    loading.value = true;
     try {
-        const id = libraryIdParam.value;
+        const id = String(libraryIdParam.value ?? '');
         if (!id) {
             throw new Error('Missing library id');
         }
-        const response = await axios.get(`/api/library/${id}`);
-        if (response.data?.status !== 'success') {
-            throw new Error('Unable to load classes for this library.');
-        }
-        const rawRooms = response.data?.data?.room_names ?? [];
-        const parsed = rawRooms
-            .map((room: unknown) => Array.isArray(room) ? room[0] : room)
-            .filter((name: unknown): name is string => typeof name === 'string' && name.trim().length > 0);
-        classes.value = parsed;
-        if (parsed.length > 0) {
+
+        await new Promise((r) => setTimeout(r, 400));
+
+        const samples: Record<string, string[]> = {
+            '1': ['algebra', 'chemistry', 'biology', 'history', 'spanish'],
+            '2': ['algorithms', 'data structures', 'operating systems', 'databases', 'networks'],
+            '3': ['physics', 'calculus', 'literature', 'philosophy', 'statistics'],
+        };
+
+        const fallback = ['math', 'english', 'science', 'art', 'music', 'geography'];
+
+        const mockRooms = samples[id] ?? fallback;
+
+        classes.value = mockRooms;
+        if (mockRooms.length > 0) {
             setInitialReels();
         } else {
             displayedReels.value = ['—', '—', '—'];
         }
     } catch (error) {
-        console.error('Failed to load classes for Study Slots:', error);
+        console.error('Failed to load mock classes for Study Slots:', error);
         errorMessage.value = 'Unable to load classes. Please try again later.';
     } finally {
         loading.value = false;
@@ -420,6 +697,33 @@ const resetGame = () => {
     setInitialReels();
 };
 
+watch(libraryOptions, (options) => {
+    if (!isGlobalMode.value) {
+        return;
+    }
+    const optionIds = options.map((option) => option.id);
+    selectedLibraryIds.value = selectedLibraryIds.value.filter((id) => optionIds.includes(id));
+
+    if (selectionSource.value === 'courses') {
+        if (optionIds.length === 0) {
+            selectionSource.value = 'custom';
+        }
+        ensureCourseSelection();
+    }
+
+    updateClassesFromSelection(hasSpun.value);
+}, { immediate: true });
+
+watch(selectionSource, () => {
+    if (!isGlobalMode.value) {
+        return;
+    }
+    if (selectionSource.value === 'courses') {
+        ensureCourseSelection();
+    }
+    updateClassesFromSelection(hasSpun.value);
+});
+
 watch(classes, () => {
     if (!hasSpun.value) {
         setInitialReels();
@@ -427,6 +731,9 @@ watch(classes, () => {
 });
 
 watch(libraryIdParam, () => {
+    if (!isLibraryMode.value) {
+        return;
+    }
     resetGame();
     fetchClasses();
 });
@@ -440,15 +747,20 @@ const initAudio = () => {
 };
 
 const navigateBackIfMissing = () => {
-    if (!libraryIdParam.value) {
-        router.push('/courses');
+    if (isLibraryMode.value && !libraryIdParam.value) {
+        router.push('/home');
     }
 };
 
 onMounted(() => {
     initAudio();
-    navigateBackIfMissing();
-    fetchClasses();
+    if (isLibraryMode.value) {
+        navigateBackIfMissing();
+        fetchClasses();
+    } else {
+        ensureCourseSelection();
+        fetchClasses();
+    }
 });
 
 onUnmounted(() => {
@@ -528,9 +840,217 @@ onUnmounted(() => {
     transform: translateY(-1px);
 }
 
+.header-anchor {
+    flex: 1;
+    display: flex;
+    align-items: center;
+}
+
+.home-chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.4rem 0.9rem;
+    border-radius: 999px;
+    border: 1px solid rgba(148, 163, 184, 0.35);
+    background: rgba(15, 23, 42, 0.55);
+    color: rgba(226, 232, 240, 0.85);
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
 .icon {
     width: 1.25rem;
     height: 1.25rem;
+}
+
+.selection-panel {
+    background: rgba(15, 23, 42, 0.55);
+    border: 1px solid rgba(99, 102, 241, 0.25);
+    border-radius: 20px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    backdrop-filter: blur(10px);
+}
+
+.source-toggle {
+    display: inline-flex;
+    gap: 0.4rem;
+    padding: 0.25rem;
+    border-radius: 999px;
+    border: 1px solid rgba(148, 163, 184, 0.3);
+    background: rgba(15, 23, 42, 0.4);
+}
+
+.toggle-button {
+    border: none;
+    background: transparent;
+    color: rgba(226, 232, 240, 0.7);
+    padding: 0.5rem 1.2rem;
+    border-radius: 999px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.toggle-button.active {
+    background: linear-gradient(135deg, rgba(96, 165, 250, 0.35), rgba(129, 140, 248, 0.45));
+    color: #f8fafc;
+    box-shadow: 0 12px 24px rgba(59, 130, 246, 0.25);
+}
+
+.toggle-button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.course-selection,
+.custom-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.selection-help {
+    margin: 0;
+    color: rgba(226, 232, 240, 0.7);
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.course-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.course-chip {
+    border: 1px solid rgba(148, 163, 184, 0.35);
+    background: rgba(15, 23, 42, 0.4);
+    color: rgba(226, 232, 240, 0.75);
+    padding: 0.55rem 1.1rem;
+    border-radius: 999px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.course-chip:hover {
+    transform: translateY(-2px);
+    background: rgba(148, 163, 184, 0.2);
+}
+
+.course-chip.active {
+    background: linear-gradient(135deg, rgba(96, 165, 250, 0.3), rgba(129, 140, 248, 0.45));
+    border-color: rgba(129, 140, 248, 0.6);
+    color: #f8fafc;
+    box-shadow: 0 12px 24px rgba(99, 102, 241, 0.35);
+}
+
+.course-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.mini-button {
+    border: 1px solid rgba(148, 163, 184, 0.35);
+    background: rgba(15, 23, 42, 0.4);
+    color: rgba(226, 232, 240, 0.75);
+    border-radius: 999px;
+    padding: 0.4rem 0.9rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s ease, color 0.2s ease;
+}
+
+.mini-button:hover:not(:disabled) {
+    background: rgba(148, 163, 184, 0.25);
+    color: #f8fafc;
+    transform: translateY(-1px);
+}
+
+.mini-button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.custom-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: rgba(15, 23, 42, 0.45);
+    border: 1px solid rgba(148, 163, 184, 0.3);
+    border-radius: 12px;
+    padding: 0.6rem 0.75rem;
+}
+
+.custom-item input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: #f8fafc;
+    font-size: 0.95rem;
+    outline: none;
+}
+
+.custom-item input::placeholder {
+    color: rgba(226, 232, 240, 0.45);
+}
+
+.remove-custom {
+    border: none;
+    background: rgba(248, 113, 113, 0.18);
+    color: #fecaca;
+    border-radius: 999px;
+    width: 28px;
+    height: 28px;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    font-size: 1.1rem;
+    line-height: 1;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.remove-custom:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.remove-custom:not(:disabled):hover {
+    background: rgba(248, 113, 113, 0.3);
+    transform: translateY(-1px);
+}
+
+.add-custom {
+    align-self: flex-start;
+    border: 1px dashed rgba(148, 163, 184, 0.4);
+    background: rgba(15, 23, 42, 0.35);
+    color: rgba(226, 232, 240, 0.85);
+    border-radius: 12px;
+    padding: 0.55rem 1.1rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.add-custom:hover:not(:disabled) {
+    background: rgba(99, 102, 241, 0.25);
+    border-color: rgba(99, 102, 241, 0.45);
+    transform: translateY(-1px);
+}
+
+.add-custom:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
 }
 
 .slots-intro {

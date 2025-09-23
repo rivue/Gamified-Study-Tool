@@ -37,7 +37,7 @@ export const useMessageStore = defineStore('messageStore', {
         async fetchRecentMessages(currentPath: string) {
             const params: { lesson_id?: string; challenge_id?: string } = {};
 
-            let apiEndpoint = "/api/chat";
+            const apiEndpoint = "/api/chat";
 
             const isLesson = currentPath.includes("/lesson/");
             const isChallenge = currentPath.includes("/challenge/");
@@ -95,7 +95,7 @@ export const useMessageStore = defineStore('messageStore', {
             const adStore = useAdsStore();
             adStore.show();
 
-            let formData = new FormData();
+            const formData = new FormData();
             formData.append("message", sanitizedMessage);
 
             if (isLesson) {

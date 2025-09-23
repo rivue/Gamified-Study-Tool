@@ -156,7 +156,7 @@ async function handleLeaveCourse() {
             emit('course-left', props.libraryId);
             closeModal();
             if (props.fromExplore) {
-                router.push('/courses'); 
+                router.push('/home'); 
             }
         } else {
             const errorMessage = 'An unexpected error occurred.';

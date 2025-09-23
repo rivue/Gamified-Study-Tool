@@ -39,7 +39,7 @@
                     All Courses
                 </button>
                 <button @click="setOwnerFilter('owned')" :class="['filter-btn', { 'active': ownerFilter === 'owned' }]">
-                    My Courses
+                    Owned
                 </button>
                 <button @click="setOwnerFilter('joined')"
                     :class="['filter-btn', { 'active': ownerFilter === 'joined' }]">
