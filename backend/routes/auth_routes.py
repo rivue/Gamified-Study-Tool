@@ -24,7 +24,7 @@ def generate_token_and_send_verification_email(user):
         db.session.commit()
         
         if os.getenv('FLASK_ENV') == 'production':
-            frontend_url = "https://rivue-s3xo7.ondigitalocean.app" #"https://rivue.ai"
+            frontend_url = "https://www.rivue.ai" # https://rivue-s3xo7.ondigitalocean.app" #"https://rivue.ai"
         else:
             frontend_url = "http://localhost:8080"
 
@@ -37,7 +37,7 @@ def generate_token_and_send_password_reset_email(user):
         db.session.commit()
 
         if os.getenv('FLASK_ENV') == 'production':
-            frontend_url = "https://rivue-s3xo7.ondigitalocean.app" #"https://rivue.ai"
+            frontend_url =  "https://www.rivue.ai" # "https://rivue-s3xo7.ondigitalocean.app" #"https://rivue.ai"
         else:
             frontend_url = "http://localhost:8080"
 
