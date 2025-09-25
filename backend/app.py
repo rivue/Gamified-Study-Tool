@@ -5,10 +5,11 @@ import openai
 import resend
 from dotenv import load_dotenv
 from datetime import timedelta
-from flask import Flask, jsonify, make_response, send_from_directory, request
+from flask import Flask, jsonify, make_response, send_from_directory, request, redirect
 from flask_login import LoginManager
 from flask_migrate import Migrate
 from flask_cors import CORS
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 # Load .env as early as possible so imports can read env vars
 load_dotenv()
@@ -18,6 +19,8 @@ from database.upgrade_db import run_upgrades
 app = Flask(__name__, static_folder='../frontend/dist')
 app.secret_key = os.getenv('FLASK_SECRET_KEY')
 app.config['FLASK_ENV'] = os.getenv('FLASK_ENV', 'development')
+
+CANONICAL_HOST = "www.rivue.ai"
 
 if app.config['FLASK_ENV'] != 'migration':
     openai.api_key = os.getenv("OPENAI_API_KEY")
@@ -40,6 +43,7 @@ if app.config["FLASK_ENV"] == "production":
         print("Production database environment variables not fully set.")
         raise Exception("Production database environment variables not fully set.")
     uri = f'postgresql+psycopg2://{user}:{password}@{host}:{port}/{database}'
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=0)
 else:
     # Default to local Supabase Postgres instance for development
     uri = 'postgresql+psycopg2://postgres:postgres@127.0.0.1:54322/postgres' 
@@ -124,8 +128,28 @@ def bad_request(e):
 @app.after_request
 def add_cross_origin_headers(response):
     response.headers['Cross-Origin-Opener-Policy'] = 'same-origin-allow-popups'
+    if app.config['FLASK_ENV'] == 'production':
+        response.headers.setdefault('Strict-Transport-Security', 'max-age=15552000; includeSubDomains')
     return response
-    
+
+
+@app.before_request
+def enforce_scheme_and_host():
+    if app.config['FLASK_ENV'] != 'production':
+        return None
+
+    scheme = request.headers.get('X-Forwarded-Proto', request.scheme)
+    host = request.headers.get('X-Forwarded-Host', request.host.split(':')[0])
+
+    path = request.path
+    query_string = request.query_string.decode('utf-8')
+    suffix = f"{path}?{query_string}" if query_string else path
+
+    target_host = CANONICAL_HOST if host != CANONICAL_HOST else host
+
+    if scheme != 'https' or host != target_host:
+        return redirect(f"https://{target_host}{suffix}", code=308)
+
 class UserAlreadyMemberError(Exception):
     pass
 
