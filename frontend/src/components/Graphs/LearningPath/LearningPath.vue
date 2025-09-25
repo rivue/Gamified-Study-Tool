@@ -522,16 +522,16 @@ const rawUnitData = ref<Record<string, any[][]>>({});
 watch(() => props.unitSectionMap, async (newVal) => {
     rawUnitData.value = { ...(newVal || {}) };
     // Inject a mock unit/section to launch the terminal lesson (no backend)
-    const MOCK_UNIT = 'Sandbox';
-    const MOCK_SECTION: [number, string] = [-1, 'Terminal (Mock)'];
-    if (!rawUnitData.value[MOCK_UNIT]) {
-        rawUnitData.value[MOCK_UNIT] = [] as any[];
-    }
-    // Avoid duplicates
-    const exists = (rawUnitData.value[MOCK_UNIT] as any[]).some(([id, name]) => id === MOCK_SECTION[0] && name === MOCK_SECTION[1]);
-    if (!exists) {
-        (rawUnitData.value[MOCK_UNIT] as any[]).push(MOCK_SECTION);
-    }
+    // const MOCK_UNIT = 'Sandbox';
+    // const MOCK_SECTION: [number, string] = [-1, 'Terminal (Mock)'];
+    // if (!rawUnitData.value[MOCK_UNIT]) {
+    //     rawUnitData.value[MOCK_UNIT] = [] as any[];
+    // }
+    // // Avoid duplicates
+    // const exists = (rawUnitData.value[MOCK_UNIT] as any[]).some(([id, name]) => id === MOCK_SECTION[0] && name === MOCK_SECTION[1]);
+    // if (!exists) {
+    //     (rawUnitData.value[MOCK_UNIT] as any[]).push(MOCK_SECTION);
+    // }
     recalcMaxLeft()
 }, { deep: true, immediate: true })
 
