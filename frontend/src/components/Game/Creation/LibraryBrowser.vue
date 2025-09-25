@@ -37,20 +37,22 @@
                         <div>
                             <h2>Study Slots</h2>
                             <p>
-                                Pick the courses you want to spin or type a quick custom list whenever
-                                inspiration strikes.
+                                Spin up your next focus mission with a press — we built a dedicated space for
+                                Study Slots so it is only a tap away.
                             </p>
                         </div>
                     </div>
                     <div v-if="loadError" class="panel-error">{{ loadError }}</div>
-                    <StudySlots
-                        mode="global"
-                        :available-libraries="libraryOptions"
-                        :default-library-ids="defaultLibraryIds"
-                    />
+                    <button class="slots-cta" @click="goToStudySlots" :disabled="isLoading">
+                        <span>Open Study Slots</span>
+                        <Dices class="cta-icon" />
+                    </button>
+                    <p class="cta-hint">
+                        Choose from your joined courses or type a quick custom list once you are inside the slots.
+                    </p>
                 </div>
 
-                <div class="courses-panel">
+                <div>
                     <LibraryCarousel
                         v-if="loggedIn"
                         :libraries="myLibraries"
@@ -78,14 +80,11 @@ import axios from "axios";
 import { useAuthStore } from "@/store/authStore";
 import LoadingComponent from "@/components/Backstage/LoadingComponent.vue";
 import LibraryCarousel from "@/components/Game/Creation/LibraryCarousel.vue";
-import StudySlots from "@/components/Graphs/LearningPath/StudySlots.vue";
-
-interface LibraryOption {
-    id: number;
-    name: string;
-}
+import { useRouter } from "vue-router";
+import { Dices } from "lucide-vue-next";
 
 const authStore = useAuthStore();
+const router = useRouter();
 const isLoading = ref(true);
 const myLibraries = ref<any[]>([]);
 const archivedLibraries = ref<any[]>([]);
@@ -140,22 +139,17 @@ watch(loggedIn, (value) => {
         myLibraries.value = [];
         archivedLibraries.value = [];
         favoritesMap.value = {};
+        isLoading.value = false;
+        loadError.value = "";
     }
 });
 
-const libraryOptions = computed<LibraryOption[]>(() =>
-    myLibraries.value.map((library: any) => ({
-        id: library.id,
-        name: library.library_topic
-    }))
-);
-
-const defaultLibraryIds = computed(() =>
-    libraryOptions.value.slice(0, 3).map((option) => option.id)
-);
-
 const favoriteCount = computed(() => Object.values(favoritesMap.value || {}).filter(Boolean).length);
 const activeCourseCount = computed(() => myLibraries.value.length);
+
+function goToStudySlots() {
+    router.push({ name: "HomeStudySlots" });
+}
 </script>
 
 <style scoped>
@@ -307,6 +301,52 @@ const activeCourseCount = computed(() => myLibraries.value.length);
     line-height: 1.6;
 }
 
+.slots-cta {
+    margin-top: 0.5rem;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 1.1rem 1.5rem;
+    border-radius: 18px;
+    border: none;
+    background: linear-gradient(135deg, rgba(14, 165, 233, 0.55), rgba(99, 102, 241, 0.65));
+    color: #f8fafc;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 20px 40px rgba(56, 189, 248, 0.35);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+
+.slots-cta:hover:not(:disabled) {
+    transform: translateY(-3px);
+    box-shadow: 0 26px 52px rgba(99, 102, 241, 0.45);
+    filter: brightness(1.05);
+}
+
+.slots-cta:active:not(:disabled) {
+    transform: translateY(-1px);
+}
+
+.slots-cta:disabled {
+    opacity: 0.45;
+    cursor: wait;
+}
+
+.cta-icon {
+    width: 1.6rem;
+    height: 1.6rem;
+}
+
+.cta-hint {
+    margin-top: 0.85rem;
+    color: rgba(226, 232, 240, 0.7);
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
 .panel-error {
     margin-bottom: 1rem;
     padding: 0.75rem 1rem;
@@ -317,14 +357,6 @@ const activeCourseCount = computed(() => myLibraries.value.length);
     font-size: 0.95rem;
 }
 
-.courses-panel {
-    background: rgba(15, 23, 42, 0.4);
-    border: 1px solid rgba(148, 163, 184, 0.25);
-    border-radius: 28px;
-    padding: 2rem 0;
-    box-shadow: 0 24px 40px rgba(15, 23, 42, 0.35);
-    backdrop-filter: blur(12px);
-}
 
 .guest-message {
     padding: 3rem;
@@ -363,8 +395,5 @@ const activeCourseCount = computed(() => myLibraries.value.length);
         padding: 1.5rem;
     }
 
-    .courses-panel {
-        padding: 1.5rem 0.5rem;
-    }
 }
 </style>

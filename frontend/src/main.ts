@@ -202,6 +202,12 @@ const routes = [
         component: defineAsyncComponent(() => import('./components/Game/Creation/LibraryBrowser.vue')),
         meta: { title: 'Rivue.ai | Home' }
     },
+    {
+        name: 'HomeStudySlots',
+        path: '/home/study-slots',
+        component: defineAsyncComponent(() => import('./views/HomeStudySlots.vue')),
+        meta: { title: 'Rivue.ai | Study Slots' }
+    },
     { path: '/create', component: defineAsyncComponent(() => import('./components/Game/Creation/LibraryCreator.vue')), meta: { title: 'Rivue.ai | Create Course' } },
     // { path: '/progress', component: defineAsyncComponent(() => import('./components/Backstage/ProgressPage.vue')), meta: { title: 'Rivue.ai | Progress' } },
     { path: '/contact', component: defineAsyncComponent(() => import('./components/Footer/ContactPage.vue')), meta: { title: 'Rivue.ai | Contact Us' } },

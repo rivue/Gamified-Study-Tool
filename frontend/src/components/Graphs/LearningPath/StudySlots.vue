@@ -1,6 +1,6 @@
 <template>
-    <div class="study-slots-page" :class="pageStateClass">
-        <div class="slots-container">
+    <div class="study-slots-page" :class="[pageStateClass, { global: isGlobalMode }]">
+        <div class="slots-container" :class="{ global: isGlobalMode }">
             <header class="slots-header">
                 <div class="header-anchor">
                     <router-link v-if="isLibraryMode" :to="`/lessons/${libraryIdParam}`" class="back-link">
@@ -29,15 +29,19 @@
                         :class="['toggle-button', { active: selectionSource === 'courses' }]"
                         @click="chooseSelectionSource('courses')"
                         :disabled="libraryOptions.length === 0"
+                        :aria-pressed="selectionSource === 'courses'"
                     >
-                        Use my courses
+                        <Library class="toggle-icon" />
+                        <span>Use my courses</span>
                     </button>
                     <button
                         type="button"
                         :class="['toggle-button', { active: selectionSource === 'custom' }]"
                         @click="chooseSelectionSource('custom')"
+                        :aria-pressed="selectionSource === 'custom'"
                     >
-                        Custom list
+                        <ListChecks class="toggle-icon" />
+                        <span>Custom list</span>
                     </button>
                 </div>
 
@@ -106,6 +110,16 @@
                     </p>
                 </div>
             </div>
+
+            <!-- <div class="lucky-panel">
+                <button type="button" class="lucky-switch" :class="{ active: luckyJackpotEnabled }" @click="toggleLuckyJackpot" aria-pressed="luckyJackpotEnabled">
+                    <span class="switch-track">
+                        <span class="switch-thumb"></span>
+                    </span>
+                    <span class="switch-label">Jackpot assist</span>
+                </button>
+                <p class="lucky-copy">Guarantee a jackpot every third spin whenever assist is on.</p>
+            </div> -->
 
             <section class="machine-shell" :class="machineStateClass">
                 <div class="light-bar">
@@ -197,7 +211,7 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, watch, withDefaults } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { ArrowLeftCircle, Play, RotateCcw, Volume2, VolumeX } from 'lucide-vue-next';
+import { ArrowLeftCircle, Play, RotateCcw, Volume2, VolumeX, Library, ListChecks } from 'lucide-vue-next';
 
 type LibrarySummary = {
     id: number;
@@ -250,6 +264,7 @@ const selectionSource = ref<'courses' | 'custom'>(isGlobalMode.value && props.av
 const selectedLibraryIds = ref<number[]>([]);
 const customCourses = ref<string[]>(['', '', '']);
 const maxCustomCourses = 12;
+const luckyJackpotEnabled = ref(false);
 
 const lights = computed(() => Array.from({ length: 18 }));
 const noClassesAvailable = computed(() => !loading.value && classes.value.length === 0);
@@ -444,6 +459,10 @@ const handleCustomCourseChange = () => {
     updateClassesFromSelection(hasSpun.value);
 };
 
+const toggleLuckyJackpot = () => {
+    luckyJackpotEnabled.value = !luckyJackpotEnabled.value;
+};
+
 const formatTime = (totalSeconds: number) => {
     const clamped = Math.max(totalSeconds, 0);
     const minutes = Math.floor(clamped / 60).toString().padStart(2, '0');
@@ -554,6 +573,12 @@ const spin = () => {
     if (!canSpin.value) {
         return;
     }
+    const usingLuckyAssist = luckyJackpotEnabled.value && classes.value.length > 0;
+    const forceJackpotThisSpin = usingLuckyAssist;
+    const forcedJackpotValue = forceJackpotThisSpin
+        ? classes.value[Math.floor(Math.random() * classes.value.length)]
+        : null;
+
     spinMessage.value = 'Spinning...';
     isSpinning.value = true;
     hasSpun.value = true;
@@ -574,7 +599,7 @@ const spin = () => {
     durations.forEach((duration, index) => {
         reelIntervals[index] = setInterval(() => {
             const randomClass = classes.value[Math.floor(Math.random() * classes.value.length)];
-            displayedReels.value[index] = randomClass;
+            displayedReels.value[index] = forcedJackpotValue ?? randomClass;
         }, speeds[index]);
 
         const timeout = setTimeout(() => {
@@ -582,7 +607,8 @@ const spin = () => {
                 clearInterval(reelIntervals[index]!);
                 reelIntervals[index] = null;
             }
-            const result = classes.value[Math.floor(Math.random() * classes.value.length)];
+            // const result = forcedJackpotValue ?? classes.value[Math.floor(Math.random() * classes.value.length)];
+            const result = classes.value[3]
             displayedReels.value[index] = result;
             finalResults[index] = result;
             if (finalResults.filter(Boolean).length === 3) {
@@ -779,6 +805,12 @@ onUnmounted(() => {
     align-items: flex-start;
     background: radial-gradient(circle at top, rgba(99, 102, 241, 0.35), rgba(15, 23, 42, 0.95));
     color: var(--light-text, #f8fafc);
+    width: 100%;
+}
+
+.study-slots-page.global {
+    align-items: stretch;
+    padding: clamp(1.5rem, 3vw, 2.75rem);
 }
 
 .study-slots-page.win .slots-container,
@@ -795,6 +827,12 @@ onUnmounted(() => {
     position: relative;
     border: 1px solid rgba(148, 163, 184, 0.2);
     backdrop-filter: blur(12px);
+}
+
+.slots-container.global {
+    max-width: none;
+    border-radius: 28px;
+    padding: clamp(2rem, 3vw, 3rem);
 }
 
 .slots-header {
@@ -878,30 +916,125 @@ onUnmounted(() => {
     backdrop-filter: blur(10px);
 }
 
+.lucky-panel {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.8rem;
+    padding: 1rem 1.25rem;
+    background: rgba(15, 23, 42, 0.45);
+    border: 1px solid rgba(129, 140, 248, 0.35);
+    border-radius: 20px;
+}
+
+.lucky-switch {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    border: none;
+    background: transparent;
+    color: rgba(226, 232, 240, 0.85);
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.lucky-switch:hover {
+    transform: translateY(-1px);
+    color: #f8fafc;
+}
+
+.switch-track {
+    width: 54px;
+    height: 28px;
+    border-radius: 999px;
+    background: rgba(59, 130, 246, 0.2);
+    position: relative;
+    padding: 3px;
+    transition: background 0.25s ease;
+}
+
+.switch-thumb {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #e0f2fe;
+    box-shadow: 0 6px 12px rgba(14, 116, 144, 0.35);
+    transition: transform 0.25s ease, background 0.25s ease, box-shadow 0.25s ease;
+}
+
+.lucky-switch.active .switch-track {
+    background: linear-gradient(135deg, rgba(56, 189, 248, 0.7), rgba(59, 130, 246, 0.9));
+}
+
+.lucky-switch.active .switch-thumb {
+    transform: translateX(26px);
+    background: #ffffff;
+    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.45);
+}
+
+.switch-label {
+    font-size: 0.9rem;
+    letter-spacing: 0.1em;
+}
+
+.lucky-copy {
+    margin: 0;
+    color: rgba(226, 232, 240, 0.7);
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
 .source-toggle {
     display: inline-flex;
-    gap: 0.4rem;
-    padding: 0.25rem;
-    border-radius: 999px;
-    border: 1px solid rgba(148, 163, 184, 0.3);
-    background: rgba(15, 23, 42, 0.4);
+    gap: 0.6rem;
+    padding: 0.35rem;
+    border-radius: 18px;
+    border: 1px solid rgba(148, 163, 184, 0.35);
+    background: rgba(15, 23, 42, 0.55);
+    box-shadow: inset 0 0 0 1px rgba(30, 64, 175, 0.25);
 }
 
 .toggle-button {
     border: none;
-    background: transparent;
-    color: rgba(226, 232, 240, 0.7);
-    padding: 0.5rem 1.2rem;
-    border-radius: 999px;
+    background: rgba(15, 23, 42, 0.3);
+    color: rgba(226, 232, 240, 0.75);
+    padding: 0.65rem 1.4rem;
+    border-radius: 16px;
     font-weight: 600;
     cursor: pointer;
-    transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.toggle-button .toggle-icon {
+    width: 1.1rem;
+    height: 1.1rem;
+}
+
+.toggle-button:hover:not(:disabled) {
+    transform: translateY(-2px);
+    color: #f8fafc;
+    background: rgba(59, 130, 246, 0.28);
 }
 
 .toggle-button.active {
-    background: linear-gradient(135deg, rgba(96, 165, 250, 0.35), rgba(129, 140, 248, 0.45));
-    color: #f8fafc;
-    box-shadow: 0 12px 24px rgba(59, 130, 246, 0.25);
+    background: linear-gradient(135deg, rgba(96, 165, 250, 0.55), rgba(129, 140, 248, 0.75));
+    color: #fdfdfd;
+    box-shadow: 0 16px 30px rgba(37, 99, 235, 0.35);
+}
+
+.toggle-button.active .toggle-icon {
+    filter: drop-shadow(0 0 6px rgba(191, 219, 254, 0.6));
 }
 
 .toggle-button:disabled {

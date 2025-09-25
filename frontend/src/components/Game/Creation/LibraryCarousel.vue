@@ -1,5 +1,5 @@
 <template>
-    <div class="library-list mt-8 m-auto">
+    <div class="library-list m-auto">
         <div class="header-container">
             <div class="header-content">
                 <h1 class="title">Courses</h1>
