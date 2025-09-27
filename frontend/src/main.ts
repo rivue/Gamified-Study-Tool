@@ -231,16 +231,6 @@ const routes = [
         component: defineAsyncComponent(() => import('./components/LegalDocuments.vue')),
         meta: { title: 'Rivue.ai | Legal' }
     },
-    {
-        path: '/',
-        redirect: () => {
-            if (process.env.NODE_ENV === 'production') {
-                window.location.href = 'https://try.rivue.ai';
-                return 'https://try.rivue.ai'; // Fallback for router
-            }
-            return '/explore'; // Redirect to a local page in development
-        },
-    },
     // { path: '/lessons/:pathMatch(.*)*', redirect: '/' },
     { path: '/explore/:pathMatch(.*)*', redirect: '/explore' },
     { path: '/courses/:pathMatch(.*)*', redirect: '/home' },
@@ -361,9 +351,15 @@ axios.defaults.baseURL = process.env.VUE_APP_API_BASE_URL;
 
 axios.defaults.withCredentials = true;
 
-const pinia = createPinia()
+const isProduction = process.env.NODE_ENV === 'production';
 
-const app = createApp(App);
-app.use(pinia)
-app.use(router);
-app.mount('#app');
+if (isProduction) {
+    window.location.replace('https://try.rivue.ai');
+} else {
+    const pinia = createPinia();
+
+    const app = createApp(App);
+    app.use(pinia);
+    app.use(router);
+    app.mount('#app');
+}
