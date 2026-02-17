@@ -366,16 +366,9 @@ axios.defaults.baseURL = process.env.VUE_APP_API_BASE_URL;
 
 axios.defaults.withCredentials = true;
 
-const isProduction = process.env.NODE_ENV === 'production';
-const isRootPath = window.location.pathname === '/' || window.location.pathname === '';
+const pinia = createPinia();
 
-if (isProduction && isRootPath) {
-    window.location.replace('https://try.rivue.ai');
-} else {
-    const pinia = createPinia();
-
-    const app = createApp(App);
-    app.use(pinia);
-    app.use(router);
-    app.mount('#app');
-}
+const app = createApp(App);
+app.use(pinia);
+app.use(router);
+app.mount('#app');
