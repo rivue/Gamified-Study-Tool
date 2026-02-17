@@ -1,0 +1,16 @@
+{
+    "redirects": [
+      {
+        "source": "/",
+        "has": [
+          {
+            "type": "host",
+            "value": "rivue.ai"
+          }
+        ],
+        "destination": "https://try.rivue.ai",
+        "permanent": true
+      }
+    ]
+  }
+  
