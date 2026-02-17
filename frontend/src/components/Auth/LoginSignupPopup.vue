@@ -64,6 +64,14 @@ const loggedIn = computed(() => {
     return authStore.loggedIn;
 });
 
+const resolveRedirectPath = () => {
+    const redirectPath = route.query.redirect?.toString();
+    if (redirectPath && redirectPath !== '/login') {
+        return redirectPath;
+    }
+    return '/home';
+};
+
 // Google Sign In Handler
 const handleGoogleSignIn = async (response: any) => {
     loggingIn.value = true;
@@ -74,7 +82,7 @@ const handleGoogleSignIn = async (response: any) => {
 
         if (data.status === 'success') {
             authStore.login(data.user); // Assuming data.user contains the user info
-            router.push("/home");
+            router.push(resolveRedirectPath());
         } else {
             const popupStore = usePopupStore();
             popupStore.showPopup('Google Sign-In failed. Please try again.');
@@ -165,8 +173,7 @@ const toggleForms = (form: string) => {
 
 const handleLoginSuccess = async (user: UserData) => {
     authStore.login(user);
-    // const redirectPath = route.query.redirect?.toString() || "/";
-    router.push("/home");
+    router.push(resolveRedirectPath());
 };
 
 const toEmailVerificationScreen = () => {

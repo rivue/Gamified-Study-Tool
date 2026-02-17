@@ -1,12 +1,11 @@
 # routes/auth_routes.py
 import re
 from datetime import datetime
-from flask import request, jsonify, url_for, session, make_response
+from flask import request, jsonify, session, make_response, current_app
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_required, logout_user, current_user, login_user
 import pymysql.err as pymysql_err
 import os
-import re
 from google.oauth2 import id_token
 from google.auth.transport import requests as google_requests
 
@@ -17,6 +16,17 @@ from email_provider.resend_api import send_email
 from email_provider.email_templates import Registration, PasswordReset
 
 GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID")
+
+def build_user_payload(user):
+    return {
+        'id': user.id,
+        'username': user.username,
+        'email': user.email,
+        'first_name': user.first_name,
+        'last_name': user.last_name,
+        'current_streak': user.streak_count,
+        'highest_streak': user.highest_streak,
+    }
 
 def generate_token_and_send_verification_email(user):
         user.confirmation_token = generate_confirmation_token(user.id)
@@ -66,20 +76,14 @@ def init_auth_routes(app):
                     user.timezone = timezone
                     db.session.commit()
 
+                session.clear()
                 login_user(user, remember=True)
+                session.permanent = True
                 user.update_daily_streak(login=True)
                 db.session.commit()
                 
                 print(f" streak: {user.streak_count}, highest_streak: {user.highest_streak}")
-                user_data = {
-                    'id': user.id,
-                    'username': user.username,
-                    'email': user.email,
-                    'first_name': user.first_name,
-                    'last_name': user.last_name,
-                    'current_streak': user.streak_count,
-                    'highest_streak': user.highest_streak              
-                }
+                user_data = build_user_payload(user)
                 
                 print(f"login resulf: {user_data}")
                 return jsonify({'status': 'success', 'user': user_data})
@@ -90,11 +94,32 @@ def init_auth_routes(app):
             return jsonify({'status': 'fail', 'message': 'An unexpected error occurred. Please try again later.'}), 500
         
 
-    @app.route("/api/logout", methods=["GET"])
+    @app.route("/api/logout", methods=["POST"])
     @login_required
     def logout_route():
         logout_user()
-        return jsonify({"status": "success"})
+        session.clear()
+
+        response = jsonify({"status": "success"})
+        session_cookie_name = current_app.config.get('SESSION_COOKIE_NAME', 'session')
+        remember_cookie_name = current_app.config.get('REMEMBER_COOKIE_NAME', 'remember_token')
+
+        response.delete_cookie(
+            session_cookie_name,
+            path='/',
+            secure=bool(current_app.config.get('SESSION_COOKIE_SECURE', False)),
+            httponly=True,
+            samesite=current_app.config.get('SESSION_COOKIE_SAMESITE', 'Lax'),
+        )
+        response.delete_cookie(
+            remember_cookie_name,
+            path='/',
+            secure=bool(current_app.config.get('REMEMBER_COOKIE_SECURE', False)),
+            httponly=True,
+            samesite=current_app.config.get('REMEMBER_COOKIE_SAMESITE', 'Lax'),
+        )
+
+        return response
 
 
     # creates new user in database (signup) and sends email to verify account
@@ -200,7 +225,9 @@ def init_auth_routes(app):
 
             if confirm(user.id, token):
                 app.logger.info("confirm successful")
-                login_user(user)
+                session.clear()
+                login_user(user, remember=True)
+                session.permanent = True
                 user.confirmation_token = None
                 user.confirm_sent_at = None
                 db.session.commit()
@@ -386,18 +413,12 @@ def init_auth_routes(app):
 
             user.confirmed = True
             db.session.commit()
-            login_user(user)
+            session.clear()
+            login_user(user, remember=True)
+            session.permanent = True
             user.update_daily_streak(login=True)
             db.session.commit()
-            user_data = {
-                'id': user.id,
-                'username': user.username,
-                'email': user.email,
-                'first_name': user.first_name,
-                'last_name': user.last_name,
-                'current_streak': user.streak_count,
-                'highest_streak': user.highest_streak
-            }
+            user_data = build_user_payload(user)
             return jsonify({'status': "success", "message": "existing_user", "user": user_data}), 200
 
         else:
@@ -415,16 +436,10 @@ def init_auth_routes(app):
             )
             db.session.add(user)
             db.session.commit()
-            login_user(user)
+            session.clear()
+            login_user(user, remember=True)
+            session.permanent = True
             user.update_daily_streak(login=True)
             db.session.commit()
-            user_data = {
-                'id': user.id,
-                'username': user.username,
-                'email': user.email,
-                'first_name': user.first_name,
-                'last_name': user.last_name,
-                'current_streak': user.streak_count,
-                'highest_streak': user.highest_streak
-            }
+            user_data = build_user_payload(user)
             return jsonify({'status': "success", "message": "new_user", "user": user_data}), 200

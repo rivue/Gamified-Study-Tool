@@ -3,6 +3,8 @@ import { defineStore } from 'pinia';
 import axios from 'axios';
 import { useUserStatsStore } from '@/store/userStatsStore';
 
+const DISABLE_AUTH = process.env.VUE_APP_DISABLE_AUTH === 'true' || process.env.NODE_ENV !== 'production';
+
 // Define an interface for the auth state
 
 export interface UserData {
@@ -10,24 +12,29 @@ export interface UserData {
     username: string | null;
     firstName: string | null;
     lastName: string | null;
+    email?: string | null;
+    first_name?: string | null;
+    last_name?: string | null;
     current_streak?: number;
     highest_streak?: number;
     // tier: string;
 }
 interface AuthState {
     loggedIn: boolean;
+    isAuthChecked: boolean;
     user: UserData;
     cloudTokens: number;
 }
 
 export const useAuthStore = defineStore('auth', {
   state: (): AuthState => ({
-    loggedIn: localStorage.getItem('loggedIn') === 'true',
+    loggedIn: DISABLE_AUTH || localStorage.getItem('loggedIn') === 'true',
+    isAuthChecked: DISABLE_AUTH,
     user: {
-        id: localStorage.getItem('userId') || null,
-        username: localStorage.getItem('username') || null,
-        firstName: localStorage.getItem('firstName') || null,
-        lastName: localStorage.getItem('lastName') || null,
+        id: localStorage.getItem('userId') || (DISABLE_AUTH ? 'guest' : null),
+        username: localStorage.getItem('username') || (DISABLE_AUTH ? 'guest' : null),
+        firstName: localStorage.getItem('firstName') || (DISABLE_AUTH ? 'Guest' : null),
+        lastName: localStorage.getItem('lastName') || (DISABLE_AUTH ? 'User' : null),
         // tier: localStorage.getItem('userTier') || "free",
     },
     cloudTokens: 0, // This seems session-specific, not persisted typically
@@ -49,7 +56,45 @@ export const useAuthStore = defineStore('auth', {
     // }
   },
   actions: {
+    normalizeUserPayload(payload?: Partial<UserData>) {
+      if (!payload) return null;
+
+      const normalizedId = payload.id !== undefined && payload.id !== null ? String(payload.id) : null;
+      return {
+        id: normalizedId,
+        username: payload.username ?? payload.email ?? null,
+        firstName: payload.firstName ?? payload.first_name ?? null,
+        lastName: payload.lastName ?? payload.last_name ?? null,
+        current_streak: payload.current_streak,
+        highest_streak: payload.highest_streak,
+      };
+    },
+    resetAuthState() {
+      this.loggedIn = false;
+      this.user = {
+        id: null,
+        username: null,
+        firstName: null,
+        lastName: null,
+      };
+      this.cloudTokens = 0;
+      localStorage.setItem('loggedIn', 'false');
+      localStorage.removeItem('userId');
+      localStorage.removeItem('username');
+      localStorage.removeItem('firstName');
+      localStorage.removeItem('lastName');
+    },
     async checkAuth() {
+      if (DISABLE_AUTH) {
+        this.login({
+          id: this.user.id || 'guest',
+          username: this.user.username || 'guest',
+          firstName: this.user.firstName || 'Guest',
+          lastName: this.user.lastName || 'User',
+        });
+        this.isAuthChecked = true;
+        return;
+      }
       try {
         const response = await axios.get('/api/check-auth');
         if (response.data.loggedIn) {
@@ -57,7 +102,7 @@ export const useAuthStore = defineStore('auth', {
           // These will be populated by login action if provided, or later by profile page.
         //   this.user.tier = response.data.userTier;
           this.cloudTokens = response.data.requestCount; // Assuming requestCount maps to cloudTokens
-          this.user.id = response.data.userId;
+          this.user.id = String(response.data.userId);
           
         //   localStorage.setItem('userTier', this.user.tier);
           localStorage.setItem('userId', this.user.id as string); // Ensure userId is not null before setting
@@ -65,60 +110,72 @@ export const useAuthStore = defineStore('auth', {
           this.loggedIn = true;
           localStorage.setItem('loggedIn', 'true');
         } else {
-          this.logout(); // Clears all user data including new fields
+          this.resetAuthState();
         }
       } catch (error) {
-        this.logout();
+        this.resetAuthState();
+      } finally {
+        this.isAuthChecked = true;
       }
     },
     // Login action updated to accept optional payload
     login(payload?: Partial<UserData>) {
       this.loggedIn = true;
+      this.isAuthChecked = true;
       localStorage.setItem('loggedIn', 'true');
 
-      if (payload) {
-        if (payload.id) {
-            this.user.id = payload.id;
-            localStorage.setItem('userId', payload.id);
+      const normalizedPayload = this.normalizeUserPayload(payload);
+      if (normalizedPayload) {
+        if (normalizedPayload.id) {
+            this.user.id = normalizedPayload.id;
+            localStorage.setItem('userId', normalizedPayload.id);
         }
-        if (payload.username) {
-            this.user.username = payload.username;
-            localStorage.setItem('username', payload.username);
+        if (normalizedPayload.username) {
+            this.user.username = normalizedPayload.username;
+            localStorage.setItem('username', normalizedPayload.username);
         }
-        if (payload.firstName) {
-            this.user.firstName = payload.firstName;
-            localStorage.setItem('firstName', payload.firstName);
+        if (normalizedPayload.firstName) {
+            this.user.firstName = normalizedPayload.firstName;
+            localStorage.setItem('firstName', normalizedPayload.firstName);
         }
-        if (payload.lastName) {
-            this.user.lastName = payload.lastName;
-            localStorage.setItem('lastName', payload.lastName);
+        if (normalizedPayload.lastName) {
+            this.user.lastName = normalizedPayload.lastName;
+            localStorage.setItem('lastName', normalizedPayload.lastName);
         }
         // if (payload.tier) {
         //     this.user.tier = payload.tier;
         //     localStorage.setItem('userTier', payload.tier);
         // }
-        if (payload.current_streak !== undefined && payload.highest_streak !== undefined) {
+        if (normalizedPayload.current_streak !== undefined && normalizedPayload.highest_streak !== undefined) {
             const userStats = useUserStatsStore();
-            userStats.setStreakData(payload.current_streak, payload.highest_streak);
+            userStats.setStreakData(normalizedPayload.current_streak, normalizedPayload.highest_streak);
         }
       }
     },
     logout() {
-        this.loggedIn = false;
-        this.user = {
-            id: null,
-            username: null,
-            firstName: null,
-            lastName: null,
-            // tier: "free",
-        };
-        this.cloudTokens = 0;
-        localStorage.setItem('loggedIn', 'false');
-        localStorage.removeItem('userId');
-        localStorage.removeItem('username');
-        localStorage.removeItem('firstName');
-        localStorage.removeItem('lastName');
-        // localStorage.removeItem('userTier');
+        if (DISABLE_AUTH) {
+            this.login({
+                id: 'guest',
+                username: 'guest',
+                firstName: 'Guest',
+                lastName: 'User',
+            });
+            return;
+        }
+        this.resetAuthState();
+        this.isAuthChecked = true;
+    },
+    async logoutFromServer() {
+      if (DISABLE_AUTH) {
+        this.logout();
+        return;
+      }
+
+      try {
+        await axios.post('/api/logout');
+      } finally {
+        this.logout();
+      }
     },
     // Action to specifically update user details, e.g., from profile page
     updateUserDetails(details: Partial<UserData>) {

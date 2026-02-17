@@ -6,7 +6,7 @@ import resend
 from dotenv import load_dotenv
 from datetime import timedelta
 from flask import Flask, jsonify, make_response, send_from_directory, request, redirect
-from flask_login import LoginManager
+from flask_login import LoginManager, login_user, current_user
 from flask_migrate import Migrate
 from flask_cors import CORS
 from werkzeug.middleware.proxy_fix import ProxyFix
@@ -54,6 +54,7 @@ print(f"SQLALCHEMY_DATABASE_URI: {app.config['SQLALCHEMY_DATABASE_URI']}")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['REMEMBER_COOKIE_DURATION'] = timedelta(days=7)
 app.config['FLASK_SECRET_KEY'] = os.getenv('FLASK_SECRET_KEY')
+is_production_env = app.config['FLASK_ENV'] == 'production'
 
 if session_pooler:
     from sqlalchemy.pool import NullPool
@@ -77,23 +78,50 @@ else:
 app.config["SQLALCHEMY_ENGINE_OPTIONS"] = engine_options
 
 app.config.update(
-    # SESSION_COOKIE_SECURE=True,  # for HTTPS only
-    SESSION_COOKIE_SECURE=False,
+    SESSION_COOKIE_SECURE=is_production_env,
     SESSION_COOKIE_HTTPONLY=True,
     SESSION_COOKIE_SAMESITE='Lax',
-    # REMEMBER_COOKIE_SECURE=True,
-    REMEMBER_COOKIE_SECURE=False,
+    REMEMBER_COOKIE_SECURE=is_production_env,
     REMEMBER_COOKIE_HTTPONLY=True,
-    REMEMBER_COOKIE_SAMESITE='Lax'
+    REMEMBER_COOKIE_SAMESITE='Lax',
+    PERMANENT_SESSION_LIFETIME=timedelta(days=7),
 )
 
 db.init_app(app)
 migrate = Migrate(app, db)
 if os.getenv('FLASK_ENV') == 'production':
-    origins = ["https://www.rivue.ai", "https://rivue-s3xo7.ondigitalocean.app/"]
+    origins = ["https://www.rivue.ai", "https://rivue-s3xo7.ondigitalocean.app"]
 else:
     origins = "*"
 CORS(app, origins=origins, supports_credentials=True)
+
+# Skip auth in non-production by default (override with DISABLE_AUTH=false)
+DISABLE_AUTH = os.getenv(
+    "DISABLE_AUTH",
+    "true" if app.config["FLASK_ENV"] != "production" else "false"
+).lower() == "true"
+app.config["LOGIN_DISABLED"] = DISABLE_AUTH
+
+def get_or_create_guest_user():
+    """Create or fetch a reusable guest user for auth-free browsing."""
+    guest_email = os.getenv("GUEST_EMAIL", "guest@example.com")
+    guest_username = os.getenv("GUEST_USERNAME", "guest")
+
+    guest = db.session.query(User).filter_by(email=guest_email).first()
+    if guest:
+        return guest
+
+    guest = User(
+        email=guest_email,
+        username=guest_username,
+        first_name="Guest",
+        last_name="User",
+        password=None,
+        confirmed=True,
+    )
+    db.session.add(guest)
+    db.session.commit()
+    return guest
 
 
 
@@ -149,6 +177,22 @@ def enforce_scheme_and_host():
 
     if scheme != 'https' or host != target_host:
         return redirect(f"https://{target_host}{suffix}", code=308)
+
+@app.before_request
+def auto_login_guest_user():
+    """
+    When auth is disabled (development), silently log users in as a reusable guest
+    account so login_required routes and user_id checks keep working.
+    """
+    if not DISABLE_AUTH:
+        return None
+
+    if current_user.is_authenticated:
+        return None
+
+    guest_user = get_or_create_guest_user()
+    login_user(guest_user, remember=True, force=True)
+    return None
 
 class UserAlreadyMemberError(Exception):
     pass

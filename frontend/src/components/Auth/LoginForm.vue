@@ -110,13 +110,13 @@ const handleSubmit = () => {
     formData.append("password", password.value);
     formData.append("timezone", Intl.DateTimeFormat().resolvedOptions().timeZone);
 
-    axios.post("api/login", formData)
+    axios.post("/api/login", formData)
         .then(response => {
             if (response.status === 200) {
                 console.log(response)
                 const user: UserData = {
                     id: response.data.user.id,
-                    username: response.data.user.email,
+                    username: response.data.user.username ?? response.data.user.email,
                     firstName: response.data.user.first_name,
                     lastName: response.data.user.last_name,
                     current_streak: response.data.user.current_streak,

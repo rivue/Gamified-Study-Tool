@@ -232,15 +232,10 @@ const saveUsername = async () => {
 
 const logout = async () => {
     try {
-        const response = await axios.get("/api/logout");
-        if (response.data.status === "success") {
-            authStore.logout();
-            router.push("/");
-        } else {
-            popupStore.showPopup("Failed to logout.");
-        }
+        await authStore.logoutFromServer();
+        router.push("/login");
     } catch (error) {
-        popupStore.showPopup("Error logging out:");
+        popupStore.showPopup("Error logging out.");
     }
 };
 

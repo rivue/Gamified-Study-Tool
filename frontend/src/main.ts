@@ -11,6 +11,8 @@ import './assets/themes.css';
 import axios from 'axios';
 import { showExperimentsToast } from './utils/toasts';
 
+const DISABLE_AUTH = process.env.VUE_APP_DISABLE_AUTH === 'true' || process.env.NODE_ENV !== 'production';
+
 // basically main home page
 // { path: '/', component: defineAsyncComponent(() => import('./components/Footer/MainPage.vue')), meta: { title: Rivue.ai | Learn Anything!' } },
 
@@ -266,12 +268,26 @@ router.beforeEach(async (to, from, next) => {
     const loading = useLoadingStore()
     if (!from.matched.length) loading.start()
 
+    if (DISABLE_AUTH && !authStore.loggedIn) {
+        authStore.login({
+            id: authStore.user.id || 'guest',
+            username: authStore.user.username || 'guest',
+            firstName: authStore.user.firstName || 'Guest',
+            lastName: authStore.user.lastName || 'User',
+        });
+    }
+
+    if (!DISABLE_AUTH && !authStore.isAuthChecked) {
+        await authStore.checkAuth();
+    }
+
     const publicPaths = [
         '/',
         '/login',
         '/terms',
         '/contact',
         '/plan',
+        '/legal',
         '/legal/',
         '/verify', // Explicitly add /verify as a public path
         '/verify/', // Make /verify/ a public path
@@ -287,14 +303,13 @@ router.beforeEach(async (to, from, next) => {
         !isResetPasswordPath &&
         !isPublicVerifyPath;
 
-    if (to.meta.requiresCreator && to.params.id) {
+    if (!DISABLE_AUTH && to.meta.requiresCreator && to.params.id) {
         // Only proceed with this check if the user is logged in
         if (authStore.loggedIn) {
             try {
-                let user = 0;
                 const curr_user = await axios.get('/api/check-auth');
                 if (curr_user.data.userId) {
-                    user = curr_user.data.userId;
+                    // user is authenticated; continue to membership check below
                 } else {
                     return next('/login');
                 }
@@ -328,11 +343,11 @@ router.beforeEach(async (to, from, next) => {
         // Redirect authenticated users away from the login page
         
         next('/');
-    } else if (!authStore.loggedIn && requiresAuth) {
+    } else if (!DISABLE_AUTH && !authStore.loggedIn && requiresAuth) {
         // Redirect unauthenticated users to the login page with redirect to the intended page
         next({
             path: '/login',
-            query: { redirect: from.fullPath },
+            query: { redirect: to.fullPath },
         });
     } else {
         next();

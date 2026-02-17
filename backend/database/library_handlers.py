@@ -279,17 +279,21 @@ def get_library(library_id, user_id=None, click=True):
     library_data["unit_to_section_map"] = unit_to_section_map
     library_data["unit_to_position_map"] = unit_to_position_map
 
-    favorited_status = LibraryFavorites.query.filter_by(
-        user_id=user_id,
-        library_id=library_id
-    ).first()
+    favorited_status = None
+    if user_id:
+        favorited_status = LibraryFavorites.query.filter_by(
+            user_id=user_id,
+            library_id=library_id
+        ).first()
 
-    library_data["favorited_status"] = favorited_status.is_favorited
+    library_data["favorited_status"] = favorited_status.is_favorited if favorited_status else False
 
-    membership_status = LibraryMembership.query.filter_by(
-        user_id=user_id,
-        library_id=library_id
-    ).first()
+    membership_status = None
+    if user_id:
+        membership_status = LibraryMembership.query.filter_by(
+            user_id=user_id,
+            library_id=library_id
+        ).first()
     
     if membership_status:
         library_data["membership_status"] = True
